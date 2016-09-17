@@ -1,5 +1,6 @@
 package org.eclipse.persistence.json.bind.defaultmapping.basic;
 
+import org.eclipse.persistence.json.bind.defaultmapping.basic.model.BooleanModel;
 import org.eclipse.persistence.json.bind.defaultmapping.generics.model.GenericTestClass;
 import org.junit.Test;
 
@@ -19,25 +20,22 @@ public class BooleanTest {
 
     @Test
     public void testBooleanSerialization() throws Exception {
-        GenericTestClass<Boolean, Boolean> booleanModel = new GenericTestClass<>();
-        booleanModel.field1 = true;
-        booleanModel.field2 = false;
+        BooleanModel booleanModel = new BooleanModel(true, false);
+
         String expected = "{\"field1\":\"true\",\"field2\":\"false\"}";
         assertEquals(expected, jsonb.toJson(booleanModel));
     }
 
     @Test
     public void testBooleanDeserializationFromBooleanAsStringValue() throws Exception {
-        Type type = new GenericTestClass<Boolean, Boolean>(){}.getClass();
-        GenericTestClass<Boolean, Boolean> booleanModel = jsonb.fromJson("{\"field1\":\"true\",\"field2\":\"true\"}", type);
+        BooleanModel booleanModel = jsonb.fromJson("{\"field1\":\"true\",\"field2\":\"true\"}", BooleanModel.class);
         assertEquals(booleanModel.field1, true);
         assertEquals(booleanModel.field2, true);
     }
 
     @Test
     public void testBooleanDeserializationFromBooleanRawValue() throws Exception {
-        Type type = new GenericTestClass<Boolean, Boolean>(){}.getClass();
-        GenericTestClass<Boolean, Boolean> booleanModel = jsonb.fromJson("{\"field1\":false,\"field2\":false}", type);
+        BooleanModel booleanModel = jsonb.fromJson("{\"field1\":false,\"field2\":false}", BooleanModel.class);
         assertEquals(booleanModel.field1, false);
         assertEquals(booleanModel.field2, false);
     }
