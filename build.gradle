@@ -4,12 +4,12 @@ apply plugin: 'signing'
 apply plugin: 'idea'
 apply plugin: 'findbugs'
 
-group = "org.eclipse.persistence"
+group = "org.eclipse"
 version = "1.0-SNAPSHOT"
 
 jar {
-    name = "jsonb-ri"
-    archivesBaseName = "jsonb-ri"
+    name = "yasson"
+    archivesBaseName = "yasson"
     version =  '1.0-SNAPSHOT'
 }
 
@@ -57,13 +57,12 @@ dependencies {
     testCompile 'org.openjdk.jmh:jmh-core:0.9.3';
     testCompile 'org.jboss.weld:weld-core:2.3.3.Final';
     testCompile 'org.jboss.weld.se:weld-se:2.3.3.Final';
-
 }
 
 test {
     if (!project.hasProperty('1.1')) {
         println 'Single value tests excluded'
-        exclude 'org/eclipse/persistence/json/bind/defaultmapping/basic/SingleValueTest.class'
+        exclude 'org/eclipse/yasson/defaultmapping/basic/SingleValueTest.class'
     }
 }
 
@@ -117,16 +116,16 @@ if (project.hasProperty("deployOSS")) {
                 }
 
                 pom.project {
-                    name 'jsonb-ri'
+                    name 'yasson'
                     packaging 'jar'
                     // optionally artifactId can be defined here
                     description 'Reference implementation of JSR-367'
 //                url 'http://www.example.com/example-application'
 
                     scm {
-                        connection 'scm:git://git.eclipse.org/gitroot/eclipselink/eclipselink.runtime.git'
-                        developerConnection 'scm:ssh://git.eclipse.org/gitroot/eclipselink/eclipselink.runtime.git'
-                        url 'http://git.eclipse.org/c/eclipselink/eclipselink.runtime.git'
+                        connection 'scm:git://git@github.com:eclipse/yasson.git'
+                        developerConnection 'scm:ssh://git@github.com:eclipse/yasson.git'
+                        url 'https://github.com/eclipse/yasson.git'
                     }
 
                     licenses {
