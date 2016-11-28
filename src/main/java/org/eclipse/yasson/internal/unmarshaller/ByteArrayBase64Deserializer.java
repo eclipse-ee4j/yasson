@@ -13,7 +13,6 @@
 
 package org.eclipse.yasson.internal.unmarshaller;
 
-import org.eclipse.yasson.internal.ProcessingContext;
 import org.eclipse.yasson.internal.Unmarshaller;
 import org.eclipse.yasson.internal.properties.MessageKeys;
 import org.eclipse.yasson.internal.properties.Messages;
@@ -38,11 +37,10 @@ public class ByteArrayBase64Deserializer extends AbstractValueTypeDeserializer<b
 
     @Override
     protected byte[] deserialize(String jsonValue, Unmarshaller unmarshaller, Type rtType) {
-        return getDecoder().decode(jsonValue);
+        return getDecoder(unmarshaller.getJsonbContext().getBinaryDataStrategy()).decode(jsonValue);
     }
 
-    private Base64.Decoder getDecoder() {
-        final String strategy = ProcessingContext.getJsonbContext().getBinaryDataStrategy();
+    private Base64.Decoder getDecoder(String strategy) {
         switch (strategy) {
             case BinaryDataStrategy.BASE_64:
                 return Base64.getDecoder();

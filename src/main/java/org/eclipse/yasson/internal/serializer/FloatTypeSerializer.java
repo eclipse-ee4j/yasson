@@ -13,7 +13,7 @@
 
 package org.eclipse.yasson.internal.serializer;
 
-import org.eclipse.yasson.model.SerializerBindingModel;
+import org.eclipse.yasson.model.JsonBindingModel;
 
 import javax.json.stream.JsonGenerator;
 
@@ -22,7 +22,7 @@ import javax.json.stream.JsonGenerator;
  */
 public class FloatTypeSerializer extends AbstractNumberSerializer<Float> {
 
-    public FloatTypeSerializer(SerializerBindingModel model) {
+    public FloatTypeSerializer(JsonBindingModel model) {
         super(Float.class, model);
     }
 

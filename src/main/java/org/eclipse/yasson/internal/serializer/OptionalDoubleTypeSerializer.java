@@ -13,7 +13,8 @@
 
 package org.eclipse.yasson.internal.serializer;
 
-import org.eclipse.yasson.model.SerializerBindingModel;
+import org.eclipse.yasson.internal.Marshaller;
+import org.eclipse.yasson.model.JsonBindingModel;
 
 import javax.json.stream.JsonGenerator;
 import java.util.OptionalDouble;
@@ -23,24 +24,24 @@ import java.util.OptionalDouble;
  */
 public class OptionalDoubleTypeSerializer extends AbstractValueTypeSerializer<OptionalDouble> {
 
-    public OptionalDoubleTypeSerializer(SerializerBindingModel model) {
-        super(OptionalDouble.class, model);
+    public OptionalDoubleTypeSerializer(JsonBindingModel model) {
+        super(model);
     }
 
     @Override
-    protected void serialize(OptionalDouble obj, JsonGenerator generator, String key) {
+    protected void serialize(OptionalDouble obj, JsonGenerator generator, String key, Marshaller marshaller) {
         if (obj.isPresent()) {
             generator.write(key, obj.getAsDouble());
-        } else {
+        } else if (model.getCustomization().isNillable()) {
             generator.writeNull(key);
         }
     }
 
     @Override
-    protected void serialize(OptionalDouble obj, JsonGenerator generator) {
+    protected void serialize(OptionalDouble obj, JsonGenerator generator, Marshaller marshaller) {
         if (obj.isPresent()) {
             generator.write(obj.getAsDouble());
-        } else {
+        } else if (model.getCustomization().isNillable()) {
             generator.writeNull();
         }
     }

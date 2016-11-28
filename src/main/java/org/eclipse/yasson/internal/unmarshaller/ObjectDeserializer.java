@@ -14,7 +14,6 @@ package org.eclipse.yasson.internal.unmarshaller;
 
 import org.eclipse.yasson.internal.JsonbParser;
 import org.eclipse.yasson.internal.JsonbRiParser;
-import org.eclipse.yasson.internal.ProcessingContext;
 import org.eclipse.yasson.internal.ReflectionUtils;
 import org.eclipse.yasson.internal.Unmarshaller;
 import org.eclipse.yasson.model.ClassModel;
@@ -78,10 +77,11 @@ class ObjectDeserializer<T> extends AbstractContainerDeserializer<T> {
      * which is transferred into instance values by calling getInstance.
      *
      * @return instance
+     * @param unmarshaller
      */
     @Override
     @SuppressWarnings("unchecked")
-    public T getInstance() {
+    public T getInstance(Unmarshaller unmarshaller) {
         if (instance != null) {
             return instance;
         }
@@ -90,7 +90,7 @@ class ObjectDeserializer<T> extends AbstractContainerDeserializer<T> {
         instance = creator != null ? createInstance((Class<T>) rawType, creator)
                 : ReflectionUtils.createNoArgConstructorInstance((Class<T>) rawType);
 
-        for(Iterator<ClassModel> classModelIterator = ProcessingContext.getMappingContext().classModelIterator(rawType); classModelIterator.hasNext();) {
+        for(Iterator<ClassModel> classModelIterator = unmarshaller.getMappingContext().classModelIterator(rawType); classModelIterator.hasNext();) {
             classModelIterator.next().getProperties().entrySet().stream()
                     .filter((entry)->creator == null || !creator.contains(entry.getKey()))
                     .forEach((entry)->{
@@ -136,7 +136,7 @@ class ObjectDeserializer<T> extends AbstractContainerDeserializer<T> {
         }
 
         //create current item instance of identified object field
-        final JsonbDeserializer<?> deserializer = newUnmarshallerItemBuilder().
+        final JsonbDeserializer<?> deserializer = newUnmarshallerItemBuilder(context.getJsonbContext()).
                 withModel(newPropertyModel).build();
 
         Object result = deserializer.deserialize(parser, context, newPropertyModel.getPropertyType());

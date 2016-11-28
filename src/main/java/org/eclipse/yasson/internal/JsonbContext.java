@@ -14,6 +14,7 @@
 package org.eclipse.yasson.internal;
 
 import org.eclipse.yasson.internal.cdi.JsonbComponentInstanceCreator;
+import org.eclipse.yasson.internal.cdi.JsonbComponentInstanceCreatorFactory;
 import org.eclipse.yasson.internal.internalOrdering.AnyOrderStrategy;
 import org.eclipse.yasson.internal.internalOrdering.LexicographicalOrderStrategy;
 import org.eclipse.yasson.internal.internalOrdering.PropOrderStrategy;
@@ -33,16 +34,13 @@ import javax.json.bind.config.PropertyOrderStrategy;
 import javax.json.bind.config.PropertyVisibilityStrategy;
 import javax.json.spi.JsonProvider;
 import java.time.format.DateTimeFormatter;
-import java.util.Collections;
-import java.util.HashMap;
 import java.util.Locale;
-import java.util.Map;
 import java.util.Objects;
 import java.util.Optional;
 
 /**
- * Context holding effectively immutable objects per JSONB configuration.
- * Thread safe
+ * Jsonb context holding central components and configuration of jsonb runtime. Scoped to instance of Jsonb runtime.
+ * Thread safe.
  *
  * @author Roman Grigoriadi
  */
@@ -62,40 +60,54 @@ public class JsonbContext {
 
     private final ComponentMatcher componentMatcher;
 
-    private final Map<String, PropOrderStrategy> orderStrategies;
-
     private final JsonbDateFormatter dateFormatter;
+
+    private final AnnotationIntrospector annotationIntrospector;
+
+    private final PropertyOrdering propertyOrdering;
+
+    private boolean genericComponents;
 
     /**
      * Creates and initialize context.
      *
-     * @param componentInstanceCreator implementation for creating components such as custom adapters or strategies
-     * @param mappingContext mapping context not null
      * @param jsonbConfig jsonb jsonbConfig not null
      * @param jsonProvider provider of JSONP
      */
-    public JsonbContext(MappingContext mappingContext, JsonbConfig jsonbConfig, JsonbComponentInstanceCreator componentInstanceCreator, JsonProvider jsonProvider) {
+    public JsonbContext(JsonbConfig jsonbConfig, JsonProvider jsonProvider) {
         Objects.requireNonNull(jsonbConfig);
-        Objects.requireNonNull(mappingContext);
-        Objects.requireNonNull(componentInstanceCreator);
         this.jsonbConfig = jsonbConfig;
-        this.mappingContext = mappingContext;
-        this.componentInstanceCreator = componentInstanceCreator;
+        this.mappingContext = new MappingContext(this);
+        this.componentInstanceCreator = JsonbComponentInstanceCreatorFactory.getComponentInstanceCreator();
+        this.componentMatcher = new ComponentMatcher(this);
+        this.annotationIntrospector = new AnnotationIntrospector(this);
         this.propertyNamingStrategy = resolvePropertyNamingStrategy();
         this.propertyVisibilityStrategy = resolvePropertyVisibilityStrategy();
         this.jsonProvider = jsonProvider;
-        this.orderStrategies = initOrderStrategies();
-        this.componentMatcher = new ComponentMatcher();
-        this.componentMatcher.init(this);
+        this.propertyOrdering = new PropertyOrdering(initOrderStrategy());
         this.dateFormatter = initDateFormatter();
     }
 
-    private Map<String, PropOrderStrategy> initOrderStrategies() {
-        Map<String, PropOrderStrategy> strategies = new HashMap<>();
-        strategies.put(PropertyOrderStrategy.LEXICOGRAPHICAL, new LexicographicalOrderStrategy());
-        strategies.put(PropertyOrderStrategy.REVERSE, new ReverseOrderStrategy());
-        strategies.put(PropertyOrderStrategy.ANY, new AnyOrderStrategy());
-        return Collections.unmodifiableMap(strategies);
+    private PropOrderStrategy initOrderStrategy() {
+        final Optional<Object> property = jsonbConfig.getProperty(JsonbConfig.PROPERTY_ORDER_STRATEGY);
+        if (property.isPresent()) {
+            final Object strategy = property.get();
+            if (!(strategy instanceof String)) {
+                throw new JsonbException(Messages.getMessage(MessageKeys.PROPERTY_ORDER, strategy));
+            }
+            switch ((String) strategy) {
+                case PropertyOrderStrategy.LEXICOGRAPHICAL:
+                    return new LexicographicalOrderStrategy();
+                case PropertyOrderStrategy.REVERSE:
+                    return new ReverseOrderStrategy();
+                case PropertyOrderStrategy.ANY:
+                    return new AnyOrderStrategy();
+                default:
+                    throw new JsonbException(Messages.getMessage(MessageKeys.PROPERTY_ORDER, strategy));
+            }
+        }
+        //default by spec
+        return new LexicographicalOrderStrategy();
     }
 
     private PropertyNamingStrategy resolvePropertyNamingStrategy() {
@@ -189,15 +201,6 @@ public class JsonbContext {
     }
 
     /**
-     * Property order strategies for serializers.
-     *
-     * @return property order strategies
-     */
-    public Map<String, PropOrderStrategy> getOrderStrategies() {
-        return orderStrategies;
-    }
-
-    /**
      * Checks for binary data strategy to use.
      *
      * @return binary data strategy
@@ -264,5 +267,39 @@ public class JsonbContext {
      */
     public JsonbDateFormatter getConfigDateFormatter() {
         return dateFormatter;
+    }
+
+    /**
+     * Component for annotation parsing.
+     *
+     * @return annotation introspector
+     */
+    public AnnotationIntrospector getAnnotationIntrospector() {
+        return annotationIntrospector;
+    }
+
+    /**
+     * Property ordering component.
+     *
+     * @return component for ordering properties
+     */
+    public PropertyOrdering getPropertyOrdering() {
+        return propertyOrdering;
+    }
+
+    /**
+     * Flag for searching for generic serializers and adapters in runtime.
+     *
+     * @return true if generic components are present
+     */
+    public boolean genericComponentsPresent() {
+        return genericComponents;
+    }
+
+    /**
+     * Set flag for searching for generic serializers and adapters in runtime.
+     */
+    public void registerGenericComponentFlag() {
+        this.genericComponents = true;
     }
 }

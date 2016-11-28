@@ -13,7 +13,7 @@
 
 package org.eclipse.yasson.internal.serializer;
 
-import org.eclipse.yasson.model.SerializerBindingModel;
+import org.eclipse.yasson.model.JsonBindingModel;
 
 import javax.json.stream.JsonGenerator;
 import java.math.BigInteger;
@@ -24,7 +24,7 @@ import java.math.BigInteger;
  */
 public class BigIntegerTypeSerializer extends AbstractNumberSerializer<BigInteger> {
 
-    public BigIntegerTypeSerializer(SerializerBindingModel model) {
+    public BigIntegerTypeSerializer(JsonBindingModel model) {
         super(BigInteger.class, model);
     }
 

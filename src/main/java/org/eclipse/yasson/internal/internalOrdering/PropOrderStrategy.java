@@ -14,6 +14,7 @@ package org.eclipse.yasson.internal.internalOrdering;
 
 import org.eclipse.yasson.model.PropertyModel;
 
+import java.util.Collection;
 import java.util.List;
 
 /**
@@ -21,7 +22,8 @@ import java.util.List;
  *
  * @author David Kral
  */
-public interface PropOrderStrategy {
+public abstract class PropOrderStrategy {
+
 
     /**
      * Sorts properties
@@ -29,6 +31,6 @@ public interface PropOrderStrategy {
      * @param properties properties for ordering
      * @return sorted List of properties
      */
-    List<PropertyModel> sortProperties(List<PropertyModel> properties);
+    public abstract List<PropertyModel> sortProperties(Collection<PropertyModel> properties);
 
 }

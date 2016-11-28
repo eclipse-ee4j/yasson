@@ -64,27 +64,23 @@ public class PolymorphismAdapterTest {
 
     @Test
     public void testPolymorphic() {
-        Dog ralph = new Dog();
-        ralph.name = "Ralph";
-        ralph.dogProperty = "Property of a Dog.";
-
-        Dog cassidy = new Dog();
-        cassidy.name = "Cassidy";
-        cassidy.dogProperty = "Property of a Dog.";
+        Dog dog = new Dog();
+        dog.name = "Ralph";
+        dog.dogProperty = "Property of a Dog.";
+        Pojo pojo = new Pojo();
+        pojo.animal = dog;
 
         Cat cat = new Cat();
-        cat.name = "Harris";
+        cat.name = "Snowball";
         cat.catProperty = "Property of a Cat.";
-
-        Pojo pojo = new Pojo();
-        pojo.animal = ralph;
         pojo.listOfAnimals.add(cat);
-        pojo.listOfAnimals.add(cassidy);
+        pojo.listOfAnimals.add(dog);
 
-        final String expected = "{\"animal\":{\"className\":\"org.eclipse.yasson.adapters.PolymorphismAdapterTest$Dog\",\"instance\":{\"name\":\"Ralph\",\"dogProperty\":\"Property of a Dog.\"}},\"listOfAnimals\":[{\"className\":\"org.eclipse.yasson.adapters.PolymorphismAdapterTest$Cat\",\"instance\":{\"name\":\"Harris\",\"catProperty\":\"Property of a Cat.\"}},{\"className\":\"org.eclipse.yasson.adapters.PolymorphismAdapterTest$Dog\",\"instance\":{\"name\":\"Cassidy\",\"dogProperty\":\"Property of a Dog.\"}}]}";
+        final String expected = "{\"animal\":{\"className\":\"org.eclipse.yasson.adapters.PolymorphismAdapterTest$Dog\",\"instance\":{\"name\":\"Ralph\",\"dogProperty\":\"Property of a Dog.\"}},\"listOfAnimals\":[{\"className\":\"org.eclipse.yasson.adapters.PolymorphismAdapterTest$Cat\",\"instance\":{\"name\":\"Snowball\",\"catProperty\":\"Property of a Cat.\"}},{\"className\":\"org.eclipse.yasson.adapters.PolymorphismAdapterTest$Dog\",\"instance\":{\"name\":\"Ralph\",\"dogProperty\":\"Property of a Dog.\"}}]}";
 
         JsonbConfig config = new JsonbConfig();
         config.withAdapters(new AnimalAdapter());
+//        config.withFormatting(true);
         Jsonb jsonb = JsonbBuilder.create(config);
         String json = jsonb.toJson(pojo);
 
@@ -96,17 +92,17 @@ public class PolymorphismAdapterTest {
         assertEquals("Property of a Dog.", ((Dog)result.animal).dogProperty);
         assertEquals(2, result.listOfAnimals.size());
         assertEquals(Cat.class, result.listOfAnimals.get(0).getClass());
-        assertEquals("Harris", result.listOfAnimals.get(0).name);
+        assertEquals("Snowball", result.listOfAnimals.get(0).name);
         assertEquals("Property of a Cat.", ((Cat)result.listOfAnimals.get(0)).catProperty);
         assertEquals(Dog.class, result.listOfAnimals.get(1).getClass());
-        assertEquals("Cassidy", result.listOfAnimals.get(1).name);
+        assertEquals("Ralph", result.listOfAnimals.get(1).name);
         assertEquals("Property of a Dog.", ((Dog)result.listOfAnimals.get(1)).dogProperty);
 
         /*
         Produces following JSON:
         {
             "animal":{
-                "className":"org.eclipse.yasson.adapters.PolymorphismAdapterTest$Dog",
+                "className":"PolymorphismAdapterTest$Dog",
                 "instance":{
                     "name":"Ralph",
                     "dogProperty":"Property of a Dog."
@@ -114,16 +110,16 @@ public class PolymorphismAdapterTest {
             },
             "listOfAnimals":[
                 {
-                    "className":"org.eclipse.yasson.adapters.PolymorphismAdapterTest$Cat",
+                    "className":"PolymorphismAdapterTest$Cat",
                     "instance":{
-                        "name":"Harris",
+                        "name":"Snowball",
                         "catProperty":"Property of a Cat."
                     }
                 },
                 {
-                    "className":"org.eclipse.yasson.adapters.PolymorphismAdapterTest$Dog",
+                    "className":"PolymorphismAdapterTest$Dog",
                     "instance":{
-                        "name":"Cassidy",
+                        "name":"Ralph",
                         "dogProperty":"Property of a Dog."
                     }
                 }
@@ -137,17 +133,18 @@ public class PolymorphismAdapterTest {
      */
     @Test()
     public void testClassLoadNotAllowed() {
-        final String expected = "{\"animal\":{\"className\":\"PolymorphismAdapterTest$Dog\",\"instance\":{\"name\":\"Ralph\",\"dogProperty\":\"Property of a Dog.\"}},\"listOfAnimals\":[{\"className\":\"PolymorphismAdapterTest$Cat\",\"instance\":{\"name\":\"Harris\",\"catProperty\":\"Property of a Cat.\"}},{\"className\":\"PolymorphismAdapterTest$Dog\",\"instance\":{\"name\":\"Ralph\",\"dogProperty\":\"Property of a Dog.\"}}]}";
+        final String expected = "{\"animal\":{\"className\":\"org.eclipse.yasson.adapters.PolymorphismAdapterTest$Dog\",\"instance\":{\"name\":\"Ralph\",\"dogProperty\":\"Property of a Dog.\"}},\"listOfAnimals\":[{\"className\":\"org.eclipse.yasson.adapters.PolymorphismAdapterTest$Cat\",\"instance\":{\"name\":\"Snowball\",\"catProperty\":\"Property of a Cat.\"}},{\"className\":\"org.eclipse.yasson.adapters.PolymorphismAdapterTest$Dog\",\"instance\":{\"name\":\"Ralph\",\"dogProperty\":\"Property of a Dog.\"}}]}";
 
         JsonbConfig config = new JsonbConfig();
-        config.withAdapters(new PolymorphismAdapter<Animal>(Cat.class){}); // Dog.class missing and allowedClasses is not empty.
+        config.withAdapters(new PolymorphismAdapter<Animal>(Cat.class){}); //Dog.class missing and allowed classes are not empty.
+//        config.withFormatting(true);
         Jsonb jsonb = JsonbBuilder.create(config);
 
         try {
-            jsonb.fromJson(expected, Pojo.class);
+            Pojo pojo = jsonb.fromJson(expected, Pojo.class);
             fail("Should throw class load not allowed");
         } catch (JsonbException e) {
-            Assert.assertEquals(Messages.getMessage(MessageKeys.CLASS_LOAD_NOT_ALLOWED, "PolymorphismAdapterTest$Dog"), e.getCause().getMessage());
+            Assert.assertEquals(Messages.getMessage(MessageKeys.CLASS_LOAD_NOT_ALLOWED, Dog.class.getName()), e.getCause().getMessage());
         }
     }
 }

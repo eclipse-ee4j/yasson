@@ -13,7 +13,7 @@
 
 package org.eclipse.yasson.internal.unmarshaller;
 
-import org.eclipse.yasson.internal.ProcessingContext;
+import org.eclipse.yasson.internal.Unmarshaller;
 
 import javax.json.JsonObject;
 import javax.json.JsonObjectBuilder;
@@ -36,7 +36,7 @@ public class JsonObjectDeserializer extends AbstractJsonpDeserializer<JsonObject
      */
     protected JsonObjectDeserializer(DeserializerBuilder builder) {
         super(builder);
-        objectBuilder = ProcessingContext.getJsonbContext().getJsonProvider().createObjectBuilder();
+        objectBuilder = builder.getJsonbContext().getJsonProvider().createObjectBuilder();
     }
 
     @Override
@@ -65,7 +65,7 @@ public class JsonObjectDeserializer extends AbstractJsonpDeserializer<JsonObject
     }
 
     @Override
-    public JsonObject getInstance() {
+    public JsonObject getInstance(Unmarshaller unmarshaller) {
         return objectBuilder.build();
     }
 }

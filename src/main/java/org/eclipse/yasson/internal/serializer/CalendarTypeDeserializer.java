@@ -14,7 +14,6 @@
 package org.eclipse.yasson.internal.serializer;
 
 import org.eclipse.yasson.internal.JsonbContext;
-import org.eclipse.yasson.internal.ProcessingContext;
 import org.eclipse.yasson.internal.Unmarshaller;
 import org.eclipse.yasson.model.JsonBindingModel;
 
@@ -74,7 +73,7 @@ public class CalendarTypeDeserializer extends AbstractValueTypeDeserializer<Cale
 
     @Override
     protected Calendar deserialize(String jsonValue, Unmarshaller unmarshaller, Type rtType) {
-        final JsonbContext jsonbContext = ProcessingContext.getJsonbContext();
+        final JsonbContext jsonbContext = unmarshaller.getJsonbContext();
         final JsonbDateFormatter formatter = jsonbContext.getComponentMatcher().getDateFormatter(model);
         Calendar result = (Calendar) calendarTemplate.clone();
         final String format = formatter.getFormat();

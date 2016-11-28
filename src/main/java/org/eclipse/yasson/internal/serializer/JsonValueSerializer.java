@@ -13,7 +13,8 @@
 
 package org.eclipse.yasson.internal.serializer;
 
-import org.eclipse.yasson.model.SerializerBindingModel;
+import org.eclipse.yasson.internal.Marshaller;
+import org.eclipse.yasson.model.JsonBindingModel;
 
 import javax.json.JsonValue;
 import javax.json.stream.JsonGenerator;
@@ -25,17 +26,17 @@ import javax.json.stream.JsonGenerator;
  */
 public class JsonValueSerializer extends AbstractValueTypeSerializer<JsonValue> {
 
-    public JsonValueSerializer(SerializerBindingModel model) {
-        super(JsonValue.class, model);
+    public JsonValueSerializer(JsonBindingModel model) {
+        super(model);
     }
 
     @Override
-    protected void serialize(JsonValue obj, JsonGenerator generator, String key) {
+    protected void serialize(JsonValue obj, JsonGenerator generator, String key, Marshaller marshaller) {
         generator.write(key, obj);
     }
 
     @Override
-    protected void serialize(JsonValue obj, JsonGenerator generator) {
+    protected void serialize(JsonValue obj, JsonGenerator generator, Marshaller marshaller) {
         generator.write(obj);
     }
 }

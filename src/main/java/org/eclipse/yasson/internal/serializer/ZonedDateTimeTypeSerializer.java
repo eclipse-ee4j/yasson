@@ -13,7 +13,7 @@
 
 package org.eclipse.yasson.internal.serializer;
 
-import org.eclipse.yasson.model.SerializerBindingModel;
+import org.eclipse.yasson.model.JsonBindingModel;
 
 import java.time.Instant;
 import java.time.ZonedDateTime;
@@ -29,7 +29,7 @@ public class ZonedDateTimeTypeSerializer extends AbstractDateTimeSerializer<Zone
     private static final Logger log = Logger.getLogger(ZonedDateTimeTypeSerializer.class.getName());
 
 
-    public ZonedDateTimeTypeSerializer(SerializerBindingModel model) {
+    public ZonedDateTimeTypeSerializer(JsonBindingModel model) {
         super(ZonedDateTime.class, model);
     }
 

@@ -13,7 +13,7 @@
 
 package org.eclipse.yasson.internal.serializer;
 
-import org.eclipse.yasson.model.SerializerBindingModel;
+import org.eclipse.yasson.model.JsonBindingModel;
 
 import javax.json.stream.JsonGenerator;
 import java.math.BigDecimal;
@@ -24,7 +24,7 @@ import java.math.BigDecimal;
  */
 public class BigDecimalTypeSerializer extends AbstractNumberSerializer<BigDecimal> {
 
-    public BigDecimalTypeSerializer(SerializerBindingModel model) {
+    public BigDecimalTypeSerializer(JsonBindingModel model) {
         super(BigDecimal.class, model);
     }
 

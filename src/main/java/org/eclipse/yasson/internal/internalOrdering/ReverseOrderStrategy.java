@@ -14,6 +14,8 @@ package org.eclipse.yasson.internal.internalOrdering;
 
 import org.eclipse.yasson.model.PropertyModel;
 
+import java.util.Collection;
+import java.util.Comparator;
 import java.util.List;
 
 import static java.util.stream.Collectors.toList;
@@ -23,11 +25,15 @@ import static java.util.stream.Collectors.toList;
  *
  * @author David Kral
  */
-public class ReverseOrderStrategy implements PropOrderStrategy {
+public class ReverseOrderStrategy extends PropOrderStrategy implements Comparator<PropertyModel> {
 
     @Override
-    public List<PropertyModel> sortProperties(List<PropertyModel> properties) {
-        return properties.stream().sorted((object1, object2) -> object2.getJsonWriteName().compareTo(object1.getJsonWriteName())).collect(toList());
+    public List<PropertyModel> sortProperties(Collection<PropertyModel> properties) {
+        return properties.stream().sorted(this).collect(toList());
     }
 
+    @Override
+    public int compare(PropertyModel object1, PropertyModel object2) {
+        return object2.getWriteName().compareTo(object1.getWriteName());
+    }
 }

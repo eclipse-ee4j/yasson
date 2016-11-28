@@ -100,14 +100,14 @@ public class UnmarshallingUnsupportedTypesTest {
     public void testPojoAsScalarValue() {
         //wrong, nestedPojo is a value.
         String json  = "{\"nestedPojo\":\"10\",\"optionalLong\":11}";
-        assertFail(json, SupportedTypes.class, "Error deserialize JSON value into type");
+        assertFail(json, SupportedTypes.class, "Error deserialize JSON value into type: class org.eclipse.yasson.defaultmapping.specific.model.SupportedTypes$NestedPojo");
     }
 
     @Test
     public void testPojoAsArray() {
         //wrong, nestedPojo is a collection.
         String json  = "{\"nestedPojo\":[\"10\"],\"optionalLong\":11}";
-        assertFail(json, SupportedTypes.class, "Can't deserialize JSON array into: class ");
+        assertFail(json, SupportedTypes.class, "Can't deserialize JSON array into: class org.eclipse.yasson.defaultmapping.specific.model.SupportedTypes$NestedPojo");
     }
 
     @Test

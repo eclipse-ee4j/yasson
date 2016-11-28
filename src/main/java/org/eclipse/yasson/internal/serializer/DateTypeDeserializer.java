@@ -13,7 +13,6 @@
 
 package org.eclipse.yasson.internal.serializer;
 
-import org.eclipse.yasson.internal.ProcessingContext;
 import org.eclipse.yasson.internal.Unmarshaller;
 import org.eclipse.yasson.internal.properties.MessageKeys;
 import org.eclipse.yasson.internal.properties.Messages;
@@ -26,6 +25,7 @@ import java.text.DateFormat;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.Date;
+import java.util.Locale;
 
 /**
  * @author David Král
@@ -37,22 +37,22 @@ public class DateTypeDeserializer extends AbstractValueTypeDeserializer<Date> {
         super(Date.class, model);
     }
 
-    private DateFormat getDateFormat(JsonbDateFormatter formatter) {
+    private DateFormat getDateFormat(JsonbDateFormatter formatter, Locale locale) {
         if (JsonbDateFormat.DEFAULT_FORMAT.equals(formatter.getFormat())) {
-            return new SimpleDateFormat(JsonbDateFormatter.ISO_8601_DATE_TIME_FORMAT, ProcessingContext.getJsonbContext().getLocale(formatter.getLocale()));
+            return new SimpleDateFormat(JsonbDateFormatter.ISO_8601_DATE_TIME_FORMAT, locale);
         }
-        return new SimpleDateFormat(formatter.getFormat(), ProcessingContext.getJsonbContext().getLocale(formatter.getLocale()));
+        return new SimpleDateFormat(formatter.getFormat(), locale);
     }
 
 
     @Override
     protected Date deserialize(String jsonValue, Unmarshaller unmarshaller, Type rtType) {
 
-        final JsonbDateFormatter dateFormatter = ProcessingContext.getJsonbContext().getComponentMatcher().getDateFormatter(model);
+        final JsonbDateFormatter dateFormatter = unmarshaller.getJsonbContext().getComponentMatcher().getDateFormatter(model);
         if(JsonbDateFormat.TIME_IN_MILLIS.equals(dateFormatter.getFormat())) {
             return new Date(Long.parseLong(jsonValue));
         }
-        final DateFormat dateFormat = getDateFormat(dateFormatter);
+        final DateFormat dateFormat = getDateFormat(dateFormatter, unmarshaller.getJsonbContext().getLocale(dateFormatter.getLocale()));
         try {
             return dateFormat.parse(jsonValue);
         } catch (ParseException e) {

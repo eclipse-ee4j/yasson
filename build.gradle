@@ -40,29 +40,21 @@ repositories {
 
 dependencies {
     compile 'javax.json.bind:javax.json.bind-api:1.0-SNAPSHOT'
-    compile 'javax.json:javax.json-api:1.0'
+    compile 'javax.json:javax.json-api:1.1.0-SNAPSHOT'
     compile 'javax.enterprise:cdi-api:1.2'
 
-    if (project.hasProperty('1.1')) {
-        println '1.1'
-        testRuntime 'org.glassfish:javax.json:1.1.0-SNAPSHOT'
-    } else {
-        println '1.0'
-        testRuntime 'org.glassfish:javax.json:1.0.4'
-    }
+    testRuntime 'org.glassfish:javax.json:1.1.0-SNAPSHOT'
 
-    testCompile 'org.openjdk.jmh:jmh-core:0.9.3'
-    testCompile 'org.openjdk.jmh:jmh-generator-annprocess:0.9.3'
     testCompile 'junit:junit:4.12'
-    testCompile 'org.openjdk.jmh:jmh-core:0.9.3';
     testCompile 'org.jboss.weld:weld-core:2.3.3.Final';
     testCompile 'org.jboss.weld.se:weld-se:2.3.3.Final';
+
 }
 
 test {
     if (!project.hasProperty('1.1')) {
         println 'Single value tests excluded'
-        exclude 'org/eclipse/yasson/defaultmapping/basic/SingleValueTest.class'
+        exclude 'org/eclipse/persistence/json/bind/defaultmapping/basic/SingleValueTest.class'
     }
 }
 
@@ -100,8 +92,10 @@ artifacts {
     sign configurations.archives
 }*/
 
+// use ./gradlew upload -PdeployOSS
 if (project.hasProperty("deployOSS")) {
 
+    println 'Deploying to OSS';
     uploadArchives {
         repositories {
             mavenDeployer {

@@ -13,7 +13,8 @@
 
 package org.eclipse.yasson.internal.serializer;
 
-import org.eclipse.yasson.model.SerializerBindingModel;
+import org.eclipse.yasson.internal.Marshaller;
+import org.eclipse.yasson.model.JsonBindingModel;
 
 import javax.json.stream.JsonGenerator;
 import java.time.ZoneOffset;
@@ -23,17 +24,17 @@ import java.time.ZoneOffset;
  */
 public class ZoneOffsetTypeSerializer extends AbstractValueTypeSerializer<ZoneOffset> {
 
-    public ZoneOffsetTypeSerializer(SerializerBindingModel model) {
-        super(ZoneOffset.class, model);
+    public ZoneOffsetTypeSerializer(JsonBindingModel model) {
+        super(model);
     }
 
     @Override
-    protected void serialize(ZoneOffset obj, JsonGenerator generator, String key) {
+    protected void serialize(ZoneOffset obj, JsonGenerator generator, String key, Marshaller marshaller) {
         generator.write(key, obj.getId());
     }
 
     @Override
-    protected void serialize(ZoneOffset obj, JsonGenerator generator) {
+    protected void serialize(ZoneOffset obj, JsonGenerator generator, Marshaller marshaller) {
         generator.write(obj.getId());
     }
 }

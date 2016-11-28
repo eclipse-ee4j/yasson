@@ -12,6 +12,7 @@
  ******************************************************************************/
 package org.eclipse.yasson.defaultmapping.dates;
 
+import org.eclipse.yasson.TestTypeToken;
 import org.eclipse.yasson.defaultmapping.dates.model.CalendarPojo;
 import org.eclipse.yasson.defaultmapping.dates.model.ClassLevelDateAnnotation;
 import org.eclipse.yasson.defaultmapping.dates.model.DatePojo;
@@ -263,7 +264,7 @@ public class DatesTest {
         String expected = "{\"value\":\"2015-02-16T13:21:00\"}";
         assertEquals(expected, jsonb.toJson(pojo));
 
-        ScalarValueWrapper<LocalDateTime> result = jsonb.fromJson(expected, new ScalarValueWrapper<LocalDateTime>() {}.getClass());
+        ScalarValueWrapper<LocalDateTime> result = jsonb.fromJson(expected, new TestTypeToken<ScalarValueWrapper<LocalDateTime>>(){}.getType());
         assertEquals(dateTime, result.getValue());
     }
 
@@ -279,10 +280,10 @@ public class DatesTest {
         Jsonb jsonb1 = JsonbBuilder.create(new JsonbConfig().withDateFormat(JsonbDateFormat.TIME_IN_MILLIS, Locale.FRENCH));
         assertEquals("{\"value\":\"1424089260000\"}", jsonb1.toJson(pojo));
 
-        ScalarValueWrapper<LocalDateTime> result = jsonb.fromJson(expected, new ScalarValueWrapper<LocalDateTime>() {}.getClass());
+        ScalarValueWrapper<LocalDateTime> result = jsonb.fromJson(expected, new TestTypeToken<ScalarValueWrapper<LocalDateTime>>(){}.getType());
         assertEquals(dateTime, result.getValue());
 
-        result = jsonb1.fromJson("{\"value\":\"1424089260000\"}", new ScalarValueWrapper<LocalDateTime>() {}.getClass());
+        result = jsonb1.fromJson("{\"value\":\"1424089260000\"}", new TestTypeToken<ScalarValueWrapper<LocalDateTime>>(){}.getType());
         assertEquals(dateTime, result.getValue());
     }
 
@@ -376,8 +377,7 @@ public class DatesTest {
         String expected = "{\"value\":\"+06 ALMT ven. avril 03-04-2015 13:21:00\"}";
         assertEquals(expected, jsonb.toJson(new ScalarValueWrapper<>(dateTime)));
 
-        ScalarValueWrapper<ZonedDateTime> result = jsonb.fromJson(expected, new ScalarValueWrapper<ZonedDateTime>() {
-        }.getClass());
+        ScalarValueWrapper<ZonedDateTime> result = jsonb.fromJson(expected, new TestTypeToken<ScalarValueWrapper<ZonedDateTime>>(){}.getType());
 
         assertEquals(dateTime, result.getValue());
 

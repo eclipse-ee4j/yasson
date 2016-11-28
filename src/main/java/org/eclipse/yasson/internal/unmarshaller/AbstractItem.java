@@ -13,10 +13,12 @@
 package org.eclipse.yasson.internal.unmarshaller;
 
 import org.eclipse.yasson.internal.AbstractSerializerBuilder;
-import org.eclipse.yasson.internal.ProcessingContext;
+import org.eclipse.yasson.internal.JsonbContext;
 import org.eclipse.yasson.internal.ReflectionUtils;
 import org.eclipse.yasson.model.ClassModel;
+import org.eclipse.yasson.model.ContainerCustomization;
 import org.eclipse.yasson.model.Customization;
+import org.eclipse.yasson.model.CustomizationBuilder;
 import org.eclipse.yasson.model.JsonBindingModel;
 
 import java.lang.reflect.Type;
@@ -29,7 +31,7 @@ import java.lang.reflect.Type;
  * @param <T> Instantiated object type
  * @author Roman Grigoriadi
  */
-public abstract class AbstractDeserializer<T> implements CurrentItem<T> {
+public abstract class AbstractItem<T> implements CurrentItem<T> {
 
     /**
      * Item containing instance of wrapping object and its metadata.
@@ -52,13 +54,19 @@ public abstract class AbstractDeserializer<T> implements CurrentItem<T> {
     /**
      * Create instance of current item with its builder.
      */
-    protected AbstractDeserializer(AbstractSerializerBuilder builder) {
+    protected AbstractItem(AbstractSerializerBuilder builder) {
         this.wrapper = builder.getWrapper();
         this.wrapperModel = builder.getModel();
         this.classModel = builder.getClassModel();
         this.runtimeType = builder.getRuntimeType();
     }
 
+    public AbstractItem(CurrentItem<?> wrapper, Type runtimeType, ClassModel classModel, JsonBindingModel wrapperModel) {
+        this.wrapper = wrapper;
+        this.runtimeType = runtimeType;
+        this.classModel = classModel;
+        this.wrapperModel = wrapperModel;
+    }
 
     @Override
     public ClassModel getClassModel() {
@@ -85,12 +93,13 @@ public abstract class AbstractDeserializer<T> implements CurrentItem<T> {
         return runtimeType;
     }
 
-    protected Customization resolveContainerModelCustomization(Type componentType) {
+    protected Customization resolveContainerModelCustomization(Type componentType, JsonbContext jsonbContext) {
         Class<?> valueRawType = ReflectionUtils.resolveRawType(this, componentType);
-        ClassModel classModel = ProcessingContext.getMappingContext().getClassModel(valueRawType);
+        ClassModel classModel = jsonbContext.getMappingContext().getClassModel(valueRawType);
         if (classModel != null) {
-            return classModel.getCustomization();
+            return new ContainerCustomization(classModel.getCustomization());
         }
-        return new DefaultCustomization();
+        // TODO deal with DefaultCustomization
+        return new ContainerCustomization(new CustomizationBuilder());
     }
 }

@@ -13,7 +13,8 @@
 
 package org.eclipse.yasson.internal.serializer;
 
-import org.eclipse.yasson.model.SerializerBindingModel;
+import org.eclipse.yasson.internal.Marshaller;
+import org.eclipse.yasson.model.JsonBindingModel;
 
 import javax.json.stream.JsonGenerator;
 import java.time.Duration;
@@ -23,17 +24,17 @@ import java.time.Duration;
  */
 public class DurationTypeSerializer extends AbstractValueTypeSerializer<Duration> {
 
-    public DurationTypeSerializer(SerializerBindingModel model) {
-        super(Duration.class, model);
+    public DurationTypeSerializer(JsonBindingModel model) {
+        super(model);
     }
 
     @Override
-    protected void serialize(Duration obj, JsonGenerator generator, String key) {
+    protected void serialize(Duration obj, JsonGenerator generator, String key, Marshaller marshaller) {
         generator.write(key, obj.toString());
     }
 
     @Override
-    protected void serialize(Duration obj, JsonGenerator generator) {
+    protected void serialize(Duration obj, JsonGenerator generator, Marshaller marshaller) {
         generator.write(obj.toString());
     }
 }

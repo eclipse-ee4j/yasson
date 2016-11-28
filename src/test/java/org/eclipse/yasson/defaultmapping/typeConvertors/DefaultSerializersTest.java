@@ -12,6 +12,7 @@
  ******************************************************************************/
 package org.eclipse.yasson.defaultmapping.typeConvertors;
 
+import org.eclipse.yasson.TestTypeToken;
 import org.eclipse.yasson.defaultmapping.generics.model.ScalarValueWrapper;
 import org.eclipse.yasson.defaultmapping.typeConvertors.model.ByteArrayWrapper;
 import org.eclipse.yasson.internal.JsonBindingBuilder;
@@ -39,7 +40,7 @@ public class DefaultSerializersTest {
     public void testCharacter() {
         final String json = "{\"value\":\"\uFFFF\"}";
         assertEquals(json, jsonb.toJson(new ScalarValueWrapper<>('\uFFFF')));
-        ScalarValueWrapper<Character> result = jsonb.fromJson(json, new ScalarValueWrapper<Character>() {}.getClass());
+        ScalarValueWrapper<Character> result = jsonb.fromJson(json, new TestTypeToken<ScalarValueWrapper<Character>>(){}.getType());
         assertEquals((Character)'\uFFFF', result.getValue());
     }
 

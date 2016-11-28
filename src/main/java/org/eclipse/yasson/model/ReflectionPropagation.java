@@ -12,6 +12,8 @@
  ******************************************************************************/
 package org.eclipse.yasson.model;
 
+import org.eclipse.yasson.internal.JsonbContext;
+
 import javax.json.bind.JsonbException;
 import java.lang.reflect.Field;
 import java.lang.reflect.InvocationTargetException;
@@ -50,8 +52,8 @@ public class ReflectionPropagation extends PropertyValuePropagation {
 
     private SetValueCommand setValueCommand;
 
-    ReflectionPropagation(Property property) {
-        super(property);
+    ReflectionPropagation(Property property, JsonbContext ctx) {
+        super(property, ctx);
     }
 
     /**

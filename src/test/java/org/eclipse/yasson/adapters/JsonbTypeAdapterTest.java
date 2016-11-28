@@ -13,6 +13,7 @@
 
 package org.eclipse.yasson.adapters;
 
+import org.eclipse.yasson.TestTypeToken;
 import org.eclipse.yasson.adapters.model.Box;
 import org.eclipse.yasson.adapters.model.BoxToCratePropagatedIntegerStringAdapter;
 import org.eclipse.yasson.adapters.model.GenericBox;
@@ -92,10 +93,10 @@ public class JsonbTypeAdapterTest {
         AnnotatedPojo<Integer, String> annotatedPojo = new AnnotatedPojo<>();
         annotatedPojo.tBox = new GenericBox<>("T_BOX", 110);
         annotatedPojo.xBox = new GenericBox<>("X_BOX", "STR");
-        String marshalledJson = jsonb.toJson(annotatedPojo, new AnnotatedPojo<Integer, String>() {}.getClass());
+        String marshalledJson = jsonb.toJson(annotatedPojo, new TestTypeToken<AnnotatedPojo<Integer, String>>(){}.getType());
         assertEquals("{\"tBox\":{\"adaptedT\":{\"x\":[\"110\"]},\"crateStrField\":\"T_BOX\"},\"xBox\":{\"strField\":\"X_BOX\",\"x\":\"STR\"}}", marshalledJson);
 
-        AnnotatedPojo<Integer,String> result = jsonb.fromJson("{\"tBox\":{\"crateStrField\":\"T_BOX\",\"adaptedT\":{\"x\":[\"110\"]}},\"xBox\":{\"strField\":\"X_BOX\",\"x\":\"STR\"}}", new AnnotatedPojo<Integer,String>(){}.getClass());
+        AnnotatedPojo<Integer,String> result = jsonb.fromJson("{\"tBox\":{\"crateStrField\":\"T_BOX\",\"adaptedT\":{\"x\":[\"110\"]}},\"xBox\":{\"strField\":\"X_BOX\",\"x\":\"STR\"}}", new TestTypeToken<AnnotatedPojo<Integer,String>>(){}.getType());
         assertEquals("T_BOX", result.tBox.getStrField());
         assertEquals(Integer.valueOf(110), result.tBox.getX());
         assertEquals("X_BOX", result.xBox.getStrField());

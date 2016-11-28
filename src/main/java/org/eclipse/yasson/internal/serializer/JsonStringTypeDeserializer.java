@@ -13,7 +13,6 @@
 
 package org.eclipse.yasson.internal.serializer;
 
-import org.eclipse.yasson.internal.ProcessingContext;
 import org.eclipse.yasson.internal.Unmarshaller;
 import org.eclipse.yasson.model.JsonBindingModel;
 
@@ -33,7 +32,7 @@ public class JsonStringTypeDeserializer extends AbstractValueTypeDeserializer<Js
 
     @Override
     protected JsonString deserialize(String jsonValue, Unmarshaller unmarshaller, Type rtType) {
-        final JsonBuilderFactory factory = ProcessingContext.getJsonbContext().getJsonProvider().createBuilderFactory(null);
+        final JsonBuilderFactory factory = unmarshaller.getJsonbContext().getJsonProvider().createBuilderFactory(null);
         final JsonObject jsonObject = factory.createObjectBuilder()
                 .add("json", jsonValue)
                 .build();

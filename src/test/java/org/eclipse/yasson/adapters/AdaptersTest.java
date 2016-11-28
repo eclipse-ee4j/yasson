@@ -14,6 +14,7 @@
 package org.eclipse.yasson.adapters;
 
 
+import org.eclipse.yasson.TestTypeToken;
 import org.eclipse.yasson.adapters.model.AdaptedPojo;
 import org.eclipse.yasson.adapters.model.Box;
 import org.eclipse.yasson.adapters.model.BoxToCrateCompatibleGenericsAdapter;
@@ -120,8 +121,7 @@ public class AdaptersTest {
         pojo.intBox = new GenericBox<>("INT_BOX_STR", 11);
         pojo.tBox = new GenericBox<>("T_BOX_STR", 110);
 
-        String marshalledJson = jsonb.toJson(pojo, new AdaptedPojo<Integer>() {
-        }.getClass());
+        String marshalledJson = jsonb.toJson(pojo, new TestTypeToken<AdaptedPojo<Integer>>(){}.getType());
         assertEquals("{\"intBox\":{\"adaptedT\":11,\"crateStrField\":\"INT_BOX_STR\"}," +
                 "\"strField\":\"POJO_STRING\"," +
                 "\"tBox\":{\"adaptedT\":110,\"crateStrField\":\"T_BOX_STR\"}}", marshalledJson);
@@ -130,8 +130,7 @@ public class AdaptersTest {
                 "\"tBox\":{\"crateStrField\":\"tGenBoxCrateStr\",\"adaptedT\":22}," +
                 "\"strField\":\"POJO_STRING\"," +
                 "\"strBox\":{\"strField\":\"strBoxStr\",\"x\":\"44\"}}";
-        AdaptedPojo result = jsonb.fromJson(toUnmarshall, new AdaptedPojo<Integer>() {
-        }.getClass());
+        AdaptedPojo result = jsonb.fromJson(toUnmarshall, new TestTypeToken<AdaptedPojo<Integer>>(){}.getType());
         assertEquals("POJO_STRING", result.strField);
         assertEquals("Box3", result.intBox.getStrField());
         assertEquals(33, result.intBox.getX());
@@ -152,8 +151,7 @@ public class AdaptersTest {
         pojo.tBox = new GenericBox<>("T_BOX_STR", 111);
         pojo.strBox = new GenericBox<>("STR_BOX_STR", "101");
 
-        String marshalledJson = jsonb.toJson(pojo, new AdaptedPojo<Integer>() {
-        }.getClass());
+        String marshalledJson = jsonb.toJson(pojo, new TestTypeToken<AdaptedPojo<Integer>>(){}.getType());
         assertEquals("{\"intBox\":{\"adaptedT\":{\"x\":[\"110\"]},\"crateStrField\":\"INT_BOX_STR\"}," +
                         "\"strBox\":{\"strField\":\"STR_BOX_STR\",\"x\":\"101\"}," +
                         "\"tBox\":{\"adaptedT\":{\"x\":[\"111\"]},\"crateStrField\":\"T_BOX_STR\"}}",
@@ -164,8 +162,7 @@ public class AdaptersTest {
                 "\"strField\":\"POJO_STRING\"," +
                 "\"strBox\":{\"strField\":\"strBoxStr\",\"x\":\"44\"}}";
 
-        AdaptedPojo result = jsonb.fromJson(toUnmarshall, new AdaptedPojo<Integer>() {
-        }.getClass());
+        AdaptedPojo result = jsonb.fromJson(toUnmarshall, new TestTypeToken<AdaptedPojo<Integer>>(){}.getType());
         assertEquals("POJO_STRING", result.strField);
         assertEquals("strCrateStr", result.intBox.getStrField());
         assertEquals(77, result.intBox.getX());
@@ -184,16 +181,14 @@ public class AdaptersTest {
         AdaptedPojo<List<Integer>> pojo = new AdaptedPojo<>();
         pojo.tVar = Arrays.asList(11, 22, 33);
         pojo.integerList = Arrays.asList(110, 111, 101);
-        String marshalledJson = jsonb.toJson(pojo, new AdaptedPojo<List<Integer>>() {
-        }.getClass());
+        String marshalledJson = jsonb.toJson(pojo, new TestTypeToken<AdaptedPojo<List<Integer>>>(){}.getType());
         assertEquals("{\"integerList\":\"110#111#101\"," +
                 "\"tVar\":\"11#22#33\"}", marshalledJson);
 
         String toUnmarshall = "{\"integerList\":\"11#22#33#44\",\"stringList\":[\"first\",\"second\"]," +
                 "\"tVar\":\"110#111#101\"}";
 
-        AdaptedPojo result = jsonb.fromJson(toUnmarshall, new AdaptedPojo<List<Integer>>() {
-        }.getClass());
+        AdaptedPojo result = jsonb.fromJson(toUnmarshall, new TestTypeToken<AdaptedPojo<List<Integer>>>(){}.getType());
         List<Integer> expectedIntegerList = Arrays.asList(11, 22, 33, 44);
         List<String> expectedStringList = Arrays.asList("first", "second");
         List<Integer> expectedTList = Arrays.asList(110, 111, 101);
@@ -215,15 +210,13 @@ public class AdaptersTest {
         pojo.tGenericBoxList.add(new GenericBox<>("GEN_BOX_STR_1", 110));
         pojo.tGenericBoxList.add(new GenericBox<>("GEN_BOX_STR_2", 101));
 
-        String marshalledJson = jsonb.toJson(pojo, new AdaptedPojo<Integer>() {
-        }.getClass());
+        String marshalledJson = jsonb.toJson(pojo, new TestTypeToken<AdaptedPojo<Integer>>(){}.getType());
         assertEquals("{\"tGenericBoxList\":[{\"adaptedT\":110,\"crateStrField\":\"GEN_BOX_STR_1\"},{\"adaptedT\":101,\"crateStrField\":\"GEN_BOX_STR_2\"}]}", marshalledJson);
 
         String toUnmarshall = "{\"integerList\":[11,22,33,44],\"stringList\":[\"first\",\"second\"]," +
                 "\"tGenericBoxList\":[{\"crateStrField\":\"FirstCrate\",\"adaptedT\":11},{\"crateStrField\":\"SecondCrate\",\"adaptedT\":22}]}";
 
-        AdaptedPojo<Integer> result = jsonb.fromJson(toUnmarshall, new AdaptedPojo<Integer>() {
-        }.getClass());
+        AdaptedPojo<Integer> result = jsonb.fromJson(toUnmarshall, new TestTypeToken<AdaptedPojo<Integer>>(){}.getType());
         assertEquals("FirstCrate", result.tGenericBoxList.get(0).getStrField());
         assertEquals("SecondCrate", result.tGenericBoxList.get(1).getStrField());
         assertEquals(Integer.valueOf(11), result.tGenericBoxList.get(0).getX());
@@ -274,12 +267,10 @@ public class AdaptersTest {
         AdaptedPojo<Integer> adaptedPojo = new AdaptedPojo<>();
         adaptedPojo.tBox = new GenericBox<>("tGenBoxStrField", 22);
         adaptedPojo.intBox = new GenericBox<>("genBoxStrField", 11);
-        String json = jsonb.toJson(adaptedPojo, new AdaptedPojo<Integer>() {
-        }.getClass());
+        String json = jsonb.toJson(adaptedPojo, new TestTypeToken<AdaptedPojo<Integer>>(){}.getType());
         assertEquals("{\"intBox\":{\"adaptedT\":{\"x\":[\"11\"]},\"crateStrField\":\"genBoxStrField\"},\"tBox\":{\"adaptedT\":{\"x\":[\"22\"]},\"crateStrField\":\"tGenBoxStrField\"}}", json);
 
-        AdaptedPojo<Integer> unmarshalledAdaptedPojo = jsonb.fromJson(json, new AdaptedPojo<Integer>() {
-        }.getClass());
+        AdaptedPojo<Integer> unmarshalledAdaptedPojo = jsonb.fromJson(json, new TestTypeToken<AdaptedPojo<Integer>>(){}.getType());
         assertEquals("genBoxStrField", unmarshalledAdaptedPojo.intBox.getStrField());
         assertEquals(Integer.valueOf(11), unmarshalledAdaptedPojo.intBox.getX());
     }
@@ -306,12 +297,10 @@ public class AdaptersTest {
         intBoxList.add(new GenericBox<>("", 11d));
         intBoxPojo.tVar = intBoxList;
 
-        String json = jsonb.toJson(intBoxPojo, new AdaptedPojo<List<GenericBox<Double>>>() {
-        }.getClass());
+        String json = jsonb.toJson(intBoxPojo, new TestTypeToken<AdaptedPojo<List<GenericBox<Double>>>>(){}.getType());
         assertEquals("{\"tVar\":11.0}", json);
 
-        AdaptedPojo<List<GenericBox<Double>>> result = jsonb.fromJson(json, new AdaptedPojo<List<GenericBox<Double>>>() {
-        }.getClass());
+        AdaptedPojo<List<GenericBox<Double>>> result = jsonb.fromJson(json, new TestTypeToken<AdaptedPojo<List<GenericBox<Double>>>>(){}.getType());
         assertEquals(Double.valueOf(11), result.tVar.get(0).getX());
     }
 
@@ -373,7 +362,7 @@ public class AdaptersTest {
         String marshalledJson = jsonb.toJson(pojo, new AdaptedPojo<Integer>(){}.getClass());
         assertEquals("{\"stringIntegerMap\":\"first-11#second-22\",\"tMap\":\"first-11#second-22\"}", marshalledJson);
 
-        AdaptedPojo<Integer> result = jsonb.fromJson("{\"stringIntegerMap\":\"fake-value\",\"tMap\":\"fake-value\"}", new AdaptedPojo<Integer>() {}.getClass());
+        AdaptedPojo<Integer> result = jsonb.fromJson("{\"stringIntegerMap\":\"fake-value\",\"tMap\":\"fake-value\"}", new TestTypeToken<AdaptedPojo<Integer>>(){}.getType());
         assertEquals(Integer.valueOf(101), result.stringIntegerMap.get("fake"));
         assertEquals(Integer.valueOf(101), result.tMap.get("fake"));
     }
@@ -400,11 +389,12 @@ public class AdaptersTest {
         pojo.tMap = new HashMap<>();
         pojo.tMap.put("first", "101");
 
-        final Class<? extends AdaptedPojo<String>> pojoClass = new AdaptedPojo<String>() {}.getClass();
-        String marshalledJson = jsonb.toJson(pojo, pojoClass);
+        TestTypeToken<AdaptedPojo<String>> typeToken = new TestTypeToken<AdaptedPojo<String>>() {};
+
+        String marshalledJson = jsonb.toJson(pojo, typeToken.getType());
         assertEquals("{\"tMap\":{\"crateIntField\":101,\"crateStrField\":\"first\"}}", marshalledJson);
 
-        AdaptedPojo<String> result = jsonb.fromJson("{\"tMap\":{\"crateIntField\":101,\"crateStrField\":\"first\"}}", pojoClass);
+        AdaptedPojo<String> result = jsonb.fromJson("{\"tMap\":{\"crateIntField\":101,\"crateStrField\":\"first\"}}", typeToken.getType());
         assertEquals("11", result.tMap.get("fake"));
     }
 

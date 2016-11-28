@@ -13,7 +13,7 @@
 
 package org.eclipse.yasson.internal.serializer;
 
-import org.eclipse.yasson.model.SerializerBindingModel;
+import org.eclipse.yasson.model.JsonBindingModel;
 
 import java.time.Instant;
 import java.time.LocalDateTime;
@@ -26,7 +26,7 @@ import java.util.Locale;
  */
 public class LocalDateTimeTypeSerializer extends AbstractDateTimeSerializer<LocalDateTime> {
 
-    public LocalDateTimeTypeSerializer(SerializerBindingModel model) {
+    public LocalDateTimeTypeSerializer(JsonBindingModel model) {
         super(LocalDateTime.class, model);
     }
 
