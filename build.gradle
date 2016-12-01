@@ -1,3 +1,15 @@
+/*******************************************************************************
+ * Copyright (c) 2015, 2016 Oracle and/or its affiliates. All rights reserved.
+ * This program and the accompanying materials are made available under the
+ * terms of the Eclipse Public License v1.0 and Eclipse Distribution License v. 1.0
+ * which accompanies this distribution.
+ * The Eclipse Public License is available at http://www.eclipse.org/legal/epl-v10.html
+ * and the Eclipse Distribution License is available at
+ * http://www.eclipse.org/org/documents/edl-v10.php.
+ *
+ * Contributors:
+ *     Dmitry Kornilov - initial implementation
+ ******************************************************************************/
 apply plugin: 'java'
 apply plugin: "maven"
 apply plugin: 'signing'
@@ -21,7 +33,6 @@ compileJava {
     compileTestJava {
         options.encoding = defaultEncoding
     }
-
 }
 
 sourceSets {
@@ -48,14 +59,6 @@ dependencies {
     testCompile 'junit:junit:4.12'
     testCompile 'org.jboss.weld:weld-core:2.3.3.Final';
     testCompile 'org.jboss.weld.se:weld-se:2.3.3.Final';
-
-}
-
-test {
-    if (!project.hasProperty('1.1')) {
-        println 'Single value tests excluded'
-        exclude 'org/eclipse/persistence/json/bind/defaultmapping/basic/SingleValueTest.class'
-    }
 }
 
 task wrapper(type: Wrapper) {
@@ -68,10 +71,6 @@ idea {
         downloadSources = true
     }
 }
-
-/*task noErrorJavadoc(type: Javadoc) {
-    failOnError = false
-}*/
 
 task javadocJar(type: Jar, dependsOn: javadoc) {
     classifier = 'javadoc'
@@ -88,33 +87,29 @@ artifacts {
     archives sourcesJar
 }
 
-/*signing {
-    sign configurations.archives
-}*/
-
-// use ./gradlew upload -PdeployOSS
-if (project.hasProperty("deployOSS")) {
-
-    println 'Deploying to OSS';
+/**
+ * Uploads Yasson to repo.eclipse.org:
+ * use ./gradlew upload -PdeployEclipse
+ */
+if (project.hasProperty("deployEclipse")) {
     uploadArchives {
         repositories {
             mavenDeployer {
-//            beforeDeployment { MavenDeployment deployment -> signing.signPom(deployment) }
+                // beforeDeployment { MavenDeployment deployment -> signing.signPom(deployment) }
 
-                repository(url: "https://oss.sonatype.org/service/local/staging/deploy/maven2/") {
-                    authentication(userName: uName, password: uPwd)
+                repository(url: "https://repo.eclipse.org/content/repositories/yasson-releases/") {
+                    authentication(userName: eclipseRepoUsername, password: eclipseRepoPassword)
                 }
 
-                snapshotRepository(url: "https://oss.sonatype.org/content/repositories/snapshots/") {
-                    authentication(userName: uName, password: uPwd)
+                snapshotRepository(url: "https://repo.eclipse.org/content/repositories/yasson-snapshots/") {
+                    authentication(userName: eclipseRepoUsername, password: eclipseRepoPassword)
                 }
 
                 pom.project {
                     name 'yasson'
                     packaging 'jar'
-                    // optionally artifactId can be defined here
-                    description 'Reference implementation of JSR-367'
-//                url 'http://www.example.com/example-application'
+                    description 'Eclipse Yasson. Reference implementation of JSR-367 (JSON-B).'
+                    url 'https://projects.eclipse.org/projects/rt.yasson'
 
                     scm {
                         connection 'scm:git://git@github.com:eclipse/yasson.git'
@@ -124,16 +119,15 @@ if (project.hasProperty("deployOSS")) {
 
                     licenses {
                         license {
-                            name 'Eclipse Public License v1.0 and Eclipse Distribution License v. 1.0'
+                            name 'Eclipse Public License v1.0 and Eclipse Distribution License v1.0'
                             url 'http://www.eclipse.org/legal/epl-v10.html'
                         }
                     }
 
                     developers {
                         developer {
-                            id 'rgrigoriadi'
-                            name 'Roman Grigoriadi'
-                            email 'roman.grigoriadi@oracle.com'
+                            name 'Yasson committers'
+                            email 'yasson-dev@eclipse.org'
                         }
                     }
                 }
