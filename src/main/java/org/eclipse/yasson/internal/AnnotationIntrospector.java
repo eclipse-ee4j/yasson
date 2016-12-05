@@ -412,7 +412,7 @@ public class AnnotationIntrospector {
      */
     public Optional<PropertyVisibilityStrategy> getPropertyVisibilityStrategy(Class<?> clazz) {
         JsonbVisibility visibilityAnnotation = findAnnotation(clazz.getDeclaredAnnotations(), JsonbVisibility.class);
-        if (visibilityAnnotation == null) {
+        if ((visibilityAnnotation == null) && (clazz.getPackage() != null)) {
             visibilityAnnotation = findAnnotation(clazz.getPackage().getDeclaredAnnotations(), JsonbVisibility.class);
         }
         final Optional<JsonbVisibility> visibilityOptional = Optional.ofNullable(visibilityAnnotation);
@@ -536,7 +536,7 @@ public class AnnotationIntrospector {
             addIfNotPresent(classElement, ifc.getDeclaredAnnotations());
         }
 
-        if (!clazz.isPrimitive() && !clazz.isArray()) {
+        if (!clazz.isPrimitive() && !clazz.isArray() && (clazz.getPackage() != null)) {
             addIfNotPresent(classElement, clazz.getPackage().getAnnotations());
         }
         return classElement;
