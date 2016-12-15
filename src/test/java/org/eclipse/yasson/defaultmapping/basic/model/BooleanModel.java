@@ -15,7 +15,7 @@ package org.eclipse.yasson.defaultmapping.basic.model;
 
 /**
  * Encapsulates different types of boolean values as a field so that the boolean value's serialization and
- * deserialization could be tested
+ * deserialization could be tested.
  *
  * @author Ehsan Zaery Moghaddam (zaerymoghaddam@gmail.com)
  */

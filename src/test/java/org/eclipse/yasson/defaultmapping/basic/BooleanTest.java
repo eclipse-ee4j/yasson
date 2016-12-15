@@ -22,8 +22,8 @@ import javax.json.bind.JsonbBuilder;
 import static org.junit.Assert.assertEquals;
 
 /**
- * Tests serialization and deserialization of boolean values
- * <p>
+ * Tests serialization and deserialization of boolean values.
+ *
  * @author Ehsan Zaery Moghaddam (zaerymoghaddam@gmail.com)
  */
 public class BooleanTest {
