@@ -29,11 +29,11 @@ public class BooleanTypeSerializer extends AbstractValueTypeSerializer<Boolean> 
 
     @Override
     protected void serialize(Boolean obj, JsonGenerator generator, String key, Marshaller marshaller) {
-        generator.write(key, String.valueOf(obj));
+        generator.write(key, obj);
     }
 
     @Override
     protected void serialize(Boolean obj, JsonGenerator generator, Marshaller marshaller) {
-        generator.write(String.valueOf(obj));
+        generator.write(obj);
     }
 }
