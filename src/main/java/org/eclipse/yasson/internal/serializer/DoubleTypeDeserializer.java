@@ -14,8 +14,11 @@
 package org.eclipse.yasson.internal.serializer;
 
 import org.eclipse.yasson.internal.Unmarshaller;
+import org.eclipse.yasson.internal.properties.MessageKeys;
+import org.eclipse.yasson.internal.properties.Messages;
 import org.eclipse.yasson.model.JsonBindingModel;
 
+import javax.json.bind.JsonbException;
 import java.lang.reflect.Type;
 
 /**
@@ -41,7 +44,15 @@ public class DoubleTypeDeserializer extends AbstractNumberDeserializer<Double> {
             case NEGATIVE_INFINITY:
                 return Double.NEGATIVE_INFINITY;
         }
-        return deserializeForamtted(jsonValue, false, unmarshaller.getJsonbContext()).map(num->Double.parseDouble(num.toString()))
-                .orElseGet(()->Double.parseDouble(jsonValue));
+        return deserializeForamtted(jsonValue, false, unmarshaller.getJsonbContext())
+                .map(num -> Double.parseDouble(num.toString()))
+                .orElseGet(() -> {
+                    try {
+                        return Double.parseDouble(jsonValue);
+                    } catch (NumberFormatException e) {
+                        throw new JsonbException(Messages.getMessage(MessageKeys.DESERIALIZE_VALUE_ERROR,
+                                Double.class));
+                    }
+                });
     }
 }

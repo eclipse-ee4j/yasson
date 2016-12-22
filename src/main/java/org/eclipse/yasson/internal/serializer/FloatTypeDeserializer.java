@@ -14,8 +14,11 @@
 package org.eclipse.yasson.internal.serializer;
 
 import org.eclipse.yasson.internal.Unmarshaller;
+import org.eclipse.yasson.internal.properties.MessageKeys;
+import org.eclipse.yasson.internal.properties.Messages;
 import org.eclipse.yasson.model.JsonBindingModel;
 
+import javax.json.bind.JsonbException;
 import java.lang.reflect.Type;
 
 /**
@@ -37,7 +40,14 @@ public class FloatTypeDeserializer extends AbstractNumberDeserializer<Float> {
      */
     @Override
     protected Float deserialize(String jsonValue, Unmarshaller unmarshaller, Type rtType) {
-        return deserializeForamtted(jsonValue, false, unmarshaller.getJsonbContext()).map(num->Float.parseFloat(num.toString()))
-                .orElseGet(()->Float.parseFloat(jsonValue));
+        return deserializeForamtted(jsonValue, false, unmarshaller.getJsonbContext())
+                .map(num -> Float.parseFloat(num.toString()))
+                .orElseGet(() -> {
+                    try {
+                        return Float.parseFloat(jsonValue);
+                    } catch (NumberFormatException e) {
+                        throw new JsonbException(Messages.getMessage(MessageKeys.DESERIALIZE_VALUE_ERROR, Float.class));
+                    }
+                });
     }
 }

@@ -14,8 +14,11 @@
 package org.eclipse.yasson.internal.serializer;
 
 import org.eclipse.yasson.internal.Unmarshaller;
+import org.eclipse.yasson.internal.properties.MessageKeys;
+import org.eclipse.yasson.internal.properties.Messages;
 import org.eclipse.yasson.model.JsonBindingModel;
 
+import javax.json.bind.JsonbException;
 import java.lang.reflect.Type;
 
 /**
@@ -29,7 +32,14 @@ public class ShortTypeDeserializer extends AbstractNumberDeserializer<Short> {
 
     @Override
     protected Short deserialize(String jsonValue, Unmarshaller unmarshaller, Type rtType) {
-        return deserializeForamtted(jsonValue, true, unmarshaller.getJsonbContext()).map(num -> Short.parseShort(num.toString()))
-                .orElseGet(() -> Short.parseShort(jsonValue));
+        return deserializeForamtted(jsonValue, true, unmarshaller.getJsonbContext())
+                .map(num -> Short.parseShort(num.toString()))
+                .orElseGet(() -> {
+                    try {
+                        return Short.parseShort(jsonValue);
+                    } catch (NumberFormatException e) {
+                        throw new JsonbException(Messages.getMessage(MessageKeys.DESERIALIZE_VALUE_ERROR, Short.class));
+                    }
+                });
     }
 }

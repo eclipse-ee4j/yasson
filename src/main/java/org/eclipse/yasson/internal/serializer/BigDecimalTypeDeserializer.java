@@ -14,13 +14,17 @@
 package org.eclipse.yasson.internal.serializer;
 
 import org.eclipse.yasson.internal.Unmarshaller;
+import org.eclipse.yasson.internal.properties.MessageKeys;
+import org.eclipse.yasson.internal.properties.Messages;
 import org.eclipse.yasson.model.JsonBindingModel;
 
+import javax.json.bind.JsonbException;
 import java.lang.reflect.Type;
 import java.math.BigDecimal;
 
 /**
  * Deserialize bigdecimal.
+ *
  * @author David Král
  */
 public class BigDecimalTypeDeserializer extends AbstractNumberDeserializer<BigDecimal> {
@@ -31,7 +35,15 @@ public class BigDecimalTypeDeserializer extends AbstractNumberDeserializer<BigDe
 
     @Override
     public BigDecimal deserialize(String jsonValue, Unmarshaller unmarshaller, Type rtType) {
-        return deserializeForamtted(jsonValue, false, unmarshaller.getJsonbContext()).map(num->new BigDecimal(num.toString()))
-                .orElseGet(()->new BigDecimal(jsonValue));
+        return deserializeForamtted(jsonValue, false, unmarshaller.getJsonbContext())
+                .map(num -> new BigDecimal(num.toString()))
+                .orElseGet(() -> {
+                    try {
+                        return new BigDecimal(jsonValue);
+                    } catch (NumberFormatException e) {
+                        throw new JsonbException(Messages.getMessage(MessageKeys.DESERIALIZE_VALUE_ERROR,
+                                BigDecimal.class));
+                    }
+                });
     }
 }
