@@ -17,6 +17,7 @@ import org.eclipse.yasson.internal.serializer.SerializerBuilder;
 import org.eclipse.yasson.internal.unmarshaller.ContainerModel;
 import org.eclipse.yasson.model.JsonBindingModel;
 import org.eclipse.yasson.model.JsonContext;
+import org.eclipse.yasson.model.JsonbPropertyInfo;
 
 import javax.json.bind.JsonbException;
 import javax.json.bind.serializer.JsonbSerializer;
@@ -107,7 +108,8 @@ public class Marshaller extends ProcessingContext implements SerializationContex
     private JsonbSerializer<?> getRootSerializer(Class<?> rootClazz, JsonBindingModel model) {
         final ContainerSerializerProvider serializerProvider = getMappingContext().getSerializerProvider(rootClazz);
         if (serializerProvider != null) {
-            return serializerProvider.provideSerializer(null, runtimeType, getMappingContext().getClassModel(rootClazz), model);
+            return serializerProvider.provideSerializer(new JsonbPropertyInfo().withRuntimeType(runtimeType)
+                    .withClassModel(getMappingContext().getClassModel(rootClazz)).withJsonBindingModel(model));
         }
         return new SerializerBuilder(jsonbContext).withObjectClass(rootClazz)
                 .withType(model.getType()).withModel(model).build();

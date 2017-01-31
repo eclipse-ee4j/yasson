@@ -22,6 +22,7 @@ import org.eclipse.yasson.model.ClassModel;
 import org.eclipse.yasson.model.Customization;
 import org.eclipse.yasson.model.JsonBindingModel;
 import org.eclipse.yasson.model.JsonContext;
+import org.eclipse.yasson.model.JsonbPropertyInfo;
 
 import javax.json.bind.JsonbException;
 import javax.json.bind.adapter.JsonbAdapter;
@@ -103,7 +104,7 @@ public class AdaptedObjectSerializer<T, A> implements CurrentItem<T>, JsonbSeria
     private JsonbSerializer<A> resolveSerializer(Marshaller ctx, A adapted) {
         final ContainerSerializerProvider cached = ctx.getMappingContext().getSerializerProvider(adapted.getClass());
         if (cached != null) {
-            return (JsonbSerializer<A>) cached.provideSerializer(this, adapted.getClass(), null, model);
+            return (JsonbSerializer<A>) cached.provideSerializer(new JsonbPropertyInfo().withWrapper(this).withRuntimeType(adapted.getClass()).withJsonBindingModel(model));
         }
         return (JsonbSerializer<A>) new SerializerBuilder(ctx.getJsonbContext()).withObjectClass(adapted.getClass()).withModel(model).withWrapper(this).build();
     }

@@ -3,6 +3,7 @@ package org.eclipse.yasson.internal.serializer;
 import org.eclipse.yasson.internal.unmarshaller.CurrentItem;
 import org.eclipse.yasson.model.ClassModel;
 import org.eclipse.yasson.model.JsonBindingModel;
+import org.eclipse.yasson.model.JsonbPropertyInfo;
 
 import javax.json.bind.serializer.JsonbSerializer;
 import java.lang.reflect.Type;
@@ -14,5 +15,5 @@ import java.lang.reflect.Type;
  */
 public interface ContainerSerializerProvider {
 
-    JsonbSerializer<?> provideSerializer(CurrentItem<?> wrapper, Type runtimeType, ClassModel classModel, JsonBindingModel wrapperModel);
+    JsonbSerializer<?> provideSerializer(JsonbPropertyInfo propertyInfo);
 }

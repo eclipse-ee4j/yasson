@@ -25,8 +25,11 @@ import org.eclipse.yasson.serializers.model.CrateJsonObjectDeserializer;
 import org.eclipse.yasson.serializers.model.CrateSerializer;
 import org.eclipse.yasson.serializers.model.CrateSerializerWithConversion;
 import org.eclipse.yasson.serializers.model.PolymorphicDeserializer;
+import org.eclipse.yasson.serializers.model.StringPaddingSerializer;
+import org.eclipse.yasson.serializers.model.StringWrapper;
 import org.junit.Test;
 
+import javax.json.JsonBuilderFactory;
 import javax.json.bind.Jsonb;
 import javax.json.bind.JsonbBuilder;
 import javax.json.bind.JsonbConfig;
@@ -235,6 +238,15 @@ public class SerializersTest {
         //set by deserializer statically
         assertEquals(new BigDecimal("123"), result.crate.crateBigDec);
         assertEquals("abc", result.crate.crateStr);
+    }
+
+    @Test
+    public void testStringField() {
+        Jsonb jsonb = JsonbBuilder.create();
+        StringWrapper pojo = new StringWrapper();
+        pojo.strField = "abc";
+        final String result = jsonb.toJson(pojo);
+        System.out.println("result = " + result);
     }
 
     private Box createPojoWithDates() {

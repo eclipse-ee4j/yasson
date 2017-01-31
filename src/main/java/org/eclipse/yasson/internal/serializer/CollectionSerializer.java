@@ -14,10 +14,13 @@
 package org.eclipse.yasson.internal.serializer;
 
 import org.eclipse.yasson.internal.AbstractContainerSerializer;
+import org.eclipse.yasson.internal.JsonbContext;
 import org.eclipse.yasson.internal.Marshaller;
 import org.eclipse.yasson.internal.ReflectionUtils;
 import org.eclipse.yasson.internal.unmarshaller.ContainerModel;
+import org.eclipse.yasson.internal.unmarshaller.CurrentItem;
 import org.eclipse.yasson.internal.unmarshaller.EmbeddedItem;
+import org.eclipse.yasson.model.ClassModel;
 import org.eclipse.yasson.model.JsonBindingModel;
 import org.eclipse.yasson.model.JsonContext;
 
@@ -27,6 +30,7 @@ import javax.json.stream.JsonGenerator;
 import java.lang.reflect.ParameterizedType;
 import java.lang.reflect.Type;
 import java.util.Collection;
+import java.util.Optional;
 
 /**
  * Serializer for collections.
@@ -39,13 +43,31 @@ public class CollectionSerializer<T extends Collection> extends AbstractContaine
 
     private final Type collectionValueType;
 
+    private final JsonbSerializer valueSerializer;
+
     protected CollectionSerializer(SerializerBuilder builder) {
         super(builder);
-        collectionValueType = getRuntimeType() instanceof ParameterizedType ?
-                ReflectionUtils.resolveType(this, ((ParameterizedType) getRuntimeType()).getActualTypeArguments()[0])
-                : Object.class;
+        collectionValueType = getValueType();
         containerModel = new ContainerModel(collectionValueType, resolveContainerModelCustomization(collectionValueType, builder.getJsonbContext()),
                 JsonContext.JSON_ARRAY);
+        valueSerializer = resolveValueSerializer(collectionValueType, builder.getJsonbContext());
+    }
+
+    private JsonbSerializer resolveValueSerializer(Type collectionValueType, JsonbContext jsonbContext) {
+        if (collectionValueType == Object.class) {
+            return null;
+        }
+        final Optional<Class<?>> optionalRawType = ReflectionUtils.getOptionalRawType(collectionValueType);
+        if (!optionalRawType.isPresent()) {
+            return null;
+        }
+        return new SerializerBuilder(jsonbContext).withType(collectionValueType).withObjectClass(optionalRawType.get()).withWrapper(this).withModel(containerModel).build();
+    }
+
+    private Type getValueType() {
+        return getRuntimeType() instanceof ParameterizedType ?
+                ReflectionUtils.resolveType(this, ((ParameterizedType) getRuntimeType()).getActualTypeArguments()[0])
+                : Object.class;
     }
 
     @Override
@@ -55,8 +77,12 @@ public class CollectionSerializer<T extends Collection> extends AbstractContaine
                 generator.writeNull();
                 continue;
             }
-            final JsonbSerializer<?> serializer = new SerializerBuilder(((Marshaller)ctx).getJsonbContext()).withObjectClass(item.getClass()).withWrapper(this).withModel(containerModel).build();
-            serializerCaptor(serializer, item, generator, ctx);
+            if (valueSerializer != null) {
+                serializerCaptor(valueSerializer, item, generator, ctx);
+            } else {
+                final JsonbSerializer<?> serializer = new SerializerBuilder(((Marshaller)ctx).getJsonbContext()).withObjectClass(item.getClass()).withWrapper(this).withModel(containerModel).build();
+                serializerCaptor(serializer, item, generator, ctx);
+            }
         }
     }
 
