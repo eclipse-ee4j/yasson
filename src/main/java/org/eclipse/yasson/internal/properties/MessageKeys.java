@@ -68,7 +68,8 @@ public enum MessageKeys {
     DESERIALIZE_VALUE_ERROR("deserializeValueError"),
     PARSING_NUMBER("parsingNumber"),
     UNKNOWN_BINARY_DATA_STRATEGY("unknownBinaryDataStrategy"),
-    PROPERTY_NAMING_STRATEGY_INVALID("invalidPropertyNamingStrategy")
+    PROPERTY_NAMING_STRATEGY_INVALID("invalidPropertyNamingStrategy"),
+    CREATOR_PARAMETER_NOT_ANNOTATED("creatorParameterNotAnnotated")
     ;
 
     /** Message bundle key. */

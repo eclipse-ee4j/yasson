@@ -17,6 +17,7 @@ import org.eclipse.yasson.customization.model.CreatorConstructorPojo;
 import org.eclipse.yasson.customization.model.CreatorFactoryMethodPojo;
 import org.eclipse.yasson.customization.model.CreatorIncompatibleTypePojo;
 import org.eclipse.yasson.customization.model.CreatorMultipleDeclarationErrorPojo;
+import org.eclipse.yasson.customization.model.CreatorWithoutJsonbProperty;
 import org.junit.Test;
 
 import javax.json.bind.Jsonb;
@@ -43,7 +44,7 @@ public class JsonbCreatorTest {
 
     @Test
     public void testRootFactoryMethod() {
-        String json = "{\"str1\":\"abc\",\"str2\":\"def\",\"bigDec\":25}";
+        String json = "{\"par1\":\"abc\",\"par2\":\"def\",\"bigDec\":25}";
         final Jsonb jsonb = JsonbBuilder.create();
         CreatorFactoryMethodPojo pojo = jsonb.fromJson(json, CreatorFactoryMethodPojo.class);
         assertEquals("abc", pojo.str1);
@@ -53,7 +54,7 @@ public class JsonbCreatorTest {
 
     @Test
     public void testRootCreatorWithInnerCreator() {
-        String json = "{\"str1\":\"abc\",\"str2\":\"def\",\"bigDec\":25, \"innerFactoryCreator\":{\"str1\":\"inn1\",\"str2\":\"inn2\",\"bigDec\":11}}";
+        String json = "{\"str1\":\"abc\",\"str2\":\"def\",\"bigDec\":25, \"innerFactoryCreator\":{\"par1\":\"inn1\",\"par2\":\"inn2\",\"bigDec\":11}}";
         final Jsonb jsonb = JsonbBuilder.create();
         CreatorConstructorPojo pojo = jsonb.fromJson(json, CreatorConstructorPojo.class);
         assertEquals("abc", pojo.str1);
@@ -77,12 +78,21 @@ public class JsonbCreatorTest {
 
     @Test
     public void testMultipleCreatorsError() {
-
         try {
             JsonbBuilder.create().fromJson("{\"s1\":\"abc\"}", CreatorMultipleDeclarationErrorPojo.class);
             fail();
         } catch (JsonbException e) {
             assertTrue(e.getMessage().startsWith("More than one @JsonbCreator"));
+        }
+    }
+
+    @Test
+    public void testCreatorWithoutJsonbParameters() {
+        try {
+            JsonbBuilder.create().fromJson("{\"s1\":\"abc\"}", CreatorWithoutJsonbProperty.class);
+            fail();
+        } catch (JsonbException e) {
+            assertTrue(e.getMessage().startsWith("Argument has no JsonbProperty annotation"));
         }
     }
 }

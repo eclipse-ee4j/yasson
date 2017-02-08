@@ -21,6 +21,7 @@ import org.eclipse.yasson.internal.properties.Messages;
 import org.eclipse.yasson.internal.serializer.JsonbDateFormatter;
 import org.eclipse.yasson.internal.serializer.JsonbNumberFormatter;
 import org.eclipse.yasson.model.ClassCustomization;
+import org.eclipse.yasson.model.CreatorParam;
 import org.eclipse.yasson.model.CustomizationBuilder;
 import org.eclipse.yasson.model.JsonbAnnotatedElement;
 import org.eclipse.yasson.model.JsonbCreator;
@@ -152,11 +153,19 @@ public class AnnotationIntrospector {
         if (existing != null) {
             throw new JsonbException(Messages.getMessage(MessageKeys.MULTIPLE_JSONB_CREATORS, clazz));
         }
-        List<String> paramNames = new ArrayList<>();
-        for (Parameter param : executable.getParameters()) {
-            paramNames.add(param.getName());
+
+        final Parameter[] parameters = executable.getParameters();
+
+        List<CreatorParam> creatorParams = new ArrayList<>();
+        for (Parameter parameter : parameters) {
+            final JsonbProperty jsonbPropertyAnnotation = parameter.getAnnotation(JsonbProperty.class);
+            if (jsonbPropertyAnnotation == null || jsonbPropertyAnnotation.value().isEmpty()) {
+                throw new JsonbException(Messages.getMessage(MessageKeys.CREATOR_PARAMETER_NOT_ANNOTATED, executable.getName()));
+            }
+            creatorParams.add(new CreatorParam(jsonbPropertyAnnotation.value(), parameter.getType()));
         }
-        return new JsonbCreator(executable, paramNames.toArray(new String[paramNames.size()]));
+
+        return new JsonbCreator(executable, creatorParams);
     }
 
     /**

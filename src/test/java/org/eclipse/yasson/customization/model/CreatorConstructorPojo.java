@@ -14,6 +14,7 @@
 package org.eclipse.yasson.customization.model;
 
 import javax.json.bind.annotation.JsonbCreator;
+import javax.json.bind.annotation.JsonbProperty;
 import java.math.BigDecimal;
 
 /**
@@ -30,7 +31,7 @@ public class CreatorConstructorPojo {
     public CreatorFactoryMethodPojo innerFactoryCreator;
 
     @JsonbCreator
-    public CreatorConstructorPojo(String str1, String str2) {
+    public CreatorConstructorPojo(@JsonbProperty("str1") String str1, @JsonbProperty("str2") String str2) {
         this.str1 = str1;
         this.str2 = str2;
     }

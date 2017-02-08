@@ -21,6 +21,9 @@ import java.lang.reflect.Constructor;
 import java.lang.reflect.Executable;
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
 
 /**
  * Object holding reference to Constructor / Method for custom object creation.
@@ -31,11 +34,13 @@ public class JsonbCreator {
 
     private final Executable executable;
 
-    private final String[] params;
+    private final Map<String, CreatorParam> params = new HashMap<>();
 
-    public JsonbCreator(Executable executable, String[] params) {
+    public JsonbCreator(Executable executable, List<CreatorParam> creatorParams) {
         this.executable = executable;
-        this.params = params;
+        for (CreatorParam param : creatorParams) {
+            params.put(param.getName(), param);
+        }
     }
 
     /**
@@ -55,29 +60,24 @@ public class JsonbCreator {
                 return (T) ((Method) executable).invoke(on, params);
             }
         } catch (IllegalAccessException | InvocationTargetException | InstantiationException e) {
-            throw new JsonbException(Messages.getMessage(MessageKeys.ERROR_CALLING_JSONB_CREATOR));
+            throw new JsonbException(Messages.getMessage(MessageKeys.ERROR_CALLING_JSONB_CREATOR), e);
         }
     }
 
     /**
      * True if param name is one of creator params.
-     * @param param param name to check
+     * @param paramName param name to check
      * @return true if found
      */
-    public boolean contains(String param) {
-        for(int i=0; i<params.length; i++) {
-            if (params[i].equals(param)) {
-                return true;
-            }
-        }
-        return false;
+    public boolean contains(String paramName) {
+        return params.containsKey(paramName);
     }
 
     /**
-     * Parameter names of this creator.
-     * @return parameter names
+     * Parameters of this creator.
+     * @return parameters
      */
-    public String[] getParams() {
+    public Map<String, CreatorParam> getParams() {
         return params;
     }
 }

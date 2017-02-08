@@ -14,6 +14,7 @@
 package org.eclipse.yasson.customization.model;
 
 import javax.json.bind.annotation.JsonbCreator;
+import javax.json.bind.annotation.JsonbProperty;
 
 /**
  * @author Roman Grigoriadi
@@ -23,7 +24,7 @@ public class CreatorMultipleDeclarationErrorPojo {
     public String s1;
 
     @JsonbCreator
-    public CreatorMultipleDeclarationErrorPojo(String s1) {
+    public CreatorMultipleDeclarationErrorPojo(@JsonbProperty("val1") String s1) {
         this.s1 = s1;
     }
 
