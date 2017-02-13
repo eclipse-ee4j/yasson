@@ -6,17 +6,17 @@ import javax.json.bind.annotation.JsonbProperty;
 /**
  * @author Roman Grigoriadi
  */
-public class CreatorWithoutJsonbProperty {
+public class CreatorWithoutJsonbProperty1 {
 
     private final String par1;
     private final String par2;
-    private double par3;
+    private byte par3;
 
     @JsonbCreator
-    public CreatorWithoutJsonbProperty(@JsonbProperty("s1") String par1, String par2, double d1) {
+    public CreatorWithoutJsonbProperty1(String par1, @JsonbProperty("s2") String par2, byte par3) {
         this.par1 = par1;
         this.par2 = par2;
-        this.par3 = d1;
+        this.par3 = par3;
     }
 
     public String getPar1() {
@@ -27,7 +27,7 @@ public class CreatorWithoutJsonbProperty {
         return par2;
     }
 
-    public double getPar3() {
+    public byte getPar3() {
         return par3;
     }
 }

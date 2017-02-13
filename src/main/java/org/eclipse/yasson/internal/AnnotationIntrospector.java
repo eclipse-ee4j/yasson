@@ -156,13 +156,15 @@ public class AnnotationIntrospector {
 
         final Parameter[] parameters = executable.getParameters();
 
-        List<CreatorParam> creatorParams = new ArrayList<>();
-        for (Parameter parameter : parameters) {
+        CreatorParam[] creatorParams = new CreatorParam[parameters.length];
+        for (int i=0; i<parameters.length; i++) {
+            final Parameter parameter = parameters[i];
             final JsonbProperty jsonbPropertyAnnotation = parameter.getAnnotation(JsonbProperty.class);
-            if (jsonbPropertyAnnotation == null || jsonbPropertyAnnotation.value().isEmpty()) {
-                throw new JsonbException(Messages.getMessage(MessageKeys.CREATOR_PARAMETER_NOT_ANNOTATED, executable.getName()));
+            if (jsonbPropertyAnnotation != null && !jsonbPropertyAnnotation.value().isEmpty()) {
+                creatorParams[i] = new CreatorParam(jsonbPropertyAnnotation.value(), parameter.getType());
+            } else {
+                creatorParams[i] = new CreatorParam(parameter.getName(), parameter.getType());
             }
-            creatorParams.add(new CreatorParam(jsonbPropertyAnnotation.value(), parameter.getType()));
         }
 
         return new JsonbCreator(executable, creatorParams);

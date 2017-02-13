@@ -34,13 +34,11 @@ public class JsonbCreator {
 
     private final Executable executable;
 
-    private final Map<String, CreatorParam> params = new HashMap<>();
+    private final CreatorParam[] params;
 
-    public JsonbCreator(Executable executable, List<CreatorParam> creatorParams) {
+    public JsonbCreator(Executable executable, CreatorParam[] creatorParams) {
         this.executable = executable;
-        for (CreatorParam param : creatorParams) {
-            params.put(param.getName(), param);
-        }
+        this.params = creatorParams;
     }
 
     /**
@@ -70,14 +68,28 @@ public class JsonbCreator {
      * @return true if found
      */
     public boolean contains(String paramName) {
-        return params.containsKey(paramName);
+        return findByName(paramName) != null;
+    }
+
+    /**
+     * Find creator parameter by name.
+     * @param paramName parameter name as it appear in json document.
+     * @return creator parameter
+     */
+    public CreatorParam findByName(String paramName) {
+        for (CreatorParam param : params) {
+            if (param.getName().equals(paramName)) {
+                return param;
+            }
+        }
+        return null;
     }
 
     /**
      * Parameters of this creator.
      * @return parameters
      */
-    public Map<String, CreatorParam> getParams() {
+    public CreatorParam[] getParams() {
         return params;
     }
 }

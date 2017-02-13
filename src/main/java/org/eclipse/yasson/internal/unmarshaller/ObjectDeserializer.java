@@ -12,6 +12,7 @@
  ******************************************************************************/
 package org.eclipse.yasson.internal.unmarshaller;
 
+import com.sun.org.apache.xpath.internal.operations.Bool;
 import org.eclipse.yasson.internal.JsonbParser;
 import org.eclipse.yasson.internal.JsonbRiParser;
 import org.eclipse.yasson.internal.ReflectionUtils;
@@ -23,6 +24,7 @@ import org.eclipse.yasson.model.PropertyModel;
 
 import javax.json.bind.serializer.JsonbDeserializer;
 import javax.json.stream.JsonParser;
+import java.lang.reflect.Type;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Iterator;
@@ -112,8 +114,12 @@ class ObjectDeserializer<T> extends AbstractContainerDeserializer<T> {
     private T createInstance(Class<T> rawType, JsonbCreator creator) {
         final T instance;
         final List<Object> paramValues = new ArrayList<>();
-        for(CreatorParam param : creator.getParams().values()) {
-            paramValues.add(values.get(param.getName()));
+        for(CreatorParam param : creator.getParams()) {
+            Object value = values.get(param.getName());
+            if (value == null) {
+                value = defaultConstructorValue(param.getType());
+            }
+            paramValues.add(value);
         }
         instance = creator.call(paramValues.toArray(), rawType);
         return instance;
@@ -134,7 +140,7 @@ class ObjectDeserializer<T> extends AbstractContainerDeserializer<T> {
         final JsonbCreator creator = getClassModel().getClassCustomization().getCreator();
         //first check jsonb creator param, since it can be different from property name
         if (creator != null) {
-            final CreatorParam param = creator.getParams().get(parserContext.getLastKeyName());
+            final CreatorParam param = creator.findByName(parserContext.getLastKeyName());
             if (param != null) {
                 final JsonbDeserializer<?> deserializer = newUnmarshallerItemBuilder(context.getJsonbContext()).withType(param.getType()).build();
                 Object result = deserializer.deserialize(parser, context, param.getType());
@@ -174,5 +180,25 @@ class ObjectDeserializer<T> extends AbstractContainerDeserializer<T> {
         }
         lastPropertyModel = new LastPropertyModel(lastKeyName, getClassModel().findPropertyModelByJsonReadName(lastKeyName));
         return lastPropertyModel.getPropertyModel();
+    }
+
+    private Object defaultConstructorValue(Type paramType) {
+        if (paramType == Boolean.TYPE) {
+            return false;
+        } else if (paramType == Byte.TYPE) {
+            return (byte) 0;
+        } else if (paramType == Short.TYPE) {
+            return (short) 0;
+        } else if (paramType == Integer.TYPE) {
+            return 0;
+        } else if (paramType == Float.TYPE) {
+            return 0f;
+        } else if (paramType == Double.TYPE) {
+            return 0d;
+        } else if (paramType == Long.TYPE) {
+            return 0L;
+        } else {
+            return null;
+        }
     }
 }
