@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2015 Oracle and/or its affiliates. All rights reserved.
+ * Copyright (c) 2015, 2017 Oracle and/or its affiliates. All rights reserved.
  * This program and the accompanying materials are made available under the
  * terms of the Eclipse Public License v1.0 and Eclipse Distribution License v. 1.0
  * which accompanies this distribution.
@@ -43,8 +43,8 @@ public class Marshaller extends ProcessingContext implements SerializationContex
     /**
      * Creates Marshaller for generation to String.
      *
-     * @param jsonbContext
-     * @param rootRuntimeType type of root object
+     * @param jsonbContext Current context.
+     * @param rootRuntimeType Type of root object.
      */
     public Marshaller(JsonbContext jsonbContext, Type rootRuntimeType) {
         super(jsonbContext);
@@ -54,7 +54,7 @@ public class Marshaller extends ProcessingContext implements SerializationContex
     /**
      * Creates Marshaller for generation to String.
      *
-     * @param jsonbContext
+     * @param jsonbContext Current context.
      */
     public Marshaller(JsonbContext jsonbContext) {
         super(jsonbContext);

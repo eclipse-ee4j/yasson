@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2016 Oracle and/or its affiliates. All rights reserved.
+ * Copyright (c) 2016, 2017 Oracle and/or its affiliates. All rights reserved.
  * This program and the accompanying materials are made available under the
  * terms of the Eclipse Public License v1.0 and Eclipse Distribution License v. 1.0
  * which accompanies this distribution.
@@ -28,19 +28,23 @@ public class AbstractSerializerBuilder<T extends AbstractSerializerBuilder> {
      * Not null with an exception of a root item.
      */
     protected CurrentItem<?> wrapper;
+
     /**
      * Model of jsonb binding.
      */
     protected JsonBindingModel model;
+
     /**
      * In case of unknown object genericType.
      * Null for embedded objects such as collections, or known conversion types.
      */
     protected ClassModel classModel;
+
     /**
      * Runtime type resolved after expanding type variables and wildcards.
      */
     protected Type runtimeType;
+
     /**
      * Type is used when field model is not present.
      * In case of root, or embedded objects such as collections.

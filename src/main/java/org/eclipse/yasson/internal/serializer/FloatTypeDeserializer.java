@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2016 Oracle and/or its affiliates. All rights reserved.
+ * Copyright (c) 2016, 2017 Oracle and/or its affiliates. All rights reserved.
  * This program and the accompanying materials are made available under the
  * terms of the Eclipse Public License v1.0 and Eclipse Distribution License v. 1.0
  * which accompanies this distribution.
@@ -22,7 +22,7 @@ import javax.json.bind.JsonbException;
 import java.lang.reflect.Type;
 
 /**
- * @author David Král
+ * @author David Kral
  */
 public class FloatTypeDeserializer extends AbstractNumberDeserializer<Float> {
 
@@ -30,14 +30,6 @@ public class FloatTypeDeserializer extends AbstractNumberDeserializer<Float> {
         super(Float.class, model);
     }
 
-    /**
-     * Convert string value to object.
-     *
-     * @param jsonValue    json value
-     * @param unmarshaller unmarshaller instance
-     * @param rtType
-     * @return deserialized object
-     */
     @Override
     protected Float deserialize(String jsonValue, Unmarshaller unmarshaller, Type rtType) {
         return deserializeForamtted(jsonValue, false, unmarshaller.getJsonbContext())

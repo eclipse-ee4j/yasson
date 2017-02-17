@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2016 Oracle and/or its affiliates. All rights reserved.
+ * Copyright (c) 2016, 2017 Oracle and/or its affiliates. All rights reserved.
  * This program and the accompanying materials are made available under the
  * terms of the Eclipse Public License v1.0 and Eclipse Distribution License v. 1.0
  * which accompanies this distribution.
@@ -30,8 +30,9 @@ public abstract class AbstractValueTypeSerializer<T> implements JsonbSerializer<
     protected final JsonBindingModel model;
 
     /**
-     * New instance.
-     * @param model
+     * Creates a new instance.
+     *
+     * @param model Binding model.
      */
     public AbstractValueTypeSerializer(JsonBindingModel model) {
         this.model = model;
@@ -40,9 +41,9 @@ public abstract class AbstractValueTypeSerializer<T> implements JsonbSerializer<
     /**
      * Serializes an object to JSON.
      *
-     * @param obj       object to serialize
-     * @param generator JSON generator to use
-     * @param ctx       JSONB mapper context
+     * @param obj Object to serialize.
+     * @param generator JSON generator to use.
+     * @param ctx JSON-B mapper context.
      */
     @Override
     public void serialize(T obj, JsonGenerator generator, SerializationContext ctx) {

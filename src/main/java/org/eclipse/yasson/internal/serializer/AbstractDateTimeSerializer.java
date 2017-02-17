@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2016 Oracle and/or its affiliates. All rights reserved.
+ * Copyright (c) 2016, 2017 Oracle and/or its affiliates. All rights reserved.
  * This program and the accompanying materials are made available under the
  * terms of the Eclipse Public License v1.0 and Eclipse Distribution License v. 1.0
  * which accompanies this distribution.
@@ -30,25 +30,17 @@ import java.util.Locale;
  *
  * @author Roman Grigoriadi
  */
-
 public abstract class AbstractDateTimeSerializer<T extends TemporalAccessor> extends AbstractValueTypeSerializer<T> {
-
 
     /**
      * Construct serializer with its class.
-     * @param clazz class
+     *
+     * @param model Binding model.
      */
-    public AbstractDateTimeSerializer(Class<T> clazz, JsonBindingModel model) {
+    public AbstractDateTimeSerializer(JsonBindingModel model) {
         super(model);
     }
 
-    /**
-     * Serializes an object to JSON.
-     *
-     * @param obj       object to serialize
-     * @param generator JSON generator to use
-     * @param ctx       JSONB mapper context
-     */
     @Override
     public void serialize(T obj, JsonGenerator generator, SerializationContext ctx) {
         final JsonbContext jsonbContext = ((Marshaller) ctx).getJsonbContext();
@@ -60,6 +52,14 @@ public abstract class AbstractDateTimeSerializer<T extends TemporalAccessor> ext
         }
     }
 
+    /**
+     * Converts to JSON string.
+     *
+     * @param object Object to convert.
+     * @param formatter Formatter to use.
+     * @param jsonbContext JSON-B context.
+     * @return JSON representation of given object.
+     */
     public String toJson(T object, JsonbDateFormatter formatter, JsonbContext jsonbContext) {
         if (JsonbDateFormat.TIME_IN_MILLIS.equals(formatter.getFormat())) {
             return String.valueOf(toInstant(object).toEpochMilli());

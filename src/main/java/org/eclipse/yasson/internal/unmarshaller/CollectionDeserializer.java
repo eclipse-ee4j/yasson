@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2015 Oracle and/or its affiliates. All rights reserved.
+ * Copyright (c) 2015, 2017 Oracle and/or its affiliates. All rights reserved.
  * This program and the accompanying materials are made available under the
  * terms of the Eclipse Public License v1.0 and Eclipse Distribution License v. 1.0
  * which accompanies this distribution.
@@ -48,7 +48,7 @@ class CollectionDeserializer<T extends Collection<?>> extends AbstractContainerD
     private T instance;
 
     /**
-     * @param builder
+     * @param builder {@link DeserializerBuilder) used to build this instance
      */
     protected CollectionDeserializer(DeserializerBuilder builder) {
         super(builder);
@@ -84,12 +84,6 @@ class CollectionDeserializer<T extends Collection<?>> extends AbstractContainerD
         return ReflectionUtils.createNoArgConstructorInstance(rawType);
     }
 
-    /**
-     * Instance of an item. Unmarshalling sets values to such instance.
-     *
-     * @return instance
-     * @param unmarshaller
-     */
     @Override
     public T getInstance(Unmarshaller unmarshaller) {
         return instance;
@@ -105,14 +99,6 @@ class CollectionDeserializer<T extends Collection<?>> extends AbstractContainerD
         ((Collection<T>) instance).add(object);
     }
 
-
-    /**
-     * Determine class mappings and create an instance of a new deserializer.
-     * Currently processed deserializer is pushed to stack, for waiting till new object is finished.
-     *
-     * @param parser
-     * @param context
-     */
     @Override
     protected void deserializeNext(JsonParser parser, Unmarshaller context) {
         final JsonbDeserializer<?> deserializer = newCollectionOrMapItem(collectionValueType, context.getJsonbContext());

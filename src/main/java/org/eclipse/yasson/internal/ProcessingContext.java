@@ -23,8 +23,8 @@ public abstract class ProcessingContext {
 
     protected static final String NULL = "null";
 
-
     protected final JsonbContext jsonbContext;
+
     /**
      * Parent instance for marshaller and unmarshaller.
      *
@@ -36,6 +36,7 @@ public abstract class ProcessingContext {
 
     /**
      * Jsonb context.
+     *
      * @return jsonb context
      */
     public JsonbContext getJsonbContext() {
@@ -44,6 +45,7 @@ public abstract class ProcessingContext {
 
     /**
      * Mapping context.
+     *
      * @return mapping context
      */
     public MappingContext getMappingContext() {

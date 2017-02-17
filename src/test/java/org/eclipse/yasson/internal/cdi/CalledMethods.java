@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2016 Oracle and/or its affiliates. All rights reserved.
+ * Copyright (c) 2016, 2017 Oracle and/or its affiliates. All rights reserved.
  * This program and the accompanying materials are made available under the
  * terms of the Eclipse Public License v1.0 and Eclipse Distribution License v. 1.0
  * which accompanies this distribution.
@@ -32,9 +32,10 @@ public class CalledMethods {
     private Map<String, Integer> results = new HashMap<>();
 
     /**
-     * Returns if method was called.
-     * @param methodName
-     * @return
+     * Returns true if given method method was called.
+     *
+     * @param methodName Method to check.
+     * @return True if given method was called.
      */
     public boolean isCalled(String methodName) {
         return results.containsKey(methodName);

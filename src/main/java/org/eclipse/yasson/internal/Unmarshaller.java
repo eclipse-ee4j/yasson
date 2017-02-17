@@ -40,7 +40,7 @@ public class Unmarshaller extends ProcessingContext implements DeserializationCo
 
     private CurrentItem<?> current;
 
-            @Override
+    @Override
     public <T> T deserialize(Class<T> clazz, JsonParser parser) {
         return deserializeItem(clazz, parser);
                 }

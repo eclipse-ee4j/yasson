@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2016 Oracle and/or its affiliates. All rights reserved.
+ * Copyright (c) 2016, 2017 Oracle and/or its affiliates. All rights reserved.
  * This program and the accompanying materials are made available under the
  * terms of the Eclipse Public License v1.0 and Eclipse Distribution License v. 1.0
  * which accompanies this distribution.
@@ -34,8 +34,11 @@ public class JsonbDateFormatter {
     private final String locale;
 
     /**
-     * Construct with cached {@link DateTimeFormatter}, format and locale.
-     * @param dateTimeFormatter
+     * Creates an instance with cached {@link DateTimeFormatter}, format and locale.
+     *
+     * @param dateTimeFormatter Reused time formatter.
+     * @param format Format in string.
+     * @param locale Locale in string.
      */
     public JsonbDateFormatter(DateTimeFormatter dateTimeFormatter, String format, String locale) {
         this.dateTimeFormatter = dateTimeFormatter;
@@ -44,8 +47,9 @@ public class JsonbDateFormatter {
     }
 
     /**
-     * Construct with cached {@link DateTimeFormatter}.
-     * @param dateTimeFormatter
+     * Creates an instance with cached {@link DateTimeFormatter}.
+     *
+     * @param dateTimeFormatter Reused date/time formatter.
      */
     public JsonbDateFormatter(DateTimeFormatter dateTimeFormatter) {
         this.dateTimeFormatter = dateTimeFormatter;
@@ -54,9 +58,11 @@ public class JsonbDateFormatter {
     }
 
     /**
-     * Construct with format string and locale. Formatter will be created on every formatting / parsing operation.
-     * @param format formatter format
-     * @param locale locale
+     * Creates an instance with format string and locale.
+     * Formatter will be created on every formatting / parsing operation.
+     *
+     * @param format Formatter format.
+     * @param locale Locale in string.
      */
     public JsonbDateFormatter(String format, String locale) {
         this.format = format;
@@ -65,8 +71,9 @@ public class JsonbDateFormatter {
     }
 
     /**
-     * Cached instance of {@link DateTimeFormatter} to be used.
-     * @return formatter instance
+     * Creates an instance with cached instance of {@link DateTimeFormatter}.
+     *
+     * @return Formatter instance.
      */
     public DateTimeFormatter getDateTimeFormatter() {
         return dateTimeFormatter;
@@ -76,7 +83,8 @@ public class JsonbDateFormatter {
      * Format string to be used either by formatter.
      * Needed for formatting {@link java.util.Date} with {@link java.text.SimpleDateFormat},
      * which is not threadsafe.
-     * @return format
+     *
+     * @return Format.
      */
     public String getFormat() {
         return format;
@@ -84,7 +92,8 @@ public class JsonbDateFormatter {
 
     /**
      * Locale to use with formatter.
-     * @return locale
+     *
+     * @return Locale.
      */
     public String getLocale() {
         return locale;
@@ -93,7 +102,7 @@ public class JsonbDateFormatter {
     /**
      * Default date formatter if none is provided.
      *
-     * @return default date formatter
+     * @return Default date formatter.
      */
     public static JsonbDateFormatter getDefault() {
         return new JsonbDateFormatter(JsonbDateFormat.DEFAULT_FORMAT, JsonbDateFormat.DEFAULT_LOCALE);

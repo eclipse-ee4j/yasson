@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2015 Oracle and/or its affiliates. All rights reserved.
+ * Copyright (c) 2015, 2017 Oracle and/or its affiliates. All rights reserved.
  * This program and the accompanying materials are made available under the
  * terms of the Eclipse Public License v1.0 and Eclipse Distribution License v. 1.0
  * which accompanies this distribution.
@@ -8,7 +8,7 @@
  * http://www.eclipse.org/org/documents/edl-v10.php.
  *
  * Contributors:
- *     David Král - initial implementation
+ *     David Kral - initial implementation
  ******************************************************************************/
 package org.eclipse.yasson.internal.properties;
 
@@ -25,7 +25,7 @@ import java.util.ResourceBundle;
 /**
  * JSONB properties file manager.
  *
- * @author David Král
+ * @author David Kral
  */
 public class Messages {
 

@@ -78,9 +78,11 @@ public class PropertyModel implements JsonBindingModel, Comparable<PropertyModel
     private final boolean resolvedType;
 
     /**
-     * Creates instance.
-     * @param classModel classModel of declaring class.
-     * @param property javabean like property to model.
+     * Creates an instance.
+     *
+     * @param classModel Class model of declaring class.
+     * @param property Property.
+     * @param jsonbContext Context.
      */
     public PropertyModel(ClassModel classModel, Property property, JsonbContext jsonbContext) {
         this.classModel = classModel;

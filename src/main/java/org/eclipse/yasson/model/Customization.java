@@ -10,7 +10,6 @@
  * Contributors:
  * Roman Grigoriadi
  ******************************************************************************/
-
 package org.eclipse.yasson.model;
 
 import org.eclipse.yasson.internal.adapter.AdapterBinding;
@@ -41,9 +40,9 @@ public abstract class Customization {
 
     private final JsonbNumberFormatter numberFormat;
 
-
     /**
      * Copies properties from builder an creates immutable instance.
+     *
      * @param builder not null
      */
     public Customization(CustomizationBuilder builder) {
@@ -72,17 +71,18 @@ public abstract class Customization {
     }
 
     /**
-     * Marshall null values to JSON.
+     * Returns true if <i>nillable</i> customization is present.
      *
-     * @return if true marshalling null values is active
+     * @return True if <i>nillable</i> customization is present.
      */
     public boolean isNillable() {
         return nillable;
     }
 
     /**
-     * Skip marshalling / unmarshalling for this customization.
-     * Works as java "transient" keyword.
+     * Returns true if <i>transient</i> customization is present.
+     *
+     * @return True if <i>transient</i> customization is present.
      */
     public boolean isJsonbTransient() {
 
@@ -92,7 +92,8 @@ public abstract class Customization {
     /**
      * Date formatter for formatting dates.
      * If not set defaulted to javax.json.bind.annotation.JsonbDateFormat.DEFAULT_FORMAT.
-     * @return date format
+     *
+     * @return Date format.
      */
     public JsonbDateFormatter getDateTimeFormatter() {
         return dateTimeFormatter;
@@ -100,6 +101,7 @@ public abstract class Customization {
 
     /**
      * Number format for formatting numbers.
+     *
      * @return number format
      */
     public JsonbNumberFormatter getNumberFormat() {

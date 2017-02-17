@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2016 Oracle and/or its affiliates. All rights reserved.
+ * Copyright (c) 2016, 2017 Oracle and/or its affiliates. All rights reserved.
  * This program and the accompanying materials are made available under the
  * terms of the Eclipse Public License v1.0 and Eclipse Distribution License v. 1.0
  * which accompanies this distribution.
@@ -30,10 +30,9 @@ public interface RuntimeTypeInfo {
     RuntimeTypeInfo getWrapper();
 
     /**
-     * Runtime type of a class. Can be a class, ParameterizedType, or TypeVariable.
-     * When a field or a class is declared including generic information this will return runtime type info.
+     * Returns a runtime type. It can be a class, {@link java.lang.reflect.ParameterizedType} or {@link java.lang.reflect.TypeVariable}.
      *
-     * @return
+     * @return Runtime type or null if not defined.
      */
     Type getRuntimeType();
 }

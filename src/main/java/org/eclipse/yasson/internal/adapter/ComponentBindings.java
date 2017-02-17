@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2016 Oracle and/or its affiliates. All rights reserved.
+ * Copyright (c) 2016, 2017 Oracle and/or its affiliates. All rights reserved.
  * This program and the accompanying materials are made available under the
  * terms of the Eclipse Public License v1.0 and Eclipse Distribution License v. 1.0
  * which accompanies this distribution.
@@ -10,13 +10,13 @@
  * Contributors:
  * Roman Grigoriadi
  ******************************************************************************/
-
 package org.eclipse.yasson.internal.adapter;
 
 import java.lang.reflect.Type;
 
 /**
  * Wrapper holding singleton instances of user defined components - Adapters, (De)Serializers.
+ *
  * @author Roman Grigoriadi
  */
 public class ComponentBindings {
@@ -38,8 +38,12 @@ public class ComponentBindings {
     }
 
     /**
-     * Construct populated bindings for a given type.
-     * @param bindingType type components are bound to
+     * Creates an instance and populates it with bindings for a given type.
+     *
+     * @param bindingType Type components are bound to.
+     * @param serializer Serializer.
+     * @param deserializer Deserializer.
+     * @param adapter Adapter.
      */
     public ComponentBindings(Type bindingType, SerializerBinding serializer, DeserializerBinding deserializer, AdapterBinding adapter) {
         this.bindingType = bindingType;
@@ -50,7 +54,8 @@ public class ComponentBindings {
 
     /**
      * Type to which components are bound.
-     * @return bound type
+     *
+     * @return Bound type.
      */
     public Type getBindingType() {
         return bindingType;

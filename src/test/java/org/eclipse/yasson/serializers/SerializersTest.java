@@ -25,11 +25,9 @@ import org.eclipse.yasson.serializers.model.CrateJsonObjectDeserializer;
 import org.eclipse.yasson.serializers.model.CrateSerializer;
 import org.eclipse.yasson.serializers.model.CrateSerializerWithConversion;
 import org.eclipse.yasson.serializers.model.PolymorphicDeserializer;
-import org.eclipse.yasson.serializers.model.StringPaddingSerializer;
 import org.eclipse.yasson.serializers.model.StringWrapper;
 import org.junit.Test;
 
-import javax.json.JsonBuilderFactory;
 import javax.json.bind.Jsonb;
 import javax.json.bind.JsonbBuilder;
 import javax.json.bind.JsonbConfig;

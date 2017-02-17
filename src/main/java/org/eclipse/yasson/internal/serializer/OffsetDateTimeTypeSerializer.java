@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2016 Oracle and/or its affiliates. All rights reserved.
+ * Copyright (c) 2016, 2017 Oracle and/or its affiliates. All rights reserved.
  * This program and the accompanying materials are made available under the
  * terms of the Eclipse Public License v1.0 and Eclipse Distribution License v. 1.0
  * which accompanies this distribution.
@@ -22,15 +22,19 @@ import java.util.Locale;
 import java.util.logging.Logger;
 
 /**
- * @author David Král
+ * Serializer for {@link OffsetDateTime} type.
+ *
+ * @author David Kral
  */
 public class OffsetDateTimeTypeSerializer extends AbstractDateTimeSerializer<OffsetDateTime> {
 
-    private static final Logger log = Logger.getLogger(OffsetDateTimeTypeSerializer.class.getName());
-
-
+    /**
+     * Creates a serializer.
+     *
+     * @param model Binding model.
+     */
     public OffsetDateTimeTypeSerializer(JsonBindingModel model) {
-        super(OffsetDateTime.class, model);
+        super(model);
     }
 
     @Override
@@ -42,5 +46,4 @@ public class OffsetDateTimeTypeSerializer extends AbstractDateTimeSerializer<Off
     protected String formatDefault(OffsetDateTime value, Locale locale) {
         return DateTimeFormatter.ISO_OFFSET_DATE_TIME.withLocale(locale).format(value);
     }
-
 }

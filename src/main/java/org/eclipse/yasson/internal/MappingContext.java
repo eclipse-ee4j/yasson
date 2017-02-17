@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2015 Oracle and/or its affiliates. All rights reserved.
+ * Copyright (c) 2015, 2017 Oracle and/or its affiliates. All rights reserved.
  * This program and the accompanying materials are made available under the
  * terms of the Eclipse Public License v1.0 and Eclipse Distribution License v. 1.0
  * which accompanies this distribution.
@@ -78,9 +78,11 @@ public class MappingContext {
     }
 
     /**
-     * Search for class model.
-     * Parse class and create one if not found.
-     * @param clazz clazz to search by or parse, not null.
+     * Searches for class model for given class. Returns the existing instance. Creates a new instance if
+     * it doesn't exist.
+     *
+     * @param clazz Class to search by or parse, not null.
+     * @return {@link ClassModel} for given class.
      */
     public ClassModel getOrCreateClassModel(Class<?> clazz) {
         ClassModel classModel = classes.get(clazz);

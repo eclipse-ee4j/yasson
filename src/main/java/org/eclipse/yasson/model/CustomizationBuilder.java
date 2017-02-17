@@ -49,8 +49,9 @@ public class CustomizationBuilder {
     private String[] propertyOrder;
 
     /**
-     * Creates customization for class properties.
-     * @return class property customization
+     * Creates a customization for class properties.
+     *
+     * @return A new instance of {@link PropertyCustomization}
      */
     public PropertyCustomization buildPropertyCustomization() {
         return new PropertyCustomization(this);
@@ -58,176 +59,207 @@ public class CustomizationBuilder {
 
     /**
      * Creates customization for class.
-     * @return class customization
+     *
+     * @return A new instance of {@link ClassCustomization}
      */
     public ClassCustomization buildClassCustomization() {
         return new ClassCustomization(this);
     }
 
     /**
-     * Marshall null values to JSON.
-     * @return if true marshalling null values is active
+     * Returns true if <i>nillable</i> customization is present.
+     *
+     * @return True if <i>nillable</i> customization is present.
      */
     public boolean isNillable() {
         return nillable;
     }
 
     /**
-     * Marshall null values to JSON.
+     * Sets a presence of <i>nillable</i> customization.
+     *
+     * @param nillable Presence of <i>nillable</i> customization.
      */
     public void setNillable(boolean nillable) {
         this.nillable = nillable;
     }
 
     /**
-     * Skip marshalling / unmarshalling for this customization.
-     * Works as java "transient" keyword.
+     * Returns true if <i>transient</i> customization is present.
+     *
+     * @return True if <i>transient</i> customization is present.
      */
     public boolean isJsonbTransient() {
         return jsonbTransient;
     }
 
     /**
-     * Skip marshalling / unmarshalling for this customization.
-     * Works as java "transient" keyword.
+     * Sets a presence of <i>transient</i> customization.
+     *
+     * @param jsonbTransient Presence of <i>transient</i> customization.
      */
     public void setJsonbTransient(boolean jsonbTransient) {
         this.jsonbTransient = jsonbTransient;
     }
 
     /**
-     * Name as appears in JSON for reading property.
+     * Sets a JSON property name used to read a property value from on deserialization.
+     *
+     * @return JSON property name
      */
     public String getJsonReadName() {
         return jsonReadName;
     }
 
     /**
-     * Name as appears in JSON for reading property.
+     * Sets a JSON property name used to read a property value from on deserialization.
+     *
+     * @param jsonReadName JSON property name
      */
     public void setJsonReadName(String jsonReadName) {
         this.jsonReadName = jsonReadName;
     }
 
     /**
-     * Name as should be written to JSON for marshalling.
+     * Gets a property name which is written to JSON document on serialization.
+     *
+     * @return Property name.
      */
     public String getJsonWriteName() {
         return jsonWriteName;
     }
 
     /**
-     * Name as should be written to JSON for marshalling.
+     * Sets a property name which is written to JSON document on serialization.
+     *
+     * @param jsonWriteName Property name.
      */
     public void setJsonWriteName(String jsonWriteName) {
         this.jsonWriteName = jsonWriteName;
     }
 
     /**
-     * Adapter a class or a property of a class.
-     * @return adapter
+     * Gets an adapter.
+     *
+     * @return Adapter.
      */
     public AdapterBinding getAdapterInfo() {
         return adapterInfo;
     }
 
     /**
-     * Adapter a class or a property of a class.
-     * @param adapterInfo adapter info
+     * Sets an adapter.
+     *
+     * @param adapterInfo Adapter.
      */
     public void setAdapterInfo(AdapterBinding adapterInfo) {
         this.adapterInfo = adapterInfo;
     }
 
     /**
-     * Meta info for user serializers.
-     * @return serializer info
+     * Gets meta info for user serializers.
+     *
+     * @return Serializer info
      */
     public SerializerBinding getSerializerBinding() {
         return serializerBinding;
     }
 
     /**
-     * Set serializer info.
-     * @param serializerBinding
+     * Sets serializer info.
+     *
+     * @param serializerBinding Serializer info to set.
      */
     public void setSerializerBinding(SerializerBinding serializerBinding) {
         this.serializerBinding = serializerBinding;
     }
 
     /**
-     * Deserializer info.
-     * @return deserializer
+     * Gets a deserializer.
+     *
+     * @return Deserializer.
      */
     public DeserializerBinding getDeserializerBinding() {
         return deserializerBinding;
     }
 
     /**
-     * Deserializer info.
-     * @param deserializerBinding deserializer
+     * Sets a deserializer info.
+     *
+     * @param deserializerBinding Deserializer.
      */
     public void setDeserializerBinding(DeserializerBinding deserializerBinding) {
         this.deserializerBinding = deserializerBinding;
     }
 
     /**
-     * Date format for formatting dates.
-     * @return date format
+     * Gets a date format for formatting dates.
+     *
+     * @return Date format.
      */
     public JsonbDateFormatter getDateFormatter() {
         return dateFormatter;
     }
 
     /**
-     * Date format for formatting dates.
-     * @param dateFormatter date format
+     * Sets date format for formatting dates.
+     *
+     * @param dateFormatter Date format.
      */
-    public CustomizationBuilder setDateFormatter(JsonbDateFormatter dateFormatter) {
+    public void setDateFormatter(JsonbDateFormatter dateFormatter) {
         this.dateFormatter = dateFormatter;
-        return this;
     }
 
     /**
-     * Number formatter for formatting numbers
-     * @return number format
+     * Gets number formatter for formatting numbers.
+     *
+     * @return Number format.
      */
     public JsonbNumberFormatter getNumberFormat() {
         return numberFormat;
     }
 
     /**
-     * Number formatter for formatting numbers.
-     * @param numberFormat number format
+     * Sets number formatter for formatting numbers.
+     *
+     * @param numberFormat Number format.
      */
     public void setNumberFormat(JsonbNumberFormatter numberFormat) {
         this.numberFormat = numberFormat;
     }
 
     /**
-     * Custom constructor or method for user instantiation.
-     * @return creator
+     * Gets custom constructor or method for user instantiation.
+     *
+     * @return Custom creator.
      */
     public JsonbCreator getCreator() {
         return creator;
     }
 
     /**
-     * Custom constructor or method for user instantiation.
+     * Sets custom constructor or method for user instantiation.
+     *
+     * @param creator Creator to set.
      */
     public void setCreator(JsonbCreator creator) {
         this.creator = creator;
     }
 
     /**
-     * Names of properties to sort with.
+     * Gets ordered list of property names.
      *
-     * @return sorted names of properties
+     * @return Sorted names of properties.
      */
     public String[] getPropertyOrder() {
         return propertyOrder;
     }
 
+    /**
+     * Sets a sorted list of property names.
+     *
+     * @param propertyOrder Array containing property names
+     */
     public void setPropertyOrder(String[] propertyOrder) {
         this.propertyOrder = propertyOrder;
     }

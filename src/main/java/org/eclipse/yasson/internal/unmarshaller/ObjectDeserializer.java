@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2015 Oracle and/or its affiliates. All rights reserved.
+ * Copyright (c) 2015, 2017 Oracle and/or its affiliates. All rights reserved.
  * This program and the accompanying materials are made available under the
  * terms of the Eclipse Public License v1.0 and Eclipse Distribution License v. 1.0
  * which accompanies this distribution.
@@ -12,7 +12,6 @@
  ******************************************************************************/
 package org.eclipse.yasson.internal.unmarshaller;
 
-import com.sun.org.apache.xpath.internal.operations.Bool;
 import org.eclipse.yasson.internal.JsonbParser;
 import org.eclipse.yasson.internal.JsonbRiParser;
 import org.eclipse.yasson.internal.ReflectionUtils;
@@ -81,8 +80,8 @@ class ObjectDeserializer<T> extends AbstractContainerDeserializer<T> {
      * Due to support of custom (parametrized) constructors and factory methods, values are held in map,
      * which is transferred into instance values by calling getInstance.
      *
-     * @return instance
-     * @param unmarshaller
+     * @param unmarshaller Current deserialization context.
+     * @return An instance of deserializing item.
      */
     @Override
     @SuppressWarnings("unchecked")
@@ -127,7 +126,8 @@ class ObjectDeserializer<T> extends AbstractContainerDeserializer<T> {
 
     /**
      * Set populated instance of current object to its unfinished wrapper values map.
-     * @param result
+     *
+     * @param result An instance result of an item.
      */
     @Override
     public void appendResult(Object result) {

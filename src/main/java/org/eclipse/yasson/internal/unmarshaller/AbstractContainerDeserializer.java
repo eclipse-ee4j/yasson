@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2016 Oracle and/or its affiliates. All rights reserved.
+ * Copyright (c) 2016, 2017 Oracle and/or its affiliates. All rights reserved.
  * This program and the accompanying materials are made available under the
  * terms of the Eclipse Public License v1.0 and Eclipse Distribution License v. 1.0
  * which accompanies this distribution.
@@ -29,6 +29,8 @@ import javax.json.stream.JsonParser;
 import java.lang.reflect.Type;
 
 /**
+ * Base class for all deserializers.
+ *
  * @author Roman Grigoriadi
  */
 public abstract class AbstractContainerDeserializer<T> extends AbstractItem<T> implements JsonbDeserializer<T> {
@@ -38,7 +40,7 @@ public abstract class AbstractContainerDeserializer<T> extends AbstractItem<T> i
     /**
      * Create instance of current item with its builder.
      *
-     * @param builder
+     * @param builder {@link DeserializerBuilder} used to build this instance
      */
     protected AbstractContainerDeserializer(DeserializerBuilder builder) {
         super(builder);
@@ -58,8 +60,13 @@ public abstract class AbstractContainerDeserializer<T> extends AbstractItem<T> i
         return getInstance((Unmarshaller) context);
     }
 
+    /**
+     * Creates and initializes an instance of deserializing item.
+     *
+     * @param unmarshaller Current deserialization context.
+     * @return An instance of deserializing item.
+     */
     protected abstract T getInstance(Unmarshaller unmarshaller);
-
 
     protected void deserializeInternal(JsonbParser parser, Unmarshaller context) {
         parserContext = moveToFirst(parser);
@@ -91,22 +98,26 @@ public abstract class AbstractContainerDeserializer<T> extends AbstractItem<T> i
     /**
      * Determine class mappings and create an instance of a new deserializer.
      * Currently processed deserializer is pushed to stack, for waiting till new object is finished.
+     *
+     * @param parser Json parser.
+     * @param context Current unmarshalling context.
      */
     protected abstract void deserializeNext(JsonParser parser, Unmarshaller context);
 
     /**
      * Move to first event for current deserializer structure.
-     * @param parser parser
-     * @return first event
+     *
+     * @param parser Json parser.
+     * @return First event.
      */
     protected abstract JsonbRiParser.LevelContext moveToFirst(JsonbParser parser);
 
     /**
      * Binding model for current deserializer.
-     * @return model
+     *
+     * @return Binding model.
      */
     protected abstract JsonBindingModel getModel();
-
 
     protected DeserializerBuilder newUnmarshallerItemBuilder(JsonbContext ctx) {
         return new DeserializerBuilder(ctx).withWrapper(this).withJsonValueType(JsonValueType.of(parserContext.getLastEvent()));
@@ -121,7 +132,8 @@ public abstract class AbstractContainerDeserializer<T> extends AbstractItem<T> i
      * After object is transitively deserialized from JSON, "append" it to its wrapper.
      * In case of a field set value to field, in case of collections
      * or other embedded objects use methods provided.
-     * @param result instance result of an item
+     *
+     * @param result An instance result of an item.
      */
     public abstract void appendResult(Object result);
 }

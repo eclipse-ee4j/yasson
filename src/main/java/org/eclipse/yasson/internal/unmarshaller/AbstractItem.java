@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2016 Oracle and/or its affiliates. All rights reserved.
+ * Copyright (c) 2016, 2017 Oracle and/or its affiliates. All rights reserved.
  * This program and the accompanying materials are made available under the
  * terms of the Eclipse Public License v1.0 and Eclipse Distribution License v. 1.0
  * which accompanies this distribution.
@@ -52,7 +52,9 @@ public abstract class AbstractItem<T> implements CurrentItem<T> {
     private final JsonBindingModel wrapperModel;
 
     /**
-     * Create instance of current item with its builder.
+     * Creates and populates an instance from given builder.
+     *
+     * @param builder Builder to initialize from.
      */
     protected AbstractItem(AbstractSerializerBuilder builder) {
         this.wrapper = builder.getWrapper();
@@ -61,6 +63,14 @@ public abstract class AbstractItem<T> implements CurrentItem<T> {
         this.runtimeType = builder.getRuntimeType();
     }
 
+    /**
+     * Creates an instance.
+     *
+     * @param wrapper Item wrapper.
+     * @param runtimeType Runtime type.
+     * @param classModel Class model.
+     * @param wrapperModel Binding model.
+     */
     public AbstractItem(CurrentItem<?> wrapper, Type runtimeType, ClassModel classModel, JsonBindingModel wrapperModel) {
         this.wrapper = wrapper;
         this.runtimeType = runtimeType;

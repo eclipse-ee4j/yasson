@@ -361,8 +361,10 @@ public class AnnotationIntrospector {
 
     /**
      * Search {@link JsonbNumberFormat} on property, if not found looks at annotations declared on property type class.
-     * @param property
-     * @return
+     *
+     * @param property Property to search on.
+     * @return {@link JsonbNumberFormatter} constructed from {@link JsonbNumberFormat} annotation
+     *         or null if {@link JsonbNumberFormat} annotation is not present.
      */
     public JsonbNumberFormatter getJsonbNumberFormat(Property property) {
         final JsonbNumberFormat annotation = getAnnotationFromProperty(JsonbNumberFormat.class, property)
@@ -513,6 +515,9 @@ public class AnnotationIntrospector {
 
     /**
      * Get class interfaces recursively.
+     *
+     * @param cls Class to process.
+     * @return A list of all class interfaces.
      */
     public Set<Class<?>> collectInterfaces(Class<?> cls) {
         Set<Class<?>> collected = new LinkedHashSet<>();
@@ -526,6 +531,12 @@ public class AnnotationIntrospector {
         return collected;
     }
 
+    /**
+     * Processes customizations.
+     *
+     * @param clsElement Element to process.
+     * @return Populated {@link ClassCustomization} instance.
+     */
     public ClassCustomization introspectCustomization(JsonbAnnotatedElement<Class<?>> clsElement) {
         final CustomizationBuilder builder = new CustomizationBuilder();
         builder.setNillable(isClassNillable(clsElement));
@@ -537,8 +548,10 @@ public class AnnotationIntrospector {
     }
 
     /**
-     * Collect annotations of a class and its interfaces.
-     * @return element with class and annotations
+     * Collect annotations of given class and its interfaces.
+     *
+     * @param clazz Class to process.
+     * @return Element with class and annotations.
      */
     public JsonbAnnotatedElement<Class<?>> collectAnnotations(Class<?> clazz) {
         JsonbAnnotatedElement<Class<?>> classElement = new JsonbAnnotatedElement<>(clazz);

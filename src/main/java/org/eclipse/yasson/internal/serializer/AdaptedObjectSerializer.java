@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2016 Oracle and/or its affiliates. All rights reserved.
+ * Copyright (c) 2016, 2017 Oracle and/or its affiliates. All rights reserved.
  * This program and the accompanying materials are made available under the
  * terms of the Eclipse Public License v1.0 and Eclipse Distribution License v. 1.0
  * which accompanies this distribution.
@@ -109,43 +109,21 @@ public class AdaptedObjectSerializer<T, A> implements CurrentItem<T>, JsonbSeria
         return (JsonbSerializer<A>) new SerializerBuilder(ctx.getJsonbContext()).withObjectClass(adapted.getClass()).withModel(model).withWrapper(this).build();
     }
 
-
-    /**
-     * Class model containing property for this item.
-     *
-     * @return class model
-     */
     @Override
     public ClassModel getClassModel() {
         return null;
     }
 
-    /**
-     * Item wrapper. Null only in case of a root item.
-     *
-     * @return wrapper item of this item
-     */
     @Override
     public CurrentItem<?> getWrapper() {
         return null;
     }
 
-    /**
-     * Binding model of this item in wrapper. May be JavaBean property or a container like collection.
-     *
-     * @return wrapper model.
-     */
     @Override
     public JsonBindingModel getWrapperModel() {
         return model;
     }
 
-    /**
-     * Runtime type of a class. Can be a class, ParameterizedType, or TypeVariable.
-     * When a field or a class is declared including generic information this will return runtime type info.
-     *
-     * @return
-     */
     @Override
     public Type getRuntimeType() {
         return null;

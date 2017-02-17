@@ -25,7 +25,7 @@ import java.math.BigInteger;
 /**
  * Deserialize {@link BigInteger}.
  *
- * @author David Král
+ * @author David Kral
  */
 public class BigIntegerTypeDeserializer extends AbstractNumberDeserializer<BigInteger> {
 

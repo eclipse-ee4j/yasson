@@ -123,7 +123,6 @@ public class ComponentMatcher {
      * If type is not parametrized runtime component resolution doesn't has to happen.
      *
      * @param bindingType component binding type
-     * @return true if parameterized
      */
     private void registerGeneric(Type bindingType) {
         if (bindingType instanceof ParameterizedType && !jsonbContext.genericComponentsPresent()) {

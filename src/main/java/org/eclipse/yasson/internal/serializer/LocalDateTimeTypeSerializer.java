@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2016 Oracle and/or its affiliates. All rights reserved.
+ * Copyright (c) 2016, 2017 Oracle and/or its affiliates. All rights reserved.
  * This program and the accompanying materials are made available under the
  * terms of the Eclipse Public License v1.0 and Eclipse Distribution License v. 1.0
  * which accompanies this distribution.
@@ -22,12 +22,12 @@ import java.time.format.DateTimeFormatter;
 import java.util.Locale;
 
 /**
- * @author David Král
+ * @author David Kral
  */
 public class LocalDateTimeTypeSerializer extends AbstractDateTimeSerializer<LocalDateTime> {
 
     public LocalDateTimeTypeSerializer(JsonBindingModel model) {
-        super(LocalDateTime.class, model);
+        super(model);
     }
 
     @Override
@@ -40,5 +40,4 @@ public class LocalDateTimeTypeSerializer extends AbstractDateTimeSerializer<Loca
     protected String formatDefault(LocalDateTime value, Locale locale) {
         return DateTimeFormatter.ISO_LOCAL_DATE_TIME.withLocale(locale).format(value);
     }
-
 }

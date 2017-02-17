@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2016 Oracle and/or its affiliates. All rights reserved.
+ * Copyright (c) 2016, 2017 Oracle and/or its affiliates. All rights reserved.
  * This program and the accompanying materials are made available under the
  * terms of the Eclipse Public License v1.0 and Eclipse Distribution License v. 1.0
  * which accompanies this distribution.
@@ -34,8 +34,9 @@ public abstract class AbstractValueTypeDeserializer<T> implements JsonbDeseriali
 
     /**
      * New instance.
-     * @param clazz clazz to work with
-     * @param model
+     *
+     * @param clazz Class to work with.
+     * @param model Binding model.
      */
     public AbstractValueTypeDeserializer(Class<T> clazz, JsonBindingModel model) {
         this.clazz = clazz;
@@ -44,10 +45,11 @@ public abstract class AbstractValueTypeDeserializer<T> implements JsonbDeseriali
 
     /**
      * Extracts single string value for conversion.
-     * @param parser parser to get value from
-     * @param ctx unmarshaller
-     * @param rtType return type
-     * @return deserialized object
+     *
+     * @param parser Parser to get value from.
+     * @param ctx Unmarshaller.
+     * @param rtType return type.
+     * @return Seserialized object.
      */
     @Override
     public T deserialize(JsonParser parser, DeserializationContext ctx, Type rtType) {
@@ -63,10 +65,11 @@ public abstract class AbstractValueTypeDeserializer<T> implements JsonbDeseriali
 
     /**
      * Convert string value to object.
-     * @param jsonValue json value
-     * @param unmarshaller unmarshaller instance
-     * @param rtType
-     * @return deserialized object
+     *
+     * @param jsonValue Json value.
+     * @param unmarshaller Unmarshaller instance.
+     * @param rtType Runtime type.
+     * @return Deserialized object.
      */
     protected abstract T deserialize(String jsonValue, Unmarshaller unmarshaller, Type rtType);
 }

@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2016 Oracle and/or its affiliates. All rights reserved.
+ * Copyright (c) 2016, 2017 Oracle and/or its affiliates. All rights reserved.
  * This program and the accompanying materials are made available under the
  * terms of the Eclipse Public License v1.0 and Eclipse Distribution License v. 1.0
  * which accompanies this distribution.
@@ -16,30 +16,37 @@ package org.eclipse.yasson.internal;
 import javax.json.stream.JsonParser;
 
 /**
- * Jsonb parsing helper methods on top of JSOPN parser.
+ * Jsonb parsing helper methods on top of JSON-P parser.
+ *
  * @author Roman Grigoriadi
  */
 public interface JsonbParser extends JsonParser {
 
     /**
      * Moves parser to required event, if current event is equal to required does nothing.
-     * @param event required event
+     *
+     * @param event Required event.
      */
     void moveTo(JsonParser.Event event);
 
     /**
      * Moves parser cursor to any JSON value.
+     *
+     * @return Event.
      */
     Event moveToValue();
 
     /**
      * Moves parser cursor to START_OBJECT or START_ARRAY.
+     *
+     * @return Event.
      */
     Event moveToStartStructure();
 
     /**
      * Current level of JsonbRiParser.
-     * @return current level
+     *
+     * @return Current level.
      */
     JsonbRiParser.LevelContext getCurrentLevel();
 

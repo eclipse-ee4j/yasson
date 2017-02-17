@@ -1,3 +1,15 @@
+/*******************************************************************************
+ * Copyright (c) 2016, 2017 Oracle and/or its affiliates. All rights reserved.
+ * This program and the accompanying materials are made available under the
+ * terms of the Eclipse Public License v1.0 and Eclipse Distribution License v. 1.0
+ * which accompanies this distribution.
+ * The Eclipse Public License is available at http://www.eclipse.org/legal/epl-v10.html
+ * and the Eclipse Distribution License is available at
+ * http://www.eclipse.org/org/documents/edl-v10.php.
+ *
+ * Contributors:
+ * Roman Grigoriadi
+ ******************************************************************************/
 package org.eclipse.yasson.internal;
 
 import org.eclipse.yasson.internal.internalOrdering.PropOrderStrategy;
@@ -22,9 +34,9 @@ public class PropertyOrdering {
     private PropOrderStrategy propertyOrderStrategy;
 
     /**
-     * Property ordering.
+     * Creates a new instance.
      *
-     * @param propertyOrderStrategy not null
+     * @param propertyOrderStrategy Property order strategy. Must be not null.
      */
     public PropertyOrdering(PropOrderStrategy propertyOrderStrategy) {
         Objects.requireNonNull(propertyOrderStrategy);
@@ -33,10 +45,11 @@ public class PropertyOrdering {
 
     /**
      * Sorts class properties either, by class {@link javax.json.bind.annotation.JsonbPropertyOrder} annotation,
-     * or by {@link PropertyOrderStrategy} if set in JsonbConfig.
-     * @param properties
-     * @param classModel
-     * @return
+     * or by {@link PropertyOrderStrategy} if set in {@link JsonbConfig}.
+     *
+     * @param properties Properties to sort.
+     * @param classModel Class model.
+     * @return Sorted list of properties.
      */
     public List<PropertyModel> orderProperties(Map<String, PropertyModel> properties, ClassModel classModel) {
         String[] order = classModel.getClassCustomization().getPropertyOrder();
@@ -61,8 +74,9 @@ public class PropertyOrdering {
     }
 
     /**
-     * Property order strategy from jsonbconfig (if present)
-     * @return
+     * Returns a property order strategy from {@link JsonbConfig}.
+     *
+     * @return {@link PropOrderStrategy} or null if not present.
      */
     public PropOrderStrategy getPropertyOrderStrategy() {
         return propertyOrderStrategy;
