@@ -20,7 +20,7 @@ import javax.json.bind.annotation.JsonbTypeSerializer;
  * @author Roman Grigoriadi
  */
 @JsonbTypeSerializer(AnnotatedWithSerializerTypeSerializer.class)
-@JsonbTypeDeserializer(AnnotatedWithSerialzierTypeDeserializer.class)
+@JsonbTypeDeserializer(AnnotatedWithSerializerTypeDeserializer.class)
 public class AnnotatedWithSerializerType {
 
     public String value;

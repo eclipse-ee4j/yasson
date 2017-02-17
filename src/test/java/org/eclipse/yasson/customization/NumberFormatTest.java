@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2016 Oracle and/or its affiliates. All rights reserved.
+ * Copyright (c) 2016, 2017 Oracle and/or its affiliates. All rights reserved.
  * This program and the accompanying materials are made available under the
  * terms of the Eclipse Public License v1.0 and Eclipse Distribution License v. 1.0
  * which accompanies this distribution.
@@ -51,7 +51,7 @@ public class NumberFormatTest {
     }
 
     @Test
-    public void testDeserialzier() {
+    public void testDeserializer() {
         String expectedJson = "{\"aByte\":\"127\",\"aDouble\":\"000.10000000\",\"aFloat\":\"000.34999999\",\"aLong\":\"9223372036854775807\",\"aShort\":\"00001\",\"bigDecimal\":\"00000010.000000\",\"bigInteger\":\"00000001\",\"integer\":\"2147483647.0\"}";
         NumberFormatPojo pojo = jsonb.fromJson(expectedJson, NumberFormatPojo.class);
 

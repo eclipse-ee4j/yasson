@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2016 Oracle and/or its affiliates. All rights reserved.
+ * Copyright (c) 2016, 2017 Oracle and/or its affiliates. All rights reserved.
  * This program and the accompanying materials are made available under the
  * terms of the Eclipse Public License v1.0 and Eclipse Distribution License v. 1.0
  * which accompanies this distribution.
@@ -84,7 +84,7 @@ public class SerializersTest {
      * Tests JSONB deserialization of arbitrary type invoked from a Deserializer.
      */
     @Test
-    public void testDeserialzierDeserializationByType() {
+    public void testDeserializerDeserializationByType() {
         JsonbConfig config = new JsonbConfig().withDeserializers(new CrateDeserializer());
         Jsonb jsonb = JsonbBuilder.create(config);
 
@@ -144,7 +144,7 @@ public class SerializersTest {
     }
 
     @Test
-    public void testCrateJsonObjectDeserialzer() {
+    public void testCrateJsonObjectDeserializer() {
         JsonbConfig config = new JsonbConfig().withDeserializers(new CrateJsonObjectDeserializer());
         Jsonb jsonb = JsonbBuilder.create(config);
         String expected = "{\"boxStr\":\"Box string\",\"crate\":{\"date-converted\":\"2015-05-14T11:10:01\",\"crateStr\":\"REPLACED crate str\",\"crateInner\":{\"crateInnerBigDec\":10,\"crateInnerStr\":\"Single inner\"},\"crateInnerList\":[{\"crateInnerBigDec\":10,\"crate_inner_str\":\"List inner 0\"},{\"crateInnerBigDec\":10,\"crate_inner_str\":\"List inner 1\"}],\"crateBigDec\":54321},\"secondBoxStr\":\"Second box string\"}";

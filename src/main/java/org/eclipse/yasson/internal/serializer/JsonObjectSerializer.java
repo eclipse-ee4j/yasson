@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2016 Oracle and/or its affiliates. All rights reserved.
+ * Copyright (c) 2016, 2017 Oracle and/or its affiliates. All rights reserved.
  * This program and the accompanying materials are made available under the
  * terms of the Eclipse Public License v1.0 and Eclipse Distribution License v. 1.0
  * which accompanies this distribution.
@@ -13,36 +13,37 @@
 
 package org.eclipse.yasson.internal.serializer;
 
-import javax.json.JsonArray;
+import javax.json.JsonObject;
 import javax.json.JsonValue;
 import javax.json.bind.serializer.SerializationContext;
 import javax.json.stream.JsonGenerator;
+import java.util.Map;
 
 /**
- * Serializes JSON array to json.
+ * Serializes JSON object to json.
  *
  * @author Roman Grigoriadi
  */
-public class JsonArraySerialzier extends AbstractJsonpSerializer<JsonArray> {
+public class JsonObjectSerializer extends AbstractJsonpSerializer<JsonObject> {
 
-    protected JsonArraySerialzier(SerializerBuilder builder) {
+    protected JsonObjectSerializer(SerializerBuilder builder) {
         super(builder);
     }
 
     @Override
-    protected void serializeInternal(JsonArray obj, JsonGenerator generator, SerializationContext ctx) {
-        for (JsonValue value : obj) {
-            generator.write(value);
+    protected void serializeInternal(JsonObject obj, JsonGenerator generator, SerializationContext ctx) {
+        for (Map.Entry<String, JsonValue> entry : obj.entrySet()) {
+            generator.write(entry.getKey(), entry.getValue());
         }
     }
 
     @Override
     protected void writeStart(JsonGenerator generator) {
-        generator.writeStartArray();
+        generator.writeStartObject();
     }
 
     @Override
     protected void writeStart(String key, JsonGenerator generator) {
-        generator.writeStartArray(key);
+        generator.writeStartObject(key);
     }
 }

@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2015 Oracle and/or its affiliates. All rights reserved.
+ * Copyright (c) 2015, 2017 Oracle and/or its affiliates. All rights reserved.
  * This program and the accompanying materials are made available under the
  * terms of the Eclipse Public License v1.0 and Eclipse Distribution License v. 1.0
  * which accompanies this distribution.
@@ -70,7 +70,7 @@ public class DeserializerBuilder extends AbstractSerializerBuilder<DeserializerB
         //First check if user deserializer is registered for such type
         final ComponentMatcher componentMatcher = jsonbContext.getComponentMatcher();
         Optional<DeserializerBinding<?>> userDeserializer =
-                componentMatcher.getDeserialzierBinding(getRuntimeType(), getModel());
+                componentMatcher.getDeserializerBinding(getRuntimeType(), getModel());
         if (userDeserializer.isPresent() &&
                 !(wrapper instanceof UserDeserializerDeserializer && ReflectionUtils.getRawType(wrapper.getRuntimeType()).isAssignableFrom(rawType))) {
             return new UserDeserializerDeserializer<>(this, userDeserializer.get().getJsonbDeserializer());

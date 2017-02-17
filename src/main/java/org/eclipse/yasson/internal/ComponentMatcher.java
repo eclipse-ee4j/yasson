@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2016 Oracle and/or its affiliates. All rights reserved.
+ * Copyright (c) 2016, 2017 Oracle and/or its affiliates. All rights reserved.
  * This program and the accompanying materials are made available under the
  * terms of the Eclipse Public License v1.0 and Eclipse Distribution License v. 1.0
  * which accompanies this distribution.
@@ -72,7 +72,7 @@ public class ComponentMatcher {
     void init() {
         final JsonbSerializer<?>[] serializers = (JsonbSerializer<?>[])jsonbContext.getConfig().getProperty(JsonbConfig.SERIALIZERS).orElseGet(()->new JsonbSerializer<?>[]{});
         for (JsonbSerializer serializer : serializers) {
-            introspectSerialzierBinding(serializer.getClass(), serializer);
+            introspectSerializerBinding(serializer.getClass(), serializer);
         }
         final JsonbDeserializer<?>[] deserializers = (JsonbDeserializer<?>[])jsonbContext.getConfig().getProperty(JsonbConfig.DESERIALIZERS).orElseGet(()->new JsonbDeserializer<?>[]{});
         for (JsonbDeserializer deserializer : deserializers) {
@@ -138,7 +138,7 @@ public class ComponentMatcher {
      * @return serializer optional
      */
     @SuppressWarnings("unchecked")
-    public Optional<SerializerBinding<?>> getSerialzierBinding(Type propertyRuntimeType, JsonBindingModel propertyModel) {
+    public Optional<SerializerBinding<?>> getSerializerBinding(Type propertyRuntimeType, JsonBindingModel propertyModel) {
         if (propertyModel == null || propertyModel.getCustomization() == null || propertyModel.getCustomization().getSerializerBinding() == null) {
             return searchComponentBinding(propertyRuntimeType, ComponentBindings::getSerializer);
         }
@@ -152,7 +152,7 @@ public class ComponentMatcher {
      * @return serializer optional
      */
     @SuppressWarnings("unchecked")
-    public Optional<DeserializerBinding<?>> getDeserialzierBinding(Type propertyRuntimeType, JsonBindingModel model) {
+    public Optional<DeserializerBinding<?>> getDeserializerBinding(Type propertyRuntimeType, JsonBindingModel model) {
         if (model == null || model.getCustomization().getDeserializerBinding() == null) {
             return searchComponentBinding(propertyRuntimeType, ComponentBindings::getDeserializer);
         }
@@ -258,7 +258,7 @@ public class ComponentMatcher {
      * If an instance of deserializerClass is present in context and is bound for same type, return that instance.
      * Otherwise create new instance and set it to context.
      *
-     * @param deserializerClass class of deserialzier
+     * @param deserializerClass class of deserializer
      * @param instance instance to use if not cached already
      * @return wrapper used in property models
      */
@@ -281,11 +281,11 @@ public class ComponentMatcher {
      * If an instance of serializerClass is present in context and is bound for same type, return that instance.
      * Otherwise create new instance and set it to context.
      *
-     * @param serializerClass class of deserialzier
+     * @param serializerClass class of deserializer
      * @param instance instance to use if not cached
      * @return wrapper used in property models
      */
-    SerializerBinding introspectSerialzierBinding(Class<? extends JsonbSerializer> serializerClass, JsonbSerializer instance) {
+    SerializerBinding introspectSerializerBinding(Class<? extends JsonbSerializer> serializerClass, JsonbSerializer instance) {
         final ParameterizedType serializerRuntimeType = ReflectionUtils.findParameterizedType(serializerClass, JsonbSerializer.class);
         Type serBindingType = resolveTypeArg(serializerRuntimeType.getActualTypeArguments()[0], serializerClass.getClass());
         final ComponentBindings componentBindings = getBindingInfo(serBindingType);

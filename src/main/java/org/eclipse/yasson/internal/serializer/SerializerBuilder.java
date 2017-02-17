@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2016 Oracle and/or its affiliates. All rights reserved.
+ * Copyright (c) 2016, 2017 Oracle and/or its affiliates. All rights reserved.
  * This program and the accompanying materials are made available under the
  * terms of the Eclipse Public License v1.0 and Eclipse Distribution License v. 1.0
  * which accompanies this distribution.
@@ -31,7 +31,7 @@ import java.util.Map;
 import java.util.Optional;
 
 /**
- * Builder for serialziers.
+ * Builder for serializers.
  *
  * @author Roman Grigoriadi
  */
@@ -53,7 +53,7 @@ public class SerializerBuilder extends AbstractSerializerBuilder<SerializerBuild
 
         //First check if user deserializer is registered for such type
         final ComponentMatcher componentMatcher = jsonbContext.getComponentMatcher();
-        Optional<SerializerBinding<?>> userSerializer = componentMatcher.getSerialzierBinding(getRuntimeType(), getModel());
+        Optional<SerializerBinding<?>> userSerializer = componentMatcher.getSerializerBinding(getRuntimeType(), getModel());
         if (userSerializer.isPresent() &&
                 !(wrapper instanceof UserSerializerSerializer && ReflectionUtils.getRawType(wrapper.getRuntimeType()).isAssignableFrom(objectClass))) {
             return new UserSerializerSerializer<>(model, userSerializer.get().getJsonbSerializer());
@@ -87,9 +87,9 @@ public class SerializerBuilder extends AbstractSerializerBuilder<SerializerBuild
 
         } else if (JsonValue.class.isAssignableFrom(objectClass)) {
             if(JsonObject.class.isAssignableFrom(objectClass)) {
-                return new JsonObjectSerialzier(this);
+                return new JsonObjectSerializer(this);
             } else {
-                return new JsonArraySerialzier(this);
+                return new JsonArraySerializer(this);
             }
         } else if (Optional.class.isAssignableFrom(objectClass)) {
             return new OptionalObjectSerializer<>(this);
