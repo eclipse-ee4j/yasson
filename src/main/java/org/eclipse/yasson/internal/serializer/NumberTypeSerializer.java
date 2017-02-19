@@ -19,14 +19,20 @@ import org.eclipse.yasson.model.JsonBindingModel;
 import javax.json.stream.JsonGenerator;
 
 /**
+ * Serializer for {@link Number} type.
+ * 
  * @author David Kral
  */
 public class NumberTypeSerializer extends AbstractValueTypeSerializer<Number> {
 
+    /**
+     * Creates a new instance.
+     *
+     * @param model Binding model.
+     */
     public NumberTypeSerializer(JsonBindingModel model) {
         super(model);
     }
-
 
     @Override
     protected void serialize(Number obj, JsonGenerator generator, String key, Marshaller marshaller) {

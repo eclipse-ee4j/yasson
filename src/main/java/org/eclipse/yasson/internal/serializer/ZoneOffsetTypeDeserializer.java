@@ -20,10 +20,17 @@ import java.lang.reflect.Type;
 import java.time.ZoneOffset;
 
 /**
+ * Deserializer for {@link ZoneOffset} type.
+ * 
  * @author David Kral
  */
 public class ZoneOffsetTypeDeserializer extends AbstractValueTypeDeserializer<ZoneOffset> {
 
+    /**
+     * Creates a new instance.
+     *
+     * @param model Binding model.
+     */
     public ZoneOffsetTypeDeserializer(JsonBindingModel model) {
         super(ZoneOffset.class, model);
     }

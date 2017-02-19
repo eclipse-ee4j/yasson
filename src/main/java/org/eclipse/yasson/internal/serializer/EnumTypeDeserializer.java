@@ -19,10 +19,17 @@ import org.eclipse.yasson.model.JsonBindingModel;
 import java.lang.reflect.Type;
 
 /**
+ * Deserializer for {@link Enum} type.
+ *
  * @author David Kral
  */
 public class EnumTypeDeserializer extends AbstractValueTypeDeserializer<Enum> {
 
+    /**
+     * Creates a new instance.
+     *
+     * @param model Binding model.
+     */
     public EnumTypeDeserializer(JsonBindingModel model) {
         super(Enum.class, model);
     }

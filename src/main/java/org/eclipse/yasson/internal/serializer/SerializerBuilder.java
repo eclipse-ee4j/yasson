@@ -39,15 +39,31 @@ public class SerializerBuilder extends AbstractSerializerBuilder<SerializerBuild
 
     private Class<?> objectClass;
 
+    /**
+     * Creates a new builder.
+     *
+     * @param jsonbContext JSON-B context.
+     */
     public SerializerBuilder(JsonbContext jsonbContext) {
         super(jsonbContext);
     }
 
+    /**
+     * Adds object class.
+     *
+     * @param objectClass object class
+     * @return Builder.
+     */
     public SerializerBuilder withObjectClass(Class<?> objectClass) {
         this.objectClass = objectClass;
         return this;
     }
 
+    /**
+     * Builds a {@link JsonbSerializer}.
+     *
+     * @return JsonbSerializer.
+     */
     public JsonbSerializer<?> build() {
         runtimeType = resolveRuntimeType();
 
@@ -143,5 +159,4 @@ public class SerializerBuilder extends AbstractSerializerBuilder<SerializerBuild
         }
         return objectClass;
     }
-
 }

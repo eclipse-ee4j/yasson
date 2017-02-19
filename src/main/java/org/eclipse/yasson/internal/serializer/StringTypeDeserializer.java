@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2016 Oracle and/or its affiliates. All rights reserved.
+ * Copyright (c) 2016, 2017 Oracle and/or its affiliates. All rights reserved.
  * This program and the accompanying materials are made available under the
  * terms of the Eclipse Public License v1.0 and Eclipse Distribution License v. 1.0
  * which accompanies this distribution.
@@ -24,10 +24,17 @@ import java.io.UnsupportedEncodingException;
 import java.lang.reflect.Type;
 
 /**
+ * Deserializer for {@link String} type.
+ * 
  * @author Roman Grigoriadi
  */
 public class StringTypeDeserializer extends AbstractValueTypeDeserializer<String> {
 
+    /**
+     * Creates a new instance.
+     *
+     * @param model Binding model.
+     */
     public StringTypeDeserializer(JsonBindingModel model) {
         super(String.class, model);
     }

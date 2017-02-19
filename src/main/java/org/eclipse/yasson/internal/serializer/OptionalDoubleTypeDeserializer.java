@@ -26,10 +26,17 @@ import java.lang.reflect.Type;
 import java.util.OptionalDouble;
 
 /**
+ * Deserializer for {@link OptionalDouble} type.
+ * 
  * @author David Kral
  */
 public class OptionalDoubleTypeDeserializer extends AbstractValueTypeDeserializer<OptionalDouble> {
 
+    /**
+     * Creates a new instance.
+     *
+     * @param model Binding model.
+     */
     public OptionalDoubleTypeDeserializer(JsonBindingModel model) {
         super(OptionalDouble.class, model);
     }

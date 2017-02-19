@@ -25,13 +25,18 @@ import java.util.Locale;
 import java.util.logging.Logger;
 
 /**
+ * Deserializer for {@link ZonedDateTime} type.
+ *
  * @author David Kral
  */
 public class ZonedDateTimeTypeDeserializer extends AbstractDateTimeDeserializer<ZonedDateTime> {
-
     private static final Logger log = Logger.getLogger(ZonedDateTimeTypeDeserializer.class.getName());
 
-
+    /**
+     * Creates a new instance.
+     *
+     * @param model Binding model.
+     */
     public ZonedDateTimeTypeDeserializer(JsonBindingModel model) {
         super(ZonedDateTime.class, model);
     }

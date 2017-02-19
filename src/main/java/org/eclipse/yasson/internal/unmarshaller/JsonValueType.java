@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2015 Oracle and/or its affiliates. All rights reserved.
+ * Copyright (c) 2015, 2017 Oracle and/or its affiliates. All rights reserved.
  * This program and the accompanying materials are made available under the
  * terms of the Eclipse Public License v1.0 and Eclipse Distribution License v. 1.0
  * which accompanies this distribution.
@@ -41,10 +41,21 @@ public enum JsonValueType {
 
     private final Class<?> supportedByType;
 
+    /**
+     * Gets conversion type.
+     *
+     * @return Conversion type.
+     */
     public Class<?> getConversionType() {
         return supportedByType;
     }
 
+    /**
+     * Gets by parser event.
+     *
+     * @param event Event.
+     * @return Matching type.
+     */
     public static JsonValueType of(JsonParser.Event event) {
         switch (event) {
             case VALUE_FALSE:

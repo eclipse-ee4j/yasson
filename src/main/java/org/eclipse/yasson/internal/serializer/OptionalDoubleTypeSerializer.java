@@ -20,10 +20,17 @@ import javax.json.stream.JsonGenerator;
 import java.util.OptionalDouble;
 
 /**
+ * Serializer for {@link OptionalDouble} type.
+ * 
  * @author David Kral
  */
 public class OptionalDoubleTypeSerializer extends AbstractValueTypeSerializer<OptionalDouble> {
 
+    /**
+     * Creates a new instance.
+     *
+     * @param model Binding model.
+     */
     public OptionalDoubleTypeSerializer(JsonBindingModel model) {
         super(model);
     }

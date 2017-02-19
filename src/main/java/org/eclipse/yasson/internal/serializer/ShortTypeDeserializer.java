@@ -22,10 +22,17 @@ import javax.json.bind.JsonbException;
 import java.lang.reflect.Type;
 
 /**
+ * Deserializer for {@link Short} type.
+ * 
  * @author David Kral
  */
 public class ShortTypeDeserializer extends AbstractNumberDeserializer<Short> {
 
+    /**
+     * Creates a new instance.
+     *
+     * @param model Binding model.
+     */
     public ShortTypeDeserializer(JsonBindingModel model) {
         super(Short.class, model);
     }

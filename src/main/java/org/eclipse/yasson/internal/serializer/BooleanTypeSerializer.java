@@ -19,10 +19,17 @@ import org.eclipse.yasson.model.JsonBindingModel;
 import javax.json.stream.JsonGenerator;
 
 /**
+ * Serializer for {@link Boolean} type.
+ *
  * @author David Kral
  */
 public class BooleanTypeSerializer extends AbstractValueTypeSerializer<Boolean> {
 
+    /**
+     * Creates an instance.
+     *
+     * @param model Binding model.
+     */
     public BooleanTypeSerializer(JsonBindingModel model) {
         super(model);
     }

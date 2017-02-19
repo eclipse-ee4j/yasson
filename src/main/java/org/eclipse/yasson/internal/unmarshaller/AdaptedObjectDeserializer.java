@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2016 Oracle and/or its affiliates. All rights reserved.
+ * Copyright (c) 2016, 2017 Oracle and/or its affiliates. All rights reserved.
  * This program and the accompanying materials are made available under the
  * terms of the Eclipse Public License v1.0 and Eclipse Distribution License v. 1.0
  * which accompanies this distribution.
@@ -31,7 +31,7 @@ import java.lang.reflect.Type;
  * Decorator for an item which builds adapted type instance by a {@link JsonbAdapter}.
  * After adapted item is finished building its instance is converted to field type object by calling adapter.
  *
- * @param <A> adapted type, type to unmarshall JSOn into
+ * @param <A> adapted type, type to deserialize JSON into
  * @param <T> required type, typically type of the field, which is adapted to another type
  */
 public class AdaptedObjectDeserializer<A, T> implements CurrentItem<T>, JsonbDeserializer<T> {
@@ -44,6 +44,7 @@ public class AdaptedObjectDeserializer<A, T> implements CurrentItem<T>, JsonbDes
 
     /**
      * Creates decoration instance wrapping real adapted object item.
+     *
      * @param adapterInfo adapter type info
      * @param wrapperItem wrapper item to get instance from
      */
@@ -75,6 +76,11 @@ public class AdaptedObjectDeserializer<A, T> implements CurrentItem<T>, JsonbDes
         throw new JsonbException(Messages.getMessage(MessageKeys.INTERNAL_ERROR, "Deserialization propagation is not allowed for:" + adaptedItem));
     }
 
+    /**
+     * Sets adapted item.
+     *
+     * @param adaptedItem Adapted item to set.
+     */
     public void setAdaptedItem(JsonbDeserializer<A> adaptedItem) {
         this.adaptedItem = adaptedItem;
     }
@@ -92,5 +98,4 @@ public class AdaptedObjectDeserializer<A, T> implements CurrentItem<T>, JsonbDes
             throw new JsonbException(Messages.getMessage(MessageKeys.ADAPTER_EXCEPTION, adapterInfo.getBindingType(), adapterInfo.getToType(), adapterInfo.getAdapter().getClass()), e);
         }
     }
-
 }

@@ -23,7 +23,7 @@ import java.util.PropertyResourceBundle;
 import java.util.ResourceBundle;
 
 /**
- * JSONB properties file manager.
+ * JSON-B messages.
  *
  * @author David Kral
  */
@@ -35,10 +35,25 @@ public class Messages {
     private Messages() {
     }
 
+    /**
+     * Gets message by key. Default locale is used.
+     *
+     * @param key Message key.
+     * @param objects Message parameters.
+     * @return Formatted message in string.
+     */
     public static String getMessage(MessageKeys key, Object... objects) {
         return getMessage(key, Locale.getDefault(), objects);
     }
 
+    /**
+     * Gets message by key and locale.
+     *
+     * @param key Message key.
+     * @param locale Locale.
+     * @param objects Message parameters.
+     * @return Formatted message in string.
+     */
     public static String getMessage(MessageKeys key, Locale locale, Object... objects) {
         ResourceBundle messages = ResourceBundle.getBundle(MESSAGE_BUNDLE, locale, new UTF8Control());
         MessageFormat formatter = new MessageFormat(messages.getString(key.key));

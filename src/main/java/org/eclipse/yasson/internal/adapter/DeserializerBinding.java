@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2016 Oracle and/or its affiliates. All rights reserved.
+ * Copyright (c) 2016, 2017 Oracle and/or its affiliates. All rights reserved.
  * This program and the accompanying materials are made available under the
  * terms of the Eclipse Public License v1.0 and Eclipse Distribution License v. 1.0
  * which accompanies this distribution.
@@ -25,15 +25,21 @@ public class DeserializerBinding<T> extends AbstractComponentBinding {
 
     private final JsonbDeserializer<T> jsonbDeserializer;
 
+    /**
+     *Creates a new instance.
+     *
+     * @param bindingType Binding type.
+     * @param jsonbDeserializer Deserializer.
+     */
     public DeserializerBinding(Type bindingType, JsonbDeserializer<T> jsonbDeserializer) {
         super(bindingType);
         this.jsonbDeserializer = jsonbDeserializer;
     }
 
     /**
-     * Deserializer if any.
+     * Gets deserializer if any.
      *
-     * @return deserializer
+     * @return Deserializer.
      */
     public JsonbDeserializer<T> getJsonbDeserializer() {
         return jsonbDeserializer;

@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2016 Oracle and/or its affiliates. All rights reserved.
+ * Copyright (c) 2016, 2017 Oracle and/or its affiliates. All rights reserved.
  * This program and the accompanying materials are made available under the
  * terms of the Eclipse Public License v1.0 and Eclipse Distribution License v. 1.0
  * which accompanies this distribution.
@@ -28,13 +28,19 @@ import java.util.Optional;
  * Common serializer for numbers, using number format.
  *
  * @author Roman Grigoriadi
+ * @param <T> Type to deserialize.
  */
 public abstract class AbstractNumberDeserializer<T extends Number> extends AbstractValueTypeDeserializer<T> {
 
+    /**
+     * Creates an instance of AbstractNumberDeserializer.
+     *
+     * @param clazz Class to create deserializer for.
+     * @param model Binding model.
+     */
     public AbstractNumberDeserializer(Class<T> clazz, JsonBindingModel model) {
         super(clazz, model);
     }
-
 
     protected final Optional<Number> deserializeForamtted(String jsonValue, boolean integerOnly, JsonbContext jsonbContext) {
         final JsonbNumberFormatter numberFormat = model.getCustomization().getNumberFormat();
@@ -51,8 +57,4 @@ public abstract class AbstractNumberDeserializer<T extends Number> extends Abstr
         }
         return Optional.empty();
     }
-
-
-
-
 }

@@ -19,7 +19,7 @@ import javax.json.bind.serializer.SerializationContext;
 import javax.json.stream.JsonGenerator;
 
 /**
- * Serializes JSON array to json.
+ * Serializer for {@link JsonArray}.
  *
  * @author Roman Grigoriadi
  */

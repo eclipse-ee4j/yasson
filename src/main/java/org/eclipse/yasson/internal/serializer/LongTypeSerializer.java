@@ -18,12 +18,19 @@ import org.eclipse.yasson.model.JsonBindingModel;
 import javax.json.stream.JsonGenerator;
 
 /**
+ * Serializer for {@link Long} type.
+ * 
  * @author David Kral
  */
 public class LongTypeSerializer extends AbstractNumberSerializer<Long> {
 
+    /**
+     * Creates a new instance.
+     *
+     * @param model Binding model.
+     */
     public LongTypeSerializer(JsonBindingModel model) {
-        super(Long.class, model);
+        super(model);
     }
 
     @Override

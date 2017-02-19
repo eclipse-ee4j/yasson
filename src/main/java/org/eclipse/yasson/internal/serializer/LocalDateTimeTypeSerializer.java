@@ -22,10 +22,17 @@ import java.time.format.DateTimeFormatter;
 import java.util.Locale;
 
 /**
+ * Serializer for {@link LocalDateTime} type.
+ * 
  * @author David Kral
  */
 public class LocalDateTimeTypeSerializer extends AbstractDateTimeSerializer<LocalDateTime> {
 
+    /**
+     * Creates a new instance.
+     *
+     * @param model Binding model.
+     */
     public LocalDateTimeTypeSerializer(JsonBindingModel model) {
         super(model);
     }

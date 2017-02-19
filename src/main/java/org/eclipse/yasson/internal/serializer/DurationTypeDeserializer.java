@@ -20,10 +20,17 @@ import java.lang.reflect.Type;
 import java.time.Duration;
 
 /**
+ * Deserializer for {@link Duration} type.
+ *
  * @author David Kral
  */
 public class DurationTypeDeserializer extends AbstractValueTypeDeserializer<Duration> {
 
+    /**
+     * Creates a new instance.
+     *
+     * @param model Binding model.
+     */
     public DurationTypeDeserializer(JsonBindingModel model) {
         super(Duration.class, model);
     }

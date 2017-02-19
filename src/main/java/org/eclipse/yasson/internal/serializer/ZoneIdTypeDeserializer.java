@@ -20,10 +20,17 @@ import java.lang.reflect.Type;
 import java.time.ZoneId;
 
 /**
+ * Deserializer for {@link ZoneId} type.
+ * 
  * @author David Kral
  */
 public class ZoneIdTypeDeserializer extends AbstractValueTypeDeserializer<ZoneId> {
 
+    /**
+     * Creates a new instance.
+     *
+     * @param model Binding model.
+     */
     public ZoneIdTypeDeserializer(JsonBindingModel model) {
         super(ZoneId.class, model);
     }

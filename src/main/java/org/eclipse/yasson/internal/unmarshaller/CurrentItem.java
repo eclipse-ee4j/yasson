@@ -44,5 +44,4 @@ public interface CurrentItem<T> extends RuntimeTypeInfo {
      * @return Wrapper model.
      */
     JsonBindingModel getWrapperModel();
-
 }

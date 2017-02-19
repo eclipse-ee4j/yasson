@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2016 Oracle and/or its affiliates. All rights reserved.
+ * Copyright (c) 2016, 2017 Oracle and/or its affiliates. All rights reserved.
  * This program and the accompanying materials are made available under the
  * terms of the Eclipse Public License v1.0 and Eclipse Distribution License v. 1.0
  * which accompanies this distribution.
@@ -50,10 +50,18 @@ public class PolymorphismAdapter<T> implements JsonbAdapter<T, TypeWrapper<T>> {
 
     private final String[] allowedClasses;
 
+    /**
+     *
+     * @param allowedClasses
+     */
     public PolymorphismAdapter(final Class... allowedClasses) {
         this.allowedClasses = Stream.of(allowedClasses).map(Class::getName).toArray(value -> new String[allowedClasses.length]);
     }
 
+    /**
+     *
+     * @return
+     */
     public String[] getAllowedClasses() {
         return allowedClasses;
     }

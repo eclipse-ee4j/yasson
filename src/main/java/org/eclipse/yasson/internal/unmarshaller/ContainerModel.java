@@ -51,6 +51,7 @@ public class ContainerModel implements JsonBindingModel {
         this.context = context;
         this.writeName = writeName;
     }
+
     /**
      * Construct model.
      *

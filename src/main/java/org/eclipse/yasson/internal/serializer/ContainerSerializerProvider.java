@@ -23,5 +23,11 @@ import javax.json.bind.serializer.JsonbSerializer;
  */
 public interface ContainerSerializerProvider {
 
+    /**
+     * Provides container serializer instance for given property.
+     *
+     * @param propertyInfo Property to create serializer for.
+     * @return Serializer instance.
+     */
     JsonbSerializer<?> provideSerializer(JsonbPropertyInfo propertyInfo);
 }

@@ -21,10 +21,17 @@ import java.lang.reflect.Type;
 import java.util.TimeZone;
 
 /**
+ * Deserializer for {@link TimeZone} type.
+ * 
  * @author David Kral
  */
 public class TimeZoneTypeDeserializer extends AbstractValueTypeDeserializer<TimeZone> {
 
+    /**
+     * Creates a new instance.
+     *
+     * @param model Binding model.
+     */
     public TimeZoneTypeDeserializer(JsonBindingModel model) {
         super(TimeZone.class, model);
     }

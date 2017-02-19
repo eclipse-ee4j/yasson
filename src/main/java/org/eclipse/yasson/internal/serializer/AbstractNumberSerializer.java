@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2016 Oracle and/or its affiliates. All rights reserved.
+ * Copyright (c) 2016, 2017 Oracle and/or its affiliates. All rights reserved.
  * This program and the accompanying materials are made available under the
  * terms of the Eclipse Public License v1.0 and Eclipse Distribution License v. 1.0
  * which accompanies this distribution.
@@ -29,7 +29,12 @@ import java.util.function.Consumer;
  */
 public abstract class AbstractNumberSerializer<T extends Number> extends AbstractValueTypeSerializer<T> {
 
-    public AbstractNumberSerializer(Class<T> clazz, JsonBindingModel model) {
+    /**
+     * Creates an instance.
+     *
+     * @param model Binding model.
+     */
+    public AbstractNumberSerializer(JsonBindingModel model) {
         super(model);
     }
 
@@ -42,12 +47,12 @@ public abstract class AbstractNumberSerializer<T extends Number> extends Abstrac
 
     /**
      * Serialize raw number when NumberFormat is not present.
+     *
      * @param obj number
      * @param generator generator to use
      * @param key json key
      */
     protected abstract void serializeNonFormatted(T obj, JsonGenerator generator, String key);
-
 
     @Override
     protected void serialize(T obj, JsonGenerator generator, Marshaller marshaller) {
@@ -58,6 +63,7 @@ public abstract class AbstractNumberSerializer<T extends Number> extends Abstrac
 
     /**
      * Serialize raw number when NumberFormat is not present.
+     *
      * @param obj number
      * @param generator generator to use
      */
@@ -74,5 +80,4 @@ public abstract class AbstractNumberSerializer<T extends Number> extends Abstrac
         }
         return false;
     }
-
 }

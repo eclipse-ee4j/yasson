@@ -27,11 +27,17 @@ import java.util.Date;
 import java.util.Locale;
 
 /**
+ * Serializer for {@link Date} type.
+ *
  * @author David Kral
  */
 public class DateTypeSerializer extends AbstractValueTypeSerializer<Date> {
 
-
+    /**
+     * Creates a new instance.
+     *
+     * @param model Binding model.
+     */
     public DateTypeSerializer(JsonBindingModel model) {
         super(model);
     }

@@ -18,12 +18,19 @@ import org.eclipse.yasson.model.JsonBindingModel;
 import javax.json.stream.JsonGenerator;
 
 /**
+ * Serializer for {@link Byte} type.
+ *
  * @author David Kral
  */
 public class ByteTypeSerializer extends AbstractNumberSerializer<Byte> {
 
+    /**
+     * Creates a new instance.
+     *
+     * @param model Binding model.
+     */
     public ByteTypeSerializer(JsonBindingModel model) {
-        super(Byte.class, model);
+        super(model);
     }
 
     @Override

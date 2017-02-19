@@ -20,10 +20,17 @@ import javax.json.stream.JsonGenerator;
 import java.util.OptionalLong;
 
 /**
+ * Serializer for {@link OptionalLong} type.
+ * 
  * @author David Kral
  */
 public class OptionalLongTypeSerializer extends AbstractValueTypeSerializer<OptionalLong> {
 
+    /**
+     * Creates a new instance.
+     *
+     * @param model Binding model.
+     */
     public OptionalLongTypeSerializer(JsonBindingModel model) {
         super(model);
     }

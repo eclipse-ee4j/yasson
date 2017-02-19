@@ -19,14 +19,20 @@ import org.eclipse.yasson.model.JsonBindingModel;
 import java.lang.reflect.Type;
 
 /**
+ * Deserializer for {@link Character} type.
+ *
  * @author David Kral
  */
 public class CharacterTypeDeserializer extends AbstractValueTypeDeserializer<Character> {
 
+    /**
+     * Creates a new instance.
+     *
+     * @param model Binding model.
+     */
     public CharacterTypeDeserializer(JsonBindingModel model) {
         super(Character.class, model);
     }
-
 
     @Override
     protected Character deserialize(String value, Unmarshaller unmarshaller, Type rtType) {

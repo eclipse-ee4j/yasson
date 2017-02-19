@@ -20,10 +20,17 @@ import javax.json.stream.JsonGenerator;
 import java.util.OptionalInt;
 
 /**
+ * Serializer for {@link OptionalInt} type.
+ * 
  * @author David Kral
  */
 public class OptionalIntTypeSerializer extends AbstractValueTypeSerializer<OptionalInt> {
 
+    /**
+     * Creates a new instance.
+     *
+     * @param model Binding model.
+     */
     public OptionalIntTypeSerializer(JsonBindingModel model) {
         super(model);
     }

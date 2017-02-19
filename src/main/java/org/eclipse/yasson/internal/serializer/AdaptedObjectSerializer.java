@@ -34,6 +34,7 @@ import java.lang.reflect.Type;
 /**
  * Serializer for adapted object.
  * Converts object using adapter first, than seriazizes result with standard process.
+ *
  * @author Roman Grigoriadi
  */
 public class AdaptedObjectSerializer<T, A> implements CurrentItem<T>, JsonbSerializer<T> {
@@ -72,7 +73,6 @@ public class AdaptedObjectSerializer<T, A> implements CurrentItem<T>, JsonbSeria
             wrapperSerializerModel.getCustomization() : null;
         }
 
-
         @Override
         public Type getType() {
             return adaptedType;
@@ -83,7 +83,13 @@ public class AdaptedObjectSerializer<T, A> implements CurrentItem<T>, JsonbSeria
 
     private final AdapterBinding adapterInfo;
 
-    public AdaptedObjectSerializer(JsonBindingModel model, AdapterBinding  adapter) {
+    /**
+     * Creates AdapterObjectSerializer.
+     *
+     * @param model Binding model.
+     * @param adapter Adapter.
+     */
+    public AdaptedObjectSerializer(JsonBindingModel model, AdapterBinding adapter) {
         this.model = new AdaptedObjectSerializerModel(model, adapter.getToType());
         this.adapterInfo = adapter;
     }

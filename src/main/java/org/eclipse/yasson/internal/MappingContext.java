@@ -27,7 +27,7 @@ import java.util.function.Function;
  * JSONB mappingContext. Created once per {@link javax.json.bind.Jsonb} instance. Represents a global scope.
  * Holds internal model.
  *
- * Thread safe
+ * Thread safe.
  *
  * @author Dmitry Kornilov
  * @author Roman Grigoriadi
@@ -56,8 +56,8 @@ public class MappingContext {
             classParser.parseProperties(newClassModel, clsElement);
             return newClassModel;
         }
-
     }
+
     private final JsonbContext jsonbContext;
 
     private final ConcurrentHashMap<Class<?>, ClassModel> classes = new ConcurrentHashMap<>();
@@ -69,7 +69,7 @@ public class MappingContext {
     /**
      * Create mapping context which is scoped to jsonb runtime.
      *
-     * @param jsonbContext required
+     * @param jsonbContext Context. Required.
      */
     public MappingContext(JsonbContext jsonbContext) {
         Objects.requireNonNull(jsonbContext);
@@ -129,19 +129,31 @@ public class MappingContext {
 
     /**
      * Search for class model, without parsing if not found.
-     * @param clazz clazz to search by or parse, not null.
-     * @return model of a class if found.
+     *
+     * @param clazz Class to search by or parse, not null.
+     * @return Model of a class if found.
      */
     public ClassModel getClassModel(Class<?> clazz) {
         return classes.get(clazz);
     }
 
+    /**
+     * Gets serializer provider for given class.
+     *
+     * @param clazz Class to get serializer provider for.
+     * @return Serializer provider.
+     */
     public ContainerSerializerProvider getSerializerProvider(Class<?> clazz) {
         return serializers.get(clazz);
     }
 
+    /**
+     * Adds given serializer provider for given class.
+     *
+     * @param clazz Class to add serializer provider for.
+     * @param serializerProvider Serializer provider to add.
+     */
     public void addSerializerProvider(Class<?> clazz, ContainerSerializerProvider serializerProvider) {
         serializers.putIfAbsent(clazz, serializerProvider);
     }
-
 }

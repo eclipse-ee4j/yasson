@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2016 Oracle and/or its affiliates. All rights reserved.
+ * Copyright (c) 2016, 2017 Oracle and/or its affiliates. All rights reserved.
  * This program and the accompanying materials are made available under the
  * terms of the Eclipse Public License v1.0 and Eclipse Distribution License v. 1.0
  * which accompanies this distribution.
@@ -142,41 +142,45 @@ public class JsonbContext {
         return (PropertyVisibilityStrategy) propertyVisibilityStrategy;
     }
 
-
     /**
-     * Instance of Jsonb jsonbConfig.
-     * @return jsonb jsonbConfig
+     * Gets {@link JsonbConfig}.
+     *
+     * @return Configuration.
      */
     public JsonbConfig getConfig() {
         return jsonbConfig;
     }
 
     /**
-     * Instance of MappingContext.
-     * @return mapping context
+     * Gets mapping context.
+     *
+     * @return Mapping context.
      */
     public MappingContext getMappingContext() {
         return mappingContext;
     }
 
     /**
-     * Property visibility strategy.
-     * @return strategy for property visibility
+     * Gets property visibility strategy.
+     *
+     * @return Property visibility strategy.
      */
     public PropertyVisibilityStrategy getPropertyVisibilityStrategy() {
         return propertyVisibilityStrategy;
     }
 
     /**
-     * Property naming strategy.
-     * @return strategy for property naming.
+     * Gets property naming strategy.
+     *
+     * @return Property naming strategy.
      */
     public PropertyNamingStrategy getPropertyNamingStrategy() {
         return propertyNamingStrategy;
     }
 
     /**
-     * Provider of JSONP implementation.
+     * Gets JSONP provider.
+     *
      * @return JSONP provider.
      */
     public JsonProvider getJsonProvider() {
@@ -186,7 +190,7 @@ public class JsonbContext {
     /**
      * Implementation creating instances of user components used by JSONB, such as adapters and strategies.
      *
-     * @return instance creator
+     * @return Instance creator.
      */
     public JsonbComponentInstanceCreator getComponentInstanceCreator() {
         return componentInstanceCreator;
@@ -194,7 +198,8 @@ public class JsonbContext {
 
     /**
      * Component matcher for lookup of (de)serializers and adapters.
-     * @return component matcher
+     *
+     * @return Component matcher.
      */
     public ComponentMatcher getComponentMatcher() {
         return componentMatcher;
@@ -203,7 +208,7 @@ public class JsonbContext {
     /**
      * Checks for binary data strategy to use.
      *
-     * @return binary data strategy
+     * @return Binary data strategy.
      */
     public  String getBinaryDataStrategy() {
         final Optional<Boolean> iJson = jsonbConfig.getProperty(JsonbConfig.STRICT_IJSON).map((obj->(Boolean)obj));
@@ -226,10 +231,6 @@ public class JsonbContext {
         return new JsonbDateFormatter(DateTimeFormatter.ofPattern(dateFormat, locale), dateFormat, locale.toLanguageTag());
     }
 
-    /**
-     * DateFormatter of JsonbConfig.
-     * @return date formatter
-     */
     private String getGlobalConfigJsonbDateFormat() {
         final Optional<Object> formatProperty = jsonbConfig.getProperty(JsonbConfig.DATE_FORMAT);
         return formatProperty.map(f -> {
@@ -240,6 +241,12 @@ public class JsonbContext {
         }).orElse(JsonbDateFormat.DEFAULT_FORMAT);
     }
 
+    /**
+     * Converts string locale to {@link Locale}.
+     *
+     * @param locale Locale to convert.
+     * @return {@link Locale} instance.
+     */
     public Locale getLocale(String locale) {
         if (locale.equals(JsonbDateFormat.DEFAULT_LOCALE)) {
             return getConfigLocale();
@@ -248,8 +255,9 @@ public class JsonbContext {
     }
 
     /**
-     * Locale of JsonbConfig.
-     * @return locale
+     * Gets locale from {@link JsonbConfig}.
+     *
+     * @return Configured locale.
      */
     public Locale getConfigLocale() {
         final Optional<Object> localeProperty = jsonbConfig.getProperty(JsonbConfig.LOCALE);
@@ -262,26 +270,27 @@ public class JsonbContext {
     }
 
     /**
-     * Instantiated shared config date formatter.
-     * @return date formatter
+     * Gets instantiated shared config date formatter.
+     *
+     * @return Date formatter.
      */
     public JsonbDateFormatter getConfigDateFormatter() {
         return dateFormatter;
     }
 
     /**
-     * Component for annotation parsing.
+     * Gets component for annotation parsing.
      *
-     * @return annotation introspector
+     * @return Annotation introspector.
      */
     public AnnotationIntrospector getAnnotationIntrospector() {
         return annotationIntrospector;
     }
 
     /**
-     * Property ordering component.
+     * Gets property ordering component.
      *
-     * @return component for ordering properties
+     * @return Component for ordering properties.
      */
     public PropertyOrdering getPropertyOrdering() {
         return propertyOrdering;
@@ -290,7 +299,7 @@ public class JsonbContext {
     /**
      * Flag for searching for generic serializers and adapters in runtime.
      *
-     * @return true if generic components are present
+     * @return True if generic components are present.
      */
     public boolean genericComponentsPresent() {
         return genericComponents;

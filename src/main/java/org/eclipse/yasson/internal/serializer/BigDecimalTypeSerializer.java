@@ -19,13 +19,19 @@ import javax.json.stream.JsonGenerator;
 import java.math.BigDecimal;
 
 /**
- * Serialize {@link BigDecimal}
+ * Serializer for {@link BigDecimal} type.
+ *
  * @author David Kral
  */
 public class BigDecimalTypeSerializer extends AbstractNumberSerializer<BigDecimal> {
 
+    /**
+     * Creates an instance.
+     *
+     * @param model Binding model.
+     */
     public BigDecimalTypeSerializer(JsonBindingModel model) {
-        super(BigDecimal.class, model);
+        super(model);
     }
 
     @Override
@@ -37,5 +43,4 @@ public class BigDecimalTypeSerializer extends AbstractNumberSerializer<BigDecima
     protected void serializeNonFormatted(BigDecimal obj, JsonGenerator generator) {
         generator.write(obj);
     }
-
 }

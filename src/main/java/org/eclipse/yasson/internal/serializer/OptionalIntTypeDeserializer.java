@@ -26,10 +26,17 @@ import java.lang.reflect.Type;
 import java.util.OptionalInt;
 
 /**
+ * Deserializer for {@link OptionalInt} type.
+ * 
  * @author David Kral
  */
 public class OptionalIntTypeDeserializer extends AbstractValueTypeDeserializer<OptionalInt> {
 
+    /**
+     * Creates a new instance.
+     *
+     * @param model Binding model.
+     */
     public OptionalIntTypeDeserializer(JsonBindingModel model) {
         super(OptionalInt.class, model);
     }

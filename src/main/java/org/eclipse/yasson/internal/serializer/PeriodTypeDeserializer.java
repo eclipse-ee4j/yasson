@@ -20,10 +20,17 @@ import java.lang.reflect.Type;
 import java.time.Period;
 
 /**
+ * Deserializer for {@link Period} type.
+ * 
  * @author David Kral
  */
 public class PeriodTypeDeserializer extends AbstractValueTypeDeserializer<Period> {
 
+    /**
+     * Creates a new instance.
+     *
+     * @param model Binding model.
+     */
     public PeriodTypeDeserializer(JsonBindingModel model) {
         super(Period.class, model);
     }

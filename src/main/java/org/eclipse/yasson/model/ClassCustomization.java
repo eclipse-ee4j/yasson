@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2015 Oracle and/or its affiliates. All rights reserved.
+ * Copyright (c) 2015, 2017 Oracle and/or its affiliates. All rights reserved.
  * This program and the accompanying materials are made available under the
  * terms of the Eclipse Public License v1.0 and Eclipse Distribution License v. 1.0
  * which accompanies this distribution.
@@ -46,6 +46,10 @@ public class ClassCustomization extends Customization {
         this.propertyOrder = other.getPropertyOrder();
     }
 
+    /**
+     *
+     * @return
+     */
     public JsonbCreator getCreator() {
         return creator;
     }
@@ -59,6 +63,10 @@ public class ClassCustomization extends Customization {
         return propertyOrder;
     }
 
+    /**
+     *
+     * @param propertyOrder
+     */
     public void setPropertyOrder(String[] propertyOrder) {
         this.propertyOrder = propertyOrder;
     }

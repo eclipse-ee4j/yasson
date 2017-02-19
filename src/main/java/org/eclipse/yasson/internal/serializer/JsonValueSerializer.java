@@ -20,12 +20,17 @@ import javax.json.JsonValue;
 import javax.json.stream.JsonGenerator;
 
 /**
- * Serializes single JsonValue.
+ * Serializer for {@link JsonValue} type.
  *
  * @author Roman Grigoriadi
  */
 public class JsonValueSerializer extends AbstractValueTypeSerializer<JsonValue> {
 
+    /**
+     * Creates a new instance.
+     *
+     * @param model Binding model.
+     */
     public JsonValueSerializer(JsonBindingModel model) {
         super(model);
     }

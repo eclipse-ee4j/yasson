@@ -31,7 +31,7 @@ import java.util.Base64;
 public class ByteArrayBase64Serializer extends AbstractValueTypeSerializer<byte[]> {
 
     /**
-     * New instance.
+     * Creates a new instance.
      *
      * @param clazz Class to work with.
      * @param model Binding model.
@@ -61,5 +61,4 @@ public class ByteArrayBase64Serializer extends AbstractValueTypeSerializer<byte[
                         "Invalid strategy: " + strategy));
         }
     }
-
 }

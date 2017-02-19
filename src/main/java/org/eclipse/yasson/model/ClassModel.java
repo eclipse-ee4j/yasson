@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2015 Oracle and/or its affiliates. All rights reserved.
+ * Copyright (c) 2015, 2017 Oracle and/or its affiliates. All rights reserved.
  * This program and the accompanying materials are made available under the
  * terms of the Eclipse Public License v1.0 and Eclipse Distribution License v. 1.0
  * which accompanies this distribution.
@@ -47,9 +47,10 @@ public class ClassModel {
     private final PropertyNamingStrategy propertyNamingStrategy;
 
     /**
-     * Gets a property model by default (non customized) name
-     * @param name a name as parsed from field / getter / setter without annotation customizing
-     * @return property model
+     * Gets a property model by default (non customized) name.
+     *
+     * @param name A name as parsed from field / getter / setter without annotation customizing.
+     * @return Property model.
      */
     public PropertyModel getPropertyModel(String name) {
         return properties.get(name);
@@ -57,10 +58,11 @@ public class ClassModel {
 
     /**
      * Create instance of class model.
-     * @param clazz class to model onto
-     * @param customization customization of the class parsed from annotations
-     * @param parentClassModel class model of parent class
-     * @param propertyNamingStrategy property naming strategy
+     *
+     * @param clazz Class to model.
+     * @param customization Customization of the class parsed from annotations.
+     * @param parentClassModel Class model of parent class.
+     * @param propertyNamingStrategy Property naming strategy.
      */
     public ClassModel(Class<?> clazz, ClassCustomization customization, ClassModel parentClassModel, PropertyNamingStrategy propertyNamingStrategy) {
         this.clazz = clazz;
@@ -71,6 +73,7 @@ public class ClassModel {
 
     /**
      * Search for field in this class model and superclasses of its class.
+     *
      * @param jsonReadName name as it appears in JSON during reading.
      * @return PropertyModel if found.
      */
@@ -98,6 +101,8 @@ public class ClassModel {
     /**
      * Check if name is equal according to property strategy. In case of {@link CaseInsensitiveStrategy} ignore case.
      * User can provide own strategy implementation, cast to custom interface is not an option.
+     *
+     * @return True if names are equal.
      */
     private boolean equalsReadName(String jsonName, PropertyModel propertyModel) {
         final String propertyReadName = propertyModel.getReadName();
@@ -107,17 +112,28 @@ public class ClassModel {
         return jsonName.equalsIgnoreCase(propertyReadName);
     }
 
+    /**
+     * Gets customization.
+     *
+     * @return Customization.
+     */
     public ClassCustomization getCustomization() {
         return classCustomization;
     }
 
+    /**
+     * Gets type.
+     *
+     * @return Type.
+     */
     public Class<?> getType() {
         return clazz;
     }
 
     /**
      * Introspected customization for a class.
-     * @return immutable class customization.
+     *
+     * @return Immutable class customization.
      */
     public ClassCustomization getClassCustomization() {
         return classCustomization;
@@ -139,6 +155,10 @@ public class ClassModel {
         return sortedProperties;
     }
 
+    /**
+     *
+     * @param parsedProperties
+     */
     public void setProperties(List<PropertyModel> parsedProperties) {
         sortedProperties = parsedProperties.toArray(new PropertyModel[]{});
         this.properties = parsedProperties.stream().collect(Collectors.toMap(PropertyModel::getPropertyName, (mod) -> mod));

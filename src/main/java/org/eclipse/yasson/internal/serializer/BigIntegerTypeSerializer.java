@@ -19,13 +19,19 @@ import javax.json.stream.JsonGenerator;
 import java.math.BigInteger;
 
 /**
- * Serialize {@link BigInteger}
+ * Serializer for {@link BigInteger} type.
+ *
  * @author David Kral
  */
 public class BigIntegerTypeSerializer extends AbstractNumberSerializer<BigInteger> {
 
+    /**
+     * Creates an instance.
+     *
+     * @param model Binding model.
+     */
     public BigIntegerTypeSerializer(JsonBindingModel model) {
-        super(BigInteger.class, model);
+        super(model);
     }
 
     @Override

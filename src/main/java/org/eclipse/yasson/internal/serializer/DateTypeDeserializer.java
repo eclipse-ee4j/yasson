@@ -28,11 +28,17 @@ import java.util.Date;
 import java.util.Locale;
 
 /**
+ * Deserializer for {@link Date} type.
+ *
  * @author David Kral
  */
 public class DateTypeDeserializer extends AbstractValueTypeDeserializer<Date> {
 
-
+    /**
+     * Creates a new instance.
+     *
+     * @param model Binding model.
+     */
     public DateTypeDeserializer(JsonBindingModel model) {
         super(Date.class, model);
     }
@@ -43,7 +49,6 @@ public class DateTypeDeserializer extends AbstractValueTypeDeserializer<Date> {
         }
         return new SimpleDateFormat(formatter.getFormat(), locale);
     }
-
 
     @Override
     protected Date deserialize(String jsonValue, Unmarshaller unmarshaller, Type rtType) {

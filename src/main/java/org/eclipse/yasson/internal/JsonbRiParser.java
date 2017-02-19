@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2016 Oracle and/or its affiliates. All rights reserved.
+ * Copyright (c) 2016, 2017 Oracle and/or its affiliates. All rights reserved.
  * This program and the accompanying materials are made available under the
  * terms of the Eclipse Public License v1.0 and Eclipse Distribution License v. 1.0
  * which accompanies this distribution.
@@ -25,6 +25,7 @@ import java.util.Stack;
 
 /**
  * Decorator for JSONP parser used by JSONB.
+ *
  * @author Roman Grigoriadi
  */
 public class JsonbRiParser implements JsonParser, JsonbParser {
@@ -35,14 +36,23 @@ public class JsonbRiParser implements JsonParser, JsonbParser {
     public static class LevelContext {
         private final LevelContext parent;
         private JsonParser.Event lastEvent;
-        private String lastStringValue;
         private String lastKeyName;
         private boolean parsed;
 
+        /**
+         * Creates an instance.
+         *
+         * @param parent Parent context.
+         */
         public LevelContext(LevelContext parent) {
             this.parent = parent;
         }
 
+        /**
+         * Gets last event.
+         *
+         * @return Last event.
+         */
         public JsonParser.Event getLastEvent() {
             return lastEvent;
         }
@@ -51,14 +61,11 @@ public class JsonbRiParser implements JsonParser, JsonbParser {
             this.lastEvent = lastEvent;
         }
 
-        public String getLastStringValue() {
-            return lastStringValue;
-        }
-
-        private void setLastStringValue(String lastStringValue) {
-            this.lastStringValue = lastStringValue;
-        }
-
+        /**
+         * Gets last key name.
+         *
+         * @return Last key name.
+         */
         public String getLastKeyName() {
             return lastKeyName;
         }
@@ -67,10 +74,20 @@ public class JsonbRiParser implements JsonParser, JsonbParser {
             this.lastKeyName = lastKeyName;
         }
 
+        /**
+         * Get parent.
+         *
+         * @return Parent.
+         */
         public LevelContext getParent() {
             return parent;
         }
 
+        /**
+         * Getter for parsed property.
+         *
+         * @return True or false.
+         */
         public boolean isParsed() {
             return parsed;
         }
@@ -87,22 +104,31 @@ public class JsonbRiParser implements JsonParser, JsonbParser {
 
     private final Stack<LevelContext> level = new Stack<>();
 
+    /**
+     * Creates a parser.
+     *
+     * @param jsonParser JSON-P parser to decorate.
+     */
     public JsonbRiParser(JsonParser jsonParser) {
         this.jsonParser = jsonParser;
     }
 
+    @Override
     public boolean hasNext() {
         return  jsonParser.hasNext();
     }
 
+    @Override
     public long getLong() {
         return jsonParser.getLong();
     }
 
+    @Override
     public int getInt() {
         return jsonParser.getInt();
     }
 
+    @Override
     public JsonParser.Event next() {
         final JsonParser.Event next = jsonParser.next();
         LevelContext current = level.empty() ? null : level.peek();
@@ -129,25 +155,29 @@ public class JsonbRiParser implements JsonParser, JsonbParser {
         return next;
     }
 
+    @Override
     public boolean isIntegralNumber() {
         return jsonParser.isIntegralNumber();
     }
 
+    @Override
     public BigDecimal getBigDecimal() {
         return jsonParser.getBigDecimal();
     }
 
+    @Override
     public JsonLocation getLocation() {
         return jsonParser.getLocation();
     }
 
+    @Override
     public void close() {
         jsonParser.close();
     }
 
+    @Override
     public String getString() {
         final String value = jsonParser.getString();
-        getCurrentLevel().setLastStringValue(value);
         return value;
     }
 
@@ -209,7 +239,6 @@ public class JsonbRiParser implements JsonParser, JsonbParser {
     public LevelContext getCurrentLevel() {
         return level.peek();
     }
-
 
     @Override
     public void skipJsonStructure() {

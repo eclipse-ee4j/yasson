@@ -22,10 +22,17 @@ import javax.json.bind.JsonbException;
 import java.lang.reflect.Type;
 
 /**
+ * Serializer for {@link Byte} type.
+ *
  * @author David Kral
  */
 public class ByteTypeDeserializer extends AbstractNumberDeserializer<Byte> {
 
+    /**
+     * Creates a new instance.
+     *
+     * @param model Binding model.
+     */
     public ByteTypeDeserializer(JsonBindingModel model) {
         super(Byte.class, model);
     }

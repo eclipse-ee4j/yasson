@@ -22,10 +22,17 @@ import java.time.ZoneOffset;
 import java.time.format.DateTimeFormatter;
 
 /**
+ * Serializer for {@link Instant} type.
+ *
  * @author David Kral
  */
 public class InstantTypeSerializer extends AbstractValueTypeSerializer<Instant> {
 
+    /**
+     * Creates a new instance.
+     *
+     * @param model Binding model.
+     */
     public InstantTypeSerializer(JsonBindingModel model) {
         super(model);
     }

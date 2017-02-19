@@ -20,7 +20,7 @@ import javax.json.stream.JsonGenerator;
 import java.util.Map;
 
 /**
- * Serializes JSON object to json.
+ * Serializer for {@link JsonObject} type.
  *
  * @author Roman Grigoriadi
  */

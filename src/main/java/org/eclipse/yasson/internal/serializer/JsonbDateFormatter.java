@@ -24,6 +24,7 @@ import java.time.format.DateTimeFormatter;
 public class JsonbDateFormatter {
 
     public static final String ISO_8601_DATE_TIME_FORMAT = "yyyy-MM-dd'T'HH:mm:ss";
+
     public static final String ISO_8601_DATE_FORMAT = "yyyy-MM-dd";
 
     //Java 8 date formatter is thread safe, cache it if possible

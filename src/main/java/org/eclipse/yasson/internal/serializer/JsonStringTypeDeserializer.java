@@ -22,10 +22,17 @@ import javax.json.JsonString;
 import java.lang.reflect.Type;
 
 /**
+ * Deserializer for {@link JsonString} type.
+ * 
  * @author David Kral
  */
 public class JsonStringTypeDeserializer extends AbstractValueTypeDeserializer<JsonString> {
 
+    /**
+     * Creates a new instance.
+     *
+     * @param model Binding model.
+     */
     public JsonStringTypeDeserializer(JsonBindingModel model) {
         super(JsonString.class, model);
     }

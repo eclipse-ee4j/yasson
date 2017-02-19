@@ -25,8 +25,7 @@ import java.math.BigDecimal;
  *
  * @author Roman Grigoriadi
  */
-public class JsonArrayDeserializer extends AbstractJsonpDeserializer<JsonArray> {
-    
+public class JsonArrayDeserializer extends AbstractJsonpDeserializer<JsonArray> {   
     private final JsonArrayBuilder arrayBuilder;
 
     @Override

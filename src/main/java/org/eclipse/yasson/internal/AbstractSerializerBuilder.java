@@ -21,9 +21,12 @@ import java.lang.reflect.Type;
 import java.util.Objects;
 
 /**
+ * Base class for serializer builders.
+ *
  * @author Roman Grigoriadi
  */
 public class AbstractSerializerBuilder<T extends AbstractSerializerBuilder> {
+
     /**
      * Not null with an exception of a root item.
      */
@@ -54,9 +57,9 @@ public class AbstractSerializerBuilder<T extends AbstractSerializerBuilder> {
     protected final JsonbContext jsonbContext;
 
     /**
-     * Crate builder.
+     * Crates a builder.
      *
-     * @param jsonbContext not null
+     * @param jsonbContext Not null.
      */
     public AbstractSerializerBuilder(JsonbContext jsonbContext) {
         Objects.requireNonNull(jsonbContext);
@@ -65,8 +68,9 @@ public class AbstractSerializerBuilder<T extends AbstractSerializerBuilder> {
 
     /**
      * Wrapper item for this item.
-     * @param wrapper not null
-     * @return builder instance for call chaining
+     *
+     * @param wrapper not null.
+     * @return Builder instance for call chaining.
      */
     public T withWrapper(CurrentItem<?> wrapper) {
         this.wrapper = wrapper;
@@ -75,8 +79,9 @@ public class AbstractSerializerBuilder<T extends AbstractSerializerBuilder> {
 
     /**
      * Model of a field for underlying instance. In case model is present, instance type is inferred from it.
-     * @param model model of a field, not null
-     * @return builder instance for call chaining
+     *
+     * @param model Model of a field, not null.
+     * @return Builder instance for call chaining.
      */
     public T withModel(JsonBindingModel model) {
         this.model = model;
@@ -86,8 +91,8 @@ public class AbstractSerializerBuilder<T extends AbstractSerializerBuilder> {
     /***
      * Gets or load class model for a class an its superclasses.
      *
-     * @param rawType Class to get model for
-     * @return Class model
+     * @param rawType Class to get model for.
+     * @return Class model.
      */
     protected ClassModel getClassModel(Class<?> rawType) {
         ClassModel classModel = jsonbContext.getMappingContext().getClassModel(rawType);
@@ -99,7 +104,8 @@ public class AbstractSerializerBuilder<T extends AbstractSerializerBuilder> {
 
     /**
      * Wrapper item for this item.
-     * @return wrapper item
+     *
+     * @return Wrapper item.
      */
     public CurrentItem<?> getWrapper() {
         return wrapper;
@@ -107,7 +113,8 @@ public class AbstractSerializerBuilder<T extends AbstractSerializerBuilder> {
 
     /**
      * Model of a for underlying instance. In case model is present, instance type is inferred from it.
-     * @return model of a field
+     *
+     * @return model of a field.
      */
     public JsonBindingModel getModel() {
         return model;
@@ -116,6 +123,7 @@ public class AbstractSerializerBuilder<T extends AbstractSerializerBuilder> {
     /**
      * Model of a class representing current item and instance (if any).
      * Known collection classes doesn't need such a model.
+     *
      * @return model of a class
      */
     public ClassModel getClassModel() {
@@ -125,6 +133,7 @@ public class AbstractSerializerBuilder<T extends AbstractSerializerBuilder> {
     /**
      * Resolved runtime type for instance in case of {@link java.lang.reflect.TypeVariable} or {@link java.lang.reflect.WildcardType}
      * Otherwise provided type in type field, or type of field model.
+     *
      * @return runtime type
      */
     public Type getRuntimeType() {

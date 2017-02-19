@@ -18,12 +18,19 @@ import org.eclipse.yasson.model.JsonBindingModel;
 import javax.json.stream.JsonGenerator;
 
 /**
+ * Serializer for {@link Float} type.
+ *
  * @author David Kral
  */
 public class FloatTypeSerializer extends AbstractNumberSerializer<Float> {
 
+    /**
+     * Creates a new instance.
+     *
+     * @param model Binding model.
+     */
     public FloatTypeSerializer(JsonBindingModel model) {
-        super(Float.class, model);
+        super(model);
     }
 
     @Override

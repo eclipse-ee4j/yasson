@@ -21,6 +21,7 @@ import org.eclipse.yasson.internal.serializer.JsonbNumberFormatter;
 /**
  * Customization configuration for class or field.
  * Configuration parsed from annotation is put here.
+ * Immutable.
  *
  * @author Roman Grigoriadi
  */

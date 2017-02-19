@@ -34,7 +34,6 @@ import java.lang.reflect.Type;
  * @author Roman Grigoriadi
  */
 public abstract class AbstractContainerDeserializer<T> extends AbstractItem<T> implements JsonbDeserializer<T> {
-
     protected JsonbRiParser.LevelContext parserContext;
 
     /**
@@ -49,7 +48,10 @@ public abstract class AbstractContainerDeserializer<T> extends AbstractItem<T> i
     /**
      * Drives JSONP {@link JsonParser} to deserialize json document.
      *
-     * @return instance of a type for this item
+     * @param parser JSON parser.
+     * @param context Deseriaization context.
+     * @param rtType Runtime type.
+     * @return Instance of a type for this item.
      */
     @Override
     public final T deserialize(JsonParser parser, DeserializationContext context, Type rtType) {

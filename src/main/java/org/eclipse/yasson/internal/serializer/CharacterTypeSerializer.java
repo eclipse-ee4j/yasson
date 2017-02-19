@@ -19,10 +19,17 @@ import org.eclipse.yasson.model.JsonBindingModel;
 import javax.json.stream.JsonGenerator;
 
 /**
+ * Serializer for {@link Character} type.
+ *
  * @author David Kral
  */
 public class CharacterTypeSerializer extends AbstractValueTypeSerializer<Character> {
 
+    /**
+     * Creates a new instance.
+     *
+     * @param model Binding model.
+     */
     public CharacterTypeSerializer(JsonBindingModel model) {
         super(model);
     }

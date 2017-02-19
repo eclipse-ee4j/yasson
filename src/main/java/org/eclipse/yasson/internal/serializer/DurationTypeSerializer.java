@@ -20,10 +20,17 @@ import javax.json.stream.JsonGenerator;
 import java.time.Duration;
 
 /**
+ * Serializer for {@link Duration} type.
+ *
  * @author David Kral
  */
 public class DurationTypeSerializer extends AbstractValueTypeSerializer<Duration> {
 
+    /**
+     * Creates a new instance.
+     *
+     * @param model Binding model.
+     */
     public DurationTypeSerializer(JsonBindingModel model) {
         super(model);
     }

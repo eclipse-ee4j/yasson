@@ -24,10 +24,17 @@ import java.time.format.DateTimeFormatter;
 import java.util.Locale;
 
 /**
+ * Deserializer for {@link OffsetTime} type.
+ * 
  * @author David Kral
  */
 public class OffsetTimeTypeDeserializer extends AbstractDateTimeDeserializer<OffsetTime> {
 
+    /**
+     * Creates a new instance.
+     *
+     * @param model Binding model.
+     */
     public OffsetTimeTypeDeserializer(JsonBindingModel model) {
         super(OffsetTime.class, model);
     }

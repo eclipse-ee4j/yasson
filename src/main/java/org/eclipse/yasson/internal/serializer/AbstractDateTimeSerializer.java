@@ -29,6 +29,7 @@ import java.util.Locale;
  * Abstract class for converting date objects from {@link java.time}.
  *
  * @author Roman Grigoriadi
+ * @param <T> Type to serialize.
  */
 public abstract class AbstractDateTimeSerializer<T extends TemporalAccessor> extends AbstractValueTypeSerializer<T> {
 

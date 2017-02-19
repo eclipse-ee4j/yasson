@@ -20,10 +20,17 @@ import java.lang.reflect.Type;
 import java.time.Instant;
 
 /**
+ * Deserializer for {@link Instant} type.
+ *
  * @author David Kral
  */
 public class InstantTypeDeserializer extends AbstractValueTypeDeserializer<Instant> {
 
+    /**
+     * Creates a new instance.
+     *
+     * @param model Binding model.
+     */
     public InstantTypeDeserializer(JsonBindingModel model) {
         super(Instant.class, model);
     }

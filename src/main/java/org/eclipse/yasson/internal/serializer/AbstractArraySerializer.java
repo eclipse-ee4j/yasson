@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2016 Oracle and/or its affiliates. All rights reserved.
+ * Copyright (c) 2016, 2017 Oracle and/or its affiliates. All rights reserved.
  * This program and the accompanying materials are made available under the
  * terms of the Eclipse Public License v1.0 and Eclipse Distribution License v. 1.0
  * which accompanies this distribution.
@@ -29,6 +29,7 @@ import java.lang.reflect.Type;
  * Common serializer for arrays.
  *
  * @author Roman Grigoriadi
+ * @param <T> Type to serialize.
  */
 public abstract class AbstractArraySerializer<T> extends AbstractContainerSerializer<T> implements EmbeddedItem {
 
@@ -54,7 +55,6 @@ public abstract class AbstractArraySerializer<T> extends AbstractContainerSerial
             return ReflectionUtils.getRawType(getRuntimeType()).getComponentType();
         }
     }
-
 
     @Override
     protected void writeStart(JsonGenerator generator) {

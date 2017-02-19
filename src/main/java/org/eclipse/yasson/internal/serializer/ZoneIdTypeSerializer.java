@@ -20,10 +20,17 @@ import javax.json.stream.JsonGenerator;
 import java.time.ZoneId;
 
 /**
+ * Serializer for {@link ZoneId} type.
+ * 
  * @author David Kral
  */
 public class ZoneIdTypeSerializer extends AbstractValueTypeSerializer<ZoneId> {
 
+    /**
+     * Creates a new instance.
+     *
+     * @param model Binding model.
+     */
     public ZoneIdTypeSerializer(JsonBindingModel model) {
         super(model);
     }

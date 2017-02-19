@@ -26,10 +26,17 @@ import java.lang.reflect.Type;
 import java.util.OptionalLong;
 
 /**
+ * Deserializer for {@link OptionalLong} type.
+ * 
  * @author David Kral
  */
 public class OptionalLongTypeDeserializer extends AbstractValueTypeDeserializer<OptionalLong> {
 
+    /**
+     * Creates a new instance.
+     *
+     * @param model Binding model.
+     */
     public OptionalLongTypeDeserializer(JsonBindingModel model) {
         super(OptionalLong.class, model);
     }

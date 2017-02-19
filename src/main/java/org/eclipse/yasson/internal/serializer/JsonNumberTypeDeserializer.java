@@ -23,12 +23,19 @@ import java.lang.reflect.Type;
 import java.math.BigDecimal;
 
 /**
+ * Deserializer for {@link JsonNumber} type.
+ * 
  * @author David Kral
  */
 public class JsonNumberTypeDeserializer extends AbstractValueTypeDeserializer<JsonNumber> {
 
     private final static String NUMBER = "number";
 
+    /**
+     * Creates a new instance.
+     *
+     * @param model Binding model.
+     */
     public JsonNumberTypeDeserializer(JsonBindingModel model) {
         super(JsonNumber.class, model);
     }

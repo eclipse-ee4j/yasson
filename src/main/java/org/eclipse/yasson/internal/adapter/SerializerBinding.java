@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2016 Oracle and/or its affiliates. All rights reserved.
+ * Copyright (c) 2016, 2017 Oracle and/or its affiliates. All rights reserved.
  * This program and the accompanying materials are made available under the
  * terms of the Eclipse Public License v1.0 and Eclipse Distribution License v. 1.0
  * which accompanies this distribution.
@@ -18,17 +18,18 @@ import java.lang.reflect.Type;
 
 /**
  * Binding for user Serializer component.
+ *
  * @author Roman Grigoriadi
  */
 public class SerializerBinding<T> extends AbstractComponentBinding {
 
     private final JsonbSerializer<T> jsonbSerializer;
 
-
     /**
-     * Constructs info.
-     * @param bindingType generic type argument of serializer and deserializer not null
-     * @param jsonbSerializer serializer nullable
+     * Creates a new instance.
+     *
+     * @param bindingType Generic type argument of serializer. Not null.
+     * @param jsonbSerializer Serializer. Can be null.
      */
     public SerializerBinding(Type bindingType, JsonbSerializer<T> jsonbSerializer) {
         super(bindingType);
@@ -36,8 +37,9 @@ public class SerializerBinding<T> extends AbstractComponentBinding {
     }
 
     /**
-     * Serializer if any.
-     * @return serializer
+     * Returns a serializer if any.
+     *
+     * @return Serializer.
      */
     public JsonbSerializer<T> getJsonbSerializer() {
         return jsonbSerializer;
@@ -46,7 +48,7 @@ public class SerializerBinding<T> extends AbstractComponentBinding {
     /**
      * Class of user component.
      *
-     * @return component class
+     * @return Component class.
      */
     @Override
     public Class<?> getComponentClass() {

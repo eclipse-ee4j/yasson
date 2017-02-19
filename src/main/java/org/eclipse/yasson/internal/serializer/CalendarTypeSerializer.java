@@ -31,19 +31,24 @@ import java.util.Locale;
 import java.util.Optional;
 
 /**
+ * Serializer for {@link Calendar} type.
+ *
  * @author David Kral
  */
 public class CalendarTypeSerializer extends AbstractValueTypeSerializer<Calendar> {
 
     private final Calendar calendarTemplate;
 
-
+    /**
+     * Creates a new instance.
+     *
+     * @param model Binding model.
+     */
     public CalendarTypeSerializer(JsonBindingModel model) {
         super(model);
         calendarTemplate = Calendar.getInstance();
         calendarTemplate.clear();
     }
-
 
     private String toJson(Calendar object, JsonbDateFormatter formatter, JsonbContext jsonbContext) {
         if (JsonbDateFormat.TIME_IN_MILLIS.equals(formatter.getFormat())) {

@@ -20,10 +20,17 @@ import java.lang.reflect.Type;
 import java.math.BigDecimal;
 
 /**
+ * Deserializer for {@link Number} type.
+ * 
  * @author David Kral
  */
 public class NumberTypeDeserializer extends AbstractValueTypeDeserializer<Number> {
 
+    /**
+     * Creates a new instance.
+     *
+     * @param model Binding model.
+     */
     public NumberTypeDeserializer(JsonBindingModel model) {
         super(Number.class, model);
     }

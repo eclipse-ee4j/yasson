@@ -23,6 +23,7 @@ import javax.json.stream.JsonGenerator;
 
 /**
  * Common type for all supported type serializers.
+ *
  * @author Roman Grigoriadi
  */
 public abstract class AbstractValueTypeSerializer<T> implements JsonbSerializer<T> {

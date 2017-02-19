@@ -44,14 +44,25 @@ import java.util.Optional;
 public class DeserializerBuilder extends AbstractSerializerBuilder<DeserializerBuilder> {
 
     /**
-     * Value type of json event.
+     * Value type of JSON event.
      */
     private JsonValueType jsonValueType;
 
+    /**
+     * Creates a new builder.
+     *
+     * @param jsonbContext Context.
+     */
     public DeserializerBuilder(JsonbContext jsonbContext) {
         super(jsonbContext);
     }
 
+    /**
+     * Sets value type.
+     *
+     * @param valueType Value type to set.
+     * @return Updated object.
+     */
     public DeserializerBuilder withJsonValueType(JsonValueType valueType) {
         this.jsonValueType = valueType;
         return this;

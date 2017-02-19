@@ -84,7 +84,7 @@ public class Marshaller extends ProcessingContext implements SerializationContex
         }
     }
 
-            @Override
+    @Override
     public <T> void serialize(String key, T object, JsonGenerator generator) {
         Objects.requireNonNull(key);
         Objects.requireNonNull(object);
@@ -99,6 +99,13 @@ public class Marshaller extends ProcessingContext implements SerializationContex
         serializeRoot(object, generator, model);
     }
 
+    /**
+     * Serializes root element.
+     *
+     * @param root Root.
+     * @param generator JSON generator.
+     * @param model Binding model.
+     */
     @SuppressWarnings("unchecked")
     public <T> void serializeRoot(T root, JsonGenerator generator, JsonBindingModel model) {
         final JsonbSerializer<T> rootSerializer = (JsonbSerializer<T>) getRootSerializer(root.getClass(), model);

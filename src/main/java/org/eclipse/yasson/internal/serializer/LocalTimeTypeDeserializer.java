@@ -24,11 +24,17 @@ import java.time.format.DateTimeFormatter;
 import java.util.Locale;
 
 /**
+ * Deserializer for {@link LocalTime} type.
+ * 
  * @author David Kral
  */
 public class LocalTimeTypeDeserializer extends AbstractDateTimeDeserializer<LocalTime> {
 
-
+    /**
+     * Creates a new instance.
+     *
+     * @param model Binding model.
+     */
     public LocalTimeTypeDeserializer(JsonBindingModel model) {
         super(LocalTime.class, model);
     }

@@ -22,10 +22,17 @@ import java.net.MalformedURLException;
 import java.net.URL;
 
 /**
+ * Deserializer for {@link URL} type.
+ * 
  * @author David Kral
  */
 public class URLTypeDeserializer extends AbstractValueTypeDeserializer<URL> {
 
+    /**
+     * Creates a new instance.
+     *
+     * @param model Binding model.
+     */
     public URLTypeDeserializer(JsonBindingModel model) {
         super(URL.class, model);
     }

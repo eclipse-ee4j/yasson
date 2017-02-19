@@ -18,12 +18,19 @@ import org.eclipse.yasson.model.JsonBindingModel;
 import javax.json.stream.JsonGenerator;
 
 /**
+ * Serializer for {@link Short} type.
+ * 
  * @author David Kral
  */
 public class ShortTypeSerializer extends AbstractNumberSerializer<Short> {
 
+    /**
+     * Creates a new instance.
+     *
+     * @param model Binding model.
+     */
     public ShortTypeSerializer(JsonBindingModel model) {
-        super(Short.class, model);
+        super(model);
     }
 
     @Override

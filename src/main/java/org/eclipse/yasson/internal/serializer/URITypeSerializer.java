@@ -21,10 +21,17 @@ import javax.json.stream.JsonGenerator;
 import java.net.URI;
 
 /**
+ * Serializer for {@link URI} type.
+ * 
  * @author David Kral
  */
 public class URITypeSerializer extends AbstractValueTypeSerializer<URI> {
 
+    /**
+     * Creates a new instance.
+     *
+     * @param model Binding model.
+     */
     public URITypeSerializer(JsonBindingModel model) {
         super(model);
     }

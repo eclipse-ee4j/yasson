@@ -24,6 +24,7 @@ import java.lang.reflect.Type;
 
 /**
  * Common type for all supported value type serializers.
+ *
  * @author Roman Grigoriadi
  */
 public abstract class AbstractValueTypeDeserializer<T> implements JsonbDeserializer<T> {
@@ -33,7 +34,7 @@ public abstract class AbstractValueTypeDeserializer<T> implements JsonbDeseriali
     protected final JsonBindingModel model;
 
     /**
-     * New instance.
+     * Creates a new instance.
      *
      * @param clazz Class to work with.
      * @param model Binding model.

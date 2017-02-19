@@ -19,10 +19,17 @@ import org.eclipse.yasson.model.JsonBindingModel;
 import javax.json.stream.JsonGenerator;
 
 /**
+ * Serializer for {@link Enum} type.
+ *
  * @author David Kral
  */
 public class EnumTypeSerializer extends AbstractValueTypeSerializer<Enum> {
 
+    /**
+     * Creates a new instance.
+     *
+     * @param model Binding model.
+     */
     public EnumTypeSerializer(JsonBindingModel model) {
         super(model);
     }

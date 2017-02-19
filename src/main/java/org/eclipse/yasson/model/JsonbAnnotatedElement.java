@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2016 Oracle and/or its affiliates. All rights reserved.
+ * Copyright (c) 2016, 2017 Oracle and/or its affiliates. All rights reserved.
  * This program and the accompanying materials are made available under the
  * terms of the Eclipse Public License v1.0 and Eclipse Distribution License v. 1.0
  * which accompanies this distribution.
@@ -24,11 +24,21 @@ public class JsonbAnnotatedElement<T extends AnnotatedElement> extends JsonbAnno
 
     private final T element;
 
+    /**
+     * Creates a new instance.
+     *
+     * @param element Element.
+     */
     public JsonbAnnotatedElement(T element) {
         super(element.getAnnotations());
         this.element = element;
     }
 
+    /**
+     * Gets element.
+     *
+     * @return Element.
+     */
     public T getElement() {
         return element;
     }

@@ -25,10 +25,17 @@ import javax.json.stream.JsonParser;
 import java.lang.reflect.Type;
 
 /**
+ * Deserializer for {@link Boolean} type.
+ *
  * @author David Kral
  */
 public class BooleanTypeDeserializer extends AbstractValueTypeDeserializer<Boolean> {
 
+    /**
+     * Creates an instance.
+     *
+     * @param model Binding model.
+     */
     public BooleanTypeDeserializer(JsonBindingModel model) {
         super(Boolean.class, model);
     }

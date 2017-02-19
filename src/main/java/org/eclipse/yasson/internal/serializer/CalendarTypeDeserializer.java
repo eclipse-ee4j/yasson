@@ -32,13 +32,19 @@ import java.util.Date;
 import java.util.Locale;
 
 /**
+ * Deserializer for {@link Calendar} type.
+ *
  * @author David Kral
  */
 public class CalendarTypeDeserializer extends AbstractValueTypeDeserializer<Calendar> {
 
     private final Calendar calendarTemplate;
 
-
+    /**
+     * Creates a new instance.
+     *
+     * @param model Binding model.
+     */
     public CalendarTypeDeserializer(JsonBindingModel model) {
         super(Calendar.class, model);
         calendarTemplate = Calendar.getInstance();

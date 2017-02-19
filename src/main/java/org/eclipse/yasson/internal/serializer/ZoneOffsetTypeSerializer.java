@@ -20,10 +20,17 @@ import javax.json.stream.JsonGenerator;
 import java.time.ZoneOffset;
 
 /**
+ * Serializer for {@link ZoneOffset} type.
+ * 
  * @author David Kral
  */
 public class ZoneOffsetTypeSerializer extends AbstractValueTypeSerializer<ZoneOffset> {
 
+    /**
+     * Creates an instance and initializes it with passed binding model.
+     *
+     * @param model Binding model.
+     */
     public ZoneOffsetTypeSerializer(JsonBindingModel model) {
         super(model);
     }

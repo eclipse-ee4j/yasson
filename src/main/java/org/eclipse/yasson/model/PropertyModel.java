@@ -72,12 +72,6 @@ public class PropertyModel implements JsonBindingModel, Comparable<PropertyModel
     private final JsonbSerializer<?> propertySerializer;
 
     /**
-     * Flag to cache serializer. If type is not resolved (TypeVariable or ParameterizedType containing TypeVariables)
-     * Serializer / Adapter caching is not possible.
-     */
-    private final boolean resolvedType;
-
-    /**
      * Creates an instance.
      *
      * @param classModel Class model of declaring class.
@@ -93,7 +87,6 @@ public class PropertyModel implements JsonBindingModel, Comparable<PropertyModel
         this.readName = calculateReadWriteName(customization.getJsonReadName(), jsonbContext.getPropertyNamingStrategy());
         this.writeName = calculateReadWriteName(customization.getJsonWriteName(), jsonbContext.getPropertyNamingStrategy());
         this.propertySerializer = resolveCachedSerializer();
-        this.resolvedType = ReflectionUtils.isResolvedType(propertyType);
     }
 
 
@@ -272,6 +265,11 @@ public class PropertyModel implements JsonBindingModel, Comparable<PropertyModel
         return JsonContext.JSON_OBJECT;
     }
 
+    /**
+     * Gets a name of JSON document property to read this property from.
+     *
+     * @return Name of JSON document property.
+     */
     public String getReadName() {
         return readName;
     }
@@ -281,6 +279,11 @@ public class PropertyModel implements JsonBindingModel, Comparable<PropertyModel
         return writeName;
     }
 
+    /**
+     * Gets serializer.
+     *
+     * @return Serializer.
+     */
     public JsonbSerializer<?> getPropertySerializer() {
         return propertySerializer;
     }

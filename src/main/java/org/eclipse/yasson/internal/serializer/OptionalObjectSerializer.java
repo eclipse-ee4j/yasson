@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2016 Oracle and/or its affiliates. All rights reserved.
+ * Copyright (c) 2016, 2017 Oracle and/or its affiliates. All rights reserved.
  * This program and the accompanying materials are made available under the
  * terms of the Eclipse Public License v1.0 and Eclipse Distribution License v. 1.0
  * which accompanies this distribution.
@@ -31,16 +31,20 @@ import java.util.Optional;
  * Common serializer logic for java Optionals.
  *
  * @author Roman Grigoriadi
+ * @param <T>
  */
 public class OptionalObjectSerializer<T extends Optional<?>> implements CurrentItem<T>, JsonbSerializer<T> {
-
-
     private final JsonBindingModel wrapperModel;
 
     private final CurrentItem<?> wrapper;
 
     private final Type optionalValueType;
 
+    /**
+     * Creates a new instance.
+     *
+     * @param builder Builder to initialize the instance.
+     */
     public OptionalObjectSerializer(SerializerBuilder builder) {
         this.wrapper = builder.getWrapper();
         this.wrapperModel = builder.getModel();

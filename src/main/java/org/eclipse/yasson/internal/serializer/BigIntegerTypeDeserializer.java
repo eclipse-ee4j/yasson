@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2016 Oracle and/or its affiliates. All rights reserved.
+ * Copyright (c) 2016, 2017 Oracle and/or its affiliates. All rights reserved.
  * This program and the accompanying materials are made available under the
  * terms of the Eclipse Public License v1.0 and Eclipse Distribution License v. 1.0
  * which accompanies this distribution.
@@ -23,12 +23,17 @@ import java.lang.reflect.Type;
 import java.math.BigInteger;
 
 /**
- * Deserialize {@link BigInteger}.
+ * Deserializer for {@link BigInteger} type.
  *
  * @author David Kral
  */
 public class BigIntegerTypeDeserializer extends AbstractNumberDeserializer<BigInteger> {
 
+    /**
+     * Creates an instance.
+     *
+     * @param model Binding model.
+     */
     public BigIntegerTypeDeserializer(JsonBindingModel model) {
         super(BigInteger.class, model);
     }

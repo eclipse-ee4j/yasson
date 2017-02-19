@@ -22,14 +22,20 @@ import javax.json.bind.JsonbException;
 import java.lang.reflect.Type;
 
 /**
+ * Deserializer for {@link Long} type.
+ * 
  * @author David Kral
  */
 public class LongTypeDeserializer extends AbstractNumberDeserializer<Long> {
 
+    /**
+     * Creates a new instance.
+     *
+     * @param model Binding model.
+     */
     public LongTypeDeserializer(JsonBindingModel model) {
         super(Long.class, model);
     }
-
 
     @Override
     protected Long deserialize(String jsonValue, Unmarshaller unmarshaller, Type rtType) {

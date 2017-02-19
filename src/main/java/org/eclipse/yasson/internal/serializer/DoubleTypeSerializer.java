@@ -18,15 +18,20 @@ import org.eclipse.yasson.model.JsonBindingModel;
 import javax.json.stream.JsonGenerator;
 
 /**
+ * Serializer for {@link Double} type.
+ *
  * @author David Kral
  */
 public class DoubleTypeSerializer extends AbstractNumberSerializer<Double> {
 
-
+    /**
+     * Creates a new instance.
+     *
+     * @param model Binding model.
+     */
     public DoubleTypeSerializer(JsonBindingModel model) {
-        super(Double.class, model);
+        super(model);
     }
-
 
     @Override
     protected void serializeNonFormatted(Double obj, JsonGenerator generator, String key) {

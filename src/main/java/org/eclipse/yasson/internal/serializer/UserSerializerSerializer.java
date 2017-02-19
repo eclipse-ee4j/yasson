@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2016 Oracle and/or its affiliates. All rights reserved.
+ * Copyright (c) 2016, 2017 Oracle and/or its affiliates. All rights reserved.
  * This program and the accompanying materials are made available under the
  * terms of the Eclipse Public License v1.0 and Eclipse Distribution License v. 1.0
  * which accompanies this distribution.
@@ -24,6 +24,7 @@ import javax.json.stream.JsonGenerator;
  * Serializes an object with user defined serializer.
  *
  * @author Roman Grigoriadi
+ * @param <T>
  */
 public class UserSerializerSerializer<T> implements JsonbSerializer<T> {
 
@@ -42,7 +43,6 @@ public class UserSerializerSerializer<T> implements JsonbSerializer<T> {
         this.userSerializer = userSerializer;
     }
 
-
     @Override
     public void serialize(T obj, JsonGenerator generator, SerializationContext ctx) {
         if (model.getContext() == JsonContext.JSON_OBJECT) {
@@ -50,5 +50,4 @@ public class UserSerializerSerializer<T> implements JsonbSerializer<T> {
         }
         userSerializer.serialize(obj, generator, ctx);
     }
-
 }

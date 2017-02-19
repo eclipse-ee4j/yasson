@@ -20,10 +20,17 @@ import javax.json.stream.JsonGenerator;
 import java.util.TimeZone;
 
 /**
+ * Serializer for {@link TimeZone} type.
+ * 
  * @author David Kral
  */
 public class TimeZoneTypeSerializer extends AbstractValueTypeSerializer<TimeZone> {
 
+    /**
+     * Creates a new instance.
+     *
+     * @param model Binding model.
+     */
     public TimeZoneTypeSerializer(JsonBindingModel model) {
         super(model);
     }

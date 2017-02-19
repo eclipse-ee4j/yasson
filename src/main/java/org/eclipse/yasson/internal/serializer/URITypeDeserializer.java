@@ -21,10 +21,17 @@ import java.lang.reflect.Type;
 import java.net.URI;
 
 /**
+ * Deserializer for {@link URI} type.
+ * 
  * @author David Kral
  */
 public class URITypeDeserializer extends AbstractValueTypeDeserializer<URI> {
 
+    /**
+     * Creates a new instance.
+     *
+     * @param model Binding model.
+     */
     public URITypeDeserializer(JsonBindingModel model) {
         super(URI.class, model);
     }

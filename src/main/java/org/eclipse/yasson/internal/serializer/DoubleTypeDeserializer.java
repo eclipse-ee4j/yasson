@@ -22,6 +22,8 @@ import javax.json.bind.JsonbException;
 import java.lang.reflect.Type;
 
 /**
+ * Deserializer for {@link Double} type.
+ *
  * @author David Kral
  */
 public class DoubleTypeDeserializer extends AbstractNumberDeserializer<Double> {
@@ -30,6 +32,11 @@ public class DoubleTypeDeserializer extends AbstractNumberDeserializer<Double> {
     protected static final String NEGATIVE_INFINITY = "NEGATIVE_INFINITY";
     protected static final String NAN = "NaN";
 
+    /**
+     * Creates a new instance.
+     *
+     * @param model Binding model.
+     */
     public DoubleTypeDeserializer(JsonBindingModel model) {
         super(Double.class, model);
     }

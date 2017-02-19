@@ -20,10 +20,17 @@ import javax.json.stream.JsonGenerator;
 import java.time.Period;
 
 /**
+ * Serializer for {@link Period} type.
+ * 
  * @author David Kral
  */
 public class PeriodTypeSerializer extends AbstractValueTypeSerializer<Period> {
 
+    /**
+     * Creates a new instance.
+     *
+     * @param model Binding model.
+     */
     public PeriodTypeSerializer(JsonBindingModel model) {
         super(model);
     }

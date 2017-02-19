@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2016 Oracle and/or its affiliates. All rights reserved.
+ * Copyright (c) 2016, 2017 Oracle and/or its affiliates. All rights reserved.
  * This program and the accompanying materials are made available under the
  * terms of the Eclipse Public License v1.0 and Eclipse Distribution License v. 1.0
  * which accompanies this distribution.
@@ -33,11 +33,23 @@ import java.lang.reflect.Type;
  */
 public class ObjectSerializer<T> extends AbstractContainerSerializer<T> {
 
-
+    /**
+     * Creates a new instance.
+     *
+     * @param builder Builder to initialize the instance.
+     */
     public ObjectSerializer(SerializerBuilder builder) {
         super(builder);
     }
 
+    /**
+     * Creates a new instance.
+     *
+     * @param wrapper
+     * @param runtimeType
+     * @param classModel
+     * @param wrapperModel
+     */
     public ObjectSerializer(CurrentItem<?> wrapper, Type runtimeType, ClassModel classModel, JsonBindingModel wrapperModel) {
         super(wrapper, runtimeType, classModel, wrapperModel);
     }
@@ -81,5 +93,4 @@ public class ObjectSerializer<T> extends AbstractContainerSerializer<T> {
                 .withType(genericType).build();
         serializerCaptor(serializer, propertyValue, generator, ctx);
     }
-
 }

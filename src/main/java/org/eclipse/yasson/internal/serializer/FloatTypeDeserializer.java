@@ -22,10 +22,17 @@ import javax.json.bind.JsonbException;
 import java.lang.reflect.Type;
 
 /**
+ * Deserializer for {@link Float} type.
+ *
  * @author David Kral
  */
 public class FloatTypeDeserializer extends AbstractNumberDeserializer<Float> {
 
+    /**
+     * Creates a new instance.
+     *
+     * @param model Binding model.
+     */
     public FloatTypeDeserializer(JsonBindingModel model) {
         super(Float.class, model);
     }

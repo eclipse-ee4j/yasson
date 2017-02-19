@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2015 Oracle and/or its affiliates. All rights reserved.
+ * Copyright (c) 2015, 2017 Oracle and/or its affiliates. All rights reserved.
  * This program and the accompanying materials are made available under the
  * terms of the Eclipse Public License v1.0 and Eclipse Distribution License v. 1.0
  * which accompanies this distribution.
@@ -119,6 +119,7 @@ public class ReflectionUtils {
      * Resolve a bounded type variable type by its wrapper types.
      * Resolution could be done only if a compile time generic information is provided, either:
      * by generic field or subclass of a generic class.
+     *
      * @param item item to search "runtime" generic type of a TypeVariable.
      * @param typeVariable type to search in item for, not null.
      * @return Type of a generic "runtime" bound, not null.
@@ -150,6 +151,12 @@ public class ReflectionUtils {
         return resolveItemVariableType(item.getWrapper(), typeVariable);
     }
 
+    /**
+     *
+     * @param typeToResolve
+     * @param typeToSearch
+     * @return
+     */
     public static Type resolveTypeArguments(ParameterizedType typeToResolve, Type typeToSearch) {
         final Type[] unresolvedArgs = typeToResolve.getActualTypeArguments();
         Type[] resolvedArgs = new Type[unresolvedArgs.length];
@@ -175,7 +182,7 @@ public class ReflectionUtils {
     /**
      * Search for no argument constructor of a class and create instance.
      *
-     *  @param clazz not null
+     * @param clazz not null
      * @param <T> type of instance
      * @return instance
      */
@@ -227,8 +234,8 @@ public class ReflectionUtils {
      * Check if type needs resolution. If type is a class or a parametrized type with all type arguments as classes
      * than it is considered resolved. If any of types is type variable or wildcard type is not resolved.
      *
-     * @param type type to check.
-     * @return true if resolved
+     * @param type Type to check.
+     * @return True if resolved
      */
     public static boolean isResolvedType(Type type) {
         if (type instanceof ParameterizedType) {
@@ -254,6 +261,10 @@ public class ReflectionUtils {
 
     /**
      * Resolves a wildcard most specific upper or lower bound.
+     *
+     * @param item Type.
+     * @param wildcardType Wildcard type.
+     * @return The most specific type.
      */
     private static Type resolveMostSpecificBound(RuntimeTypeInfo item, WildcardType wildcardType) {
         Class<?> result = Object.class;
@@ -279,5 +290,4 @@ public class ReflectionUtils {
         }
         return result;
     }
-
 }

@@ -25,13 +25,18 @@ import java.util.Locale;
 import java.util.logging.Logger;
 
 /**
+ * Deserializer for {@link OffsetDateTime} type.
+ *
  * @author David Kral
  */
 public class OffsetDateTimeTypeDeserializer extends AbstractDateTimeDeserializer<OffsetDateTime> {
-
     private static final Logger log = Logger.getLogger(OffsetDateTimeTypeDeserializer.class.getName());
 
-
+    /**
+     * Creates a new instance.
+     *
+     * @param model Binding model.
+     */
     public OffsetDateTimeTypeDeserializer(JsonBindingModel model) {
         super(OffsetDateTime.class, model);
     }
