@@ -20,12 +20,9 @@ import org.eclipse.yasson.internal.properties.MessageKeys;
 import org.eclipse.yasson.internal.properties.Messages;
 import org.eclipse.yasson.internal.serializer.JsonbDateFormatter;
 import org.eclipse.yasson.internal.serializer.JsonbNumberFormatter;
-import org.eclipse.yasson.model.ClassCustomization;
-import org.eclipse.yasson.model.CreatorParam;
-import org.eclipse.yasson.model.CustomizationBuilder;
-import org.eclipse.yasson.model.JsonbAnnotatedElement;
-import org.eclipse.yasson.model.JsonbCreator;
-import org.eclipse.yasson.model.Property;
+import org.eclipse.yasson.model.*;
+import org.eclipse.yasson.model.customization.ClassCustomization;
+import org.eclipse.yasson.model.customization.ClassCustomizationBuilder;
 
 import javax.json.bind.JsonbException;
 import javax.json.bind.adapter.JsonbAdapter;
@@ -51,20 +48,7 @@ import java.lang.reflect.Modifier;
 import java.lang.reflect.Parameter;
 import java.time.format.DateTimeFormatter;
 import java.time.temporal.TemporalAccessor;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.Calendar;
-import java.util.Date;
-import java.util.HashSet;
-import java.util.LinkedHashSet;
-import java.util.LinkedList;
-import java.util.List;
-import java.util.Locale;
-import java.util.Map;
-import java.util.Objects;
-import java.util.Optional;
-import java.util.Queue;
-import java.util.Set;
+import java.util.*;
 
 /**
  * Introspects configuration on classes and their properties by reading annotations.
@@ -363,27 +347,31 @@ public class AnnotationIntrospector {
      * Search {@link JsonbNumberFormat} on property, if not found looks at annotations declared on property type class.
      *
      * @param property Property to search on.
-     * @return {@link JsonbNumberFormatter} constructed from {@link JsonbNumberFormat} annotation
-     *         or null if {@link JsonbNumberFormat} annotation is not present.
+     * @return  Map of {@link JsonbNumberFormatter} instances categorized by their scopes (class, property, getter or setter). If there is no number
+     * formatter specified for given property, an empty map would be returned
      */
-    public JsonbNumberFormatter getJsonbNumberFormat(Property property) {
-        final JsonbNumberFormat annotation = getAnnotationFromProperty(JsonbNumberFormat.class, property)
-                .orElseGet(()->{
-                    //if property is not TypeVariable and its class is not number skip it
-                    final Optional<Class<?>> propertyRawTypeOptional = ReflectionUtils.getOptionalRawType(property.getPropertyType());
-                    if (propertyRawTypeOptional.isPresent()) {
-                        Class<?> rawType = propertyRawTypeOptional.get();
-                        if (!Number.class.isAssignableFrom(rawType)) {
-                            return null;
-                        }
-                    }
-                    return findAnnotation(property.getDeclaringClassElement().getAnnotations(), JsonbNumberFormat.class);
-                });
+    public Map<AnnotationTarget, JsonbNumberFormatter> getJsonNumberFormatter(Property property) {
+        Map<AnnotationTarget, JsonbNumberFormatter> result = new HashMap<>();
+        Map<AnnotationTarget, JsonbNumberFormat> annotationFromPropertyCategorized = getAnnotationFromPropertyCategorized(JsonbNumberFormat.class, property);
+        if(annotationFromPropertyCategorized.size() == 0) {
+            final Optional<Class<?>> propertyRawTypeOptional = ReflectionUtils.getOptionalRawType(property.getPropertyType());
+            if (propertyRawTypeOptional.isPresent()) {
+                Class<?> rawType = propertyRawTypeOptional.get();
+                if (!Number.class.isAssignableFrom(rawType)) {
+                    return new HashMap<>();
+                }
+            }
 
-        if (annotation == null) {
-            return null;
+            //  There is no annotation on top of property, getter or setter, so check if any annotation specified on the class containing the property
+            JsonbNumberFormat classLevelNumberFormatter = findAnnotation(property.getDeclaringClassElement().getAnnotations(), JsonbNumberFormat.class);
+            if(classLevelNumberFormatter != null) {
+                result.put(AnnotationTarget.CLASS, new JsonbNumberFormatter(classLevelNumberFormatter.value(), classLevelNumberFormatter.locale()));
+            }
+        } else {
+            annotationFromPropertyCategorized.forEach((key, annotation) -> result.put(key, new JsonbNumberFormatter(annotation.value(), annotation.locale())));
         }
-        return new JsonbNumberFormatter(annotation.value(), annotation.locale());
+
+        return result;
     }
 
     /**
@@ -459,6 +447,37 @@ public class AnnotationIntrospector {
         }
 
         return Optional.empty();
+    }
+
+    /**
+     * An override of {@link #getAnnotationFromProperty(Class, Property)} in which it returns the results as a map so that the caller can decide which
+     * one to be used for read/write operation. Some annotations should have different behaviours based on the scope that they're applied on.
+     *
+     * @param annotationClass   The annotation class to search
+     * @param property  The property to search in
+     * @param <T>   Annotation type
+     * @return  A map of all occurrences of requested annotation for given property. Caller can determine based on {@link AnnotationTarget} that given
+     * annotation is specified on what level (Class, Property, Getter or Setter). If no annotation found for given property, an empty map would be
+     * returned
+     */
+    private <T extends Annotation> Map<AnnotationTarget, T> getAnnotationFromPropertyCategorized(Class<T> annotationClass, Property property) {
+        Map<AnnotationTarget, T> result = new HashMap<>();
+        T fieldAnnotation = getFieldAnnotation(annotationClass, property.getFieldElement());
+        if (fieldAnnotation != null) {
+            result.put(AnnotationTarget.PROPERTY, fieldAnnotation);
+        }
+
+        T getterAnnotation = getMethodAnnotation(annotationClass, property.getGetterElement());
+        if (getterAnnotation != null) {
+            result.put(AnnotationTarget.GETTER, getterAnnotation);
+        }
+
+        T setterAnnotation = getMethodAnnotation(annotationClass, property.getSetterElement());
+        if (setterAnnotation != null) {
+            result.put(AnnotationTarget.SETTER, setterAnnotation);
+        }
+
+        return result;
     }
 
 
@@ -538,10 +557,10 @@ public class AnnotationIntrospector {
      * @return Populated {@link ClassCustomization} instance.
      */
     public ClassCustomization introspectCustomization(JsonbAnnotatedElement<Class<?>> clsElement) {
-        final CustomizationBuilder builder = new CustomizationBuilder();
+        final ClassCustomizationBuilder builder = new ClassCustomizationBuilder();
         builder.setNillable(isClassNillable(clsElement));
         builder.setDateFormatter(getJsonbDateFormat(clsElement));
-        builder.setNumberFormat(getJsonbNumberFormat(clsElement));
+        builder.setNumberFormatter(getJsonbNumberFormat(clsElement));
         builder.setCreator(getCreator(clsElement.getElement()));
         builder.setPropertyOrder(getPropertyOrder(clsElement));
         return builder.buildClassCustomization();

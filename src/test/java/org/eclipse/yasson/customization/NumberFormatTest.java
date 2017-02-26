@@ -43,8 +43,11 @@ public class NumberFormatTest {
         pojo.integer = Integer.MAX_VALUE;
         pojo.aShort = 1;
         pojo.aByte = 127;
+        pojo.setDoubleGetterFormatted(.1d);
+        pojo.setDoubleSetterFormatted(.5d);
+        pojo.setDoubleSetterAndPropertyFormatter(0.6d);
 
-        String expectedJson = "{\"aByte\":\"127\",\"aDouble\":\"000.10000000\",\"aFloat\":\"000.34999999\",\"aLong\":\"9223372036854775807\",\"aShort\":\"00001\",\"bigDecimal\":\"00000010.000000\",\"bigInteger\":\"00000001\",\"integer\":\"2147483647.0\"}";
+        String expectedJson = "{\"aByte\":\"127\",\"aDouble\":\"000.10000000\",\"aFloat\":\"000.34999999\",\"aLong\":\"9223372036854775807\",\"aShort\":\"00001\",\"bigDecimal\":\"00000010.000000\",\"bigInteger\":\"00000001\",\"doubleGetterFormatted\":\"000.10000000\",\"doubleSetterAndPropertyFormatter\":\"000.600\",\"doubleSetterFormatted\":0.5,\"integer\":\"2147483647.0\"}";
 
         assertEquals(expectedJson, jsonb.toJson(pojo));
 
@@ -52,7 +55,7 @@ public class NumberFormatTest {
 
     @Test
     public void testDeserializer() {
-        String expectedJson = "{\"aByte\":\"127\",\"aDouble\":\"000.10000000\",\"aFloat\":\"000.34999999\",\"aLong\":\"9223372036854775807\",\"aShort\":\"00001\",\"bigDecimal\":\"00000010.000000\",\"bigInteger\":\"00000001\",\"integer\":\"2147483647.0\"}";
+        String expectedJson = "{\"aByte\":\"127\",\"aDouble\":\"000.10000000\",\"aFloat\":\"000.34999999\",\"aLong\":\"9223372036854775807\",\"aShort\":\"00001\",\"bigDecimal\":\"00000010.000000\",\"bigInteger\":\"00000001\",\"doubleGetterFormatted\":\"000.10000\",\"doubleSetterFormatted\":\",005\",\"doubleSetterAndPropertyFormatter\":\"000.600\",\"integer\":\"2147483647.0\"}";
         NumberFormatPojo pojo = jsonb.fromJson(expectedJson, NumberFormatPojo.class);
 
         assertEquals(BigDecimal.TEN, pojo.bigDecimal);
@@ -63,6 +66,9 @@ public class NumberFormatTest {
         assertEquals((Integer)Integer.MAX_VALUE, pojo.integer);
         assertEquals(new Short((short) 1), pojo.aShort);
         assertEquals((Long)Long.MAX_VALUE, pojo.aLong);
+        assertEquals(new Double(.1d), pojo.getDoubleGetterFormatted());
+        assertEquals(new Double(.005d), pojo.getDoubleSetterFormatted());
+        assertEquals(new Double(.6d), pojo.getDoubleSetterAndPropertyFormatter());
     }
 
 }

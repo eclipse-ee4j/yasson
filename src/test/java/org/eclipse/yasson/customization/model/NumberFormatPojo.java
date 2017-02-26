@@ -45,4 +45,38 @@ public class NumberFormatPojo {
 
     @JsonbNumberFormat("000")
     public Byte aByte;
+
+    private Double doubleGetterFormatted;
+
+    private Double doubleSetterFormatted;
+
+    @JsonbNumberFormat(value = "000.000", locale = "en-us")
+    private Double doubleSetterAndPropertyFormatter;
+
+    @JsonbNumberFormat("000.00000000")
+    public Double getDoubleGetterFormatted() {
+        return doubleGetterFormatted;
+    }
+
+    public void setDoubleGetterFormatted(Double doubleGetterFormatted) {
+        this.doubleGetterFormatted = doubleGetterFormatted;
+    }
+
+    public Double getDoubleSetterFormatted() {
+        return doubleSetterFormatted;
+    }
+
+    @JsonbNumberFormat(value = "000,000", locale = "da-da")
+    public void setDoubleSetterFormatted(Double doubleSetterFormatted) {
+        this.doubleSetterFormatted = doubleSetterFormatted;
+    }
+
+    public Double getDoubleSetterAndPropertyFormatter() {
+        return doubleSetterAndPropertyFormatter;
+    }
+
+    @JsonbNumberFormat(value = "000,000", locale = "da-da")
+    public void setDoubleSetterAndPropertyFormatter(Double doubleSetterAndPropertyFormatter) {
+        this.doubleSetterAndPropertyFormatter = doubleSetterAndPropertyFormatter;
+    }
 }

@@ -10,7 +10,7 @@
  * Contributors:
  * Roman Grigoriadi
  ******************************************************************************/
-package org.eclipse.yasson.model;
+package org.eclipse.yasson.model.customization;
 
 /**
  * Customization for container like types (Maps, Collections, Arrays).
@@ -24,7 +24,7 @@ public class ContainerCustomization extends ClassCustomization {
      *
      * @param builder Builver to initialize from.
      */
-    public ContainerCustomization(CustomizationBuilder builder) {
+    public ContainerCustomization(ClassCustomizationBuilder builder) {
         super(builder);
     }
 

@@ -15,11 +15,10 @@ package org.eclipse.yasson.internal.unmarshaller;
 import org.eclipse.yasson.internal.AbstractSerializerBuilder;
 import org.eclipse.yasson.internal.JsonbContext;
 import org.eclipse.yasson.internal.ReflectionUtils;
-import org.eclipse.yasson.model.ClassModel;
-import org.eclipse.yasson.model.ContainerCustomization;
-import org.eclipse.yasson.model.Customization;
-import org.eclipse.yasson.model.CustomizationBuilder;
-import org.eclipse.yasson.model.JsonBindingModel;
+import org.eclipse.yasson.model.*;
+import org.eclipse.yasson.model.customization.ClassCustomizationBuilder;
+import org.eclipse.yasson.model.customization.ContainerCustomization;
+import org.eclipse.yasson.model.customization.Customization;
 
 import java.lang.reflect.Type;
 
@@ -110,6 +109,6 @@ public abstract class AbstractItem<T> implements CurrentItem<T> {
             return new ContainerCustomization(classModel.getCustomization());
         }
         // TODO deal with DefaultCustomization
-        return new ContainerCustomization(new CustomizationBuilder());
+        return new ContainerCustomization(new ClassCustomizationBuilder());
     }
 }

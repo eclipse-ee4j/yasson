@@ -43,7 +43,7 @@ public abstract class AbstractNumberDeserializer<T extends Number> extends Abstr
     }
 
     protected final Optional<Number> deserializeForamtted(String jsonValue, boolean integerOnly, JsonbContext jsonbContext) {
-        final JsonbNumberFormatter numberFormat = model.getCustomization().getNumberFormat();
+        final JsonbNumberFormatter numberFormat = model.getCustomization().getDeserializeNumberFormatter();
         if (numberFormat != null) {
             //TODO perf consider synchronizing on format instance or per thread cache.
             final NumberFormat format = NumberFormat.getInstance(jsonbContext.getLocale(numberFormat.getLocale()));
