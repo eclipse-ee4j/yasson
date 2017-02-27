@@ -13,7 +13,7 @@
 package org.eclipse.yasson.internal;
 
 import org.eclipse.yasson.internal.serializer.ContainerSerializerProvider;
-import org.eclipse.yasson.model.ClassCustomization;
+import org.eclipse.yasson.model.customization.ClassCustomization;
 import org.eclipse.yasson.model.ClassModel;
 import org.eclipse.yasson.model.JsonbAnnotatedElement;
 

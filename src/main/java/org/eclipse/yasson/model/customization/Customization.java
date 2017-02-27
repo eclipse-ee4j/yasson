@@ -10,7 +10,7 @@
  * Contributors:
  * Roman Grigoriadi
  ******************************************************************************/
-package org.eclipse.yasson.model;
+package org.eclipse.yasson.model.customization;
 
 import org.eclipse.yasson.internal.adapter.AdapterBinding;
 import org.eclipse.yasson.internal.adapter.DeserializerBinding;
@@ -39,8 +39,6 @@ public abstract class Customization {
 
     private final JsonbDateFormatter dateTimeFormatter;
 
-    private final JsonbNumberFormatter numberFormat;
-
     /**
      * Copies properties from builder an creates immutable instance.
      *
@@ -50,7 +48,6 @@ public abstract class Customization {
         this.nillable = builder.isNillable();
         this.jsonbTransient = builder.isJsonbTransient();
         this.dateTimeFormatter = builder.getDateFormatter();
-        this.numberFormat = builder.getNumberFormat();
         this.adapterBinding = builder.getAdapterInfo();
         this.serializerBinding = builder.getSerializerBinding();
         this.deserializerBinding = builder.getDeserializerBinding();
@@ -65,7 +62,6 @@ public abstract class Customization {
         this.nillable = other.isNillable();
         this.jsonbTransient = other.isJsonbTransient();
         this.dateTimeFormatter = other.getDateTimeFormatter();
-        this.numberFormat = other.getNumberFormat();
         this.adapterBinding = other.getAdapterBinding();
         this.serializerBinding = other.getSerializerBinding();
         this.deserializerBinding = other.getDeserializerBinding();
@@ -101,16 +97,6 @@ public abstract class Customization {
     }
 
     /**
-     * Number format for formatting numbers.
-     *
-     * @return number format
-     */
-    public JsonbNumberFormatter getNumberFormat() {
-        return numberFormat;
-    }
-
-
-    /**
      * Adapter wrapper class with resolved generic information.
      *
      * @return adapter wrapper
@@ -136,4 +122,21 @@ public abstract class Customization {
     public DeserializerBinding getDeserializerBinding() {
         return deserializerBinding;
     }
+
+    /**
+     * Number formatter for formatting numbers during serialization process. It could be the same formatter instance used for deserialization
+     * (returned by {@link #getDeserializeNumberFormatter()}
+     *
+     * @return number formatter
+     */
+    public abstract JsonbNumberFormatter getSerializeNumberFormatter();
+
+    /**
+     * Number formatter for formatting numbers during deserialization process. It could be the same formatter instance used for serialization
+     * (returned by {@link #getSerializeNumberFormatter()}
+     *
+     * @return number formatter
+     */
+    public abstract JsonbNumberFormatter getDeserializeNumberFormatter();
+
 }

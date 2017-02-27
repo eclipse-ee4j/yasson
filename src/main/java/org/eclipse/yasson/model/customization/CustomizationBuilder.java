@@ -11,28 +11,24 @@
  * Roman Grigoriadi
  ******************************************************************************/
 
-package org.eclipse.yasson.model;
+package org.eclipse.yasson.model.customization;
 
 import org.eclipse.yasson.internal.adapter.AdapterBinding;
 import org.eclipse.yasson.internal.adapter.DeserializerBinding;
 import org.eclipse.yasson.internal.adapter.SerializerBinding;
 import org.eclipse.yasson.internal.serializer.JsonbDateFormatter;
-import org.eclipse.yasson.internal.serializer.JsonbNumberFormatter;
+import org.eclipse.yasson.model.JsonbCreator;
 
 /**
- * Builder for ensuring immutable state of {@link Customization} objects.
+ * Abstract base builder for ensuring immutable state of {@link Customization} objects.
  *
  * @author Roman Grigoriadi
  */
-public class CustomizationBuilder {
+public abstract class CustomizationBuilder {
 
     private boolean nillable;
 
     private boolean jsonbTransient;
-
-    private String jsonReadName;
-
-    private String jsonWriteName;
 
     private AdapterBinding adapterInfo;
 
@@ -42,29 +38,9 @@ public class CustomizationBuilder {
 
     private JsonbDateFormatter dateFormatter;
 
-    private JsonbNumberFormatter numberFormat;
-
     private JsonbCreator creator;
 
     private String[] propertyOrder;
-
-    /**
-     * Creates a customization for class properties.
-     *
-     * @return A new instance of {@link PropertyCustomization}
-     */
-    public PropertyCustomization buildPropertyCustomization() {
-        return new PropertyCustomization(this);
-    }
-
-    /**
-     * Creates customization for class.
-     *
-     * @return A new instance of {@link ClassCustomization}
-     */
-    public ClassCustomization buildClassCustomization() {
-        return new ClassCustomization(this);
-    }
 
     /**
      * Returns true if <i>nillable</i> customization is present.
@@ -100,42 +76,6 @@ public class CustomizationBuilder {
      */
     public void setJsonbTransient(boolean jsonbTransient) {
         this.jsonbTransient = jsonbTransient;
-    }
-
-    /**
-     * Sets a JSON property name used to read a property value from on deserialization.
-     *
-     * @return JSON property name
-     */
-    public String getJsonReadName() {
-        return jsonReadName;
-    }
-
-    /**
-     * Sets a JSON property name used to read a property value from on deserialization.
-     *
-     * @param jsonReadName JSON property name
-     */
-    public void setJsonReadName(String jsonReadName) {
-        this.jsonReadName = jsonReadName;
-    }
-
-    /**
-     * Gets a property name which is written to JSON document on serialization.
-     *
-     * @return Property name.
-     */
-    public String getJsonWriteName() {
-        return jsonWriteName;
-    }
-
-    /**
-     * Sets a property name which is written to JSON document on serialization.
-     *
-     * @param jsonWriteName Property name.
-     */
-    public void setJsonWriteName(String jsonWriteName) {
-        this.jsonWriteName = jsonWriteName;
     }
 
     /**
@@ -208,24 +148,6 @@ public class CustomizationBuilder {
      */
     public void setDateFormatter(JsonbDateFormatter dateFormatter) {
         this.dateFormatter = dateFormatter;
-    }
-
-    /**
-     * Gets number formatter for formatting numbers.
-     *
-     * @return Number format.
-     */
-    public JsonbNumberFormatter getNumberFormat() {
-        return numberFormat;
-    }
-
-    /**
-     * Sets number formatter for formatting numbers.
-     *
-     * @param numberFormat Number format.
-     */
-    public void setNumberFormat(JsonbNumberFormatter numberFormat) {
-        this.numberFormat = numberFormat;
     }
 
     /**

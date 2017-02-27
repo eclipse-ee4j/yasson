@@ -70,7 +70,7 @@ public abstract class AbstractNumberSerializer<T extends Number> extends Abstrac
     protected abstract void serializeNonFormatted(T obj, JsonGenerator generator);
 
     private boolean serializeFormatted(T obj, Consumer<String> formattedConsumer, JsonbContext jsonbContext) {
-        final JsonbNumberFormatter numberFormat = model.getCustomization().getNumberFormat();
+        final JsonbNumberFormatter numberFormat = model.getCustomization().getSerializeNumberFormatter();
         if (numberFormat != null) {
             //TODO perf consider synchronizing on format instance or per thread cache.
             final NumberFormat format = NumberFormat.getInstance(jsonbContext.getLocale(numberFormat.getLocale()));

@@ -13,6 +13,8 @@
 
 package org.eclipse.yasson.model;
 
+import org.eclipse.yasson.model.customization.Customization;
+
 import java.lang.reflect.Type;
 
 /**

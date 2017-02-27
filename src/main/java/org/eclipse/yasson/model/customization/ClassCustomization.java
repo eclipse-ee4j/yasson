@@ -11,7 +11,10 @@
  * Roman Grigoriadi
  ******************************************************************************/
 
-package org.eclipse.yasson.model;
+package org.eclipse.yasson.model.customization;
+
+import org.eclipse.yasson.internal.serializer.JsonbNumberFormatter;
+import org.eclipse.yasson.model.JsonbCreator;
 
 /**
  * Customization, which could be applied on a class or package level.
@@ -24,15 +27,18 @@ public class ClassCustomization extends Customization {
 
     private String[] propertyOrder;
 
+    private final JsonbNumberFormatter numberFormatter;
+
     /**
      * Copies properties from builder an creates immutable instance.
      *
      * @param builder not null
      */
-    ClassCustomization(CustomizationBuilder builder) {
+    ClassCustomization(ClassCustomizationBuilder builder) {
         super(builder);
         this.creator = builder.getCreator();
         this.propertyOrder = builder.getPropertyOrder();
+        this.numberFormatter = builder.getNumberFormatter();
     }
 
     /**
@@ -44,6 +50,7 @@ public class ClassCustomization extends Customization {
         super(other);
         this.creator = other.getCreator();
         this.propertyOrder = other.getPropertyOrder();
+        this.numberFormatter = other.getSerializeNumberFormatter();
     }
 
     /**
@@ -69,5 +76,15 @@ public class ClassCustomization extends Customization {
      */
     public void setPropertyOrder(String[] propertyOrder) {
         this.propertyOrder = propertyOrder;
+    }
+
+    @Override
+    public JsonbNumberFormatter getSerializeNumberFormatter() {
+        return numberFormatter;
+    }
+
+    @Override
+    public JsonbNumberFormatter getDeserializeNumberFormatter() {
+        return numberFormatter;
     }
 }

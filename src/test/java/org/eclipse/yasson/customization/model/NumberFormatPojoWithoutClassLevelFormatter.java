@@ -8,44 +8,17 @@
  * http://www.eclipse.org/org/documents/edl-v10.php.
  *
  * Contributors:
- * Roman Grigoriadi
+ * Ehsan Zaery Moghaddam (zaerymoghaddam@gmail.com)
  ******************************************************************************/
 
 package org.eclipse.yasson.customization.model;
 
 import javax.json.bind.annotation.JsonbNumberFormat;
-import java.math.BigDecimal;
-import java.math.BigInteger;
 
 /**
- * @author Roman Grigoriadi
+ * @author Ehsan Zaery Moghaddam (zaerymoghaddam@gmail.com)
  */
-@JsonbNumberFormat("0.0")
-public class NumberFormatPojo {
-
-    @JsonbNumberFormat("00000000.000000")
-    public BigDecimal bigDecimal;
-
-    @JsonbNumberFormat("00000000")
-    public BigInteger bigInteger;
-
-    @JsonbNumberFormat("000.00000000")
-    public Double aDouble;
-
-    @JsonbNumberFormat("000.00000000")
-    public Float aFloat;
-
-    @JsonbNumberFormat("00000000000")
-    public Long aLong;
-
-    public Integer integer;
-
-    @JsonbNumberFormat("00000")
-    public Short aShort;
-
-    @JsonbNumberFormat("000")
-    public Byte aByte;
-
+public class NumberFormatPojoWithoutClassLevelFormatter {
     private Double doubleGetterFormatted;
 
     private Double doubleSetterFormatted;

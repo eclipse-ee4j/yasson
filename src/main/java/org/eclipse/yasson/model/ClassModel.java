@@ -13,6 +13,7 @@
 package org.eclipse.yasson.model;
 
 import org.eclipse.yasson.internal.naming.CaseInsensitiveStrategy;
+import org.eclipse.yasson.model.customization.ClassCustomization;
 
 import javax.json.bind.config.PropertyNamingStrategy;
 import java.util.Collections;

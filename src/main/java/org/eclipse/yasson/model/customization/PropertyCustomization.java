@@ -11,7 +11,9 @@
  * Roman Grigoriadi
  ******************************************************************************/
 
-package org.eclipse.yasson.model;
+package org.eclipse.yasson.model.customization;
+
+import org.eclipse.yasson.internal.serializer.JsonbNumberFormatter;
 
 /**
  * Customization for a property of a class.
@@ -24,15 +26,21 @@ public class PropertyCustomization extends Customization {
 
     private final String jsonWriteName;
 
+    private final JsonbNumberFormatter serializeNumberFormatter;
+
+    private final JsonbNumberFormatter deserializeNumberFormatter;
+
 
     /**
      * Copies properties from builder an creates immutable instance.
      * @param builder not null
      */
-    public PropertyCustomization(CustomizationBuilder builder) {
+    public PropertyCustomization(PropertyCustomizationBuilder builder) {
         super(builder);
         this.jsonReadName = builder.getJsonReadName();
         this.jsonWriteName = builder.getJsonWriteName();
+        this.serializeNumberFormatter = builder.getSerializeNumberFormatter();
+        this.deserializeNumberFormatter = builder.getDeserializeNumberFormatter();
     }
 
     /**
@@ -51,4 +59,13 @@ public class PropertyCustomization extends Customization {
         return jsonWriteName;
     }
 
+    @Override
+    public JsonbNumberFormatter getSerializeNumberFormatter() {
+        return serializeNumberFormatter;
+    }
+
+    @Override
+    public JsonbNumberFormatter getDeserializeNumberFormatter() {
+        return deserializeNumberFormatter;
+    }
 }
