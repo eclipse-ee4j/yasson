@@ -361,14 +361,13 @@ public class AnnotationIntrospector {
                     return new HashMap<>();
                 }
             }
-
-            //  There is no annotation on top of property, getter or setter, so check if any annotation specified on the class containing the property
-            JsonbNumberFormat classLevelNumberFormatter = findAnnotation(property.getDeclaringClassElement().getAnnotations(), JsonbNumberFormat.class);
-            if(classLevelNumberFormatter != null) {
-                result.put(AnnotationTarget.CLASS, new JsonbNumberFormatter(classLevelNumberFormatter.value(), classLevelNumberFormatter.locale()));
-            }
         } else {
             annotationFromPropertyCategorized.forEach((key, annotation) -> result.put(key, new JsonbNumberFormatter(annotation.value(), annotation.locale())));
+        }
+
+        JsonbNumberFormat classLevelNumberFormatter = findAnnotation(property.getDeclaringClassElement().getAnnotations(), JsonbNumberFormat.class);
+        if(classLevelNumberFormatter != null) {
+            result.put(AnnotationTarget.CLASS, new JsonbNumberFormatter(classLevelNumberFormatter.value(), classLevelNumberFormatter.locale()));
         }
 
         return result;

@@ -14,6 +14,7 @@
 package org.eclipse.yasson.customization;
 
 import org.eclipse.yasson.customization.model.NumberFormatPojo;
+import org.eclipse.yasson.customization.model.NumberFormatPojoWithoutClassLevelFormatter;
 import org.junit.Test;
 
 import javax.json.bind.Jsonb;
@@ -30,8 +31,6 @@ import static org.junit.Assert.assertEquals;
 public class NumberFormatTest {
     private Jsonb jsonb = JsonbBuilder.create();
 
-
-
     @Test
     public void testSerialize() {
         NumberFormatPojo pojo = new NumberFormatPojo();
@@ -47,15 +46,14 @@ public class NumberFormatTest {
         pojo.setDoubleSetterFormatted(.5d);
         pojo.setDoubleSetterAndPropertyFormatter(0.6d);
 
-        String expectedJson = "{\"aByte\":\"127\",\"aDouble\":\"000.10000000\",\"aFloat\":\"000.34999999\",\"aLong\":\"9223372036854775807\",\"aShort\":\"00001\",\"bigDecimal\":\"00000010.000000\",\"bigInteger\":\"00000001\",\"doubleGetterFormatted\":\"000.10000000\",\"doubleSetterAndPropertyFormatter\":\"000.600\",\"doubleSetterFormatted\":0.5,\"integer\":\"2147483647.0\"}";
+        String expectedJson = "{\"aByte\":\"127\",\"aDouble\":\"000.10000000\",\"aFloat\":\"000.34999999\",\"aLong\":\"9223372036854775807\",\"aShort\":\"00001\",\"bigDecimal\":\"00000010.000000\",\"bigInteger\":\"00000001\",\"doubleGetterFormatted\":\"000.10000000\",\"doubleSetterAndPropertyFormatter\":\"000.600\",\"doubleSetterFormatted\":\"0.5\",\"integer\":\"2147483647.0\"}";
 
         assertEquals(expectedJson, jsonb.toJson(pojo));
-
     }
 
     @Test
     public void testDeserializer() {
-        String expectedJson = "{\"aByte\":\"127\",\"aDouble\":\"000.10000000\",\"aFloat\":\"000.34999999\",\"aLong\":\"9223372036854775807\",\"aShort\":\"00001\",\"bigDecimal\":\"00000010.000000\",\"bigInteger\":\"00000001\",\"doubleGetterFormatted\":\"000.10000\",\"doubleSetterFormatted\":\",005\",\"doubleSetterAndPropertyFormatter\":\"000.600\",\"integer\":\"2147483647.0\"}";
+        String expectedJson = "{\"aByte\":\"127\",\"aDouble\":\"000.10000000\",\"aFloat\":\"000.34999999\",\"aLong\":\"9223372036854775807\",\"aShort\":\"00001\",\"bigDecimal\":\"00000010.000000\",\"bigInteger\":\"00000001\",\"doubleGetterFormatted\":\"000.10000\",\"doubleSetterFormatted\":\",005\",\"doubleSetterAndPropertyFormatter\":\"000,600\",\"integer\":\"2147483647.0\"}";
         NumberFormatPojo pojo = jsonb.fromJson(expectedJson, NumberFormatPojo.class);
 
         assertEquals(BigDecimal.TEN, pojo.bigDecimal);
@@ -71,4 +69,25 @@ public class NumberFormatTest {
         assertEquals(new Double(.6d), pojo.getDoubleSetterAndPropertyFormatter());
     }
 
+    @Test
+    public void testSerializeWithoutClassLevelFormatter() {
+        NumberFormatPojoWithoutClassLevelFormatter pojo = new NumberFormatPojoWithoutClassLevelFormatter();
+        pojo.setDoubleGetterFormatted(.1d);
+        pojo.setDoubleSetterFormatted(.5d);
+        pojo.setDoubleSetterAndPropertyFormatter(0.6d);
+
+        String expectedJson = "{\"doubleGetterFormatted\":\"000.10000000\",\"doubleSetterAndPropertyFormatter\":\"000.600\",\"doubleSetterFormatted\":0.5}";
+
+        assertEquals(expectedJson, jsonb.toJson(pojo));
+    }
+
+    @Test
+    public void testDeserializeWithoutClassLevelFormatter() {
+        String expectedJson = "{\"doubleGetterFormatted\":\"000.10000\",\"doubleSetterFormatted\":\",005\",\"doubleSetterAndPropertyFormatter\":\"000,600\"}";
+        NumberFormatPojoWithoutClassLevelFormatter pojo = jsonb.fromJson(expectedJson, NumberFormatPojoWithoutClassLevelFormatter.class);
+
+        assertEquals(new Double(.1d), pojo.getDoubleGetterFormatted());
+        assertEquals(new Double(.005d), pojo.getDoubleSetterFormatted());
+        assertEquals(new Double(.6d), pojo.getDoubleSetterAndPropertyFormatter());
+    }
 }

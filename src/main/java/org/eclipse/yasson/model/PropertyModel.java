@@ -27,6 +27,7 @@ import java.lang.reflect.Type;
 import java.util.Map;
 import java.util.Objects;
 import java.util.Optional;
+import java.util.Set;
 
 /**
  * A model for class property.
@@ -155,21 +156,25 @@ public class PropertyModel implements JsonBindingModel, Comparable<PropertyModel
          * If @JsonbNumberFormat is placed on getter implementation must use this format on serialization.
          * If @JsonbNumberFormat is placed on setter implementation must use this format on deserialization.
          * If @JsonbNumberFormat is placed on field implementation must use this format on serialization and deserialization.
+         *
+         * Priority from high to low is getter / settrer > field > class > package > global configuration
          */
         Map<AnnotationTarget, JsonbNumberFormatter> jsonNumberFormatCategorized = introspector.getJsonNumberFormatter(property);
-        if(jsonNumberFormatCategorized.keySet().contains(AnnotationTarget.PROPERTY)) {
+        Set<AnnotationTarget> annotationTargets = jsonNumberFormatCategorized.keySet();
+        if(annotationTargets.contains(AnnotationTarget.GETTER)){
+            builder.setSerializeNumberFormatter(jsonNumberFormatCategorized.get(AnnotationTarget.GETTER));
+        } else if(annotationTargets.contains(AnnotationTarget.PROPERTY)){
             builder.setSerializeNumberFormatter(jsonNumberFormatCategorized.get(AnnotationTarget.PROPERTY));
-            builder.setDeserializeNumberFormatter(jsonNumberFormatCategorized.get(AnnotationTarget.PROPERTY));
-        } else if(jsonNumberFormatCategorized.keySet().contains(AnnotationTarget.CLASS)) {
+        } else if(annotationTargets.contains(AnnotationTarget.CLASS)){
             builder.setSerializeNumberFormatter(jsonNumberFormatCategorized.get(AnnotationTarget.CLASS));
+        }
+
+        if(annotationTargets.contains(AnnotationTarget.SETTER)){
+            builder.setDeserializeNumberFormatter(jsonNumberFormatCategorized.get(AnnotationTarget.SETTER));
+        } else if(annotationTargets.contains(AnnotationTarget.PROPERTY)){
+            builder.setDeserializeNumberFormatter(jsonNumberFormatCategorized.get(AnnotationTarget.PROPERTY));
+        } else if(annotationTargets.contains(AnnotationTarget.CLASS)){
             builder.setDeserializeNumberFormatter(jsonNumberFormatCategorized.get(AnnotationTarget.CLASS));
-        } else {
-            if(jsonNumberFormatCategorized.keySet().contains(AnnotationTarget.GETTER)) {
-                builder.setSerializeNumberFormatter(jsonNumberFormatCategorized.get(AnnotationTarget.GETTER));
-            }
-            if(jsonNumberFormatCategorized.keySet().contains(AnnotationTarget.SETTER)) {
-                builder.setDeserializeNumberFormatter(jsonNumberFormatCategorized.get(AnnotationTarget.SETTER));
-            }
         }
     }
 
