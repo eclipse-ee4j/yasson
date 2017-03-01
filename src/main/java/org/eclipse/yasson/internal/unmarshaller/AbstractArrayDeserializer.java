@@ -60,7 +60,7 @@ public abstract class AbstractArrayDeserializer<T> extends AbstractContainerDese
 
     @Override
     public void appendResult(Object result) {
-        appendCaptor(result);
+        appendCaptor(convertNullToOptionalEmpty(getModel(), result));
     }
 
     @SuppressWarnings("unchecked")

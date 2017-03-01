@@ -21,12 +21,17 @@ import org.eclipse.yasson.internal.Unmarshaller;
 import org.eclipse.yasson.internal.properties.MessageKeys;
 import org.eclipse.yasson.internal.properties.Messages;
 import org.eclipse.yasson.model.JsonBindingModel;
+import org.eclipse.yasson.model.PropertyModel;
 
 import javax.json.bind.JsonbException;
 import javax.json.bind.serializer.DeserializationContext;
 import javax.json.bind.serializer.JsonbDeserializer;
 import javax.json.stream.JsonParser;
 import java.lang.reflect.Type;
+import java.util.Optional;
+import java.util.OptionalDouble;
+import java.util.OptionalInt;
+import java.util.OptionalLong;
 
 /**
  * Base class for all deserializers.
@@ -128,6 +133,38 @@ public abstract class AbstractContainerDeserializer<T> extends AbstractItem<T> i
     protected JsonbDeserializer<?> newCollectionOrMapItem(Type valueType, JsonbContext ctx) {
         Type actualValueType = ReflectionUtils.resolveType(this, valueType);
         return newUnmarshallerItemBuilder(ctx).withType(actualValueType).withModel(getModel()).build();
+    }
+
+    /**
+     * If value is null and property model type is one of {@link Optional}, {@link OptionalDouble},
+     * {@link OptionalInt}, or {@link OptionalLong}, value of corresponding {@code Optional#empty()}
+     * is returned.
+     *
+     * @param propertyModel to resolve property type from
+     * @param value value to set
+     * @return empty optional if applies
+     */
+    protected Object convertNullToOptionalEmpty(JsonBindingModel propertyModel, Object value) {
+        if (value != null) {
+            return value;
+        }
+
+        Type propertyType = propertyModel.getType();
+        if (!(propertyType instanceof Class)) {
+            propertyType = ReflectionUtils.getRawType(ReflectionUtils.resolveType(this, propertyType));
+        }
+
+        if (propertyType == Optional.class) {
+            return Optional.empty();
+        } else if (propertyType == OptionalInt.class) {
+            return OptionalInt.empty();
+        } else if (propertyType == OptionalLong.class) {
+            return OptionalLong.empty();
+        } else if (propertyType == OptionalDouble.class) {
+            return OptionalDouble.empty();
+        } else {
+            return null;
+        }
     }
 
     /**

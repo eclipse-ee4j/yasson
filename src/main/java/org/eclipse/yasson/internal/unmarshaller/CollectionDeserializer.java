@@ -91,7 +91,7 @@ class CollectionDeserializer<T extends Collection<?>> extends AbstractContainerD
 
     @Override
     public void appendResult(Object result) {
-        appendCaptor(result);
+        appendCaptor(convertNullToOptionalEmpty(getModel(), result));
     }
 
     @SuppressWarnings("unchecked")

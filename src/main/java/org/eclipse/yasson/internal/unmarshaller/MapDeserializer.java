@@ -77,7 +77,7 @@ public class MapDeserializer<T extends Map<?,?>> extends AbstractContainerDeseri
 
     @Override
     public void appendResult(Object result) {
-        appendCaptor(parserContext.getLastKeyName(), result);
+        appendCaptor(parserContext.getLastKeyName(), convertNullToOptionalEmpty(getModel(), result));
     }
 
     @SuppressWarnings("unchecked")

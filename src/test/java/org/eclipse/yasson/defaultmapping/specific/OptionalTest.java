@@ -12,11 +12,14 @@
  ******************************************************************************/
 package org.eclipse.yasson.defaultmapping.specific;
 
+import org.eclipse.yasson.TestTypeToken;
 import org.eclipse.yasson.internal.JsonBindingBuilder;
 import org.eclipse.yasson.defaultmapping.generics.model.ScalarValueWrapper;
+import org.junit.Assert;
 import org.junit.Test;
 
 import javax.json.bind.Jsonb;
+import java.util.List;
 import java.util.Optional;
 import java.util.OptionalDouble;
 import java.util.OptionalInt;
@@ -62,6 +65,41 @@ public class OptionalTest {
 
         final Optional[] array = {Optional.of(new Customer(1, "Cust1")), Optional.of(new Customer(2, "Cust2")), Optional.empty()};
         assertEquals("[{\"id\":1,\"name\":\"Cust1\"},{\"id\":2,\"name\":\"Cust2\"},null]", jsonb.toJson(array));
+    }
+
+    @Test
+    public void testUnmarshallNullAsOptionalEmpty() {
+        final Jsonb jsonb = (new JsonBindingBuilder()).build();
+
+        final ScalarValueWrapper<OptionalInt> result = jsonb.fromJson("{\"value\":null}", new ScalarValueWrapper<OptionalInt>() {
+        }.getClass().getGenericSuperclass());
+        Assert.assertEquals(OptionalInt.empty(), result.getValue());
+    }
+
+    @Test
+    public void testUnmarshallOptionalArrayNulls() {
+        final Jsonb jsonb = (new JsonBindingBuilder()).build();
+
+        final OptionalLong[] result = jsonb.fromJson("[null, null]", OptionalLong[].class);
+
+        assertEquals(2, result.length);
+
+        for (OptionalLong item : result) {
+            Assert.assertEquals(OptionalLong.empty(), item);
+        }
+    }
+
+    @Test
+    public void testUnmarrshallOptioanlList() {
+        final Jsonb jsonb = (new JsonBindingBuilder()).build();
+
+        final List<Optional<Integer>> result = jsonb.fromJson("[null, null]", new TestTypeToken<List<Optional<Integer>>>() {}.getType());
+
+        assertEquals(2, result.size());
+
+        for (Optional<Integer> item : result) {
+            Assert.assertEquals(Optional.empty(), item);
+        }
     }
 
     public static class Customer {

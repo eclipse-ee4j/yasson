@@ -29,6 +29,10 @@ import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
+import java.util.Optional;
+import java.util.OptionalDouble;
+import java.util.OptionalInt;
+import java.util.OptionalLong;
 import java.util.logging.Logger;
 
 /**
@@ -107,6 +111,7 @@ class ObjectDeserializer<T> extends AbstractContainerDeserializer<T> {
         return instance;
     }
 
+
     /**
      * Creates instance with custom jsonb creator (parameterized constructor or factory method)
      */
@@ -131,7 +136,7 @@ class ObjectDeserializer<T> extends AbstractContainerDeserializer<T> {
      */
     @Override
     public void appendResult(Object result) {
-        values.put(getModel().getPropertyName(), result);
+        values.put(getModel().getPropertyName(), convertNullToOptionalEmpty(getModel(), result));
     }
 
     @Override
