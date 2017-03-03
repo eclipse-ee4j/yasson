@@ -45,7 +45,7 @@ public abstract class AbstractDateTimeSerializer<T extends TemporalAccessor> ext
     @Override
     public void serialize(T obj, JsonGenerator generator, SerializationContext ctx) {
         final JsonbContext jsonbContext = ((Marshaller) ctx).getJsonbContext();
-        final JsonbDateFormatter formatter = jsonbContext.getComponentMatcher().getDateFormatter(model);
+        final JsonbDateFormatter formatter = jsonbContext.getComponentMatcher().getSerializeDateFormatter(model);
         if (model instanceof PropertyModel) {
             generator.write(((PropertyModel)model).getPropertyName(), toJson(obj, formatter, jsonbContext));
         } else {

@@ -312,14 +312,28 @@ public class ComponentMatcher {
     }
 
     /**
-     * Resolves date formatter either from model or global config.
+     * Resolves serialization date formatter either from model or global config.
+     *
      * @param model model of processed value (field or collection item)
-     * @return formatter
+     * @return date formatter
      */
-    public JsonbDateFormatter getDateFormatter(JsonBindingModel model) {
-        if (model == null || model.getCustomization() == null || model.getCustomization().getDateTimeFormatter() == null) {
+    public JsonbDateFormatter getSerializeDateFormatter(JsonBindingModel model) {
+        if (model == null || model.getCustomization() == null || model.getCustomization().getSerializeDateFormatter() == null) {
             return jsonbContext.getConfigDateFormatter();
         }
-        return model.getCustomization().getDateTimeFormatter();
+        return model.getCustomization().getSerializeDateFormatter();
+    }
+
+    /**
+     * Resolves deserialization date formatter either from model or global config.
+     *
+     * @param model model of processed value (field or collection item)
+     * @return date formatter
+     */
+    public JsonbDateFormatter getDeserializeDateFormatter(JsonBindingModel model) {
+        if (model == null || model.getCustomization() == null || model.getCustomization().getDeserializeDateFormatter() == null) {
+            return jsonbContext.getConfigDateFormatter();
+        }
+        return model.getCustomization().getDeserializeDateFormatter();
     }
 }

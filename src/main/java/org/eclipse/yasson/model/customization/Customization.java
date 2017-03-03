@@ -37,8 +37,6 @@ public abstract class Customization {
 
     private final boolean jsonbTransient;
 
-    private final JsonbDateFormatter dateTimeFormatter;
-
     /**
      * Copies properties from builder an creates immutable instance.
      *
@@ -47,7 +45,6 @@ public abstract class Customization {
     public Customization(CustomizationBuilder builder) {
         this.nillable = builder.isNillable();
         this.jsonbTransient = builder.isJsonbTransient();
-        this.dateTimeFormatter = builder.getDateFormatter();
         this.adapterBinding = builder.getAdapterInfo();
         this.serializerBinding = builder.getSerializerBinding();
         this.deserializerBinding = builder.getDeserializerBinding();
@@ -61,7 +58,6 @@ public abstract class Customization {
     public Customization(Customization other) {
         this.nillable = other.isNillable();
         this.jsonbTransient = other.isJsonbTransient();
-        this.dateTimeFormatter = other.getDateTimeFormatter();
         this.adapterBinding = other.getAdapterBinding();
         this.serializerBinding = other.getSerializerBinding();
         this.deserializerBinding = other.getDeserializerBinding();
@@ -84,16 +80,6 @@ public abstract class Customization {
     public boolean isJsonbTransient() {
 
         return jsonbTransient;
-    }
-
-    /**
-     * Date formatter for formatting dates.
-     * If not set defaulted to javax.json.bind.annotation.JsonbDateFormat.DEFAULT_FORMAT.
-     *
-     * @return Date format.
-     */
-    public JsonbDateFormatter getDateTimeFormatter() {
-        return dateTimeFormatter;
     }
 
     /**
@@ -138,5 +124,23 @@ public abstract class Customization {
      * @return number formatter
      */
     public abstract JsonbNumberFormatter getDeserializeNumberFormatter();
+
+    /**
+     * Date formatter for formatting date values during serialization process. It could be the same formatter instance used for deserialization
+     * (returned by {@link #getDeserializeDateFormatter()}. If not set, defaulted to <code>javax.json.bind.annotation.JsonbDateFormat.DEFAULT_FORMAT.
+     * </code>
+     *
+     * @return date formatter
+     */
+    public abstract JsonbDateFormatter getSerializeDateFormatter();
+
+    /**
+     * Date formatter for formatting date values during deserialization process. It could be the same formatter instance used for serialization
+     * (returned by {@link #getSerializeDateFormatter()}. If not set, defaulted to <code>javax.json.bind.annotation.JsonbDateFormat.DEFAULT_FORMAT.
+     * </code>
+     *
+     * @return date formatter
+     */
+    public abstract JsonbDateFormatter getDeserializeDateFormatter();
 
 }

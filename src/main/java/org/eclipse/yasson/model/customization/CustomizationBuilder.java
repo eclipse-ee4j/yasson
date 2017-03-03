@@ -16,7 +16,6 @@ package org.eclipse.yasson.model.customization;
 import org.eclipse.yasson.internal.adapter.AdapterBinding;
 import org.eclipse.yasson.internal.adapter.DeserializerBinding;
 import org.eclipse.yasson.internal.adapter.SerializerBinding;
-import org.eclipse.yasson.internal.serializer.JsonbDateFormatter;
 import org.eclipse.yasson.model.JsonbCreator;
 
 /**
@@ -35,8 +34,6 @@ public abstract class CustomizationBuilder {
     private SerializerBinding serializerBinding;
 
     private DeserializerBinding deserializerBinding;
-
-    private JsonbDateFormatter dateFormatter;
 
     private JsonbCreator creator;
 
@@ -130,24 +127,6 @@ public abstract class CustomizationBuilder {
      */
     public void setDeserializerBinding(DeserializerBinding deserializerBinding) {
         this.deserializerBinding = deserializerBinding;
-    }
-
-    /**
-     * Gets a date format for formatting dates.
-     *
-     * @return Date format.
-     */
-    public JsonbDateFormatter getDateFormatter() {
-        return dateFormatter;
-    }
-
-    /**
-     * Sets date format for formatting dates.
-     *
-     * @param dateFormatter Date format.
-     */
-    public void setDateFormatter(JsonbDateFormatter dateFormatter) {
-        this.dateFormatter = dateFormatter;
     }
 
     /**

@@ -13,6 +13,7 @@
 
 package org.eclipse.yasson.model.customization;
 
+import org.eclipse.yasson.internal.serializer.JsonbDateFormatter;
 import org.eclipse.yasson.internal.serializer.JsonbNumberFormatter;
 import org.eclipse.yasson.model.JsonbCreator;
 
@@ -29,6 +30,8 @@ public class ClassCustomization extends Customization {
 
     private final JsonbNumberFormatter numberFormatter;
 
+    private final JsonbDateFormatter dateTimeFormatter;
+
     /**
      * Copies properties from builder an creates immutable instance.
      *
@@ -39,6 +42,7 @@ public class ClassCustomization extends Customization {
         this.creator = builder.getCreator();
         this.propertyOrder = builder.getPropertyOrder();
         this.numberFormatter = builder.getNumberFormatter();
+        this.dateTimeFormatter = builder.getDateFormatter();
     }
 
     /**
@@ -51,6 +55,7 @@ public class ClassCustomization extends Customization {
         this.creator = other.getCreator();
         this.propertyOrder = other.getPropertyOrder();
         this.numberFormatter = other.getSerializeNumberFormatter();
+        this.dateTimeFormatter = other.getSerializeDateFormatter();
     }
 
     /**
@@ -86,5 +91,15 @@ public class ClassCustomization extends Customization {
     @Override
     public JsonbNumberFormatter getDeserializeNumberFormatter() {
         return numberFormatter;
+    }
+
+    @Override
+    public JsonbDateFormatter getSerializeDateFormatter() {
+        return dateTimeFormatter;
+    }
+
+    @Override
+    public JsonbDateFormatter getDeserializeDateFormatter() {
+        return dateTimeFormatter;
     }
 }
