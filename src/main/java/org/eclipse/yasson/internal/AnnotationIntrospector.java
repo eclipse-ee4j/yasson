@@ -305,7 +305,7 @@ public class AnnotationIntrospector {
                 Class<?> rawType = propertyRawTypeOptional.get();
                 if (!(Date.class.isAssignableFrom(rawType) || Calendar.class.isAssignableFrom(rawType)
                         || TemporalAccessor.class.isAssignableFrom(rawType))) {
-                    return null;
+                    return new HashMap<>();
                 }
             }
         } else {
