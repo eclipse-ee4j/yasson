@@ -287,31 +287,37 @@ public class AnnotationIntrospector {
     }
 
     /**
-     * Search for {@link JsonbDateFormat} annotation on java property and construct {@link JsonbDateFormatter}.
-     * @param property property to search not null
-     * @return formatter to use
+     * Search {@link JsonbDateFormat} on property, if not found looks at annotations declared on property type class.
+     *
+     * @param property Property to search on.
+     * @return  Map of {@link JsonbDateFormatter} instances categorized by their scopes (class, property, getter or setter). If there is no date
+     * formatter specified for given property, an empty map would be returned
      */
-    public JsonbDateFormatter getJsonbDateFormat(Property property) {
+    public  Map<AnnotationTarget, JsonbDateFormatter> getJsonbDateFormatCategorized(Property property) {
         Objects.requireNonNull(property);
 
-        final JsonbDateFormat annotation = getAnnotationFromProperty(JsonbDateFormat.class, property)
-                .orElseGet(()->{
-                    //if property is not TypeVariable and its class is not date skip it
-                    final Optional<Class<?>> propertyRawTypeOptional = ReflectionUtils.getOptionalRawType(property.getPropertyType());
-                    if (propertyRawTypeOptional.isPresent()) {
-                        Class<?> rawType = propertyRawTypeOptional.get();
-                        if (!(Date.class.isAssignableFrom(rawType) || Calendar.class.isAssignableFrom(rawType)
-                                || TemporalAccessor.class.isAssignableFrom(rawType))) {
-                            return null;
-                        }
-                    }
-                    return findAnnotation(property.getDeclaringClassElement().getAnnotations(), JsonbDateFormat.class);
-                });
-        if (annotation == null) {
-            return null;
+        Map<AnnotationTarget, JsonbDateFormatter> result = new HashMap<>();
+        Map<AnnotationTarget, JsonbDateFormat> annotationFromPropertyCategorized = getAnnotationFromPropertyCategorized(JsonbDateFormat.class, property);
+        if(annotationFromPropertyCategorized.size() == 0) {
+            //  if property is not TypeVariable and its class is not date skip it
+            final Optional<Class<?>> propertyRawTypeOptional = ReflectionUtils.getOptionalRawType(property.getPropertyType());
+            if (propertyRawTypeOptional.isPresent()) {
+                Class<?> rawType = propertyRawTypeOptional.get();
+                if (!(Date.class.isAssignableFrom(rawType) || Calendar.class.isAssignableFrom(rawType)
+                        || TemporalAccessor.class.isAssignableFrom(rawType))) {
+                    return new HashMap<>();
+                }
+            }
+        } else {
+            annotationFromPropertyCategorized.forEach((key, annotation) -> result.put(key, createJsonbDateFormatter(annotation.value(), annotation.locale(), property)));
         }
 
-        return createJsonbDateFormatter(annotation.value(), annotation.locale(), property);
+        JsonbDateFormat classLevelDateFormatter = findAnnotation(property.getDeclaringClassElement().getAnnotations(), JsonbDateFormat.class);
+        if(classLevelDateFormatter != null) {
+            result.put(AnnotationTarget.CLASS, createJsonbDateFormatter(classLevelDateFormatter.value(), classLevelDateFormatter.locale(), property));
+        }
+
+        return result;
     }
 
     /**

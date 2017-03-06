@@ -13,6 +13,7 @@
 
 package org.eclipse.yasson.model.customization;
 
+import org.eclipse.yasson.internal.serializer.JsonbDateFormatter;
 import org.eclipse.yasson.internal.serializer.JsonbNumberFormatter;
 
 /**
@@ -29,6 +30,10 @@ public class PropertyCustomizationBuilder extends CustomizationBuilder {
     private JsonbNumberFormatter serializeNumberFormatter;
 
     private JsonbNumberFormatter deserializeNumberFormatter;
+
+    private JsonbDateFormatter serializeDateFormatter;
+
+    private JsonbDateFormatter deserializeDateFormatter;
 
     /**
      * Creates a customization for class properties.
@@ -73,6 +78,42 @@ public class PropertyCustomizationBuilder extends CustomizationBuilder {
      */
     public void setDeserializeNumberFormatter(JsonbNumberFormatter deserializeNumberFormatter) {
         this.deserializeNumberFormatter = deserializeNumberFormatter;
+    }
+
+    /**
+     * Gets date formatter for formatting dates during serialization process.
+     *
+     * @return date formatter for formatting dates during serialization process.
+     */
+    public JsonbDateFormatter getSerializeDateFormatter() {
+        return serializeDateFormatter;
+    }
+
+    /**
+     * Sets date formatter for formatting dates during serialization process.
+     *
+     * @param serializeDateFormatter Date formatter for formatting dates during serialization process.
+     */
+    public void setSerializeDateFormatter(JsonbDateFormatter serializeDateFormatter) {
+        this.serializeDateFormatter = serializeDateFormatter;
+    }
+
+    /**
+     * Gets date formatter for formatting dates during deserialization process.
+     *
+     * @return Date formatter for formatting dates during deserialization process.
+     */
+    public JsonbDateFormatter getDeserializeDateFormatter() {
+        return deserializeDateFormatter;
+    }
+
+    /**
+     * Sets date formatter for formatting dates during deserialization process.
+     *
+     * @param deserializeDateFormatter Date formatter for formatting dates during deserialization process.
+     */
+    public void setDeserializeDateFormatter(JsonbDateFormatter deserializeDateFormatter) {
+        this.deserializeDateFormatter = deserializeDateFormatter;
     }
 
     /**

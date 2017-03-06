@@ -53,7 +53,7 @@ public class DateTypeDeserializer extends AbstractValueTypeDeserializer<Date> {
     @Override
     protected Date deserialize(String jsonValue, Unmarshaller unmarshaller, Type rtType) {
 
-        final JsonbDateFormatter dateFormatter = unmarshaller.getJsonbContext().getComponentMatcher().getDateFormatter(model);
+        final JsonbDateFormatter dateFormatter = unmarshaller.getJsonbContext().getComponentMatcher().getDeserializeDateFormatter(model);
         if(JsonbDateFormat.TIME_IN_MILLIS.equals(dateFormatter.getFormat())) {
             return new Date(Long.parseLong(jsonValue));
         }

@@ -13,6 +13,7 @@
 
 package org.eclipse.yasson.model.customization;
 
+import org.eclipse.yasson.internal.serializer.JsonbDateFormatter;
 import org.eclipse.yasson.internal.serializer.JsonbNumberFormatter;
 
 /**
@@ -30,6 +31,10 @@ public class PropertyCustomization extends Customization {
 
     private final JsonbNumberFormatter deserializeNumberFormatter;
 
+    private final JsonbDateFormatter serializeDateFormatter;
+
+    private final JsonbDateFormatter deserializeDateFormatter;
+
 
     /**
      * Copies properties from builder an creates immutable instance.
@@ -41,6 +46,8 @@ public class PropertyCustomization extends Customization {
         this.jsonWriteName = builder.getJsonWriteName();
         this.serializeNumberFormatter = builder.getSerializeNumberFormatter();
         this.deserializeNumberFormatter = builder.getDeserializeNumberFormatter();
+        this.serializeDateFormatter = builder.getSerializeDateFormatter();
+        this.deserializeDateFormatter = builder.getDeserializeDateFormatter();
     }
 
     /**
@@ -67,5 +74,15 @@ public class PropertyCustomization extends Customization {
     @Override
     public JsonbNumberFormatter getDeserializeNumberFormatter() {
         return deserializeNumberFormatter;
+    }
+
+    @Override
+    public JsonbDateFormatter getSerializeDateFormatter() {
+        return serializeDateFormatter;
+    }
+
+    @Override
+    public JsonbDateFormatter getDeserializeDateFormatter() {
+        return deserializeDateFormatter;
     }
 }

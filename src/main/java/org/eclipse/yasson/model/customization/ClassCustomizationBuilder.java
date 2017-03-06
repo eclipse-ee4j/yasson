@@ -12,6 +12,7 @@
  ******************************************************************************/
 package org.eclipse.yasson.model.customization;
 
+import org.eclipse.yasson.internal.serializer.JsonbDateFormatter;
 import org.eclipse.yasson.internal.serializer.JsonbNumberFormatter;
 
 /**
@@ -26,6 +27,11 @@ public class ClassCustomizationBuilder extends CustomizationBuilder {
      * annotation.
      */
     private JsonbNumberFormatter numberFormatter;
+
+    /**
+     * The class level date formatter that would be used by default for all date properties that don't have a dedicated date formatter annotation.
+     */
+    private JsonbDateFormatter dateFormatter;
 
     /**
      * Creates a customization for class properties.
@@ -53,5 +59,23 @@ public class ClassCustomizationBuilder extends CustomizationBuilder {
      */
     public void setNumberFormatter(JsonbNumberFormatter numberFormatter) {
         this.numberFormatter = numberFormatter;
+    }
+
+    /**
+     * Gets a date format for formatting dates.
+     *
+     * @return Date format.
+     */
+    public JsonbDateFormatter getDateFormatter() {
+        return dateFormatter;
+    }
+
+    /**
+     * Sets date format for formatting dates.
+     *
+     * @param dateFormatter Date format.
+     */
+    public void setDateFormatter(JsonbDateFormatter dateFormatter) {
+        this.dateFormatter = dateFormatter;
     }
 }

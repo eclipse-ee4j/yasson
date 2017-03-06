@@ -81,7 +81,7 @@ public class CalendarTypeSerializer extends AbstractValueTypeSerializer<Calendar
     @Override
     public void serialize(Calendar obj, JsonGenerator generator, SerializationContext ctx) {
         final Marshaller marshaller = (Marshaller) ctx;
-        final JsonbDateFormatter formatter = marshaller.getJsonbContext().getComponentMatcher().getDateFormatter(model);
+        final JsonbDateFormatter formatter = marshaller.getJsonbContext().getComponentMatcher().getSerializeDateFormatter(model);
         if (model instanceof PropertyModel) {
             generator.write(((PropertyModel)model).getPropertyName(), toJson(obj, formatter, marshaller.getJsonbContext()));
         } else {

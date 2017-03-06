@@ -146,9 +146,36 @@ public class PropertyModel implements JsonBindingModel, Comparable<PropertyModel
         builder.setAdapterInfo(getUserAdapterBinding(property, jsonbContext));
         builder.setSerializerBinding(getUserSerializerBinding(property, jsonbContext));
         builder.setDeserializerBinding(introspector.getDeserializerBinding(property));
-        builder.setDateFormatter(introspector.getJsonbDateFormat(property));
+        introspectDateFormatter(property, introspector, builder);
         introspectNumberFormatter(property, introspector, builder);
         return builder.buildPropertyCustomization();
+    }
+
+    private void introspectDateFormatter(Property property, AnnotationIntrospector introspector, PropertyCustomizationBuilder builder) {
+        /*
+         * If @JsonbDateFormat is placed on getter implementation must use this format on serialization.
+         * If @JsonbDateFormat is placed on setter implementation must use this format on deserialization.
+         * If @JsonbDateFormat is placed on field implementation must use this format on serialization and deserialization.
+         *
+         * Priority from high to low is getter / settrer > field > class > package > global configuration
+         */
+        Map<AnnotationTarget, JsonbDateFormatter> jsonDateFormatCategorized = introspector.getJsonbDateFormatCategorized(property);
+        Set<AnnotationTarget> annotationTargets = jsonDateFormatCategorized.keySet();
+        if(annotationTargets.contains(AnnotationTarget.GETTER)){
+            builder.setSerializeDateFormatter(jsonDateFormatCategorized.get(AnnotationTarget.GETTER));
+        } else if(annotationTargets.contains(AnnotationTarget.PROPERTY)){
+            builder.setSerializeDateFormatter(jsonDateFormatCategorized.get(AnnotationTarget.PROPERTY));
+        } else if(annotationTargets.contains(AnnotationTarget.CLASS)){
+            builder.setSerializeDateFormatter(jsonDateFormatCategorized.get(AnnotationTarget.CLASS));
+        }
+
+        if(annotationTargets.contains(AnnotationTarget.SETTER)){
+            builder.setDeserializeDateFormatter(jsonDateFormatCategorized.get(AnnotationTarget.SETTER));
+        } else if(annotationTargets.contains(AnnotationTarget.PROPERTY)){
+            builder.setDeserializeDateFormatter(jsonDateFormatCategorized.get(AnnotationTarget.PROPERTY));
+        } else if(annotationTargets.contains(AnnotationTarget.CLASS)){
+            builder.setDeserializeDateFormatter(jsonDateFormatCategorized.get(AnnotationTarget.CLASS));
+        }
     }
 
     private void introspectNumberFormatter(Property property, AnnotationIntrospector introspector, PropertyCustomizationBuilder builder) {
