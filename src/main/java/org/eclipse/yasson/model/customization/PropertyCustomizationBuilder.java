@@ -35,6 +35,10 @@ public class PropertyCustomizationBuilder extends CustomizationBuilder {
 
     private JsonbDateFormatter deserializeDateFormatter;
 
+    private boolean readTransient;
+
+    private boolean writeTransient;
+
     /**
      * Creates a customization for class properties.
      *
@@ -151,5 +155,42 @@ public class PropertyCustomizationBuilder extends CustomizationBuilder {
     public void setJsonWriteName(String jsonWriteName) {
         this.jsonWriteName = jsonWriteName;
     }
+
+    /**
+     * Returns true if <i>read transient</i> customization is present.
+     *
+     * @return True if <i>read transient</i> customization is present.
+     */
+    public boolean isReadTransient() {
+        return readTransient;
+    }
+
+    /**
+     * Sets a presence of <i>read transient</i> customization.
+     *
+     * @param readTransient Presence of <i>read transient</i> customization.
+     */
+    public void setReadTransient(boolean readTransient) {
+        this.readTransient = readTransient;
+    }
+
+    /**
+     * Returns true if <i>write transient</i> customization is present.
+     *
+     * @return True if <i>write transient</i> customization is present.
+     */
+    public boolean isWriteTransient() {
+        return writeTransient;
+    }
+
+    /**
+     * Sets a presence of <i>write transient</i> customization.
+     *
+     * @param writeTransient Presence of <i>write transient</i> customization.
+     */
+    public void setWriteTransient(boolean writeTransient) {
+        this.writeTransient = writeTransient;
+    }
+
 
 }

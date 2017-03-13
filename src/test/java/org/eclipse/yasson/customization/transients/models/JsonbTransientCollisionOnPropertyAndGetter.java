@@ -8,36 +8,28 @@
  * http://www.eclipse.org/org/documents/edl-v10.php.
  *
  * Contributors:
- * Roman Grigoriadi
+ *  Ehsan Zaery Moghaddam (zaerymoghaddam@gmail.com)
  ******************************************************************************/
 
-package org.eclipse.yasson.customization.model;
+package org.eclipse.yasson.customization.transients.models;
 
+import javax.json.bind.annotation.JsonbProperty;
 import javax.json.bind.annotation.JsonbTransient;
 
 /**
- * @author Roman Grigoriadi
+ * @author Ehsan Zaery Moghaddam (zaerymoghaddam@gmail.com)
  */
-public class JsonbTransientValue {
+public class JsonbTransientCollisionOnPropertyAndGetter {
 
     @JsonbTransient
     private String transientProperty;
 
-    private String property;
-
+    @JsonbProperty("custom_name")
     public String getTransientProperty() {
         return transientProperty;
     }
 
     public void setTransientProperty(String transientProperty) {
         this.transientProperty = transientProperty;
-    }
-
-    public String getProperty() {
-        return property;
-    }
-
-    public void setProperty(String property) {
-        this.property = property;
     }
 }
