@@ -71,9 +71,11 @@ public class UserDeserializerDeserializer<T> extends AbstractContainerDeserializ
         throw new UnsupportedOperationException("Not supported for user deserializer");
     }
 
+    /**
+     * Don't move anywhere in case of user deserializer.
+     */
     @Override
     protected JsonbRiParser.LevelContext moveToFirst(JsonbParser parser) {
-        parser.moveTo(JsonParser.Event.START_OBJECT);
         return parser.getCurrentLevel();
     }
 

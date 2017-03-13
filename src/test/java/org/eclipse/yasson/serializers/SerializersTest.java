@@ -25,7 +25,10 @@ import org.eclipse.yasson.serializers.model.CrateJsonObjectDeserializer;
 import org.eclipse.yasson.serializers.model.CrateSerializer;
 import org.eclipse.yasson.serializers.model.CrateSerializerWithConversion;
 import org.eclipse.yasson.serializers.model.PolymorphicDeserializer;
+import org.eclipse.yasson.serializers.model.SimpleAnnotatedSerializedArrayContainer;
+import org.eclipse.yasson.serializers.model.SimpleContainer;
 import org.eclipse.yasson.serializers.model.StringWrapper;
+import org.junit.Assert;
 import org.junit.Test;
 
 import javax.json.bind.Jsonb;
@@ -245,6 +248,33 @@ public class SerializersTest {
         pojo.strField = "abc";
         final String result = jsonb.toJson(pojo);
         System.out.println("result = " + result);
+    }
+
+    @Test
+    public void testContainerSerializer() {
+        Jsonb jsonb = JsonbBuilder.create();
+
+        SimpleAnnotatedSerializedArrayContainer container = new SimpleAnnotatedSerializedArrayContainer();
+        SimpleContainer instance1 = new SimpleContainer();
+        instance1.setInstance("Test String 1");
+        SimpleContainer instance2 = new SimpleContainer();
+        instance2.setInstance("Test String 2");
+        container.setArrayInstance(new SimpleContainer[] {instance1, instance2});
+
+        container.setListInstance(new ArrayList<>());
+        container.getListInstance().add(new SimpleContainer("Test List 1"));
+        container.getListInstance().add(new SimpleContainer("Test List 2"));
+
+        String jsonString = jsonb.toJson(container);
+        Assert.assertEquals("{\"arrayInstance\":[{\"instance\":\"Test String 1\"},{\"instance\":\"Test String 2\"}],\"listInstance\":[{\"instance\":\"Test List 1\"},{\"instance\":\"Test List 2\"}]}", jsonString);
+
+        SimpleAnnotatedSerializedArrayContainer unmarshalledObject = jsonb.fromJson("{\"arrayInstance\":[{\"instance\":\"Test String 1\"},{\"instance\":\"Test String 2\"}],\"listInstance\":[{\"instance\":\"Test List 1\"},{\"instance\":\"Test List 2\"}]}", SimpleAnnotatedSerializedArrayContainer.class);
+
+        Assert.assertEquals("Test String 1", unmarshalledObject.getArrayInstance()[0].getInstance());
+        Assert.assertEquals("Test String 2", unmarshalledObject.getArrayInstance()[1].getInstance());
+
+        Assert.assertEquals("Test List 1", unmarshalledObject.getListInstance().get(0).getInstance());
+        Assert.assertEquals("Test List 2", unmarshalledObject.getListInstance().get(1).getInstance());
     }
 
     private Box createPojoWithDates() {
