@@ -135,12 +135,9 @@ public class PropertyModel implements JsonBindingModel, Comparable<PropertyModel
         //drop all other annotations for transient properties
         EnumSet<AnnotationTarget> transientInfo = introspector.getJsonbTransientCategorized(property);
         if (transientInfo.size() != 0) {
-            if(transientInfo.contains(AnnotationTarget.GETTER)) {
-                builder.setReadTransient(true);
-            }
-            if (transientInfo.contains(AnnotationTarget.SETTER)) {
-                builder.setWriteTransient(true);
-            }
+            builder.setReadTransient(transientInfo.contains(AnnotationTarget.GETTER));
+            builder.setWriteTransient(transientInfo.contains(AnnotationTarget.SETTER));
+
             if (transientInfo.contains(AnnotationTarget.PROPERTY)) {
                 if(!transientInfo.contains(AnnotationTarget.GETTER)){
                     builder.setReadTransient(true);
