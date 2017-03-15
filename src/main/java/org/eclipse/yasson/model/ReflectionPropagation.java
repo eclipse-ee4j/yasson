@@ -24,30 +24,6 @@ import java.lang.reflect.Method;
  */
 public class ReflectionPropagation extends PropertyValuePropagation {
 
-    private interface GetValueCommand {
-        Object internalGetValue(Object object) throws IllegalAccessException, InvocationTargetException;
-
-        default Object getValue(Object object) {
-            try {
-                return internalGetValue(object);
-            } catch (InvocationTargetException | IllegalAccessException e) {
-                throw new JsonbException("Error getting value on: " + object, e);
-            }
-        }
-    }
-
-    private interface SetValueCommand {
-        void internalSetValue(Object object, Object value) throws IllegalAccessException, InvocationTargetException;
-
-        default void setValue(Object object, Object value) {
-            try {
-                internalSetValue(object, value);
-            } catch (InvocationTargetException | IllegalAccessException e) {
-                throw new JsonbException("Error getting value on: " + object, e);
-            }
-        }
-    }
-
     private GetValueCommand getValueCommand;
 
     private SetValueCommand setValueCommand;
@@ -63,10 +39,10 @@ public class ReflectionPropagation extends PropertyValuePropagation {
     protected void acceptMethod(Method method, OperationMode mode) {
         switch (mode) {
             case GET:
-                getValueCommand = method::invoke;
+                getValueCommand = new GetFromGetter(method);
                 break;
             case SET:
-                setValueCommand = method::invoke;
+                setValueCommand = new SetWithSetter(method);
                 break;
             default: throw new IllegalStateException("Unknown mode");
         }
@@ -79,10 +55,10 @@ public class ReflectionPropagation extends PropertyValuePropagation {
     protected void acceptField(Field field, OperationMode mode) {
         switch (mode) {
             case GET:
-                getValueCommand = field::get;
+                getValueCommand = new GetFromField(field);
                 break;
             case SET:
-                setValueCommand = field::set;
+                setValueCommand = new SetWithField(field);
                 break;
             default: throw new IllegalStateException("Unknown mode");
         }

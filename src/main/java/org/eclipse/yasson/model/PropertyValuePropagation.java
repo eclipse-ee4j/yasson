@@ -29,6 +29,12 @@ import java.util.function.Function;
  */
 public abstract class PropertyValuePropagation {
 
+    private final Field field;
+
+    private final Method getter;
+
+    private final Method setter;
+
     /**
      * Mode of property propagation get or set.
      */
@@ -53,8 +59,12 @@ public abstract class PropertyValuePropagation {
      * @param ctx Context.
      */
     protected PropertyValuePropagation(Property property, JsonbContext ctx) {
-        initReadable(property.getField(), property.getGetter(), ctx);
-        initWritable(property.getField(), property.getSetter(), ctx);
+        this.field = property.getField();
+        this.getter = property.getGetter();
+        this.setter = property.getSetter();
+
+        initReadable(field, getter, ctx);
+        initWritable(field, setter, ctx);
     }
 
     /**
@@ -195,5 +205,32 @@ public abstract class PropertyValuePropagation {
      */
     public boolean isReadable() {
         return readable;
+    }
+
+    /**
+     * Field of a javabean property.
+     *
+     * @return {@link Field field}
+     */
+    public Field getField() {
+        return field;
+    }
+
+    /**
+     * Setter of a javabean property.
+     *
+     * @return {@link Method getter}
+     */
+    public Method getGetter() {
+        return getter;
+    }
+
+    /**
+     * Getter of a javabean property.
+     *
+     * @return {@link Method setter}
+     */
+    public Method getSetter() {
+        return setter;
     }
 }

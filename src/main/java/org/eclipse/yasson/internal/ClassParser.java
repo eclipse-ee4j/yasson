@@ -58,16 +58,8 @@ class ClassParser {
         parseClassAndInterfaceMethods(classElement, classProperties);
 
         final  List<PropertyModel> sortedProperties = new ArrayList<>();
+        mergeWithParent(classModel.getParentClassModel(), classElement, classProperties, sortedProperties);
 
-        final ClassModel parentClassModel = classModel.getParentClassModel();
-        if (parentClassModel != null) {
-            for (PropertyModel parentProp : parentClassModel.getSortedProperties()) {
-                //don't replace overridden properties
-                if (!classProperties.containsKey(parentProp.getPropertyName())) {
-                    sortedProperties.add(parentProp);
-                }
-            }
-        }
 
         Map<String, PropertyModel> unsorted = new HashMap<>();
         for (Map.Entry<String, Property> entry : classProperties.entrySet()) {
@@ -175,6 +167,52 @@ class ClassParser {
             }
             checkedProperties.add(collectedPropertyModel);
         }
+    }
+
+    /**
+     * Merges current class properties with parent class properties.
+     * If javabean property is declared in more than one inheritance levels,
+     * merge field, getters and setters of that property.
+     *
+     * For example BaseClass contains field foo and getter getFoo. In BaseExtensions there is a setter setFoo.
+     * All three will be merged for BaseExtension.
+     */
+    private void mergeWithParent(ClassModel parentClassModel, JsonbAnnotatedElement<Class<?>> classElement, Map<String, Property> classProperties, List<PropertyModel> sortedProperties) {
+        //Pull properties from parent
+        if (parentClassModel != null) {
+            for (PropertyModel parentProp : parentClassModel.getSortedProperties()) {
+                final Property current = classProperties.get(parentProp.getPropertyName());
+                //don't replace overridden properties
+                if (current == null) {
+                    sortedProperties.add(parentProp);
+                } else {
+                    //merge
+                    final Property merged = mergeProperty(current, parentProp, classElement);
+                    classProperties.replace(current.getName(), merged);
+                }
+            }
+        }
+    }
+
+    private Property mergeProperty(Property current, PropertyModel parentProp, JsonbAnnotatedElement<Class<?>> classElement) {
+        Field field = current.getField() != null
+                ? current.getField() : parentProp.getPropagation().getField();
+        Method getter = current.getGetter() != null
+                ? current.getGetter() : parentProp.getPropagation().getGetter();
+        Method setter = current.getSetter() != null
+                ? current.getSetter() : parentProp.getPropagation().getSetter();
+
+        Property merged = new Property(parentProp.getPropertyName(), classElement);
+        if (field != null) {
+            merged.setField(field);
+        }
+        if (getter != null) {
+            merged.setGetter(getter);
+        }
+        if (setter != null) {
+            merged.setSetter(setter);
+        }
+        return merged;
     }
 
 }

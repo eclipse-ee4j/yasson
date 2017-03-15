@@ -350,4 +350,13 @@ public class PropertyModel implements JsonBindingModel, Comparable<PropertyModel
     private String calculateReadWriteName(String readWriteName, PropertyNamingStrategy strategy) {
         return readWriteName != null ? readWriteName : strategy.translateName(propertyName);
     }
+
+    /**
+     * Wrapper object of {@code java.lang.reflect} representations of this javabean property.
+     *
+     * @return Property model
+     */
+    public PropertyValuePropagation getPropagation() {
+        return propagation;
+    }
 }

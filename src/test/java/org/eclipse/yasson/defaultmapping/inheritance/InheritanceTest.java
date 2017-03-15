@@ -16,11 +16,13 @@ package org.eclipse.yasson.defaultmapping.inheritance;
 import org.eclipse.yasson.TestTypeToken;
 import org.eclipse.yasson.defaultmapping.generics.model.GenericTestClass;
 import org.eclipse.yasson.defaultmapping.generics.model.PropagatedGenericClass;
+import org.eclipse.yasson.defaultmapping.inheritance.model.PartialOverride;
 import org.eclipse.yasson.defaultmapping.inheritance.model.SecondLevel;
 import org.eclipse.yasson.defaultmapping.inheritance.model.generics.ExtendsExtendsPropagatedGenericClass;
 import org.eclipse.yasson.defaultmapping.inheritance.model.generics.ExtendsPropagatedGenericClass;
 import org.eclipse.yasson.defaultmapping.inheritance.model.generics.ImplementsGenericInterfaces;
 import org.eclipse.yasson.defaultmapping.inheritance.model.generics.SecondLevelGeneric;
+import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
 
@@ -206,4 +208,16 @@ public class InheritanceTest {
         assertEquals(Integer.valueOf(255), result.getAnotherGenericValue());
     }
 
+    @Test
+    public void testPartialOverride() {
+        PartialOverride partialOverride = new PartialOverride();
+        partialOverride.setIntValue(5);
+        partialOverride.setStrValue("abc");
+        String json = jsonb.toJson(partialOverride);
+        Assert.assertEquals("{\"intValue\":5,\"strValue\":\"abc\"}", json);
+
+        PartialOverride result = jsonb.fromJson("{\"intValue\":5,\"strValue\":\"abc\"}", PartialOverride.class);
+        Assert.assertEquals(5, result.getIntValue());
+        Assert.assertEquals("abc", result.getStrValue());
+    }
 }
