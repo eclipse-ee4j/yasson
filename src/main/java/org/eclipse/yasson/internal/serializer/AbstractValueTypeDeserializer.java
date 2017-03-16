@@ -55,7 +55,7 @@ public abstract class AbstractValueTypeDeserializer<T> implements JsonbDeseriali
     @Override
     public T deserialize(JsonParser parser, DeserializationContext ctx, Type rtType) {
         Unmarshaller unmarshaller = (Unmarshaller) ctx;
-        final JsonParser.Event event = ((JsonbParser) parser).moveToValue();
+        final JsonParser.Event event = ((JsonbParser) parser).getCurrentLevel().getLastEvent();
         if (event == JsonParser.Event.VALUE_NULL) {
             return null;
         }

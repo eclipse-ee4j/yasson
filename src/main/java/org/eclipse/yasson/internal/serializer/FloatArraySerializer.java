@@ -15,6 +15,7 @@ package org.eclipse.yasson.internal.serializer;
 
 import javax.json.bind.serializer.SerializationContext;
 import javax.json.stream.JsonGenerator;
+import java.math.BigDecimal;
 
 /**
  * Serializer for arrays of floats.
@@ -30,7 +31,8 @@ public class FloatArraySerializer extends AbstractArraySerializer<float[]> {
     @Override
     protected void serializeInternal(float[] arr, JsonGenerator generator, SerializationContext ctx) {
         for (float obj : arr) {
-            generator.write(obj);
+            //floats lose precision, after upcasting to doubles in jsonp
+            generator.write(new BigDecimal(String.valueOf(obj)));
         }
     }
 }

@@ -104,6 +104,8 @@ public class JsonbRiParser implements JsonParser, JsonbParser {
 
     private final Stack<LevelContext> level = new Stack<>();
 
+    private final LevelContext root = new LevelContext(null);
+
     /**
      * Creates a parser.
      *
@@ -131,14 +133,16 @@ public class JsonbRiParser implements JsonParser, JsonbParser {
     @Override
     public JsonParser.Event next() {
         final JsonParser.Event next = jsonParser.next();
-        LevelContext current = level.empty() ? null : level.peek();
-        if (current != null) {
-            current.setLastEvent(next);
+        final boolean rootLevel = level.empty();
+        if (rootLevel) {
+            root.setLastEvent(next);
+        } else {
+            level.peek().setLastEvent(next);
         }
         switch (next) {
             case START_ARRAY:
             case START_OBJECT:
-                final LevelContext newLevel = new LevelContext(current);
+                final LevelContext newLevel = new LevelContext(rootLevel ? root : level.peek());
                 newLevel.setLastEvent(next);
                 level.push(newLevel);
                 break;
@@ -237,6 +241,9 @@ public class JsonbRiParser implements JsonParser, JsonbParser {
 
     @Override
     public LevelContext getCurrentLevel() {
+        if (level.empty()) {
+            return root;
+        }
         return level.peek();
     }
 

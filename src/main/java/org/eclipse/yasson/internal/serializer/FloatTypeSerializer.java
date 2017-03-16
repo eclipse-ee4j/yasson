@@ -16,6 +16,7 @@ package org.eclipse.yasson.internal.serializer;
 import org.eclipse.yasson.model.JsonBindingModel;
 
 import javax.json.stream.JsonGenerator;
+import java.math.BigDecimal;
 
 /**
  * Serializer for {@link Float} type.
@@ -35,11 +36,13 @@ public class FloatTypeSerializer extends AbstractNumberSerializer<Float> {
 
     @Override
     protected void serializeNonFormatted(Float obj, JsonGenerator generator, String key) {
-        generator.write(key, obj);
+        //floats lose precision, after upcasting to doubles in jsonp
+        generator.write(key, new BigDecimal(String.valueOf(obj)));
     }
 
     @Override
     protected void serializeNonFormatted(Float obj, JsonGenerator generator) {
-        generator.write(obj);
+        //floats lose precision, after upcasting to doubles in jsonp
+        generator.write(new BigDecimal(String.valueOf(obj)));
     }
 }

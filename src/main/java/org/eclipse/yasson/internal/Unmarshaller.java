@@ -13,6 +13,7 @@
 package org.eclipse.yasson.internal;
 
 
+import org.eclipse.yasson.internal.unmarshaller.ContainerModel;
 import org.eclipse.yasson.internal.unmarshaller.CurrentItem;
 import org.eclipse.yasson.internal.unmarshaller.DeserializerBuilder;
 import org.eclipse.yasson.internal.unmarshaller.JsonValueType;
@@ -53,7 +54,7 @@ public class Unmarshaller extends ProcessingContext implements DeserializationCo
     @SuppressWarnings("unchecked")
     private <T> T deserializeItem(Type type, JsonParser parser) {
         final JsonbDeserializer<?> item = new DeserializerBuilder(jsonbContext).withWrapper(current)
-                .withType(type).withJsonValueType(JsonValueType.of(getRootEvent(parser))).build();
+                .withType(type).withJsonValueType(JsonValueType.of(getRootEvent(parser))).withModel(new ContainerModel(type, null)).build();
         return (T) item.deserialize(parser, this, type);
     }
 

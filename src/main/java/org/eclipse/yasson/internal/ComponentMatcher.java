@@ -152,7 +152,7 @@ public class ComponentMatcher {
      */
     @SuppressWarnings("unchecked")
     public Optional<DeserializerBinding<?>> getDeserializerBinding(Type propertyRuntimeType, JsonBindingModel model) {
-        if (model == null || model.getCustomization().getDeserializerBinding() == null) {
+        if (model == null || model.getCustomization() == null || model.getCustomization().getDeserializerBinding() == null) {
             return searchComponentBinding(propertyRuntimeType, ComponentBindings::getDeserializer);
         }
         return getComponentBinding(propertyRuntimeType, model.getCustomization().getDeserializerBinding());

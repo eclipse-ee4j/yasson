@@ -17,6 +17,7 @@ import org.eclipse.yasson.internal.JsonbContext;
 import org.eclipse.yasson.internal.properties.MessageKeys;
 import org.eclipse.yasson.internal.properties.Messages;
 import org.eclipse.yasson.model.JsonBindingModel;
+import org.eclipse.yasson.model.customization.Customization;
 
 import javax.json.bind.JsonbException;
 import java.text.DecimalFormat;
@@ -43,8 +44,9 @@ public abstract class AbstractNumberDeserializer<T extends Number> extends Abstr
     }
 
     protected final Optional<Number> deserializeForamtted(String jsonValue, boolean integerOnly, JsonbContext jsonbContext) {
-        final JsonbNumberFormatter numberFormat = model.getCustomization().getDeserializeNumberFormatter();
-        if (numberFormat != null) {
+        final Customization customization = model.getCustomization();
+        if (customization != null && customization.getDeserializeNumberFormatter() != null) {
+            final JsonbNumberFormatter numberFormat = customization.getDeserializeNumberFormatter();
             //TODO perf consider synchronizing on format instance or per thread cache.
             final NumberFormat format = NumberFormat.getInstance(jsonbContext.getLocale(numberFormat.getLocale()));
             ((DecimalFormat)format).applyPattern(numberFormat.getFormat());
