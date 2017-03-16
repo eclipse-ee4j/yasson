@@ -16,7 +16,6 @@ import org.eclipse.yasson.internal.JsonbParser;
 import org.eclipse.yasson.internal.JsonbRiParser;
 import org.eclipse.yasson.internal.ReflectionUtils;
 import org.eclipse.yasson.internal.Unmarshaller;
-import org.eclipse.yasson.model.ClassModel;
 import org.eclipse.yasson.model.CreatorParam;
 import org.eclipse.yasson.model.JsonbCreator;
 import org.eclipse.yasson.model.PropertyModel;
@@ -25,14 +24,9 @@ import javax.json.bind.serializer.JsonbDeserializer;
 import javax.json.stream.JsonParser;
 import java.lang.reflect.Type;
 import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.Iterator;
+import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.Optional;
-import java.util.OptionalDouble;
-import java.util.OptionalInt;
-import java.util.OptionalLong;
 import java.util.logging.Logger;
 
 /**
@@ -66,7 +60,7 @@ class ObjectDeserializer<T> extends AbstractContainerDeserializer<T> {
 
     private static final Logger log = Logger.getLogger(ObjectDeserializer.class.getName());
 
-    private Map<String, Object> values = new HashMap<>();
+    private Map<String, ValueWrapper> values = new LinkedHashMap<>();
 
     private T instance;
 
@@ -98,16 +92,17 @@ class ObjectDeserializer<T> extends AbstractContainerDeserializer<T> {
         instance = creator != null ? createInstance((Class<T>) rawType, creator)
                 : ReflectionUtils.createNoArgConstructorInstance((Class<T>) rawType);
 
-        for(Iterator<ClassModel> classModelIterator = unmarshaller.getMappingContext().classModelIterator(rawType); classModelIterator.hasNext();) {
-            classModelIterator.next().getProperties().entrySet().stream()
-                    .filter((entry)->creator == null || !creator.contains(entry.getKey()))
-                    .forEach((entry)->{
-                if (values.containsKey(entry.getKey())) {
-                    final Object value = values.get(entry.getKey());
-                    entry.getValue().setValue(instance, value);
-                }
-            });
-        }
+        //values must be set in order, in which they appears in JSON by spec
+        values.entrySet().forEach((entry)-> {
+            final ValueWrapper wrapper = entry.getValue();
+            //skip creator values
+            if (wrapper.getCreatorParam() != null) {
+                return;
+            }
+            final PropertyModel propertyModel = wrapper.getPropertyModel();
+            propertyModel.setValue(instance, wrapper.getValue());
+        });
+
         return instance;
     }
 
@@ -119,10 +114,11 @@ class ObjectDeserializer<T> extends AbstractContainerDeserializer<T> {
         final T instance;
         final List<Object> paramValues = new ArrayList<>();
         for(CreatorParam param : creator.getParams()) {
-            Object value = values.get(param.getName());
-            if (value == null) {
-                value = defaultConstructorValue(param.getType());
-            }
+            final ValueWrapper valueWrapper = values.get(param.getName());
+            Object value = valueWrapper == null ?
+                    defaultConstructorValue(param.getType())
+                    : valueWrapper.getValue();
+
             paramValues.add(value);
         }
         instance = creator.call(paramValues.toArray(), rawType);
@@ -136,7 +132,8 @@ class ObjectDeserializer<T> extends AbstractContainerDeserializer<T> {
      */
     @Override
     public void appendResult(Object result) {
-        values.put(getModel().getPropertyName(), convertNullToOptionalEmpty(getModel(), result));
+        final PropertyModel model = getModel();
+        values.put(model.getPropertyName(), new ValueWrapper(model, convertNullToOptionalEmpty(model, result)));
     }
 
     @Override
@@ -149,7 +146,7 @@ class ObjectDeserializer<T> extends AbstractContainerDeserializer<T> {
             if (param != null) {
                 final JsonbDeserializer<?> deserializer = newUnmarshallerItemBuilder(context.getJsonbContext()).withType(param.getType()).build();
                 Object result = deserializer.deserialize(parser, context, param.getType());
-                values.put(param.getName(), result);
+                values.put(param.getName(), new ValueWrapper(param, result));
                 return;
             }
         }
@@ -162,7 +159,7 @@ class ObjectDeserializer<T> extends AbstractContainerDeserializer<T> {
                     withModel(newPropertyModel).build();
 
             Object result = deserializer.deserialize(parser, context, newPropertyModel.getPropertyType());
-            values.put(newPropertyModel.getPropertyName(), result);
+            values.put(newPropertyModel.getPropertyName(), new ValueWrapper(newPropertyModel, result));
             return;
         }
 
@@ -204,6 +201,37 @@ class ObjectDeserializer<T> extends AbstractContainerDeserializer<T> {
             return 0L;
         } else {
             return null;
+        }
+    }
+
+    private static class ValueWrapper {
+
+        private final CreatorParam creatorParam;
+        private final PropertyModel propertyModel;
+        private final Object value;
+
+        public ValueWrapper(CreatorParam creator, Object value) {
+            this.creatorParam = creator;
+            this.value = value;
+            propertyModel = null;
+        }
+
+        public ValueWrapper(PropertyModel propertyModel, Object value) {
+            this.propertyModel = propertyModel;
+            this.value = value;
+            creatorParam = null;
+        }
+
+        public CreatorParam getCreatorParam() {
+            return creatorParam;
+        }
+
+        public PropertyModel getPropertyModel() {
+            return propertyModel;
+        }
+
+        public Object getValue() {
+            return value;
         }
     }
 }

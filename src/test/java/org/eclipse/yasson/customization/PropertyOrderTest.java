@@ -19,6 +19,8 @@ import org.eclipse.yasson.customization.model.FieldOrder;
 import org.eclipse.yasson.customization.model.FieldOrderNameAnnotation;
 import org.eclipse.yasson.customization.model.FieldSpecificOrder;
 import org.eclipse.yasson.customization.model.JsonbTransientValue;
+import org.eclipse.yasson.customization.model.RenamedPropertiesContainer;
+import org.junit.Assert;
 import org.junit.Test;
 
 import javax.json.bind.Jsonb;
@@ -85,5 +87,18 @@ public class PropertyOrderTest {
         jsonb = JsonbBuilder.create(new JsonbConfig().withPropertyOrderStrategy(PropertyOrderStrategy.REVERSE));
         String expectedReverse = "{\"zField\":\"aValue\",\"dField\":\"dValue\",\"cField\":\"cValue\",\"bField\":\"bValue\"}";
         assertEquals(expectedReverse, jsonb.toJson(fieldOrderNameAnnotation));
+    }
+
+    @Test
+    public void testLexicographicalPropertyOrderRenamedProperties() {
+        JsonbConfig config = new JsonbConfig();
+        config.setProperty(JsonbConfig.PROPERTY_ORDER_STRATEGY, PropertyOrderStrategy.LEXICOGRAPHICAL);
+        Jsonb jsonb = JsonbBuilder.create(config);
+
+        String jsonString = jsonb.toJson(new RenamedPropertiesContainer() {{ setStringInstance("Test String"); setLongInstance(1); }});
+        Assert.assertTrue(jsonString.matches("\\{\\s*\"first\"\\s*\\:\\s*0\\s*,\\s*\"second\"\\s*\\:\\s*\"Test String\"\\s*,\\s*\"third\"\\s*\\:\\s*1\\s*\\}"));
+
+        RenamedPropertiesContainer unmarshalledObject = jsonb.fromJson("{ \"first\" : 1, \"second\" : \"Test String\", \"third\" : 1 }", RenamedPropertiesContainer.class);
+        Assert.assertEquals(3, unmarshalledObject.getIntInstance());
     }
 }
