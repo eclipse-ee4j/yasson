@@ -22,8 +22,13 @@ import javax.json.bind.serializer.JsonbDeserializer;
 import javax.json.stream.JsonParser;
 import java.lang.reflect.ParameterizedType;
 import java.lang.reflect.Type;
+import java.util.EnumMap;
 import java.util.HashMap;
+import java.util.LinkedHashMap;
 import java.util.Map;
+import java.util.NavigableMap;
+import java.util.SortedMap;
+import java.util.TreeMap;
 
 /**
  * Item implementation for {@link java.util.Map} fields.
@@ -62,7 +67,15 @@ public class MapDeserializer<T extends Map<?,?>> extends AbstractContainerDeseri
     @SuppressWarnings("unchecked")
     private T createInstance() {
         Class<T> rawType = (Class<T>) ReflectionUtils.getRawType(getRuntimeType());
-        return rawType.isInterface() ? (T) new HashMap<>() : ReflectionUtils.createNoArgConstructorInstance(rawType);
+        return rawType.isInterface() ? (T) getMapImpl(rawType) : ReflectionUtils.createNoArgConstructorInstance(rawType);
+    }
+
+    private Map<Object, Object> getMapImpl(Class ifcType) {
+        //SortedMap, NavigableMap
+        if (SortedMap.class.isAssignableFrom(ifcType)) {
+            return new TreeMap<>();
+        }
+        return new HashMap<>();
     }
 
     @Override

@@ -26,9 +26,12 @@ import java.util.ArrayDeque;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.HashSet;
+import java.util.LinkedList;
 import java.util.List;
 import java.util.Queue;
 import java.util.Set;
+import java.util.SortedSet;
+import java.util.TreeSet;
 
 /**
  * Item implementation for {@link java.util.List} fields
@@ -71,17 +74,30 @@ class CollectionDeserializer<T extends Collection<?>> extends AbstractContainerD
         assert Collection.class.isAssignableFrom(rawType);
 
         if (rawType.isInterface()) {
-            if (List.class.isAssignableFrom(rawType)) {
-                return (T) new ArrayList<>();
-            }
-            if (Set.class.isAssignableFrom(rawType)) {
-                return (T) new HashSet<>();
-            }
-            if (Queue.class.isAssignableFrom(rawType)) {
-                return (T) new ArrayDeque<>();
-            }
+            final T x = createInterfaceInstance(rawType);
+            if (x != null) return x;
         }
         return ReflectionUtils.createNoArgConstructorInstance(rawType);
+    }
+
+    @SuppressWarnings("unchecked")
+    private T createInterfaceInstance(Class<?> ifcType) {
+        if (List.class.isAssignableFrom(ifcType)) {
+            if (LinkedList.class == ifcType) {
+                return (T) new LinkedList();
+            }
+            return (T) new ArrayList<>();
+        }
+        if (Set.class.isAssignableFrom(ifcType)) {
+            if (SortedSet.class.isAssignableFrom(ifcType)) {
+                return (T) new TreeSet<>();
+            }
+            return (T) new HashSet<>();
+        }
+        if (Queue.class.isAssignableFrom(ifcType)) {
+            return (T) new ArrayDeque<>();
+        }
+        return null;
     }
 
     @Override

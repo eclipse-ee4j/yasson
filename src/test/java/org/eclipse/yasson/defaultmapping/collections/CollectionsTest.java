@@ -15,8 +15,10 @@ package org.eclipse.yasson.defaultmapping.collections;
 import org.eclipse.yasson.TestTypeToken;
 import org.eclipse.yasson.defaultmapping.generics.model.Circle;
 import org.eclipse.yasson.defaultmapping.generics.model.ScalarValueWrapper;
+import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
+import sun.reflect.generics.tree.Tree;
 
 import javax.json.bind.Jsonb;
 import javax.json.bind.JsonbBuilder;
@@ -222,6 +224,34 @@ public class CollectionsTest {
         assertEquals("first", result.get(0));
         assertEquals(new BigDecimal("2.0"), ((Map)result.get(1)).get("radius"));
         assertEquals(new BigDecimal("1.0"), ((Map)result.get(1)).get("area"));
+    }
+
+    @Test
+    public void testNavigableMap() {
+        NavigableMap<String, String> map = new TreeMap<>();
+        map.put("first", "abc");
+        map.put("second", "def");
+        final String json = jsonb.toJson(map);
+        Assert.assertEquals("{\"first\":\"abc\",\"second\":\"def\"}", json);
+
+        NavigableMap<String, String> result = jsonb.fromJson(json, new TestTypeToken<NavigableMap<String, String>>() {}.getType());
+        Assert.assertEquals(TreeMap.class, result.getClass());
+        Assert.assertEquals("abc", result.get("first"));
+        Assert.assertEquals("def", result.get("second"));
+    }
+
+    @Test
+    public void testSortedMap() {
+        SortedMap<String, String> map = new TreeMap<>();
+        map.put("first", "abc");
+        map.put("second", "def");
+        final String json = jsonb.toJson(map);
+        Assert.assertEquals("{\"first\":\"abc\",\"second\":\"def\"}", json);
+
+        SortedMap<String, String> result = jsonb.fromJson(json, new TestTypeToken<SortedMap<String, String>>() {}.getType());
+        Assert.assertEquals(TreeMap.class, result.getClass());
+        Assert.assertEquals("abc", result.get("first"));
+        Assert.assertEquals("def", result.get("second"));
     }
 
 }
