@@ -13,6 +13,8 @@
 package org.eclipse.yasson.defaultmapping.specific;
 
 import org.eclipse.yasson.TestTypeToken;
+import org.eclipse.yasson.defaultmapping.specific.model.OptionalWrapper;
+import org.eclipse.yasson.defaultmapping.specific.model.Street;
 import org.eclipse.yasson.internal.JsonBindingBuilder;
 import org.eclipse.yasson.defaultmapping.generics.model.ScalarValueWrapper;
 import org.junit.Assert;
@@ -33,6 +35,31 @@ import static org.junit.Assert.assertEquals;
  * @author Dmitry Kornilov
  */
 public class OptionalTest {
+
+
+    @Test
+    public void testOptionalString() {
+        final Jsonb jsonb = (new JsonBindingBuilder()).build();
+        assertEquals("{\"value\":\"abc\"}", jsonb.toJson(new ScalarValueWrapper<>(Optional.of("abc"))));
+
+        ScalarValueWrapper<Optional> result = jsonb.fromJson("{\"value\":\"abc\"}", new TestTypeToken<ScalarValueWrapper<Optional>>() {}.getType());
+        assertEquals(Optional.of("abc"), result.getValue());
+    }
+
+    @Test
+    public void testOptionalObject() {
+        final Jsonb jsonb = (new JsonBindingBuilder()).build();
+        final OptionalWrapper optionalWrapper = new OptionalWrapper();
+        Street street = new Street("Xaveriova", 110);
+        optionalWrapper.setStreetOptional(Optional.of(street));
+
+        assertEquals("{\"streetOptional\":{\"name\":\"Xaveriova\",\"number\":110}}", jsonb.toJson(optionalWrapper));
+
+        OptionalWrapper result = jsonb.fromJson("{\"streetOptional\":{\"name\":\"Xaveriova\",\"number\":110}}", OptionalWrapper.class);
+        assertEquals("Xaveriova", result.getStreetOptional().get().getName());
+        assertEquals(Integer.valueOf(110), result.getStreetOptional().get().getNumber());
+    }
+
     @Test
     public void testMarshallOptional() {
         final Jsonb jsonb = (new JsonBindingBuilder()).build();
@@ -42,6 +69,9 @@ public class OptionalTest {
         assertEquals("{\"value\":10}", jsonb.toJson(new ScalarValueWrapper<>(OptionalInt.of(10))));
         assertEquals("{\"value\":100}", jsonb.toJson(new ScalarValueWrapper<>(OptionalLong.of(100L))));
         assertEquals("{\"value\":10.0}", jsonb.toJson(new ScalarValueWrapper<>(OptionalDouble.of(10.0D))));
+
+        final ScalarValueWrapper<OptionalInt> result = jsonb.fromJson("{\"value\":10}", new TestTypeToken<ScalarValueWrapper<OptionalInt>>() {}.getType());
+        assertEquals(OptionalInt.of(10), result.getValue());
     }
 
     @Test
@@ -49,6 +79,7 @@ public class OptionalTest {
         final Jsonb jsonb = (new JsonBindingBuilder()).build();
         assertEquals("{}", jsonb.toJson(new ScalarValueWrapper<>(Optional.empty())));
         assertEquals("{\"id\":1,\"name\":\"Cust1\"}", jsonb.toJson(Optional.of(new Customer(1, "Cust1"))));
+
     }
 
     @Test
@@ -57,6 +88,11 @@ public class OptionalTest {
 
         final OptionalInt[] array = {OptionalInt.of(1), OptionalInt.of(2), OptionalInt.empty()};
         assertEquals("[1,2,null]", jsonb.toJson(array));
+
+        OptionalInt[] result = jsonb.fromJson("[1,2,null]", new TestTypeToken<OptionalInt[]>() {}.getType());
+        assertEquals(1, result[0].getAsInt());
+        assertEquals(2, result[1].getAsInt());
+        assertEquals(OptionalInt.empty(), result[2]);
     }
 
     @Test
@@ -101,6 +137,7 @@ public class OptionalTest {
             Assert.assertEquals(Optional.empty(), item);
         }
     }
+
 
     public static class Customer {
         private int id;

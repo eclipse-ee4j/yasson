@@ -127,7 +127,7 @@ public abstract class AbstractContainerDeserializer<T> extends AbstractItem<T> i
     protected abstract JsonBindingModel getModel();
 
     protected DeserializerBuilder newUnmarshallerItemBuilder(JsonbContext ctx) {
-        return new DeserializerBuilder(ctx).withWrapper(this).withJsonValueType(JsonValueType.of(parserContext.getLastEvent()));
+        return new DeserializerBuilder(ctx).withWrapper(this).withJsonValueType(parserContext.getLastEvent());
     }
 
     protected JsonbDeserializer<?> newCollectionOrMapItem(Type valueType, JsonbContext ctx) {

@@ -22,6 +22,7 @@ import org.eclipse.yasson.internal.properties.MessageKeys;
 import org.eclipse.yasson.internal.properties.Messages;
 import org.eclipse.yasson.internal.serializer.AbstractValueTypeDeserializer;
 import org.eclipse.yasson.internal.serializer.DefaultSerializers;
+import org.eclipse.yasson.internal.serializer.OptionalObjectDeserializer;
 import org.eclipse.yasson.internal.serializer.SerializerProviderWrapper;
 import org.eclipse.yasson.model.PolymorphismAdapter;
 import org.eclipse.yasson.model.TypeWrapper;
@@ -30,9 +31,13 @@ import javax.json.JsonStructure;
 import javax.json.bind.JsonbException;
 import javax.json.bind.config.BinaryDataStrategy;
 import javax.json.bind.serializer.JsonbDeserializer;
+import javax.json.stream.JsonParser;
 import java.lang.reflect.GenericArrayType;
 import java.lang.reflect.Type;
+import java.math.BigDecimal;
+import java.util.ArrayList;
 import java.util.Collection;
+import java.util.HashMap;
 import java.util.Map;
 import java.util.Optional;
 
@@ -46,7 +51,7 @@ public class DeserializerBuilder extends AbstractSerializerBuilder<DeserializerB
     /**
      * Value type of JSON event.
      */
-    private JsonValueType jsonValueType;
+    private JsonParser.Event jsonEvent;
 
     /**
      * Creates a new builder.
@@ -60,11 +65,11 @@ public class DeserializerBuilder extends AbstractSerializerBuilder<DeserializerB
     /**
      * Sets value type.
      *
-     * @param valueType Value type to set.
+     * @param event last json event for constructed deserializer.
      * @return Updated object.
      */
-    public DeserializerBuilder withJsonValueType(JsonValueType valueType) {
-        this.jsonValueType = valueType;
+    public DeserializerBuilder withJsonValueType(JsonParser.Event event) {
+        this.jsonEvent = event;
         return this;
     }
 
@@ -96,6 +101,10 @@ public class DeserializerBuilder extends AbstractSerializerBuilder<DeserializerB
         });
         rawType = rawTypeOptional.orElse(rawType);
 
+        if (Optional.class == rawType) {
+            return new OptionalObjectDeserializer(this);
+        }
+
         //In case of Base64 json value would be string and recognition by JsonValueType would not work
         if (isByteArray(rawType)) {
             String strategy = jsonbContext.getBinaryDataStrategy();
@@ -107,8 +116,8 @@ public class DeserializerBuilder extends AbstractSerializerBuilder<DeserializerB
             }
         }
 
-        //Third deserializer is a supported value type that serializes to JSON_VALUE
-        if (isJsonValueType()) {
+        //Third deserializer is a supported value type to deserialize to JSON_VALUE
+        if (isJsonValueEvent()) {
             final Optional<AbstractValueTypeDeserializer<?>> supportedTypeDeserializer = getSupportedTypeDeserializer(rawType);
             if (!supportedTypeDeserializer.isPresent()) {
                 throw new JsonbException(Messages.getMessage(MessageKeys.DESERIALIZE_VALUE_ERROR, getRuntimeType()));
@@ -117,7 +126,7 @@ public class DeserializerBuilder extends AbstractSerializerBuilder<DeserializerB
         }
 
         JsonbDeserializer<?> deserializer;
-        if (jsonValueType == JsonValueType.ARRAY) {
+        if (jsonEvent == JsonParser.Event.START_ARRAY) {
             if (JsonStructure.class.isAssignableFrom(rawType)) {
                 return wrapAdapted(adapterInfoOptional, new JsonArrayDeserializer(this));
             } else if (rawType.isArray() || getRuntimeType() instanceof GenericArrayType) {
@@ -129,7 +138,7 @@ public class DeserializerBuilder extends AbstractSerializerBuilder<DeserializerB
             } else {
                 throw new JsonbException("Can't deserialize JSON array into: " + getRuntimeType());
             }
-        } else if(jsonValueType == JsonValueType.OBJECT) {
+        } else if(jsonEvent == JsonParser.Event.START_OBJECT) {
             if (JsonStructure.class.isAssignableFrom(rawType)) {
                 return wrapAdapted(adapterInfoOptional, new JsonObjectDeserializer(this));
             } else if (Map.class.isAssignableFrom(rawType)) {
@@ -156,18 +165,16 @@ public class DeserializerBuilder extends AbstractSerializerBuilder<DeserializerB
         throw new JsonbException("unresolved type for deserialization: " + getRuntimeType());
     }
 
-    private boolean isJsonValueType() {
-        switch (jsonValueType) {
-            case NULL:
-            case BOOLEAN:
-            case NUMBER:
-            case STRING:
+    private boolean isJsonValueEvent() {
+        switch (jsonEvent) {
+            case VALUE_NULL:
+            case VALUE_FALSE:
+            case VALUE_TRUE:
+            case VALUE_NUMBER:
+            case VALUE_STRING:
                 return true;
-            case OBJECT:
-            case ARRAY:
-                return false;
             default:
-                throw new JsonbException("Unknown value type: " + jsonValueType);
+                return false;
         }
     }
 
@@ -194,9 +201,24 @@ public class DeserializerBuilder extends AbstractSerializerBuilder<DeserializerB
 
     private Type resolveRuntimeType() {
         Type toResolve = genericType != null ? genericType : getModel().getType();
-        //Map Unknown objects to java.util.Map
+        //Try to infer best from JSON event.
         if (toResolve == Object.class) {
-            return jsonValueType.getConversionType();
+            switch (jsonEvent) {
+                case VALUE_FALSE:
+                case VALUE_TRUE:
+                    return Boolean.class;
+                case VALUE_NUMBER:
+                    return BigDecimal.class;
+                case VALUE_STRING:
+                    return String.class;
+                case START_ARRAY:
+                    return ArrayList.class;
+                case START_OBJECT:
+                    return HashMap.class;
+                    default:
+                        throw new IllegalStateException("Can't infer deserialization type type: " + jsonEvent);
+
+            }
         }
         return ReflectionUtils.resolveType(wrapper, toResolve);
     }
