@@ -19,6 +19,7 @@ import org.junit.Test;
 
 import javax.json.bind.Jsonb;
 import javax.json.bind.JsonbBuilder;
+import javax.json.bind.JsonbConfig;
 import javax.json.bind.JsonbException;
 import javax.json.bind.annotation.JsonbProperty;
 
@@ -86,7 +87,8 @@ public class JsonbTransientTest {
 
     @Test
     public void testTransientAcceptableAnnotationCombinationsDeserialization() throws Exception {
-        JsonbTransientAcceptableAnnotationCollision result = jsonb.fromJson(
+        Jsonb localJsonb = JsonbBuilder.create(new JsonbConfig().withFailOnUnknownProperties(false));
+        JsonbTransientAcceptableAnnotationCollision result = localJsonb.fromJson(
                 "{\"annotated_property_transient_setter\":\"Annotated property transient setter\"," +
                         "\"annotated_property_transient_getter\":\"Annotated property transient getter\"," +
                         "\"annotated_property_transient_getter_and_setter\":\"Annotated property transient getter and setter\"},",

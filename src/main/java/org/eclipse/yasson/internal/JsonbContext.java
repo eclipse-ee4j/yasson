@@ -271,20 +271,39 @@ public class JsonbContext {
 
     /**
      * Gets nullable from {@link JsonbConfig}.
+     * If true null values are serialized to json.
      *
      * @return Configured nullable
      */
     public boolean getConfigNullable() {
-        final Optional<Object> property = jsonbConfig.getProperty(JsonbConfig.NULL_VALUES);
+        return getBooleanConfigProperty(JsonbConfig.NULL_VALUES, false);
+    }
+
+    /**
+     * Gets unknown properties flag from {@link JsonbConfig}.
+     * If false, {@link JsonbException} is not thrown for deserialization, when json key
+     * cannot be mapped to class property.
+     *
+     * @return
+     *      {@link JsonbException} is risen on unknown property. Default is true even if
+     *      not set in json config.
+     */
+    public boolean getConfigFailOnUnknownProperties() {
+        return getBooleanConfigProperty(JsonbConfig.FAIL_ON_UNKNOWN_PROPERTIES, true);
+    }
+
+    private boolean getBooleanConfigProperty(String propertyName, boolean defaultValue) {
+        final Optional<Object> property = jsonbConfig.getProperty(propertyName);
         if (property.isPresent()) {
             final Object result = property.get();
             if (!(result instanceof Boolean)) {
-                throw new JsonbException(Messages.getMessage(MessageKeys.JSONB_CONFIG_PROPERTY_INVALID_TYPE, JsonbConfig.NULL_VALUES, Boolean.class.getSimpleName()));
+                throw new JsonbException(Messages.getMessage(MessageKeys.JSONB_CONFIG_PROPERTY_INVALID_TYPE, propertyName, Boolean.class.getSimpleName()));
             }
             return (boolean) result;
         }
-        return false;
+        return defaultValue;
     }
+
     /**
      * Gets instantiated shared config date formatter.
      *

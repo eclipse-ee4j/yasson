@@ -113,7 +113,7 @@ public class SerializersTest {
      */
     @Test
     public void testSerializerSerializationOfType() {
-        JsonbConfig config = new JsonbConfig().withSerializers(new CrateSerializer());
+        JsonbConfig config = new JsonbConfig().withSerializers(new CrateSerializer()).withFailOnUnknownProperties(false);
         Jsonb jsonb = JsonbBuilder.create(config);
         String expected = "{\"boxStr\":\"Box string\",\"crate\":{\"crateStr\":\"REPLACED crate str\",\"crateInner\":{\"crateInnerBigDec\":10,\"crate_inner_str\":\"Single inner\"},\"crateInnerList\":[{\"crateInnerBigDec\":10,\"crate_inner_str\":\"List inner 0\"},{\"crateInnerBigDec\":10,\"crate_inner_str\":\"List inner 1\"}],\"crateBigDec\":54321},\"secondBoxStr\":\"Second box string\"}";
         Box pojo = createPojo();

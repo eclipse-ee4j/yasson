@@ -35,6 +35,7 @@ import org.junit.Test;
 
 import javax.json.bind.Jsonb;
 import javax.json.bind.JsonbBuilder;
+import javax.json.bind.JsonbConfig;
 import java.lang.reflect.Type;
 import java.math.BigDecimal;
 import java.text.ParseException;
@@ -282,7 +283,8 @@ public class GenericsTest {
         String expected = "{\"boundedSet\":[3],\"lowerBoundedList\":[{\"radius\":2.5}],\"upperBoundedList\":[{\"radius\":3.5,\"color\":\"0,0,255\"}]}";
         assertEquals(expected, jsonb.toJson(boundedGenericClass));
 
-        BoundedGenericClass<HashSet<Integer>, Circle> result = jsonb.fromJson(expected,
+        Jsonb localJsonb = JsonbBuilder.create(new JsonbConfig().withFailOnUnknownProperties(false));
+        BoundedGenericClass<HashSet<Integer>, Circle> result = localJsonb.fromJson(expected,
                 new TestTypeToken<BoundedGenericClass<HashSet<Integer>, Circle>>(){}.getType());
         assertEquals(Circle.class, result.lowerBoundedList.get(0).getClass());
         assertEquals(Double.valueOf(2.5), ((Circle) result.lowerBoundedList.get(0)).getRadius());

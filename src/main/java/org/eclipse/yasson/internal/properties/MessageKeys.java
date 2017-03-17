@@ -69,7 +69,8 @@ public enum MessageKeys {
     PARSING_NUMBER("parsingNumber"),
     UNKNOWN_BINARY_DATA_STRATEGY("unknownBinaryDataStrategy"),
     PROPERTY_NAMING_STRATEGY_INVALID("invalidPropertyNamingStrategy"),
-    CREATOR_PARAMETER_NOT_ANNOTATED("creatorParameterNotAnnotated")
+    CREATOR_PARAMETER_NOT_ANNOTATED("creatorParameterNotAnnotated"),
+    UNKNOWN_JSON_PROPERTY("unknownJsonProperty")
     ;
 
     /** Message bundle key. */

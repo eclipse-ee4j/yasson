@@ -22,6 +22,7 @@ import org.junit.Test;
 
 import javax.json.bind.Jsonb;
 import javax.json.bind.JsonbBuilder;
+import javax.json.bind.JsonbConfig;
 import javax.json.bind.JsonbException;
 import java.lang.reflect.Type;
 import java.math.BigDecimal;
@@ -100,7 +101,7 @@ public class UnmarshallingUnsupportedTypesTest {
     public void testSupportedTypeAsObjectInJson() {
         //wrong, instant is wrapped with {}, unmarshalls to object.
         String json  = "{\"instant\":{\"instantWrongKey\":\"2015-12-28T14:57:00Z\"},\"optionalLong\":11}";
-        assertFail(json, SupportedTypes.class, "Can't create instance of a class: class java.time.Instant, No default constructor found.");
+        assertFail(json, SupportedTypes.class, "Json property instantWrongKey can not be mapped to a class class java.time.Instant");
     }
 
     @Test
@@ -117,10 +118,18 @@ public class UnmarshallingUnsupportedTypesTest {
         assertFail(json, SupportedTypes.class, "Can't deserialize JSON array into: class org.eclipse.yasson.defaultmapping.specific.model.SupportedTypes$NestedPojo");
     }
 
-    @Test
-    public void testMissingFieldInModel() {
+    @Test(expected = JsonbException.class)
+    public void testMissingFieldDefault() {
+        Jsonb defaultConfig = JsonbBuilder.create();
         String json  = "{\"nestedPojo\":{\"integerValue\":10,\"missingField\":5},\"optionalLong\":11}";
-        SupportedTypes result = jsonb.fromJson(json, SupportedTypes.class);
+        SupportedTypes result = defaultConfig.fromJson(json, SupportedTypes.class);
+    }
+
+    @Test()
+    public void testMissingFieldIgnored() {
+        Jsonb defaultConfig = JsonbBuilder.create(new JsonbConfig().withFailOnUnknownProperties(false));
+        String json  = "{\"nestedPojo\":{\"integerValue\":10,\"missingField\":5},\"optionalLong\":11}";
+        SupportedTypes result = defaultConfig.fromJson(json, SupportedTypes.class);
         assertEquals(Integer.valueOf(10), result.getNestedPojo().getIntegerValue());
         assertEquals(11, result.getOptionalLong().getAsLong());
     }
