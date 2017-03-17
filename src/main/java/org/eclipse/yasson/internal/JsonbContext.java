@@ -270,6 +270,22 @@ public class JsonbContext {
     }
 
     /**
+     * Gets nullable from {@link JsonbConfig}.
+     *
+     * @return Configured nullable
+     */
+    public boolean getConfigNullable() {
+        final Optional<Object> property = jsonbConfig.getProperty(JsonbConfig.NULL_VALUES);
+        if (property.isPresent()) {
+            final Object result = property.get();
+            if (!(result instanceof Boolean)) {
+                throw new JsonbException(Messages.getMessage(MessageKeys.JSONB_CONFIG_PROPERTY_INVALID_TYPE, JsonbConfig.NULL_VALUES, Boolean.class.getSimpleName()));
+            }
+            return (boolean) result;
+        }
+        return false;
+    }
+    /**
      * Gets instantiated shared config date formatter.
      *
      * @return Date formatter.

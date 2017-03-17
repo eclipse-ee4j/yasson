@@ -20,7 +20,11 @@ import org.eclipse.yasson.internal.properties.MessageKeys;
 import org.eclipse.yasson.internal.properties.Messages;
 import org.eclipse.yasson.internal.serializer.JsonbDateFormatter;
 import org.eclipse.yasson.internal.serializer.JsonbNumberFormatter;
-import org.eclipse.yasson.model.*;
+import org.eclipse.yasson.model.AnnotationTarget;
+import org.eclipse.yasson.model.CreatorParam;
+import org.eclipse.yasson.model.JsonbAnnotatedElement;
+import org.eclipse.yasson.model.JsonbCreator;
+import org.eclipse.yasson.model.Property;
 import org.eclipse.yasson.model.customization.ClassCustomization;
 import org.eclipse.yasson.model.customization.ClassCustomizationBuilder;
 
@@ -48,7 +52,22 @@ import java.lang.reflect.Modifier;
 import java.lang.reflect.Parameter;
 import java.time.format.DateTimeFormatter;
 import java.time.temporal.TemporalAccessor;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Calendar;
+import java.util.Date;
+import java.util.EnumSet;
+import java.util.HashMap;
+import java.util.HashSet;
+import java.util.LinkedHashSet;
+import java.util.LinkedList;
+import java.util.List;
+import java.util.Locale;
+import java.util.Map;
+import java.util.Objects;
+import java.util.Optional;
+import java.util.Queue;
+import java.util.Set;
 
 /**
  * Introspects configuration on classes and their properties by reading annotations.
@@ -249,7 +268,10 @@ public class AnnotationIntrospector {
      */
     public boolean isClassNillable(JsonbAnnotatedElement<Class<?>> clazzElement) {
         final JsonbNillable jsonbNillable = findAnnotation(clazzElement.getAnnotations(), JsonbNillable.class);
-        return jsonbNillable != null && jsonbNillable.value();
+        if (jsonbNillable != null) {
+            return jsonbNillable.value();
+        }
+        return jsonbContext.getConfigNullable();
     }
 
     /**

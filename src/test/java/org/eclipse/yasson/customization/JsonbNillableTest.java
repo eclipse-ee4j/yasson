@@ -20,11 +20,14 @@ import org.eclipse.yasson.customization.model.JsonbNillableOverridesInterface;
 import org.eclipse.yasson.customization.model.JsonbNillableValue;
 import org.eclipse.yasson.customization.model.packagelevelannotations.JsonbNillablePackageLevel;
 import org.eclipse.yasson.customization.model.packagelevelannotations.PackageLevelOverridenWithClassLevel;
+import org.eclipse.yasson.defaultmapping.generics.model.ScalarValueWrapper;
+import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
 
 import javax.json.bind.Jsonb;
 import javax.json.bind.JsonbBuilder;
+import javax.json.bind.JsonbConfig;
 
 import static org.junit.Assert.assertEquals;
 
@@ -81,6 +84,15 @@ public class JsonbNillableTest {
 
         JsonbNillableOverridesClass overridesClass = new JsonbNillableOverridesClass();
         assertEquals("{\"overridesNillableInParent\":null}", jsonb.toJson(overridesClass));
+    }
+
+    @Test
+    public void testNillableInConfig() {
+        JsonbConfig jsonbConfig = new JsonbConfig().withNullValues(true);
+        Jsonb jsonb = JsonbBuilder.create(jsonbConfig);
+
+        String jsonString = jsonb.toJson(new ScalarValueWrapper<String>(){});
+        Assert.assertEquals("{\"value\":null}", jsonString);
     }
 
 }
