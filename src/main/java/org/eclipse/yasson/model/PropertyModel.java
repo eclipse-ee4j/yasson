@@ -24,10 +24,7 @@ import org.eclipse.yasson.model.customization.PropertyCustomizationBuilder;
 import javax.json.bind.config.PropertyNamingStrategy;
 import javax.json.bind.serializer.JsonbSerializer;
 import java.lang.reflect.Type;
-import java.util.Map;
-import java.util.Objects;
-import java.util.Optional;
-import java.util.Set;
+import java.util.*;
 
 /**
  * A model for class property.
@@ -136,18 +133,37 @@ public class PropertyModel implements JsonBindingModel, Comparable<PropertyModel
         final AnnotationIntrospector introspector = jsonbContext.getAnnotationIntrospector();
         final PropertyCustomizationBuilder builder = new PropertyCustomizationBuilder();
         //drop all other annotations for transient properties
-        if (introspector.isTransient(property)) {
-            builder.setJsonbTransient(true);
-            return builder.buildPropertyCustomization();
+        EnumSet<AnnotationTarget> transientInfo = introspector.getJsonbTransientCategorized(property);
+        if (transientInfo.size() != 0) {
+            builder.setReadTransient(transientInfo.contains(AnnotationTarget.GETTER));
+            builder.setWriteTransient(transientInfo.contains(AnnotationTarget.SETTER));
+
+            if (transientInfo.contains(AnnotationTarget.PROPERTY)) {
+                if(!transientInfo.contains(AnnotationTarget.GETTER)){
+                    builder.setReadTransient(true);
+                }
+                if(!transientInfo.contains(AnnotationTarget.SETTER)){
+                    builder.setWriteTransient(true);
+                }
+            }
         }
-        builder.setJsonReadName(introspector.getJsonbPropertyJsonReadName(property));
-        builder.setJsonWriteName(introspector.getJsonbPropertyJsonWriteName(property));
-        builder.setNillable(classModel.getClassCustomization().isNillable() || introspector.isPropertyNillable(property));
+
+        if(!builder.isReadTransient()){
+            builder.setJsonWriteName(introspector.getJsonbPropertyJsonWriteName(property));
+            builder.setNillable(classModel.getClassCustomization().isNillable() || introspector.isPropertyNillable(property));
+            builder.setSerializerBinding(getUserSerializerBinding(property, jsonbContext));
+        }
+
+        if(!builder.isWriteTransient()){
+            builder.setJsonReadName(introspector.getJsonbPropertyJsonReadName(property));
+            builder.setDeserializerBinding(introspector.getDeserializerBinding(property));
+        }
+
         builder.setAdapterInfo(getUserAdapterBinding(property, jsonbContext));
-        builder.setSerializerBinding(getUserSerializerBinding(property, jsonbContext));
-        builder.setDeserializerBinding(introspector.getDeserializerBinding(property));
+
         introspectDateFormatter(property, introspector, builder);
         introspectNumberFormatter(property, introspector, builder);
+
         return builder.buildPropertyCustomization();
     }
 
@@ -157,24 +173,29 @@ public class PropertyModel implements JsonBindingModel, Comparable<PropertyModel
          * If @JsonbDateFormat is placed on setter implementation must use this format on deserialization.
          * If @JsonbDateFormat is placed on field implementation must use this format on serialization and deserialization.
          *
-         * Priority from high to low is getter / settrer > field > class > package > global configuration
+         * Priority from high to low is getter / setter > field > class > package > global configuration
          */
         Map<AnnotationTarget, JsonbDateFormatter> jsonDateFormatCategorized = introspector.getJsonbDateFormatCategorized(property);
         Set<AnnotationTarget> annotationTargets = jsonDateFormatCategorized.keySet();
-        if(annotationTargets.contains(AnnotationTarget.GETTER)){
-            builder.setSerializeDateFormatter(jsonDateFormatCategorized.get(AnnotationTarget.GETTER));
-        } else if(annotationTargets.contains(AnnotationTarget.PROPERTY)){
-            builder.setSerializeDateFormatter(jsonDateFormatCategorized.get(AnnotationTarget.PROPERTY));
-        } else if(annotationTargets.contains(AnnotationTarget.CLASS)){
-            builder.setSerializeDateFormatter(jsonDateFormatCategorized.get(AnnotationTarget.CLASS));
+
+        if(!builder.isReadTransient()){
+            if(annotationTargets.contains(AnnotationTarget.GETTER)){
+                builder.setSerializeDateFormatter(jsonDateFormatCategorized.get(AnnotationTarget.GETTER));
+            } else if(annotationTargets.contains(AnnotationTarget.PROPERTY)){
+                builder.setSerializeDateFormatter(jsonDateFormatCategorized.get(AnnotationTarget.PROPERTY));
+            } else if(annotationTargets.contains(AnnotationTarget.CLASS)){
+                builder.setSerializeDateFormatter(jsonDateFormatCategorized.get(AnnotationTarget.CLASS));
+            }
         }
 
-        if(annotationTargets.contains(AnnotationTarget.SETTER)){
-            builder.setDeserializeDateFormatter(jsonDateFormatCategorized.get(AnnotationTarget.SETTER));
-        } else if(annotationTargets.contains(AnnotationTarget.PROPERTY)){
-            builder.setDeserializeDateFormatter(jsonDateFormatCategorized.get(AnnotationTarget.PROPERTY));
-        } else if(annotationTargets.contains(AnnotationTarget.CLASS)){
-            builder.setDeserializeDateFormatter(jsonDateFormatCategorized.get(AnnotationTarget.CLASS));
+        if(!builder.isWriteTransient()){
+            if(annotationTargets.contains(AnnotationTarget.SETTER)){
+                builder.setDeserializeDateFormatter(jsonDateFormatCategorized.get(AnnotationTarget.SETTER));
+            } else if(annotationTargets.contains(AnnotationTarget.PROPERTY)){
+                builder.setDeserializeDateFormatter(jsonDateFormatCategorized.get(AnnotationTarget.PROPERTY));
+            } else if(annotationTargets.contains(AnnotationTarget.CLASS)){
+                builder.setDeserializeDateFormatter(jsonDateFormatCategorized.get(AnnotationTarget.CLASS));
+            }
         }
     }
 
@@ -184,24 +205,29 @@ public class PropertyModel implements JsonBindingModel, Comparable<PropertyModel
          * If @JsonbNumberFormat is placed on setter implementation must use this format on deserialization.
          * If @JsonbNumberFormat is placed on field implementation must use this format on serialization and deserialization.
          *
-         * Priority from high to low is getter / settrer > field > class > package > global configuration
+         * Priority from high to low is getter / setter > field > class > package > global configuration
          */
         Map<AnnotationTarget, JsonbNumberFormatter> jsonNumberFormatCategorized = introspector.getJsonNumberFormatter(property);
         Set<AnnotationTarget> annotationTargets = jsonNumberFormatCategorized.keySet();
-        if(annotationTargets.contains(AnnotationTarget.GETTER)){
-            builder.setSerializeNumberFormatter(jsonNumberFormatCategorized.get(AnnotationTarget.GETTER));
-        } else if(annotationTargets.contains(AnnotationTarget.PROPERTY)){
-            builder.setSerializeNumberFormatter(jsonNumberFormatCategorized.get(AnnotationTarget.PROPERTY));
-        } else if(annotationTargets.contains(AnnotationTarget.CLASS)){
-            builder.setSerializeNumberFormatter(jsonNumberFormatCategorized.get(AnnotationTarget.CLASS));
+
+        if(!builder.isReadTransient()){
+            if(annotationTargets.contains(AnnotationTarget.GETTER)){
+                builder.setSerializeNumberFormatter(jsonNumberFormatCategorized.get(AnnotationTarget.GETTER));
+            } else if(annotationTargets.contains(AnnotationTarget.PROPERTY)){
+                builder.setSerializeNumberFormatter(jsonNumberFormatCategorized.get(AnnotationTarget.PROPERTY));
+            } else if(annotationTargets.contains(AnnotationTarget.CLASS)){
+                builder.setSerializeNumberFormatter(jsonNumberFormatCategorized.get(AnnotationTarget.CLASS));
+            }
         }
 
-        if(annotationTargets.contains(AnnotationTarget.SETTER)){
-            builder.setDeserializeNumberFormatter(jsonNumberFormatCategorized.get(AnnotationTarget.SETTER));
-        } else if(annotationTargets.contains(AnnotationTarget.PROPERTY)){
-            builder.setDeserializeNumberFormatter(jsonNumberFormatCategorized.get(AnnotationTarget.PROPERTY));
-        } else if(annotationTargets.contains(AnnotationTarget.CLASS)){
-            builder.setDeserializeNumberFormatter(jsonNumberFormatCategorized.get(AnnotationTarget.CLASS));
+        if(!builder.isWriteTransient()){
+            if(annotationTargets.contains(AnnotationTarget.SETTER)){
+                builder.setDeserializeNumberFormatter(jsonNumberFormatCategorized.get(AnnotationTarget.SETTER));
+            } else if(annotationTargets.contains(AnnotationTarget.PROPERTY)){
+                builder.setDeserializeNumberFormatter(jsonNumberFormatCategorized.get(AnnotationTarget.PROPERTY));
+            } else if(annotationTargets.contains(AnnotationTarget.CLASS)){
+                builder.setDeserializeNumberFormatter(jsonNumberFormatCategorized.get(AnnotationTarget.CLASS));
+            }
         }
     }
 
@@ -213,7 +239,7 @@ public class PropertyModel implements JsonBindingModel, Comparable<PropertyModel
      */
     public Object getValue(Object object) {
         if (!isReadable()) {
-            //nulls are omitted in produced JSON, unless overriden
+            //nulls are omitted in produced JSON, unless overridden
             return null;
         }
         return propagation.getValue(object);
@@ -239,7 +265,7 @@ public class PropertyModel implements JsonBindingModel, Comparable<PropertyModel
      * @return true if can be serialized to JSON
      */
     public boolean isReadable() {
-        return !customization.isJsonbTransient() && propagation.isReadable();
+        return !customization.isReadTransient() && propagation.isReadable();
     }
 
     /**
@@ -247,7 +273,7 @@ public class PropertyModel implements JsonBindingModel, Comparable<PropertyModel
      * @return true if can be deserialized from JSON
      */
     public boolean isWritable() {
-        return !customization.isJsonbTransient() && propagation.isWritable();
+        return !customization.isWriteTransient() && propagation.isWritable();
     }
 
     /**

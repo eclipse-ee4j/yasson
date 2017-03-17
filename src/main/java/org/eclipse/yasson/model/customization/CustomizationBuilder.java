@@ -27,8 +27,6 @@ public abstract class CustomizationBuilder {
 
     private boolean nillable;
 
-    private boolean jsonbTransient;
-
     private AdapterBinding adapterInfo;
 
     private SerializerBinding serializerBinding;
@@ -55,24 +53,6 @@ public abstract class CustomizationBuilder {
      */
     public void setNillable(boolean nillable) {
         this.nillable = nillable;
-    }
-
-    /**
-     * Returns true if <i>transient</i> customization is present.
-     *
-     * @return True if <i>transient</i> customization is present.
-     */
-    public boolean isJsonbTransient() {
-        return jsonbTransient;
-    }
-
-    /**
-     * Sets a presence of <i>transient</i> customization.
-     *
-     * @param jsonbTransient Presence of <i>transient</i> customization.
-     */
-    public void setJsonbTransient(boolean jsonbTransient) {
-        this.jsonbTransient = jsonbTransient;
     }
 
     /**

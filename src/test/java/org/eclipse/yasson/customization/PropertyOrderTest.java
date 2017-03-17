@@ -18,7 +18,6 @@ import org.eclipse.yasson.customization.model.FieldCustomOrderWrapper;
 import org.eclipse.yasson.customization.model.FieldOrder;
 import org.eclipse.yasson.customization.model.FieldOrderNameAnnotation;
 import org.eclipse.yasson.customization.model.FieldSpecificOrder;
-import org.eclipse.yasson.customization.model.JsonbTransientValue;
 import org.eclipse.yasson.customization.model.RenamedPropertiesContainer;
 import org.junit.Assert;
 import org.junit.Test;
@@ -34,16 +33,6 @@ import static org.junit.Assert.assertEquals;
  * @author Roman Grigoriadi
  */
 public class PropertyOrderTest {
-
-    @Test
-    public void testOrderingWithTransientField() {
-        Jsonb jsonb = JsonbBuilder.create(new JsonbConfig().withPropertyOrderStrategy(PropertyOrderStrategy.LEXICOGRAPHICAL));
-
-        final JsonbTransientValue pojo = new JsonbTransientValue();
-        pojo.setProperty("propertyValue");
-        String result = jsonb.toJson(pojo);
-        System.out.println("result = " + result);
-    }
 
     @Test
     public void testPropertySorting() {

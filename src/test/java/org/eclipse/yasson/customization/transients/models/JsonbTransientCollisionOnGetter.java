@@ -11,7 +11,7 @@
  * Roman Grigoriadi
  ******************************************************************************/
 
-package org.eclipse.yasson.customization.model;
+package org.eclipse.yasson.customization.transients.models;
 
 import javax.json.bind.annotation.JsonbProperty;
 import javax.json.bind.annotation.JsonbTransient;
@@ -19,17 +19,17 @@ import javax.json.bind.annotation.JsonbTransient;
 /**
  * @author Roman Grigoriadi
  */
-public class JsonbTransientCollision {
+public class JsonbTransientCollisionOnGetter {
 
-    @JsonbProperty("collision")
-    private String transientAnnotated1;
+    private String transientProperty;
 
     @JsonbTransient
-    public String getTransientAnnotated1() {
-        return transientAnnotated1;
+    @JsonbProperty("custom_name")
+    public String getTransientProperty() {
+        return transientProperty;
     }
 
-    public void setTransientAnnotated1(String transientAnnotated1) {
-        this.transientAnnotated1 = transientAnnotated1;
+    public void setTransientProperty(String transientProperty) {
+        this.transientProperty = transientProperty;
     }
 }

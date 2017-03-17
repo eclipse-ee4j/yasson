@@ -35,6 +35,9 @@ public class PropertyCustomization extends Customization {
 
     private final JsonbDateFormatter deserializeDateFormatter;
 
+    private boolean readTransient;
+
+    private boolean writeTransient;
 
     /**
      * Copies properties from builder an creates immutable instance.
@@ -48,6 +51,8 @@ public class PropertyCustomization extends Customization {
         this.deserializeNumberFormatter = builder.getDeserializeNumberFormatter();
         this.serializeDateFormatter = builder.getSerializeDateFormatter();
         this.deserializeDateFormatter = builder.getDeserializeDateFormatter();
+        this.readTransient = builder.isReadTransient();
+        this.writeTransient = builder.isWriteTransient();
     }
 
     /**
@@ -84,5 +89,15 @@ public class PropertyCustomization extends Customization {
     @Override
     public JsonbDateFormatter getDeserializeDateFormatter() {
         return deserializeDateFormatter;
+    }
+
+    @Override
+    public boolean isReadTransient() {
+        return readTransient;
+    }
+
+    @Override
+    public boolean isWriteTransient() {
+        return writeTransient;
     }
 }

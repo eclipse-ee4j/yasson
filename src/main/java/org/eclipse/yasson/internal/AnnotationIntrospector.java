@@ -264,26 +264,39 @@ public class AnnotationIntrospector {
     }
 
     /**
-     * Checks if property is annotated transient.
-     * If JsonbTransient annotation is present on field getter or setter, and other annotation is present on either
-     * of it, JsonbException is thrown with message describing collision.
+     * Checks if property is annotated transient. If JsonbTransient annotation is present on field getter or setter, and other annotation is present
+     * on either of it, JsonbException is thrown with message describing collision.
      *
-     * @param property not null
-     * @return JsonbTransient annotation is found on field, getter of setter of a property
+     * @param property  The property to inspect if there is any {@link JsonbTransient} annotation defined for it
+     * @return  Set of {@link AnnotationTarget}s specifying in which scope the {@link JsonbTransient} is applied
      */
-    public boolean isTransient(Property property) {
+    public EnumSet<AnnotationTarget> getJsonbTransientCategorized(Property property) {
         Objects.requireNonNull(property);
-        final Optional<JsonbTransient> jsonbTransient = getAnnotationFromProperty(JsonbTransient.class, property);
-        if (jsonbTransient.isPresent()) {
-            final Class[] FORBIDDEN_ANNOTATIONS = new Class[]{JsonbProperty.class, JsonbNillable.class, JsonbCreator.class, JsonbDateFormat.class, JsonbNumberFormat.class, JsonbPropertyOrder.class, JsonbVisibility.class};
-            for (Class annotClass : FORBIDDEN_ANNOTATIONS) {
-                if (getAnnotationFromProperty(annotClass, property).isPresent()) {
-                    throw new JsonbException(String.format("JsonbTransient annotation collides with %s for property %s", annotClass, property.getName()));
+        EnumSet<AnnotationTarget> transientTarget = EnumSet.noneOf(AnnotationTarget.class);
+        Map<AnnotationTarget, JsonbTransient> annotationFromPropertyCategorized = getAnnotationFromPropertyCategorized(JsonbTransient.class, property);
+        if (annotationFromPropertyCategorized.size() > 0) {
+            final Class[] FORBIDDEN_ANNOTATIONS = new Class[]{JsonbProperty.class, JsonbNillable.class, JsonbCreator.class, JsonbDateFormat.class,
+                    JsonbNumberFormat.class, JsonbPropertyOrder.class, JsonbVisibility.class};
+
+            annotationFromPropertyCategorized.forEach((target, annotation) -> {
+                for (Class forbiddenAnnotation : FORBIDDEN_ANNOTATIONS) {
+                    Map forbiddenAnnotationOccurrence = getAnnotationFromPropertyCategorized(forbiddenAnnotation, property);
+                    if((forbiddenAnnotationOccurrence.size() > 0) && annotationFromPropertyCategorized.containsKey(AnnotationTarget.PROPERTY)){
+                        //  JsonbTransient is defined on property and its getter/setter has one of forbidden annotations
+                        throw new JsonbException(String.format("JsonbTransient annotation collides with %s for property %s", forbiddenAnnotation, property.getName()));
+                    } else if (forbiddenAnnotationOccurrence.containsKey(target)) {
+                        //  TODO: Clarify the message
+                        //  Conflicting annotation defined at the same scope of the JsonbTransient (both are on getter or setter)
+                        throw new JsonbException(String.format("JsonbTransient annotation collides with %s for property %s", forbiddenAnnotation, property.getName()));
+                    }
                 }
-            }
-            return true;
+            });
+
+            transientTarget.addAll(annotationFromPropertyCategorized.keySet());
+            return transientTarget;
         }
-        return false;
+
+        return transientTarget;
     }
 
     /**
