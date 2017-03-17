@@ -17,6 +17,7 @@ import org.eclipse.yasson.internal.Marshaller;
 import org.eclipse.yasson.model.JsonBindingModel;
 
 import javax.json.stream.JsonGenerator;
+import java.math.BigDecimal;
 
 /**
  * Serializer for {@link Number} type.
@@ -36,11 +37,11 @@ public class NumberTypeSerializer extends AbstractValueTypeSerializer<Number> {
 
     @Override
     protected void serialize(Number obj, JsonGenerator generator, String key, Marshaller marshaller) {
-        generator.write(key, obj.doubleValue());
+        generator.write(key, new BigDecimal(String.valueOf(obj)));
     }
 
     @Override
     protected void serialize(Number obj, JsonGenerator generator, Marshaller marshaller) {
-        generator.write(obj.doubleValue());
+        generator.write(new BigDecimal(String.valueOf(obj)));
     }
 }

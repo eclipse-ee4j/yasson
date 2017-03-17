@@ -42,4 +42,10 @@ public class NumberTest {
         ScalarValueWrapper<BigDecimal> result = jsonb.fromJson("{\"value\":0.10000000000000001}", new TestTypeToken<ScalarValueWrapper<BigDecimal>>(){}.getType());
         Assert.assertEquals(new BigDecimal("0.10000000000000001"), result.getValue());
     }
+
+    @Test
+    public void testBigDecimalCastedToNumber() {
+        String jsonString = jsonb.toJson(new Object() { public Number number = new BigDecimal("0.10000000000000001"); });
+        Assert.assertEquals("{\"number\":0.10000000000000001}", jsonString);
+    }
 }
