@@ -28,6 +28,7 @@ import org.eclipse.yasson.model.PolymorphismAdapter;
 import org.eclipse.yasson.model.TypeWrapper;
 
 import javax.json.JsonStructure;
+import javax.json.JsonValue;
 import javax.json.bind.JsonbException;
 import javax.json.bind.config.BinaryDataStrategy;
 import javax.json.bind.serializer.JsonbDeserializer;
@@ -139,7 +140,7 @@ public class DeserializerBuilder extends AbstractSerializerBuilder<DeserializerB
                 throw new JsonbException("Can't deserialize JSON array into: " + getRuntimeType());
             }
         } else if(jsonEvent == JsonParser.Event.START_OBJECT) {
-            if (JsonStructure.class.isAssignableFrom(rawType)) {
+            if (JsonValue.class.isAssignableFrom(rawType)) {
                 return wrapAdapted(adapterInfoOptional, new JsonObjectDeserializer(this));
             } else if (Map.class.isAssignableFrom(rawType)) {
                 final JsonbDeserializer<?> mapDeserializer = new MapDeserializer(this);

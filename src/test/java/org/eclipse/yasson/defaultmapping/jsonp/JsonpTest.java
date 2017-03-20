@@ -45,6 +45,9 @@ public class JsonpTest {
         public JsonValueWrapper(JsonValue jsonValue) {
             this.jsonValue = jsonValue;
         }
+
+        public JsonValueWrapper() {
+        }
     }
 
     @Test
@@ -181,6 +184,12 @@ public class JsonpTest {
         JsonArray result = jsonb.fromJson(expected, JsonArray.class);
 
         assertEquals(arr, result);
+    }
+
+    @Test
+    public void testJsonObjectAsValue() {
+        final JsonValueWrapper jsonValueWrapper = jsonb.fromJson("{ \"jsonValue\" : { \"stringInstance\" : \"Test String\" } }", JsonValueWrapper.class);
+        assertEquals("Test String", ((JsonObject) jsonValueWrapper.jsonValue).getString("stringInstance"));
     }
 
 }
