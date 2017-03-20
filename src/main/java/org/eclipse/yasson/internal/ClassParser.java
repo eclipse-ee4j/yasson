@@ -40,8 +40,6 @@ class ClassParser {
 
     public static final String SET_PREFIX = "set";
 
-    public static final String GENERATED_PREFIX = "this$";
-
     private final JsonbContext jsonbContext;
 
     ClassParser(JsonbContext jsonbContext) {
@@ -145,7 +143,7 @@ class ClassParser {
     private void parseFields(JsonbAnnotatedElement<Class<?>> classElement, Map<String, Property> classProperties) {
         for (Field field : classElement.getElement().getDeclaredFields()) {
             final String name = field.getName();
-            if (field.getName().startsWith(GENERATED_PREFIX)) {
+            if (field.isSynthetic()) {
                 continue;
             }
             final Property property = new Property(name, classElement);
