@@ -31,7 +31,7 @@ public abstract class AbstractValueTypeDeserializer<T> implements JsonbDeseriali
 
     private final Class<T> clazz;
 
-    protected final JsonBindingModel model;
+    private final JsonBindingModel model;
 
     /**
      * Creates a new instance.
@@ -73,4 +73,8 @@ public abstract class AbstractValueTypeDeserializer<T> implements JsonbDeseriali
      * @return Deserialized object.
      */
     protected abstract T deserialize(String jsonValue, Unmarshaller unmarshaller, Type rtType);
+
+    protected JsonBindingModel getModel() {
+        return model;
+    }
 }

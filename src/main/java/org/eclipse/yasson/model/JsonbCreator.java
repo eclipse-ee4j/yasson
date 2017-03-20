@@ -61,7 +61,7 @@ public class JsonbCreator {
                 return (T) ((Method) executable).invoke(on, params);
             }
         } catch (IllegalAccessException | InvocationTargetException | InstantiationException e) {
-            throw new JsonbException(Messages.getMessage(MessageKeys.ERROR_CALLING_JSONB_CREATOR), e);
+            throw new JsonbException(Messages.getMessage(MessageKeys.ERROR_CALLING_JSONB_CREATOR, on), e);
         }
     }
 

@@ -137,7 +137,7 @@ public abstract class PropertyValuePropagation {
     }
 
     private boolean isVisible(Method method, JsonbContext ctx) {
-        if (method == null) {
+        if (method == null || Modifier.isStatic(method.getModifiers())) {
             return false;
         }
         return isVisible(strategy -> strategy.isVisible(method), method.getDeclaringClass(), ctx)

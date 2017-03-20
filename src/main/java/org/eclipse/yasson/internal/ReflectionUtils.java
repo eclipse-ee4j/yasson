@@ -190,7 +190,6 @@ public class ReflectionUtils {
         Objects.requireNonNull(clazz);
         try {
             final Constructor<T> declaredConstructor = clazz.getDeclaredConstructor();
-            declaredConstructor.setAccessible(true);
             return declaredConstructor.newInstance();
         } catch (InstantiationException | IllegalAccessException | InvocationTargetException e) {
             throw new JsonbException("Can't create instance", e);

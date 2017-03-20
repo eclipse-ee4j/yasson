@@ -44,19 +44,20 @@ public abstract class AbstractNumberDeserializer<T extends Number> extends Abstr
     }
 
     protected final Optional<Number> deserializeForamtted(String jsonValue, boolean integerOnly, JsonbContext jsonbContext) {
-        final Customization customization = model.getCustomization();
-        if (customization != null && customization.getDeserializeNumberFormatter() != null) {
-            final JsonbNumberFormatter numberFormat = customization.getDeserializeNumberFormatter();
-            //TODO perf consider synchronizing on format instance or per thread cache.
-            final NumberFormat format = NumberFormat.getInstance(jsonbContext.getLocale(numberFormat.getLocale()));
-            ((DecimalFormat)format).applyPattern(numberFormat.getFormat());
-            format.setParseIntegerOnly(integerOnly);
-            try {
-                return Optional.of(format.parse(jsonValue));
-            } catch (ParseException e) {
-                throw new JsonbException(Messages.getMessage(MessageKeys.PARSING_NUMBER, jsonValue, numberFormat.getFormat()));
-            }
+        if (getModel() == null || getModel().getCustomization() == null
+                || getModel().getCustomization().getDeserializeNumberFormatter() == null) {
+            return Optional.empty();
         }
-        return Optional.empty();
+
+        final JsonbNumberFormatter numberFormat = getModel().getCustomization().getDeserializeNumberFormatter();
+        //TODO perf consider synchronizing on format instance or per thread cache.
+        final NumberFormat format = NumberFormat.getInstance(jsonbContext.getLocale(numberFormat.getLocale()));
+        ((DecimalFormat)format).applyPattern(numberFormat.getFormat());
+        format.setParseIntegerOnly(integerOnly);
+        try {
+            return Optional.of(format.parse(jsonValue));
+        } catch (ParseException e) {
+            throw new JsonbException(Messages.getMessage(MessageKeys.PARSING_NUMBER, jsonValue, numberFormat.getFormat()));
+        }
     }
 }

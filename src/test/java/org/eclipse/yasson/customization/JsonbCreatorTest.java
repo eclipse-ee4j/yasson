@@ -17,6 +17,7 @@ import org.eclipse.yasson.customization.model.CreatorConstructorPojo;
 import org.eclipse.yasson.customization.model.CreatorFactoryMethodPojo;
 import org.eclipse.yasson.customization.model.CreatorIncompatibleTypePojo;
 import org.eclipse.yasson.customization.model.CreatorMultipleDeclarationErrorPojo;
+import org.eclipse.yasson.customization.model.CreatorPackagePrivateConstructor;
 import org.eclipse.yasson.customization.model.CreatorWithoutJavabeanProperty;
 import org.eclipse.yasson.customization.model.CreatorWithoutJsonbProperty;
 import org.eclipse.yasson.customization.model.CreatorWithoutJsonbProperty1;
@@ -108,5 +109,12 @@ public class JsonbCreatorTest {
         final CreatorWithoutJavabeanProperty result = JsonbBuilder.create().fromJson("{\"s1\":\"abc\", \"s2\":\"def\"}", CreatorWithoutJavabeanProperty.class);
         Assert.assertEquals("abcdef", result.getStrField());
 
+    }
+
+    @Test(expected = JsonbException.class)
+    public void testPackagePrivateCreator() {
+        final CreatorPackagePrivateConstructor result = JsonbBuilder.create().fromJson(
+                "{\"strVal\":\"abc\", \"intVal\":5}", CreatorPackagePrivateConstructor.class);
+        System.out.println("result = " + result);
     }
 }
