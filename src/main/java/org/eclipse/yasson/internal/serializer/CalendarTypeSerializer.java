@@ -55,16 +55,18 @@ public class CalendarTypeSerializer extends AbstractValueTypeSerializer<Calendar
             return String.valueOf(object.getTime().getTime());
         }
 
-        Locale locale = jsonbContext.getLocale(formatter.getLocale());
+        Locale locale = jsonbContext.getConfigProperties().getLocale(formatter.getLocale());
         if (JsonbDateFormat.DEFAULT_FORMAT.equals(formatter.getFormat())) {
+
             final Optional<Object> strictJson =
                     jsonbContext.getConfig().getProperty(JsonbConfig.STRICT_IJSON);
+            if (strictJson.isPresent() && (Boolean) strictJson.get()) {
+                ZonedDateTime zdt = ZonedDateTime.ofInstant(object.toInstant(), object.getTimeZone().toZoneId());
+                return JsonbDateFormatter.IJSON_DATE_FORMATTER.format(zdt);
+            }
 
             //Use ISO_DATE_TIME, convert to java.time first
-            //TODO PERF subject to reconsider if conversion between java.time and java.util outweights threadsafe java.time formatter.
-            if (strictJson.isPresent() && (Boolean) strictJson.get()
-                    || object.isSet(Calendar.HOUR) || object.isSet(Calendar.HOUR_OF_DAY)) {
-
+            if (object.isSet(Calendar.HOUR) || object.isSet(Calendar.HOUR_OF_DAY)) {
                 ZonedDateTime zdt = ZonedDateTime.ofInstant(object.toInstant(), object.getTimeZone().toZoneId());
                 return DateTimeFormatter.ISO_DATE_TIME.withLocale(locale).format(zdt);
             }

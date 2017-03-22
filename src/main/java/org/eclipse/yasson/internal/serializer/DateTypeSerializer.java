@@ -46,7 +46,7 @@ public class DateTypeSerializer extends AbstractValueTypeSerializer<Date> {
         if (JsonbDateFormat.TIME_IN_MILLIS.equals(formatter.getFormat())) {
             return String.valueOf(object.getTime());
         }
-        Locale locale = jsonbContext.getLocale(formatter.getLocale());
+        Locale locale = jsonbContext.getConfigProperties().getLocale(formatter.getLocale());
         return getDateFormat(formatter, locale).format(object);
     }
 

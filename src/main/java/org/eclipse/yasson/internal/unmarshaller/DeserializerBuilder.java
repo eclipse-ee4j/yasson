@@ -108,7 +108,7 @@ public class DeserializerBuilder extends AbstractSerializerBuilder<DeserializerB
 
         //In case of Base64 json value would be string and recognition by JsonValueType would not work
         if (isByteArray(rawType)) {
-            String strategy = jsonbContext.getBinaryDataStrategy();
+            String strategy = jsonbContext.getConfigProperties().getBinaryDataStrategy();
             switch (strategy) {
                 case BinaryDataStrategy.BYTE:
                     return new ByteArrayDeserializer(this);

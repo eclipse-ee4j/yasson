@@ -271,7 +271,7 @@ public class AnnotationIntrospector {
         if (jsonbNillable != null) {
             return jsonbNillable.value();
         }
-        return jsonbContext.getConfigNullable();
+        return jsonbContext.getConfigProperties().getConfigNullable();
     }
 
     /**

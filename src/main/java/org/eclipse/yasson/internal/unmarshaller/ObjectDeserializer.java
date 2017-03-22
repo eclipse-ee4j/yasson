@@ -173,7 +173,7 @@ class ObjectDeserializer<T> extends AbstractContainerDeserializer<T> {
      * Rise an exception, or ignore JSON property, which is missing in class model.
      */
     private void skipJsonProperty(JsonbParser parser, JsonbContext jsonbContext) {
-        if (jsonbContext.getConfigFailOnUnknownProperties()) {
+        if (jsonbContext.getConfigProperties().getConfigFailOnUnknownProperties()) {
             throw new JsonbException(Messages.getMessage(MessageKeys.UNKNOWN_JSON_PROPERTY, parserContext.getLastKeyName(), getRuntimeType()));
         }
         parser.skipJsonStructure();

@@ -64,7 +64,7 @@ class ClassParser {
             unsorted.put(entry.getKey(), new PropertyModel(classModel, entry.getValue(), jsonbContext));
         }
 
-        sortedProperties.addAll(jsonbContext.getPropertyOrdering().orderProperties(unsorted, classModel));
+        sortedProperties.addAll(jsonbContext.getConfigProperties().getPropertyOrdering().orderProperties(unsorted, classModel));
 
         checkPropertyNameClash(sortedProperties, classModel.getType());
         classModel.setProperties(sortedProperties);

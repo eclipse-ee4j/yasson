@@ -67,7 +67,7 @@ public abstract class AbstractDateTimeSerializer<T extends TemporalAccessor> ext
         } else if (formatter.getDateTimeFormatter() != null) {
             return formatter.getDateTimeFormatter().format(object);
         }
-        return formatDefault(object, jsonbContext.getLocale(formatter.getLocale()));
+        return formatDefault(object, jsonbContext.getConfigProperties().getLocale(formatter.getLocale()));
     }
 
     /**

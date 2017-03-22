@@ -88,7 +88,7 @@ public class CalendarTypeDeserializer extends AbstractValueTypeDeserializer<Cale
             return result;
         }
 
-        Locale locale = jsonbContext.getLocale(formatter.getLocale());
+        Locale locale = jsonbContext.getConfigProperties().getLocale(formatter.getLocale());
         if (JsonbDateFormat.DEFAULT_FORMAT.equals(format)) {
             final boolean timed = jsonValue.contains("T");
             if (timed) {

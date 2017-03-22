@@ -42,7 +42,7 @@ public class ByteArrayBase64Deserializer extends AbstractValueTypeDeserializer<b
 
     @Override
     protected byte[] deserialize(String jsonValue, Unmarshaller unmarshaller, Type rtType) {
-        return getDecoder(unmarshaller.getJsonbContext().getBinaryDataStrategy()).decode(jsonValue);
+        return getDecoder(unmarshaller.getJsonbContext().getConfigProperties().getBinaryDataStrategy()).decode(jsonValue);
     }
 
     private Base64.Decoder getDecoder(String strategy) {

@@ -82,8 +82,8 @@ public class PropertyModel implements JsonBindingModel, Comparable<PropertyModel
         this.propertyType = property.getPropertyType();
         this.propagation = PropertyValuePropagation.createInstance(property, jsonbContext);
         this.customization = introspectCustomization(property, jsonbContext);
-        this.readName = calculateReadWriteName(customization.getJsonReadName(), jsonbContext.getPropertyNamingStrategy());
-        this.writeName = calculateReadWriteName(customization.getJsonWriteName(), jsonbContext.getPropertyNamingStrategy());
+        this.readName = calculateReadWriteName(customization.getJsonReadName(), jsonbContext.getConfigProperties().getPropertyNamingStrategy());
+        this.writeName = calculateReadWriteName(customization.getJsonWriteName(), jsonbContext.getConfigProperties().getPropertyNamingStrategy());
         this.propertySerializer = resolveCachedSerializer();
     }
 

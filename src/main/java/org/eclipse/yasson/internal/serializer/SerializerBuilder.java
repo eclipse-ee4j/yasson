@@ -91,7 +91,7 @@ public class SerializerBuilder extends AbstractSerializerBuilder<SerializerBuild
         } else if (Map.class.isAssignableFrom(objectClass)) {
             return new MapSerializer<>(this);
         } else if (isByteArray(objectClass)) {
-            String strategy = jsonbContext.getBinaryDataStrategy();
+            String strategy = jsonbContext.getConfigProperties().getBinaryDataStrategy();
             switch (strategy) {
                 case BinaryDataStrategy.BYTE:
                     return new ByteArraySerializer(this);

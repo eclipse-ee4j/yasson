@@ -15,6 +15,11 @@ package org.eclipse.yasson.internal.serializer;
 
 import javax.json.bind.annotation.JsonbDateFormat;
 import java.time.format.DateTimeFormatter;
+import java.time.format.DateTimeFormatterBuilder;
+
+import static java.time.temporal.ChronoField.HOUR_OF_DAY;
+import static java.time.temporal.ChronoField.MINUTE_OF_HOUR;
+import static java.time.temporal.ChronoField.SECOND_OF_MINUTE;
 
 /**
  * Formatter wrapper for different types of dates.
@@ -26,6 +31,20 @@ public class JsonbDateFormatter {
     public static final String ISO_8601_DATE_TIME_FORMAT = "yyyy-MM-dd'T'HH:mm:ss";
 
     public static final String ISO_8601_DATE_FORMAT = "yyyy-MM-dd";
+
+    public static final DateTimeFormatter IJSON_DATE_FORMATTER = new DateTimeFormatterBuilder()
+            .parseCaseInsensitive()
+            .append(DateTimeFormatter.ISO_LOCAL_DATE)
+            .appendLiteral('T')
+            .appendValue(HOUR_OF_DAY, 2)
+            .appendLiteral(':')
+            .appendValue(MINUTE_OF_HOUR, 2)
+            .optionalStart()
+            .appendLiteral(':')
+            .appendValue(SECOND_OF_MINUTE, 2)
+            .appendLiteral('Z')
+            .appendOffsetId()
+            .toFormatter();
 
     //Java 8 date formatter is thread safe, cache it if possible
     private final DateTimeFormatter dateTimeFormatter;

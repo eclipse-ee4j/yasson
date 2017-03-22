@@ -57,7 +57,7 @@ public class DateTypeDeserializer extends AbstractValueTypeDeserializer<Date> {
         if(JsonbDateFormat.TIME_IN_MILLIS.equals(dateFormatter.getFormat())) {
             return new Date(Long.parseLong(jsonValue));
         }
-        final DateFormat dateFormat = getDateFormat(dateFormatter, unmarshaller.getJsonbContext().getLocale(dateFormatter.getLocale()));
+        final DateFormat dateFormat = getDateFormat(dateFormatter, unmarshaller.getJsonbContext().getConfigProperties().getLocale(dateFormatter.getLocale()));
         try {
             return dateFormat.parse(jsonValue);
         } catch (ParseException e) {

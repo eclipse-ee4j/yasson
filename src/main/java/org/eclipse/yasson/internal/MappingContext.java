@@ -52,7 +52,7 @@ public class MappingContext {
         public ClassModel apply(Class aClass) {
             final JsonbAnnotatedElement<Class<?>> clsElement = jsonbContext.getAnnotationIntrospector().collectAnnotations(aClass);
             final ClassCustomization customization = jsonbContext.getAnnotationIntrospector().introspectCustomization(clsElement);
-            final ClassModel newClassModel = new ClassModel(aClass, customization, parentClassModel, jsonbContext.getPropertyNamingStrategy());
+            final ClassModel newClassModel = new ClassModel(aClass, customization, parentClassModel, jsonbContext.getConfigProperties().getPropertyNamingStrategy());
             classParser.parseProperties(newClassModel, clsElement);
             return newClassModel;
         }

@@ -51,7 +51,7 @@ public abstract class AbstractNumberDeserializer<T extends Number> extends Abstr
 
         final JsonbNumberFormatter numberFormat = getModel().getCustomization().getDeserializeNumberFormatter();
         //TODO perf consider synchronizing on format instance or per thread cache.
-        final NumberFormat format = NumberFormat.getInstance(jsonbContext.getLocale(numberFormat.getLocale()));
+        final NumberFormat format = NumberFormat.getInstance(jsonbContext.getConfigProperties().getLocale(numberFormat.getLocale()));
         ((DecimalFormat)format).applyPattern(numberFormat.getFormat());
         format.setParseIntegerOnly(integerOnly);
         try {

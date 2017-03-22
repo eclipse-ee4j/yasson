@@ -48,7 +48,7 @@ public abstract class AbstractDateTimeDeserializer<T extends TemporalAccessor> e
         } else if (formatter.getDateTimeFormatter() != null) {
             return parseWithFormatter(jsonValue, formatter.getDateTimeFormatter());
         }
-        return parseDefault(jsonValue, unmarshaller.getJsonbContext().getLocale(formatter.getLocale()));
+        return parseDefault(jsonValue, unmarshaller.getJsonbContext().getConfigProperties().getLocale(formatter.getLocale()));
     }
 
     /**

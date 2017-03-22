@@ -42,12 +42,12 @@ public class ByteArrayBase64Serializer extends AbstractValueTypeSerializer<byte[
 
     @Override
     protected void serialize(byte[] obj, JsonGenerator generator, String key, Marshaller marshaller) {
-        generator.write(key, getEncoder(marshaller.getJsonbContext().getBinaryDataStrategy()).encodeToString(obj));
+        generator.write(key, getEncoder(marshaller.getJsonbContext().getConfigProperties().getBinaryDataStrategy()).encodeToString(obj));
     }
 
     @Override
     protected void serialize(byte[] obj, JsonGenerator generator, Marshaller marshaller) {
-        generator.write(getEncoder(marshaller.getJsonbContext().getBinaryDataStrategy()).encodeToString(obj));
+        generator.write(getEncoder(marshaller.getJsonbContext().getConfigProperties().getBinaryDataStrategy()).encodeToString(obj));
     }
 
     private Base64.Encoder getEncoder(String strategy) {

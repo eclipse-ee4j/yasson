@@ -18,7 +18,6 @@ import static org.junit.Assert.assertEquals;
 /**
  * @author David Kral
  */
-@Ignore
 public class SingleValueTest {
 
     @Test
@@ -64,11 +63,14 @@ public class SingleValueTest {
         // Boolean false
         assertEquals("false", jsonb.toJson(false));
 
+        assertEquals("1", jsonb.toJson(1));
+
         // null
         //assertEquals("null", jsonb.toJson(null));
     }
 
     @Test
+    @Ignore
     public void testSingleValue() {
         Jsonb jsonb = (new JsonBindingBuilder()).build();
         assertEquals("5", jsonb.toJson(5));

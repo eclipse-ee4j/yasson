@@ -101,7 +101,7 @@ public class UnmarshallingUnsupportedTypesTest {
     public void testSupportedTypeAsObjectInJson() {
         //wrong, instant is wrapped with {}, unmarshalls to object.
         String json  = "{\"instant\":{\"instantWrongKey\":\"2015-12-28T14:57:00Z\"},\"optionalLong\":11}";
-        assertFail(json, SupportedTypes.class, "Json property instantWrongKey can not be mapped to a class class java.time.Instant");
+        assertFail(json, SupportedTypes.class, "Can't create instance of a class: class java.time.Instant, No default constructor found.");
     }
 
     @Test
@@ -118,20 +118,20 @@ public class UnmarshallingUnsupportedTypesTest {
         assertFail(json, SupportedTypes.class, "Can't deserialize JSON array into: class org.eclipse.yasson.defaultmapping.specific.model.SupportedTypes$NestedPojo");
     }
 
-    @Test(expected = JsonbException.class)
+    @Test()
     public void testMissingFieldDefault() {
         Jsonb defaultConfig = JsonbBuilder.create();
         String json  = "{\"nestedPojo\":{\"integerValue\":10,\"missingField\":5},\"optionalLong\":11}";
         SupportedTypes result = defaultConfig.fromJson(json, SupportedTypes.class);
-    }
-
-    @Test()
-    public void testMissingFieldIgnored() {
-        Jsonb defaultConfig = JsonbBuilder.create(new JsonbConfig().withFailOnUnknownProperties(false));
-        String json  = "{\"nestedPojo\":{\"integerValue\":10,\"missingField\":5},\"optionalLong\":11}";
-        SupportedTypes result = defaultConfig.fromJson(json, SupportedTypes.class);
         assertEquals(Integer.valueOf(10), result.getNestedPojo().getIntegerValue());
         assertEquals(11, result.getOptionalLong().getAsLong());
+    }
+
+    @Test(expected = JsonbException.class)
+    public void testMissingFieldIgnored() {
+        Jsonb defaultConfig = JsonbBuilder.create(new JsonbConfig().withFailOnUnknownProperties(true));
+        String json  = "{\"nestedPojo\":{\"integerValue\":10,\"missingField\":5},\"optionalLong\":11}";
+        SupportedTypes result = defaultConfig.fromJson(json, SupportedTypes.class);
     }
 
     @Test

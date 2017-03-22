@@ -319,7 +319,7 @@ public class ComponentMatcher {
      */
     public JsonbDateFormatter getSerializeDateFormatter(JsonBindingModel model) {
         if (model == null || model.getCustomization() == null || model.getCustomization().getSerializeDateFormatter() == null) {
-            return jsonbContext.getConfigDateFormatter();
+            return jsonbContext.getConfigProperties().getConfigDateFormatter();
         }
         return model.getCustomization().getSerializeDateFormatter();
     }
@@ -332,7 +332,7 @@ public class ComponentMatcher {
      */
     public JsonbDateFormatter getDeserializeDateFormatter(JsonBindingModel model) {
         if (model == null || model.getCustomization() == null || model.getCustomization().getDeserializeDateFormatter() == null) {
-            return jsonbContext.getConfigDateFormatter();
+            return jsonbContext.getConfigProperties().getConfigDateFormatter();
         }
         return model.getCustomization().getDeserializeDateFormatter();
     }

@@ -157,7 +157,7 @@ public abstract class PropertyValuePropagation {
         final Optional<PropertyVisibilityStrategy> classLevelStrategy =
                 ctx.getAnnotationIntrospector().getPropertyVisibilityStrategy(declaringClass);
         Optional<PropertyVisibilityStrategy> strategy =
-                Optional.ofNullable(classLevelStrategy.orElseGet(ctx::getPropertyVisibilityStrategy));
+                Optional.ofNullable(classLevelStrategy.orElseGet(()->ctx.getConfigProperties().getPropertyVisibilityStrategy()));
 
         return strategy.map(visibilityCheckFunction);
     }
