@@ -161,13 +161,13 @@ public class PropertyModel implements JsonBindingModel, Comparable<PropertyModel
 
         builder.setAdapterInfo(getUserAdapterBinding(property, jsonbContext));
 
-        introspectDateFormatter(property, introspector, builder);
+        introspectDateFormatter(property, introspector, builder, jsonbContext);
         introspectNumberFormatter(property, introspector, builder);
 
         return builder.buildPropertyCustomization();
     }
 
-    private void introspectDateFormatter(Property property, AnnotationIntrospector introspector, PropertyCustomizationBuilder builder) {
+    private void introspectDateFormatter(Property property, AnnotationIntrospector introspector, PropertyCustomizationBuilder builder, JsonbContext jsonbContext) {
         /*
          * If @JsonbDateFormat is placed on getter implementation must use this format on serialization.
          * If @JsonbDateFormat is placed on setter implementation must use this format on deserialization.
@@ -176,26 +176,20 @@ public class PropertyModel implements JsonBindingModel, Comparable<PropertyModel
          * Priority from high to low is getter / setter > field > class > package > global configuration
          */
         Map<AnnotationTarget, JsonbDateFormatter> jsonDateFormatCategorized = introspector.getJsonbDateFormatCategorized(property);
-        Set<AnnotationTarget> annotationTargets = jsonDateFormatCategorized.keySet();
+        final JsonbDateFormatter configDateFormatter = jsonbContext.getConfigProperties().getConfigDateFormatter();
 
         if(!builder.isReadTransient()){
-            if(annotationTargets.contains(AnnotationTarget.GETTER)){
-                builder.setSerializeDateFormatter(jsonDateFormatCategorized.get(AnnotationTarget.GETTER));
-            } else if(annotationTargets.contains(AnnotationTarget.PROPERTY)){
-                builder.setSerializeDateFormatter(jsonDateFormatCategorized.get(AnnotationTarget.PROPERTY));
-            } else if(annotationTargets.contains(AnnotationTarget.CLASS)){
-                builder.setSerializeDateFormatter(jsonDateFormatCategorized.get(AnnotationTarget.CLASS));
-            }
+            final JsonbDateFormatter dateFormatter = getTargetForMostPreciseScope(jsonDateFormatCategorized,
+                    AnnotationTarget.GETTER, AnnotationTarget.PROPERTY, AnnotationTarget.CLASS);
+
+            builder.setSerializeDateFormatter(dateFormatter != null ? dateFormatter : configDateFormatter);
         }
 
         if(!builder.isWriteTransient()){
-            if(annotationTargets.contains(AnnotationTarget.SETTER)){
-                builder.setDeserializeDateFormatter(jsonDateFormatCategorized.get(AnnotationTarget.SETTER));
-            } else if(annotationTargets.contains(AnnotationTarget.PROPERTY)){
-                builder.setDeserializeDateFormatter(jsonDateFormatCategorized.get(AnnotationTarget.PROPERTY));
-            } else if(annotationTargets.contains(AnnotationTarget.CLASS)){
-                builder.setDeserializeDateFormatter(jsonDateFormatCategorized.get(AnnotationTarget.CLASS));
-            }
+            final JsonbDateFormatter dateFormatter = getTargetForMostPreciseScope(jsonDateFormatCategorized,
+                    AnnotationTarget.SETTER, AnnotationTarget.PROPERTY, AnnotationTarget.CLASS);
+
+            builder.setDeserializeDateFormatter(dateFormatter != null ? dateFormatter : configDateFormatter);
         }
     }
 
@@ -208,27 +202,33 @@ public class PropertyModel implements JsonBindingModel, Comparable<PropertyModel
          * Priority from high to low is getter / setter > field > class > package > global configuration
          */
         Map<AnnotationTarget, JsonbNumberFormatter> jsonNumberFormatCategorized = introspector.getJsonNumberFormatter(property);
-        Set<AnnotationTarget> annotationTargets = jsonNumberFormatCategorized.keySet();
+
 
         if(!builder.isReadTransient()){
-            if(annotationTargets.contains(AnnotationTarget.GETTER)){
-                builder.setSerializeNumberFormatter(jsonNumberFormatCategorized.get(AnnotationTarget.GETTER));
-            } else if(annotationTargets.contains(AnnotationTarget.PROPERTY)){
-                builder.setSerializeNumberFormatter(jsonNumberFormatCategorized.get(AnnotationTarget.PROPERTY));
-            } else if(annotationTargets.contains(AnnotationTarget.CLASS)){
-                builder.setSerializeNumberFormatter(jsonNumberFormatCategorized.get(AnnotationTarget.CLASS));
-            }
+            builder.setSerializeNumberFormatter(getTargetForMostPreciseScope(jsonNumberFormatCategorized,
+                    AnnotationTarget.GETTER, AnnotationTarget.PROPERTY, AnnotationTarget.CLASS));
         }
 
         if(!builder.isWriteTransient()){
-            if(annotationTargets.contains(AnnotationTarget.SETTER)){
-                builder.setDeserializeNumberFormatter(jsonNumberFormatCategorized.get(AnnotationTarget.SETTER));
-            } else if(annotationTargets.contains(AnnotationTarget.PROPERTY)){
-                builder.setDeserializeNumberFormatter(jsonNumberFormatCategorized.get(AnnotationTarget.PROPERTY));
-            } else if(annotationTargets.contains(AnnotationTarget.CLASS)){
-                builder.setDeserializeNumberFormatter(jsonNumberFormatCategorized.get(AnnotationTarget.CLASS));
+            builder.setDeserializeNumberFormatter(getTargetForMostPreciseScope(jsonNumberFormatCategorized,
+                            AnnotationTarget.SETTER, AnnotationTarget.PROPERTY, AnnotationTarget.CLASS));
+        }
+    }
+
+    /**
+     * Pull result for most significant scope defined by order of annotation targets.
+     *
+     * @param collectedAnnotations all targets
+     * @param targets ordered target types by scope
+     */
+    private <T> T getTargetForMostPreciseScope(Map<AnnotationTarget, T> collectedAnnotations, AnnotationTarget... targets) {
+        for (AnnotationTarget target : targets) {
+            final T result = collectedAnnotations.get(target);
+            if (result != null) {
+                return result;
             }
         }
+        return null;
     }
 
     /**

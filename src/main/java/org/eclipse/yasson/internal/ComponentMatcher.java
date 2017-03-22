@@ -311,29 +311,4 @@ public class ComponentMatcher {
         }
     }
 
-    /**
-     * Resolves serialization date formatter either from model or global config.
-     *
-     * @param model model of processed value (field or collection item)
-     * @return date formatter
-     */
-    public JsonbDateFormatter getSerializeDateFormatter(JsonBindingModel model) {
-        if (model == null || model.getCustomization() == null || model.getCustomization().getSerializeDateFormatter() == null) {
-            return jsonbContext.getConfigProperties().getConfigDateFormatter();
-        }
-        return model.getCustomization().getSerializeDateFormatter();
-    }
-
-    /**
-     * Resolves deserialization date formatter either from model or global config.
-     *
-     * @param model model of processed value (field or collection item)
-     * @return date formatter
-     */
-    public JsonbDateFormatter getDeserializeDateFormatter(JsonBindingModel model) {
-        if (model == null || model.getCustomization() == null || model.getCustomization().getDeserializeDateFormatter() == null) {
-            return jsonbContext.getConfigProperties().getConfigDateFormatter();
-        }
-        return model.getCustomization().getDeserializeDateFormatter();
-    }
 }

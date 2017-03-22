@@ -53,7 +53,7 @@ public class DateTypeDeserializer extends AbstractValueTypeDeserializer<Date> {
     @Override
     protected Date deserialize(String jsonValue, Unmarshaller unmarshaller, Type rtType) {
 
-        final JsonbDateFormatter dateFormatter = unmarshaller.getJsonbContext().getComponentMatcher().getDeserializeDateFormatter(getModel());
+        final JsonbDateFormatter dateFormatter = getDateFormatter();
         if(JsonbDateFormat.TIME_IN_MILLIS.equals(dateFormatter.getFormat())) {
             return new Date(Long.parseLong(jsonValue));
         }
@@ -63,5 +63,12 @@ public class DateTypeDeserializer extends AbstractValueTypeDeserializer<Date> {
         } catch (ParseException e) {
             throw new JsonbException(Messages.getMessage(MessageKeys.DATE_PARSE_ERROR, jsonValue, dateFormat));
         }
+    }
+
+    private JsonbDateFormatter getDateFormatter() {
+        if (getModel() != null && getModel().getCustomization() != null && getModel().getCustomization().getDeserializeDateFormatter() != null) {
+            return getModel().getCustomization().getDeserializeDateFormatter();
+        }
+        return JsonbDateFormatter.getDefault();
     }
 }

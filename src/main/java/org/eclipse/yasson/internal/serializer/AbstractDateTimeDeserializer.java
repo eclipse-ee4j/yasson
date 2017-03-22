@@ -42,7 +42,9 @@ public abstract class AbstractDateTimeDeserializer<T extends TemporalAccessor> e
 
     @Override
     public T deserialize(String jsonValue, Unmarshaller unmarshaller, Type rtType) {
-        final JsonbDateFormatter formatter = unmarshaller.getJsonbContext().getComponentMatcher().getDeserializeDateFormatter(getModel());
+        final JsonbDateFormatter formatter = getModel() != null ?
+                getModel().getCustomization().getDeserializeDateFormatter()
+                : null;
         if (JsonbDateFormat.TIME_IN_MILLIS.equals(formatter.getFormat())) {
             return fromInstant(Instant.ofEpochMilli(Long.parseLong(jsonValue)));
         } else if (formatter.getDateTimeFormatter() != null) {

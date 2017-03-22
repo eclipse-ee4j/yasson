@@ -16,6 +16,7 @@ package org.eclipse.yasson.internal.serializer;
 import javax.json.bind.annotation.JsonbDateFormat;
 import java.time.format.DateTimeFormatter;
 import java.time.format.DateTimeFormatterBuilder;
+import java.util.Locale;
 
 import static java.time.temporal.ChronoField.HOUR_OF_DAY;
 import static java.time.temporal.ChronoField.MINUTE_OF_HOUR;
@@ -28,9 +29,13 @@ import static java.time.temporal.ChronoField.SECOND_OF_MINUTE;
  */
 public class JsonbDateFormatter {
 
+    private static final JsonbDateFormatter DEFAULT = new JsonbDateFormatter(JsonbDateFormat.DEFAULT_FORMAT, Locale.getDefault().toLanguageTag());
+
     public static final String ISO_8601_DATE_TIME_FORMAT = "yyyy-MM-dd'T'HH:mm:ss";
 
     public static final String ISO_8601_DATE_FORMAT = "yyyy-MM-dd";
+
+    public static final String IJSON_DATE_FORMAT = "yyyy-MM-dd'T'HH:mm:ss'Z'X";
 
     public static final DateTimeFormatter IJSON_DATE_FORMATTER = new DateTimeFormatterBuilder()
             .parseCaseInsensitive()
@@ -64,17 +69,6 @@ public class JsonbDateFormatter {
         this.dateTimeFormatter = dateTimeFormatter;
         this.format = format;
         this.locale = locale;
-    }
-
-    /**
-     * Creates an instance with cached {@link DateTimeFormatter}.
-     *
-     * @param dateTimeFormatter Reused date/time formatter.
-     */
-    public JsonbDateFormatter(DateTimeFormatter dateTimeFormatter) {
-        this.dateTimeFormatter = dateTimeFormatter;
-        this.format = null;
-        this.locale = null;
     }
 
     /**
@@ -119,12 +113,7 @@ public class JsonbDateFormatter {
         return locale;
     }
 
-    /**
-     * Default date formatter if none is provided.
-     *
-     * @return Default date formatter.
-     */
     public static JsonbDateFormatter getDefault() {
-        return new JsonbDateFormatter(JsonbDateFormat.DEFAULT_FORMAT, JsonbDateFormat.DEFAULT_LOCALE);
+        return DEFAULT;
     }
 }

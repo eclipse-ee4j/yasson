@@ -80,7 +80,7 @@ public class CalendarTypeDeserializer extends AbstractValueTypeDeserializer<Cale
     @Override
     protected Calendar deserialize(String jsonValue, Unmarshaller unmarshaller, Type rtType) {
         final JsonbContext jsonbContext = unmarshaller.getJsonbContext();
-        final JsonbDateFormatter formatter = jsonbContext.getComponentMatcher().getDeserializeDateFormatter(getModel());
+        final JsonbDateFormatter formatter = getModel() != null ? getModel().getCustomization().getDeserializeDateFormatter() : null;
         Calendar result = (Calendar) calendarTemplate.clone();
         final String format = formatter.getFormat();
         if (JsonbDateFormat.TIME_IN_MILLIS.equals(format)) {

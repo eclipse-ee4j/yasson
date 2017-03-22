@@ -52,6 +52,8 @@ public class JsonbConfigProperties {
 
     private final boolean failOnUnknownProperties;
 
+    private final boolean strictIJson;
+
     public JsonbConfigProperties(JsonbConfig jsonbConfig) {
         this.jsonbConfig = jsonbConfig;
         this.binaryDataStrategy = initBinaryDataStrategy();
@@ -62,6 +64,7 @@ public class JsonbConfigProperties {
         this.dateFormatter = initDateFormatter(this.locale);
         this.nullable = initConfigNullable();
         this.failOnUnknownProperties = initConfigFailOnUnknownProperties();
+        this.strictIJson = initStrictJson();
     }
 
     private JsonbDateFormatter initDateFormatter(Locale locale) {
@@ -266,5 +269,13 @@ public class JsonbConfigProperties {
      */
     public PropertyOrdering getPropertyOrdering() {
         return propertyOrdering;
+    }
+
+    /**
+     * If strict IJSON patterns should be used.
+     * @return
+     */
+    public boolean isStrictIJson() {
+        return strictIJson;
     }
 }

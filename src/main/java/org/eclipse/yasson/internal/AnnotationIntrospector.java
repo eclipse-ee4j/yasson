@@ -333,18 +333,19 @@ public class AnnotationIntrospector {
 
         Map<AnnotationTarget, JsonbDateFormatter> result = new HashMap<>();
         Map<AnnotationTarget, JsonbDateFormat> annotationFromPropertyCategorized = getAnnotationFromPropertyCategorized(JsonbDateFormat.class, property);
-        if(annotationFromPropertyCategorized.size() == 0) {
-            //  if property is not TypeVariable and its class is not date skip it
-            final Optional<Class<?>> propertyRawTypeOptional = ReflectionUtils.getOptionalRawType(property.getPropertyType());
-            if (propertyRawTypeOptional.isPresent()) {
-                Class<?> rawType = propertyRawTypeOptional.get();
-                if (!(Date.class.isAssignableFrom(rawType) || Calendar.class.isAssignableFrom(rawType)
-                        || TemporalAccessor.class.isAssignableFrom(rawType))) {
-                    return new HashMap<>();
-                }
-            }
-        } else {
+        if (annotationFromPropertyCategorized.size() != 0) {
             annotationFromPropertyCategorized.forEach((key, annotation) -> result.put(key, createJsonbDateFormatter(annotation.value(), annotation.locale(), property)));
+        }
+
+        // No date format on property, try class level
+        // if property is not TypeVariable and its class is not date skip it
+        final Optional<Class<?>> propertyRawTypeOptional = ReflectionUtils.getOptionalRawType(property.getPropertyType());
+        if (propertyRawTypeOptional.isPresent()) {
+            Class<?> rawType = propertyRawTypeOptional.get();
+            if (!(Date.class.isAssignableFrom(rawType) || Calendar.class.isAssignableFrom(rawType)
+                    || TemporalAccessor.class.isAssignableFrom(rawType))) {
+                return new HashMap<>();
+            }
         }
 
         JsonbDateFormat classLevelDateFormatter = findAnnotation(property.getDeclaringClassElement().getAnnotations(), JsonbDateFormat.class);
@@ -365,7 +366,7 @@ public class AnnotationIntrospector {
         Objects.requireNonNull(clazzElement);
         final JsonbDateFormat format = findAnnotation(clazzElement.getAnnotations(), JsonbDateFormat.class);
         if (format == null) {
-            return null;
+            return jsonbContext.getConfigProperties().getConfigDateFormatter();
         }
         return new JsonbDateFormatter(format.value(), format.locale());
     }
@@ -607,7 +608,7 @@ public class AnnotationIntrospector {
     }
 
     /**
-     * Collect annotations of given class and its interfaces.
+     * Collect annotations of given class, its interfaces and the package.
      *
      * @param clazz Class to process.
      * @return Element with class and annotations.

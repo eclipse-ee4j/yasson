@@ -60,7 +60,7 @@ public class DateTypeSerializer extends AbstractValueTypeSerializer<Date> {
     @Override
     public void serialize(Date obj, JsonGenerator generator, SerializationContext ctx) {
         final JsonbContext jsonbContext = ((Marshaller) ctx).getJsonbContext();
-        final JsonbDateFormatter formatter = jsonbContext.getComponentMatcher().getSerializeDateFormatter(model);
+        JsonbDateFormatter formatter = getDateFormatter();
         if (model.getContext() == JsonContext.JSON_OBJECT) {
             generator.write(model.getWriteName(), toJson(obj, formatter, jsonbContext));
         } else {
@@ -76,5 +76,12 @@ public class DateTypeSerializer extends AbstractValueTypeSerializer<Date> {
     @Override
     protected void serialize(Date obj, JsonGenerator generator, Marshaller marshaller) {
         throw new UnsupportedOperationException();
+    }
+
+    private JsonbDateFormatter getDateFormatter() {
+        if (model != null && model.getCustomization() != null && model.getCustomization().getSerializeDateFormatter() != null) {
+            return model.getCustomization().getSerializeDateFormatter();
+        }
+        return JsonbDateFormatter.getDefault();
     }
 }
