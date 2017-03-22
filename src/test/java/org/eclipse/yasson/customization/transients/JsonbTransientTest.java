@@ -87,7 +87,7 @@ public class JsonbTransientTest {
 
     @Test
     public void testTransientAcceptableAnnotationCombinationsDeserialization() throws Exception {
-        Jsonb localJsonb = JsonbBuilder.create(new JsonbConfig().withFailOnUnknownProperties(false));
+        Jsonb localJsonb = JsonbBuilder.create(new JsonbConfig());
         JsonbTransientAcceptableAnnotationCollision result = localJsonb.fromJson(
                 "{\"annotated_property_transient_setter\":\"Annotated property transient setter\"," +
                         "\"annotated_property_transient_getter\":\"Annotated property transient getter\"," +
