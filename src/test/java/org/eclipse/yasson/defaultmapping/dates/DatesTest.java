@@ -198,7 +198,7 @@ public class DatesTest {
 
         final String expected = "{\"defaultFormatted\":\"2015-03-03T23:00:00Z\"," +
                 "\"millisFormatted\":\"2015-03-03T23:00:00Z\"," +
-                "\"instant\":\"2015-03-03T23:00:00Z\"}";
+                "\"instant\":\"23:00:00 | 03-03-2015\"}";
         assertEquals(expected, jsonb.toJson(instantPojo));
 
         InstantPojo result = jsonb.fromJson(expected, InstantPojo.class);

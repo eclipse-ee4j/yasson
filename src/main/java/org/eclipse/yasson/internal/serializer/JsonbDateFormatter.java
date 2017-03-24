@@ -48,7 +48,7 @@ public class JsonbDateFormatter {
             .appendLiteral(':')
             .appendValue(SECOND_OF_MINUTE, 2)
             .appendLiteral('Z')
-            .appendOffsetId()
+            .appendOffset("+HH:MM", "+00:00")
             .toFormatter();
 
     //Java 8 date formatter is thread safe, cache it if possible
@@ -115,5 +115,9 @@ public class JsonbDateFormatter {
 
     public static JsonbDateFormatter getDefault() {
         return DEFAULT;
+    }
+
+    public boolean isDefault() {
+        return JsonbDateFormat.DEFAULT_FORMAT.equals(format);
     }
 }
