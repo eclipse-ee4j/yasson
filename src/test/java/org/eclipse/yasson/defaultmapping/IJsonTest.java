@@ -41,6 +41,7 @@ public class IJsonTest {
         Calendar calendar = Calendar.getInstance();
         calendar.set(1970, 0, 1, 0, 0, 0);
         calendar.clear(Calendar.MILLISECOND);
+        calendar.setTimeZone(TimeZone.getTimeZone("Europe/Paris"));
 
         String jsonString = jsonb.toJson(new ScalarValueWrapper<>(calendar.getTime()));
         Assert.assertTrue(jsonString.matches("\\{\"value\":\"1970-01-01T00:00:00Z\\+[0-9]{2}:[0-9]{2}\"}"));
