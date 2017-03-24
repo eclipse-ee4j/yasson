@@ -47,12 +47,13 @@ public class DateTypeSerializer extends AbstractValueTypeSerializer<Date> {
             return String.valueOf(object.getTime());
         }
         Locale locale = jsonbContext.getConfigProperties().getLocale(formatter.getLocale());
-        return getDateFormat(formatter, locale).format(object);
+        return getDateFormat(formatter, locale, jsonbContext.getConfigProperties().isStrictIJson()).format(object);
     }
 
-    private DateFormat getDateFormat(JsonbDateFormatter formatter, Locale locale) {
+    private DateFormat getDateFormat(JsonbDateFormatter formatter, Locale locale, boolean iJson) {
         if (JsonbDateFormat.DEFAULT_FORMAT.equals(formatter.getFormat())) {
-            return new SimpleDateFormat(JsonbDateFormatter.ISO_8601_DATE_TIME_FORMAT, locale);
+            return new SimpleDateFormat(iJson ?
+                    JsonbDateFormatter.IJSON_DATE_FORMAT : JsonbDateFormatter.ISO_8601_DATE_TIME_FORMAT, locale);
         }
         return new SimpleDateFormat(formatter.getFormat(), locale);
     }

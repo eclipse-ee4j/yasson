@@ -23,12 +23,14 @@ import java.time.Instant;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.ZoneId;
+import java.time.ZoneOffset;
 import java.time.ZonedDateTime;
 import java.time.format.DateTimeFormatter;
 import java.time.temporal.ChronoField;
 import java.time.temporal.TemporalAccessor;
 import java.util.Calendar;
 import java.util.Date;
+import java.util.GregorianCalendar;
 import java.util.Locale;
 
 /**
@@ -47,7 +49,7 @@ public class CalendarTypeDeserializer extends AbstractValueTypeDeserializer<Cale
      */
     public CalendarTypeDeserializer(JsonBindingModel model) {
         super(Calendar.class, model);
-        calendarTemplate = Calendar.getInstance();
+        calendarTemplate = new GregorianCalendar();
         calendarTemplate.clear();
     }
 
@@ -58,52 +60,59 @@ public class CalendarTypeDeserializer extends AbstractValueTypeDeserializer<Cale
      * @param locale locale
      * @return epoch millisecond
      */
-    private Long parseDefaultDateTime(String jsonValue, Locale locale) {
+    private Calendar parseDefaultDateTime(String jsonValue, Locale locale) {
         DateTimeFormatter dateTimeFormatter = DateTimeFormatter.ISO_DATE_TIME.withLocale(locale);
         final TemporalAccessor temporal = dateTimeFormatter.parse(jsonValue);
         //With timezone
         if (temporal.isSupported(ChronoField.OFFSET_SECONDS)) {
             final ZonedDateTime zdt = ZonedDateTime.from(temporal);
-            return zdt.toInstant().toEpochMilli();
+            return GregorianCalendar.from(zdt);
         }
         //No timezone
-        LocalDateTime dateTime = LocalDateTime.from(temporal);
-        return dateTime.atZone(ZoneId.systemDefault()).toInstant().toEpochMilli();
+        Calendar result = newCalendar();
+        result.setTimeInMillis(Instant.from(temporal).toEpochMilli());
+        return result;
     }
 
-    private Date parseDefaultDate(String jsonValue, Locale locale) {
+    private Calendar parseDefaultDate(String jsonValue, Locale locale) {
         DateTimeFormatter dateTimeFormatter = DateTimeFormatter.ISO_DATE.withLocale(locale);
         LocalDate localDate = LocalDate.parse(jsonValue, dateTimeFormatter);
-        return Date.from(localDate.atStartOfDay(ZoneId.systemDefault()).toInstant());
+        Calendar result = newCalendar();
+        result.setTimeInMillis(localDate.atStartOfDay(ZoneId.systemDefault()).toInstant().toEpochMilli());
+        return result;
     }
 
     @Override
     protected Calendar deserialize(String jsonValue, Unmarshaller unmarshaller, Type rtType) {
         final JsonbContext jsonbContext = unmarshaller.getJsonbContext();
         final JsonbDateFormatter formatter = getModel() != null ? getModel().getCustomization().getDeserializeDateFormatter() : null;
-        Calendar result = (Calendar) calendarTemplate.clone();
         final String format = formatter.getFormat();
         if (JsonbDateFormat.TIME_IN_MILLIS.equals(format)) {
+            Calendar result = newCalendar();
             result.setTimeInMillis(Long.parseLong(jsonValue));
             return result;
         }
 
         Locale locale = jsonbContext.getConfigProperties().getLocale(formatter.getLocale());
         if (JsonbDateFormat.DEFAULT_FORMAT.equals(format)) {
-            final boolean timed = jsonValue.contains("T");
-            if (timed) {
-                result.setTimeInMillis(parseDefaultDateTime(jsonValue, locale));
-                return result;
-            } else {
-                result.setTime(parseDefaultDate(jsonValue, locale));
-                return result;
+            if (jsonbContext.getConfigProperties().isStrictIJson()) {
+                final TemporalAccessor temporal = JsonbDateFormatter.IJSON_DATE_FORMATTER.withLocale(locale).parse(jsonValue);
+                final ZonedDateTime zdt = ZonedDateTime.from(temporal);
+                return GregorianCalendar.from(zdt);
             }
-
+            //requirement by the spec to support deserialization of both date and datetime into calendar
+            final boolean timed = jsonValue.contains("T");
+            return timed ? parseDefaultDateTime(jsonValue, locale) : parseDefaultDate(jsonValue, locale);
         }
 
         DateTimeFormatter customFormat = DateTimeFormatter.ofPattern(format, locale);
         final TemporalAccessor parsed = customFormat.parse(jsonValue);
+        Calendar result = newCalendar();
         result.setTime(new Date(Instant.from(parsed).toEpochMilli()));
         return result;
+    }
+
+    private Calendar newCalendar() {
+        return (Calendar) calendarTemplate.clone();
     }
 }

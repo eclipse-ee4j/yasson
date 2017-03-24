@@ -13,6 +13,8 @@
 
 package org.eclipse.yasson.internal.serializer;
 
+import org.eclipse.yasson.internal.JsonbConfigProperties;
+import org.eclipse.yasson.internal.JsonbContext;
 import org.eclipse.yasson.internal.Unmarshaller;
 import org.eclipse.yasson.internal.properties.MessageKeys;
 import org.eclipse.yasson.internal.properties.Messages;
@@ -43,9 +45,10 @@ public class DateTypeDeserializer extends AbstractValueTypeDeserializer<Date> {
         super(Date.class, model);
     }
 
-    private DateFormat getDateFormat(JsonbDateFormatter formatter, Locale locale) {
+    private DateFormat getDateFormat(JsonbDateFormatter formatter, Locale locale, boolean iJson) {
         if (JsonbDateFormat.DEFAULT_FORMAT.equals(formatter.getFormat())) {
-            return new SimpleDateFormat(JsonbDateFormatter.ISO_8601_DATE_TIME_FORMAT, locale);
+            return new SimpleDateFormat(iJson ?
+                    JsonbDateFormatter.IJSON_DATE_FORMAT : JsonbDateFormatter.ISO_8601_DATE_TIME_FORMAT, locale);
         }
         return new SimpleDateFormat(formatter.getFormat(), locale);
     }
@@ -57,7 +60,8 @@ public class DateTypeDeserializer extends AbstractValueTypeDeserializer<Date> {
         if(JsonbDateFormat.TIME_IN_MILLIS.equals(dateFormatter.getFormat())) {
             return new Date(Long.parseLong(jsonValue));
         }
-        final DateFormat dateFormat = getDateFormat(dateFormatter, unmarshaller.getJsonbContext().getConfigProperties().getLocale(dateFormatter.getLocale()));
+        final JsonbConfigProperties configProperties = unmarshaller.getJsonbContext().getConfigProperties();
+        final DateFormat dateFormat = getDateFormat(dateFormatter, configProperties.getLocale(dateFormatter.getLocale()), configProperties.isStrictIJson());
         try {
             return dateFormat.parse(jsonValue);
         } catch (ParseException e) {
