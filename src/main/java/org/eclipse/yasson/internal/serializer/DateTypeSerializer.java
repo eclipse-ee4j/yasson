@@ -13,16 +13,11 @@
 
 package org.eclipse.yasson.internal.serializer;
 
-import org.eclipse.yasson.internal.JsonbContext;
-import org.eclipse.yasson.internal.Marshaller;
 import org.eclipse.yasson.model.JsonBindingModel;
-import org.eclipse.yasson.model.JsonContext;
 
-import javax.json.bind.annotation.JsonbDateFormat;
-import javax.json.bind.serializer.SerializationContext;
-import javax.json.stream.JsonGenerator;
-import java.text.DateFormat;
-import java.text.SimpleDateFormat;
+import java.time.Instant;
+import java.time.format.DateTimeFormatter;
+import java.time.temporal.TemporalAccessor;
 import java.util.Date;
 import java.util.Locale;
 
@@ -31,10 +26,12 @@ import java.util.Locale;
  *
  * @author David Kral
  */
-public class DateTypeSerializer extends AbstractValueTypeSerializer<Date> {
+public class DateTypeSerializer extends AbstractDateTimeSerializer<Date> {
+
+    private DateTimeFormatter DEFAULT_FORMATTER = DateTimeFormatter.ISO_DATE_TIME.withZone(UTC);
 
     /**
-     * Creates a new instance.
+     * Construct serializer with its class.
      *
      * @param model Binding model.
      */
@@ -42,47 +39,25 @@ public class DateTypeSerializer extends AbstractValueTypeSerializer<Date> {
         super(model);
     }
 
-    private String toJson(Date object, JsonbDateFormatter formatter, JsonbContext jsonbContext) {
-        if (JsonbDateFormat.TIME_IN_MILLIS.equals(formatter.getFormat())) {
-            return String.valueOf(object.getTime());
-        }
-        Locale locale = jsonbContext.getConfigProperties().getLocale(formatter.getLocale());
-        return getDateFormat(formatter, locale, jsonbContext.getConfigProperties().isStrictIJson()).format(object);
-    }
-
-    private DateFormat getDateFormat(JsonbDateFormatter formatter, Locale locale, boolean iJson) {
-        if (JsonbDateFormat.DEFAULT_FORMAT.equals(formatter.getFormat())) {
-            return new SimpleDateFormat(iJson ?
-                    JsonbDateFormatter.IJSON_DATE_FORMAT : JsonbDateFormatter.ISO_8601_DATE_TIME_FORMAT, locale);
-        }
-        return new SimpleDateFormat(formatter.getFormat(), locale);
+    @Override
+    protected Instant toInstant(Date value) {
+        return value.toInstant();
     }
 
     @Override
-    public void serialize(Date obj, JsonGenerator generator, SerializationContext ctx) {
-        final JsonbContext jsonbContext = ((Marshaller) ctx).getJsonbContext();
-        JsonbDateFormatter formatter = getDateFormatter();
-        if (model.getContext() == JsonContext.JSON_OBJECT) {
-            generator.write(model.getWriteName(), toJson(obj, formatter, jsonbContext));
-        } else {
-            generator.write(toJson(obj, formatter, jsonbContext));
-        }
+    protected String formatDefault(Date value, Locale locale) {
+        return DEFAULT_FORMATTER.withLocale(locale).format(value.toInstant());
     }
 
     @Override
-    protected void serialize(Date obj, JsonGenerator generator, String key, Marshaller marshaller) {
-        throw new UnsupportedOperationException();
+    protected String formatWithFormatter(Date value, DateTimeFormatter formatter) {
+        DateTimeFormatter dateTimeFormatter = formatter.getZone() != null ?
+                formatter : formatter.withZone(UTC);
+        return dateTimeFormatter.format(toTemporalAccessor(value));
     }
 
     @Override
-    protected void serialize(Date obj, JsonGenerator generator, Marshaller marshaller) {
-        throw new UnsupportedOperationException();
-    }
-
-    private JsonbDateFormatter getDateFormatter() {
-        if (model != null && model.getCustomization() != null && model.getCustomization().getSerializeDateFormatter() != null) {
-            return model.getCustomization().getSerializeDateFormatter();
-        }
-        return JsonbDateFormatter.getDefault();
+    protected TemporalAccessor toTemporalAccessor(Date object) {
+        return object.toInstant();
     }
 }

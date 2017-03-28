@@ -50,6 +50,7 @@ import java.lang.reflect.Field;
 import java.lang.reflect.Method;
 import java.lang.reflect.Modifier;
 import java.lang.reflect.Parameter;
+import java.time.ZoneId;
 import java.time.format.DateTimeFormatter;
 import java.time.temporal.TemporalAccessor;
 import java.util.ArrayList;
@@ -428,23 +429,17 @@ public class AnnotationIntrospector {
         }
 
         final Optional<Class<?>> optionalRawType = ReflectionUtils.getOptionalRawType(property.getPropertyType());
+        final Class<?> propertyRawType = optionalRawType.orElse(null);
 
-        //Can't resolve date type if it is declared as generic type var
-        if (!optionalRawType.isPresent()) {
-            return new JsonbDateFormatter(DateTimeFormatter.ofPattern(format, Locale.forLanguageTag(locale)), format, locale);
-        }
-
-        final Class<?> propertyRawType = optionalRawType.get();
-
-        //Calendar and dates
-        if (Date.class.isAssignableFrom(propertyRawType) || Calendar.class.isAssignableFrom(propertyRawType)) {
-            return new JsonbDateFormatter(format, locale);
-        }
-
-        if (!TemporalAccessor.class.isAssignableFrom(propertyRawType)) {
+        if (propertyRawType != null
+                && !TemporalAccessor.class.isAssignableFrom(propertyRawType)
+                && !Date.class.isAssignableFrom(propertyRawType)
+                && !Calendar.class.isAssignableFrom(propertyRawType)) {
             throw new IllegalStateException(Messages.getMessage(MessageKeys.UNSUPPORTED_DATE_TYPE, propertyRawType));
         }
-        return new JsonbDateFormatter(DateTimeFormatter.ofPattern(format, Locale.forLanguageTag(locale)), format, locale);
+
+        DateTimeFormatter dateTimeFormatter = DateTimeFormatter.ofPattern(format, Locale.forLanguageTag(locale));
+        return new JsonbDateFormatter(dateTimeFormatter, format, locale);
     }
 
     /**

@@ -14,6 +14,7 @@
 package org.eclipse.yasson.internal.serializer;
 
 import javax.json.bind.annotation.JsonbDateFormat;
+import java.time.ZoneId;
 import java.time.format.DateTimeFormatter;
 import java.time.format.DateTimeFormatterBuilder;
 import java.util.Locale;

@@ -13,91 +13,52 @@
 
 package org.eclipse.yasson.internal.serializer;
 
-import org.eclipse.yasson.internal.JsonbContext;
-import org.eclipse.yasson.internal.Marshaller;
 import org.eclipse.yasson.model.JsonBindingModel;
-import org.eclipse.yasson.model.PropertyModel;
 
-import javax.json.bind.JsonbConfig;
-import javax.json.bind.annotation.JsonbDateFormat;
-import javax.json.bind.serializer.SerializationContext;
-import javax.json.stream.JsonGenerator;
-import java.text.DateFormat;
-import java.text.SimpleDateFormat;
+import java.time.Instant;
 import java.time.ZonedDateTime;
 import java.time.format.DateTimeFormatter;
+import java.time.temporal.TemporalAccessor;
 import java.util.Calendar;
 import java.util.Locale;
-import java.util.Optional;
 
 /**
  * Serializer for {@link Calendar} type.
  *
  * @author David Kral
  */
-public class CalendarTypeSerializer extends AbstractValueTypeSerializer<Calendar> {
+public class CalendarTypeSerializer extends AbstractDateTimeSerializer<Calendar> {
 
-    private final Calendar calendarTemplate;
 
     /**
-     * Creates a new instance.
+     * Construct serializer with its class.
      *
      * @param model Binding model.
      */
     public CalendarTypeSerializer(JsonBindingModel model) {
         super(model);
-        calendarTemplate = Calendar.getInstance();
-        calendarTemplate.clear();
-    }
-
-    private String toJson(Calendar object, JsonbDateFormatter formatter, JsonbContext jsonbContext) {
-        if (JsonbDateFormat.TIME_IN_MILLIS.equals(formatter.getFormat())) {
-            return String.valueOf(object.getTime().getTime());
-        }
-
-        Locale locale = jsonbContext.getConfigProperties().getLocale(formatter.getLocale());
-        if (JsonbDateFormat.DEFAULT_FORMAT.equals(formatter.getFormat())) {
-
-            final Optional<Object> strictJson =
-                    jsonbContext.getConfig().getProperty(JsonbConfig.STRICT_IJSON);
-            if (strictJson.isPresent() && (Boolean) strictJson.get()) {
-                ZonedDateTime zdt = ZonedDateTime.ofInstant(object.toInstant(), object.getTimeZone().toZoneId());
-                return JsonbDateFormatter.IJSON_DATE_FORMATTER.format(zdt);
-            }
-
-            //Use ISO_DATE_TIME, convert to java.time first
-            if (object.isSet(Calendar.HOUR) || object.isSet(Calendar.HOUR_OF_DAY)) {
-                ZonedDateTime zdt = ZonedDateTime.ofInstant(object.toInstant(), object.getTimeZone().toZoneId());
-                return DateTimeFormatter.ISO_DATE_TIME.withLocale(locale).format(zdt);
-            }
-            final DateFormat defaultFormat = new SimpleDateFormat(JsonbDateFormatter.ISO_8601_DATE_FORMAT, locale);
-            defaultFormat.setTimeZone(object.getTimeZone());
-            return defaultFormat.format(object.getTime());
-        }
-
-        DateFormat custom = new SimpleDateFormat(formatter.getFormat(), locale);
-        custom.setTimeZone(object.getTimeZone());
-        return custom.format(object.getTime());
     }
 
     @Override
-    public void serialize(Calendar obj, JsonGenerator generator, SerializationContext ctx) {
-        final Marshaller marshaller = (Marshaller) ctx;
-        final JsonbDateFormatter formatter = model != null ? model.getCustomization().getSerializeDateFormatter() : null;
-        if (model instanceof PropertyModel) {
-            generator.write(((PropertyModel)model).getPropertyName(), toJson(obj, formatter, marshaller.getJsonbContext()));
-        } else {
-            generator.write(toJson(obj, formatter, marshaller.getJsonbContext()));
-        }
+    protected Instant toInstant(Calendar value) {
+        return value.toInstant();
     }
 
     @Override
-    protected void serialize(Calendar obj, JsonGenerator generator, String key, Marshaller marshaller) {
-        throw new UnsupportedOperationException();
+    protected String formatDefault(Calendar value, Locale locale) {
+        DateTimeFormatter formatter = value.isSet(Calendar.HOUR) || value.isSet(Calendar.HOUR_OF_DAY) ?
+                DateTimeFormatter.ISO_DATE_TIME : DateTimeFormatter.ISO_DATE;
+        return formatter.withZone(value.getTimeZone().toZoneId())
+                .withLocale(locale).format(toTemporalAccessor(value));
     }
 
     @Override
-    protected void serialize(Calendar obj, JsonGenerator generator, Marshaller marshaller) {
-        throw new UnsupportedOperationException();
+    protected TemporalAccessor toTemporalAccessor(Calendar object) {
+        return toZonedDateTime(object);
+    }
+
+    private ZonedDateTime toZonedDateTime(Calendar object) {
+        return ZonedDateTime.ofInstant(Instant.ofEpochMilli(object.getTimeInMillis()),
+                object.getTimeZone().toZoneId());
     }
 }

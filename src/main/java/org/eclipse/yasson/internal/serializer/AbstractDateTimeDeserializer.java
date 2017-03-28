@@ -19,6 +19,7 @@ import org.eclipse.yasson.model.JsonBindingModel;
 import javax.json.bind.annotation.JsonbDateFormat;
 import java.lang.reflect.Type;
 import java.time.Instant;
+import java.time.ZoneId;
 import java.time.format.DateTimeFormatter;
 import java.time.temporal.TemporalAccessor;
 import java.util.Locale;
@@ -28,7 +29,9 @@ import java.util.Locale;
  *
  * @author Roman Grigoriadi
  */
-public abstract class AbstractDateTimeDeserializer<T extends TemporalAccessor> extends AbstractValueTypeDeserializer<T> {
+public abstract class AbstractDateTimeDeserializer<T> extends AbstractValueTypeDeserializer<T> {
+
+    public static final ZoneId UTC = ZoneId.of("UTC");
 
     /**
      * Creates an instance.
@@ -42,15 +45,36 @@ public abstract class AbstractDateTimeDeserializer<T extends TemporalAccessor> e
 
     @Override
     public T deserialize(String jsonValue, Unmarshaller unmarshaller, Type rtType) {
-        final JsonbDateFormatter formatter = getModel() != null ?
-                getModel().getCustomization().getDeserializeDateFormatter()
-                : null;
+        final JsonbDateFormatter formatter = getJsonbDateFormatter();
         if (JsonbDateFormat.TIME_IN_MILLIS.equals(formatter.getFormat())) {
             return fromInstant(Instant.ofEpochMilli(Long.parseLong(jsonValue)));
         } else if (formatter.getDateTimeFormatter() != null) {
             return parseWithFormatter(jsonValue, formatter.getDateTimeFormatter());
         }
+        final boolean strictIJson = unmarshaller.getJsonbContext().getConfigProperties().isStrictIJson();
+        if (strictIJson) {
+            return parseWithFormatter(jsonValue, JsonbDateFormatter.IJSON_DATE_FORMATTER);
+        }
         return parseDefault(jsonValue, unmarshaller.getJsonbContext().getConfigProperties().getLocale(formatter.getLocale()));
+    }
+
+    protected JsonbDateFormatter getJsonbDateFormatter() {
+        if (getModel() != null && getModel().getCustomization() != null && getModel().getCustomization().getDeserializeDateFormatter() != null) {
+            return getModel().getCustomization().getDeserializeDateFormatter();
+        }
+        return JsonbDateFormatter.getDefault();
+    }
+
+    /**
+     * Append UTC zone in case zone is not set on formatter.
+     *
+     * @param formatter formatter
+     * @return zoned formatter
+     */
+    protected DateTimeFormatter getZonedFormatter(DateTimeFormatter formatter) {
+        final DateTimeFormatter result = formatter.getZone() != null ?
+                formatter : formatter.withZone(UTC);
+        return result;
     }
 
     /**

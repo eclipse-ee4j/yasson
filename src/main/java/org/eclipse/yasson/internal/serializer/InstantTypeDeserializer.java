@@ -18,15 +18,17 @@ import org.eclipse.yasson.model.JsonBindingModel;
 
 import java.lang.reflect.Type;
 import java.time.Instant;
-import java.time.ZoneId;
 import java.time.format.DateTimeFormatter;
+import java.util.Locale;
 
 /**
  * Deserializer for {@link Instant} type.
  *
  * @author David Kral
  */
-public class InstantTypeDeserializer extends DateTimeFormatterDeserializer<Instant> {
+public class InstantTypeDeserializer extends AbstractDateTimeDeserializer<Instant> {
+
+    private static final DateTimeFormatter DEFAULT_FORMATTER = DateTimeFormatter.ISO_INSTANT.withZone(UTC);
 
     /**
      * Creates a new instance.
@@ -38,12 +40,17 @@ public class InstantTypeDeserializer extends DateTimeFormatterDeserializer<Insta
     }
 
     @Override
-    protected Instant deserialize(String jsonValue, Unmarshaller unmarshaller, Type rtType) {
-        return Instant.from(getFormatter(unmarshaller.getJsonbContext()).withZone(ZoneId.of("UTC")).parse(jsonValue));
+    protected Instant fromInstant(Instant instant) {
+        return instant;
     }
 
     @Override
-    protected DateTimeFormatter getDefaultFormatter() {
-        return DateTimeFormatter.ISO_INSTANT;
+    protected Instant parseDefault(String jsonValue, Locale locale) {
+        return Instant.from(DEFAULT_FORMATTER.withLocale(locale).parse(jsonValue));
+    }
+
+    @Override
+    protected Instant parseWithFormatter(String jsonValue, DateTimeFormatter formatter) {
+        return Instant.from(getZonedFormatter(formatter).parse(jsonValue));
     }
 }

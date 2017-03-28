@@ -13,24 +13,21 @@
 
 package org.eclipse.yasson.internal.serializer;
 
-import org.eclipse.yasson.internal.JsonbContext;
-import org.eclipse.yasson.internal.Marshaller;
 import org.eclipse.yasson.model.JsonBindingModel;
 
-import javax.json.stream.JsonGenerator;
 import java.time.Instant;
-import java.time.ZoneOffset;
 import java.time.format.DateTimeFormatter;
+import java.util.Locale;
 
 /**
  * Serializer for {@link Instant} type.
  *
  * @author David Kral
  */
-public class InstantTypeSerializer extends DateTimeFormatterSerializer<Instant> {
+public class InstantTypeSerializer extends AbstractDateTimeSerializer<Instant> {
 
     /**
-     * Creates a new instance.
+     * Construct serializer with its class.
      *
      * @param model Binding model.
      */
@@ -39,21 +36,17 @@ public class InstantTypeSerializer extends DateTimeFormatterSerializer<Instant> 
     }
 
     @Override
-    protected DateTimeFormatter getDefaultFormatter() {
-        return DateTimeFormatter.ISO_INSTANT;
+    protected Instant toInstant(Instant value) {
+        return value;
     }
 
     @Override
-    protected void serialize(Instant obj, JsonGenerator generator, String key, Marshaller marshaller) {
-        generator.write(key, formatInstant(obj, marshaller.getJsonbContext()));
+    protected String formatDefault(Instant value, Locale locale) {
+        return DateTimeFormatter.ISO_INSTANT.withLocale(locale).format(value);
     }
 
     @Override
-    protected void serialize(Instant obj, JsonGenerator generator, Marshaller marshaller) {
-        generator.write(formatInstant(obj, marshaller.getJsonbContext()));
-    }
-
-    private String formatInstant(Instant obj, JsonbContext jsonbContext) {
-        return getFormatter(jsonbContext).withZone(ZoneOffset.UTC).format(obj);
+    protected String formatWithFormatter(Instant value, DateTimeFormatter formatter) {
+        return formatter.withZone(UTC).format(value);
     }
 }

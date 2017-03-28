@@ -15,6 +15,7 @@ package org.eclipse.yasson.internal.serializer;
 
 import org.eclipse.yasson.internal.JsonbContext;
 import org.eclipse.yasson.internal.Marshaller;
+import org.eclipse.yasson.model.JsonContext;
 import org.eclipse.yasson.model.PropertyModel;
 import org.eclipse.yasson.model.JsonBindingModel;
 
@@ -22,16 +23,20 @@ import javax.json.bind.annotation.JsonbDateFormat;
 import javax.json.bind.serializer.SerializationContext;
 import javax.json.stream.JsonGenerator;
 import java.time.Instant;
+import java.time.ZoneId;
+import java.time.format.DateTimeFormatter;
 import java.time.temporal.TemporalAccessor;
 import java.util.Locale;
 
 /**
- * Abstract class for converting date objects from {@link java.time}.
+ * Abstract class for converting date objects.
  *
  * @author Roman Grigoriadi
  * @param <T> Type to serialize.
  */
-public abstract class AbstractDateTimeSerializer<T extends TemporalAccessor> extends AbstractValueTypeSerializer<T> {
+public abstract class AbstractDateTimeSerializer<T> extends AbstractValueTypeSerializer<T> {
+
+    public static final ZoneId UTC = ZoneId.of("UTC");
 
     /**
      * Construct serializer with its class.
@@ -45,9 +50,9 @@ public abstract class AbstractDateTimeSerializer<T extends TemporalAccessor> ext
     @Override
     public void serialize(T obj, JsonGenerator generator, SerializationContext ctx) {
         final JsonbContext jsonbContext = ((Marshaller) ctx).getJsonbContext();
-        final JsonbDateFormatter formatter = model != null ? model.getCustomization().getSerializeDateFormatter() : null;
-        if (model instanceof PropertyModel) {
-            generator.write(((PropertyModel)model).getPropertyName(), toJson(obj, formatter, jsonbContext));
+        final JsonbDateFormatter formatter = getJsonbDateFormatter();
+        if (model.getContext() == JsonContext.JSON_OBJECT) {
+            generator.write(model.getWriteName(), toJson(obj, formatter, jsonbContext));
         } else {
             generator.write(toJson(obj, formatter, jsonbContext));
         }
@@ -65,9 +70,28 @@ public abstract class AbstractDateTimeSerializer<T extends TemporalAccessor> ext
         if (JsonbDateFormat.TIME_IN_MILLIS.equals(formatter.getFormat())) {
             return String.valueOf(toInstant(object).toEpochMilli());
         } else if (formatter.getDateTimeFormatter() != null) {
-            return formatter.getDateTimeFormatter().format(object);
+            return formatWithFormatter(object, formatter.getDateTimeFormatter());
+        }
+        if (jsonbContext.getConfigProperties().isStrictIJson()) {
+            return formatWithFormatter(object, JsonbDateFormatter.IJSON_DATE_FORMATTER);
         }
         return formatDefault(object, jsonbContext.getConfigProperties().getLocale(formatter.getLocale()));
+    }
+
+    protected JsonbDateFormatter getJsonbDateFormatter() {
+        if (model != null && model.getCustomization() != null && model.getCustomization().getSerializeDateFormatter() != null) {
+            return model.getCustomization().getSerializeDateFormatter();
+        }
+        return JsonbDateFormatter.getDefault();
+    }
+
+    /**
+     * Convert date object to {@link TemporalAccessor}
+     *
+     * Only for legacy dates.
+     */
+    protected TemporalAccessor toTemporalAccessor(T object) {
+        return (TemporalAccessor) object;
     }
 
     /**
@@ -87,6 +111,16 @@ public abstract class AbstractDateTimeSerializer<T extends TemporalAccessor> ext
      * @return formatted date obj as string
      */
     protected abstract String formatDefault(T value, Locale locale);
+
+    /**
+     * Format date object with given formatter
+     * @param value date object to format
+     * @param formatter formatter to format with
+     * @return formatted result
+     */
+    protected String formatWithFormatter(T value, DateTimeFormatter formatter) {
+        return formatter.format(toTemporalAccessor(value));
+    }
 
     @Override
     protected void serialize(T obj, JsonGenerator generator, String key, Marshaller marshaller) {

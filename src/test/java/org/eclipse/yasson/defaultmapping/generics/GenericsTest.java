@@ -361,7 +361,9 @@ public class GenericsTest {
     @Test
     public void testMarshallRawList() throws ParseException {
         List rawList = new ArrayList();
-        rawList.add(new SimpleDateFormat("ddMMyyyy").parse("24031981"));
+        final SimpleDateFormat ddMMyyyy = new SimpleDateFormat("ddMMyyyy");
+        ddMMyyyy.setTimeZone(TimeZone.getTimeZone("Z"));
+        rawList.add(ddMMyyyy.parse("24031981"));
         Box box = new Box();
         box.boxStr = "box string";
         box.crate = new Crate();
@@ -370,7 +372,7 @@ public class GenericsTest {
 
         final Jsonb jsonb = JsonbBuilder.create();
         String result = jsonb.toJson(rawList);
-        assertEquals("[\"1981-03-24T00:00:00\",{\"boxStr\":\"box string\",\"crate\":{\"crate_str\":\"crate str\"}}]", result);
+        assertEquals("[\"1981-03-24T00:00:00Z[UTC]\",{\"boxStr\":\"box string\",\"crate\":{\"crate_str\":\"crate str\"}}]", result);
     }
 
     public interface FunctionalInterface<T> {

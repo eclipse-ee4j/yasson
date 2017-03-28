@@ -13,19 +13,11 @@
 
 package org.eclipse.yasson.internal.serializer;
 
-import org.eclipse.yasson.internal.JsonbConfigProperties;
-import org.eclipse.yasson.internal.JsonbContext;
-import org.eclipse.yasson.internal.Unmarshaller;
-import org.eclipse.yasson.internal.properties.MessageKeys;
-import org.eclipse.yasson.internal.properties.Messages;
 import org.eclipse.yasson.model.JsonBindingModel;
 
-import javax.json.bind.JsonbException;
-import javax.json.bind.annotation.JsonbDateFormat;
-import java.lang.reflect.Type;
-import java.text.DateFormat;
-import java.text.ParseException;
-import java.text.SimpleDateFormat;
+import java.time.Instant;
+import java.time.format.DateTimeFormatter;
+import java.time.temporal.TemporalAccessor;
 import java.util.Date;
 import java.util.Locale;
 
@@ -34,7 +26,9 @@ import java.util.Locale;
  *
  * @author David Kral
  */
-public class DateTypeDeserializer extends AbstractValueTypeDeserializer<Date> {
+public class DateTypeDeserializer extends AbstractDateTimeDeserializer<Date> {
+
+    private static final DateTimeFormatter DEFAULT_DATE_TIME_FORMATTER = DateTimeFormatter.ISO_DATE_TIME.withZone(UTC);
 
     /**
      * Creates a new instance.
@@ -45,34 +39,20 @@ public class DateTypeDeserializer extends AbstractValueTypeDeserializer<Date> {
         super(Date.class, model);
     }
 
-    private DateFormat getDateFormat(JsonbDateFormatter formatter, Locale locale, boolean iJson) {
-        if (JsonbDateFormat.DEFAULT_FORMAT.equals(formatter.getFormat())) {
-            return new SimpleDateFormat(iJson ?
-                    JsonbDateFormatter.IJSON_DATE_FORMAT : JsonbDateFormatter.ISO_8601_DATE_TIME_FORMAT, locale);
-        }
-        return new SimpleDateFormat(formatter.getFormat(), locale);
+    @Override
+    protected Date fromInstant(Instant instant) {
+        return new Date(instant.toEpochMilli());
     }
 
     @Override
-    protected Date deserialize(String jsonValue, Unmarshaller unmarshaller, Type rtType) {
-
-        final JsonbDateFormatter dateFormatter = getDateFormatter();
-        if(JsonbDateFormat.TIME_IN_MILLIS.equals(dateFormatter.getFormat())) {
-            return new Date(Long.parseLong(jsonValue));
-        }
-        final JsonbConfigProperties configProperties = unmarshaller.getJsonbContext().getConfigProperties();
-        final DateFormat dateFormat = getDateFormat(dateFormatter, configProperties.getLocale(dateFormatter.getLocale()), configProperties.isStrictIJson());
-        try {
-            return dateFormat.parse(jsonValue);
-        } catch (ParseException e) {
-            throw new JsonbException(Messages.getMessage(MessageKeys.DATE_PARSE_ERROR, jsonValue, dateFormat));
-        }
+    protected Date parseDefault(String jsonValue, Locale locale) {
+        final TemporalAccessor parsed = DEFAULT_DATE_TIME_FORMATTER.withLocale(locale).parse(jsonValue);
+        return new Date(Instant.from(parsed).toEpochMilli());
     }
 
-    private JsonbDateFormatter getDateFormatter() {
-        if (getModel() != null && getModel().getCustomization() != null && getModel().getCustomization().getDeserializeDateFormatter() != null) {
-            return getModel().getCustomization().getDeserializeDateFormatter();
-        }
-        return JsonbDateFormatter.getDefault();
+    @Override
+    protected Date parseWithFormatter(String jsonValue, DateTimeFormatter formatter) {
+        final TemporalAccessor parsed = getZonedFormatter(formatter).parse(jsonValue);
+        return new Date(Instant.from(parsed).toEpochMilli());
     }
 }

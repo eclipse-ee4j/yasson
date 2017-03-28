@@ -20,6 +20,7 @@ import org.junit.Test;
 import javax.json.bind.Jsonb;
 import javax.json.bind.JsonbBuilder;
 import java.util.Calendar;
+import java.util.TimeZone;
 
 import static org.junit.Assert.assertEquals;
 
@@ -37,6 +38,7 @@ public class JsonbDateFormatterTest {
         final Calendar timeCalendar = new Calendar.Builder()
                 .setDate(2017, Calendar.MARCH, 3)
                 .setTimeOfDay(11, 11, 10)
+                .setTimeZone(TimeZone.getTimeZone("UTC"))
                 .build();
 
         DateFormatPojo dateFormatPojo = new DateFormatPojo();
@@ -49,7 +51,7 @@ public class JsonbDateFormatterTest {
         dateFormatPojo.getterAndSetterFormattedDateField = timeCalendar.getTime();
         dateFormatPojo.getterAndSetterAndFieldFormattedDateField = timeCalendar.getTime();
 
-        String expectedJson = "{\"formattedDateField\":\"11:11:10 ^^ 03-03-2017\",\"getterAndFieldFormattedDateField\":\"11:11:10 <> 03-03-2017\",\"getterAndSetterAndFieldFormattedDateField\":\"11:11:10 <> 03-03-2017\",\"getterAndSetterFormattedDateField\":\"11:11:10 ^^ 03-03-2017\",\"getterFormattedDateField\":\"11:11:10 ^^ 03-03-2017\",\"plainDateField\":\"2017-03-03T11:11:10\",\"setterAndFieldFormattedDateField\":\"11:11:10 ^^ 03-03-2017\",\"setterFormattedDateField\":\"2017-03-03T11:11:10\"}";
+        String expectedJson = "{\"formattedDateField\":\"11:11:10 ^^ 03-03-2017\",\"getterAndFieldFormattedDateField\":\"11:11:10 <> 03-03-2017\",\"getterAndSetterAndFieldFormattedDateField\":\"11:11:10 <> 03-03-2017\",\"getterAndSetterFormattedDateField\":\"11:11:10 ^^ 03-03-2017\",\"getterFormattedDateField\":\"11:11:10 ^^ 03-03-2017\",\"plainDateField\":\"2017-03-03T11:11:10Z[UTC]\",\"setterAndFieldFormattedDateField\":\"11:11:10 ^^ 03-03-2017\",\"setterFormattedDateField\":\"2017-03-03T11:11:10Z[UTC]\"}";
 
         assertEquals(expectedJson, jsonb.toJson(dateFormatPojo));
     }
@@ -59,6 +61,7 @@ public class JsonbDateFormatterTest {
         final Calendar timeCalendar = new Calendar.Builder()
                 .setDate(2017, Calendar.MARCH, 3)
                 .setTimeOfDay(11, 11, 10)
+                .setTimeZone(TimeZone.getTimeZone("UTC"))
                 .build();
 
         DateFormatPojo result = jsonb.fromJson("{\"formattedDateField\":\"11:11:10 ^^ 03-03-2017\",\"getterAndSetterAndFieldFormattedDateField\":\"11:11:10 $$ 03-03-2017\",\"getterAndSetterFormattedDateField\":\"11:11:10 <> 03-03-2017\",\"getterAndFieldFormattedDateField\":\"11:11:10 ^^ 03-03-2017\",\"getterFormattedDateField\":\"2017-03-03T11:11:10\",\"plainDateField\":\"2017-03-03T11:11:10\",\"setterAndFieldFormattedDateField\":\"11:11:10 <> 03-03-2017\",\"setterFormattedDateField\":\"11:11:10 ^^ 03-03-2017\"}", DateFormatPojo.class);
@@ -78,6 +81,7 @@ public class JsonbDateFormatterTest {
         final Calendar timeCalendar = new Calendar.Builder()
                 .setDate(2017, Calendar.MARCH, 3)
                 .setTimeOfDay(11, 11, 10)
+                .setTimeZone(TimeZone.getTimeZone("UTC"))
                 .build();
 
         DateFormatPojoWithClassLevelFormatter dateFormatPojo = new DateFormatPojoWithClassLevelFormatter();
@@ -100,6 +104,7 @@ public class JsonbDateFormatterTest {
         final Calendar timeCalendar = new Calendar.Builder()
                 .setDate(2017, Calendar.MARCH, 3)
                 .setTimeOfDay(11, 11, 10)
+                .setTimeZone(TimeZone.getTimeZone("UTC"))
                 .build();
 
         DateFormatPojoWithClassLevelFormatter result = jsonb.fromJson("{\"formattedDateField\":\"11:11:10 ^^ 03-03-2017\",\"getterAndSetterAndFieldFormattedDateField\":\"11:11:10 $$ 03-03-2017\",\"getterAndSetterFormattedDateField\":\"11:11:10 <> 03-03-2017\",\"getterAndFieldFormattedDateField\":\"11:11:10 ^^ 03-03-2017\",\"getterFormattedDateField\":\"11:11:10 ^ 03-03-2017\",\"plainDateField\":\"11:11:10 ^ 03-03-2017\",\"setterAndFieldFormattedDateField\":\"11:11:10 <> 03-03-2017\",\"setterFormattedDateField\":\"11:11:10 ^^ 03-03-2017\"}", DateFormatPojoWithClassLevelFormatter.class);

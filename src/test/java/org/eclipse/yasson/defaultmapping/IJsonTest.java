@@ -42,13 +42,13 @@ public class IJsonTest {
     public void testStrictDate() {
         Calendar calendar = Calendar.getInstance();
         calendar.set(1970, 0, 1, 0, 0, 0);
-        calendar.setTimeZone(TimeZone.getTimeZone("Europe/Paris"));
+        calendar.setTimeZone(TimeZone.getTimeZone("UTC"));
         calendar.clear(Calendar.MILLISECOND);
 
         String jsonString = jsonb.toJson(new ScalarValueWrapper<>(calendar.getTime()));
         Assert.assertTrue(jsonString.matches("\\{\"value\":\"1970-01-01T00:00:00Z\\+[0-9]{2}:[0-9]{2}\"}"));
 
-        ScalarValueWrapper<Date> result = jsonb.fromJson("{\"value\":\"1970-01-01T00:00:00Z+01:00\"}", new TestTypeToken<ScalarValueWrapper<Date>>(){}.getType());
+        ScalarValueWrapper<Date> result = jsonb.fromJson("{\"value\":\"1970-01-01T00:00:00Z+00:00\"}", new TestTypeToken<ScalarValueWrapper<Date>>(){}.getType());
         Assert.assertEquals(0, result.getValue().compareTo(calendar.getTime()));
 
     }

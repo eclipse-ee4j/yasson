@@ -69,6 +69,7 @@ public class DatesTest {
     @Test
     public void testDate() throws ParseException {
         final SimpleDateFormat sdf = new SimpleDateFormat("dd.MM.yyyy");
+        sdf.setTimeZone(TimeZone.getTimeZone("UTC"));
         final Date parsedDate = sdf.parse("04.03.2015");
 
         final DatePojo pojo = new DatePojo();
@@ -77,7 +78,7 @@ public class DatesTest {
         pojo.millisFormatted = parsedDate;
 
         // marshal to ISO format
-        final String expected = "{\"defaultFormatted\":\"2015-03-04T00:00:00\"," +
+        final String expected = "{\"defaultFormatted\":\"2015-03-04T00:00:00Z[UTC]\"," +
                 "\"millisFormatted\":\"" + parsedDate.getTime()+ "\"," +
                 "\"customDate\":\"00:00:00 | 04-03-2015\"}";
         assertEquals(expected, jsonb.toJson(pojo));
@@ -142,41 +143,14 @@ public class DatesTest {
     }
 
     @Test
-    public void testCalendarWithoutTime() {
-        final Calendar cal = Calendar.getInstance();
-        cal.clear();
-        cal.set(2015, Calendar.APRIL, 3);
-
-        final CalendarPojo calendarPojo = new CalendarPojo();
-        calendarPojo.customCalendar = cal;
-        calendarPojo.defaultFormatted = cal;
-        calendarPojo.millisFormatted = cal;
-
-        // Get offset
-        final SimpleDateFormat sdf = new SimpleDateFormat("Z");
-        final String offset = sdf.format(cal.getTime());
-
-        // marshal to ISO_DATE
-        final String expected = "{\"defaultFormatted\":\"2015-04-03\"," +
-                "\"millisFormatted\":\"" + cal.getTimeInMillis() + "\"," +
-                "\"customCalendar\":\"00:00:00 | 03-04-2015, " + offset + "\"}";
-        assertEquals(expected, jsonb.toJson(calendarPojo));
-
-        // marshal to ISO_DATE_TIME
-        final CalendarPojo result = jsonb.fromJson(expected, CalendarPojo.class);
-        assertEquals(cal.getTime(), result.customCalendar.getTime());
-        assertEquals(cal.getTime(), result.millisFormatted.getTime());
-        assertEquals(cal.getTime(), result.defaultFormatted.getTime());
-    }
-
-    @Test
     public void testMarshalGregorianCalendar() {
         final Calendar cal = GregorianCalendar.getInstance();
         cal.clear();
         cal.set(2015, Calendar.APRIL, 3);
+        cal.setTimeZone(TimeZone.getTimeZone("UTC"));
 
         // marshal to ISO_DATE
-        assertEquals("{\"value\":\"2015-04-03\"}", jsonb.toJson(new ScalarValueWrapper<>(cal)));
+        assertEquals("{\"value\":\"2015-04-03Z\"}", jsonb.toJson(new ScalarValueWrapper<>(cal)));
 
         // marshal to ISO_DATE_TIME
         final Calendar dateTimeGregorianCalendar = new Calendar.Builder().setDate(2015, 3, 3)
@@ -197,7 +171,7 @@ public class DatesTest {
         InstantPojo instantPojo = new InstantPojo(instant);
 
         final String expected = "{\"defaultFormatted\":\"2015-03-03T23:00:00Z\"," +
-                "\"millisFormatted\":\"2015-03-03T23:00:00Z\"," +
+                "\"millisFormatted\":\"1425423600000\"," +
                 "\"instant\":\"23:00:00 | 03-03-2015\"}";
         assertEquals(expected, jsonb.toJson(instantPojo));
 
@@ -383,6 +357,7 @@ public class DatesTest {
     public void testClassLevel() throws ParseException {
         final ClassLevelDateAnnotation pojo = new ClassLevelDateAnnotation();
         final SimpleDateFormat sdf = new SimpleDateFormat("dd.MM.yyyy");
+        sdf.setTimeZone(TimeZone.getTimeZone("UTC"));
         pojo.date = sdf.parse("04.03.2015");
 
         final ZoneId zone = ZoneId.of("Asia/Almaty");
