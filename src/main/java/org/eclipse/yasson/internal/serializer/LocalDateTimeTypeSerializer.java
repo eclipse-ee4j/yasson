@@ -18,6 +18,7 @@ import org.eclipse.yasson.model.JsonBindingModel;
 import java.time.Instant;
 import java.time.LocalDateTime;
 import java.time.ZoneId;
+import java.time.ZonedDateTime;
 import java.time.format.DateTimeFormatter;
 import java.util.Locale;
 
@@ -51,5 +52,11 @@ public class LocalDateTimeTypeSerializer extends AbstractDateTimeSerializer<Loca
     @Override
     protected String formatWithFormatter(LocalDateTime value, DateTimeFormatter formatter) {
         return getZonedFormatter(formatter).format(value);
+    }
+
+    @Override
+    protected String formatStrictIJson(LocalDateTime value) {
+        final ZonedDateTime zonedDateTime = value.atZone(UTC);
+        return JsonbDateFormatter.IJSON_DATE_FORMATTER.format(zonedDateTime);
     }
 }

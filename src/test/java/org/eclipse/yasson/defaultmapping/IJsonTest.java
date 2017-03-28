@@ -76,4 +76,17 @@ public class IJsonTest {
         Assert.assertEquals(localDate, result.getValue());
     }
 
+    @Test
+    public void testLocalDateTime() {
+        final LocalDateTime localDateTime = LocalDateTime.of(1970, 1, 1, 1, 1, 1);
+        final String json = jsonb.toJson(new ScalarValueWrapper<>(localDateTime));
+
+        Assert.assertEquals("{\"value\":\"1970-01-01T01:01:01Z+00:00\"}", json);
+
+        ScalarValueWrapper<LocalDateTime> result = jsonb.fromJson("{\"value\":\"1970-01-01T01:01:01Z+00:00\"}", new TestTypeToken<ScalarValueWrapper<LocalDateTime>>() {
+        }.getType());
+
+
+        Assert.assertEquals(localDateTime, result.getValue());
+    }
 }
