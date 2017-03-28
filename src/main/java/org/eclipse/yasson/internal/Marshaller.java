@@ -12,6 +12,9 @@
  ******************************************************************************/
 package org.eclipse.yasson.internal;
 
+import org.eclipse.yasson.internal.properties.MessageKeys;
+import org.eclipse.yasson.internal.properties.Messages;
+import org.eclipse.yasson.internal.serializer.AbstractValueTypeSerializer;
 import org.eclipse.yasson.internal.serializer.ContainerSerializerProvider;
 import org.eclipse.yasson.internal.serializer.SerializerBuilder;
 import org.eclipse.yasson.internal.unmarshaller.ContainerModel;
@@ -26,6 +29,7 @@ import javax.json.stream.JsonGenerationException;
 import javax.json.stream.JsonGenerator;
 import java.lang.reflect.Type;
 import java.util.Objects;
+import java.util.OptionalLong;
 import java.util.logging.Logger;
 
 /**
@@ -69,7 +73,6 @@ public class Marshaller extends ProcessingContext implements SerializationContex
      */
     public void marshall(Object object, JsonGenerator jsonGenerator) {
         try {
-            //TODO remove default customization
             final ContainerModel model = new ContainerModel(runtimeType != null ? runtimeType : object.getClass(), null, JsonContext.ROOT, null);
             serializeRoot(object, jsonGenerator, model);
         } catch (JsonbException e) {
@@ -109,6 +112,9 @@ public class Marshaller extends ProcessingContext implements SerializationContex
     @SuppressWarnings("unchecked")
     public <T> void serializeRoot(T root, JsonGenerator generator, JsonBindingModel model) {
         final JsonbSerializer<T> rootSerializer = (JsonbSerializer<T>) getRootSerializer(root.getClass(), model);
+        if (jsonbContext.getConfigProperties().isStrictIJson() && rootSerializer instanceof AbstractValueTypeSerializer) {
+            throw new JsonbException(Messages.getMessage(MessageKeys.IJSON_ENABLED_SINGLE_VALUE));
+        }
         rootSerializer.serialize(root, generator, this);
     }
 

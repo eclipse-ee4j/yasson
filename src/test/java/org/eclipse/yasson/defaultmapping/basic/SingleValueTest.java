@@ -70,7 +70,6 @@ public class SingleValueTest {
     }
 
     @Test
-    @Ignore
     public void testSingleValue() {
         Jsonb jsonb = (new JsonBindingBuilder()).build();
         assertEquals("5", jsonb.toJson(5));
