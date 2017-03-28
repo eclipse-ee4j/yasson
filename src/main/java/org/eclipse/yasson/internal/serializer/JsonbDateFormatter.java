@@ -32,12 +32,6 @@ public class JsonbDateFormatter {
 
     private static final JsonbDateFormatter DEFAULT = new JsonbDateFormatter(JsonbDateFormat.DEFAULT_FORMAT, Locale.getDefault().toLanguageTag());
 
-    public static final String ISO_8601_DATE_TIME_FORMAT = "yyyy-MM-dd'T'HH:mm:ss";
-
-    public static final String ISO_8601_DATE_FORMAT = "yyyy-MM-dd";
-
-    public static final String IJSON_DATE_FORMAT = "yyyy-MM-dd'T'HH:mm:ss'Z'XXX";
-
     public static final DateTimeFormatter IJSON_DATE_FORMATTER = new DateTimeFormatterBuilder()
             .parseCaseInsensitive()
             .append(DateTimeFormatter.ISO_LOCAL_DATE)
@@ -45,14 +39,12 @@ public class JsonbDateFormatter {
             .appendValue(HOUR_OF_DAY, 2)
             .appendLiteral(':')
             .appendValue(MINUTE_OF_HOUR, 2)
-            .optionalStart()
             .appendLiteral(':')
             .appendValue(SECOND_OF_MINUTE, 2)
             .appendLiteral('Z')
             .appendOffset("+HH:MM", "+00:00")
             .toFormatter();
 
-    //Java 8 date formatter is thread safe, cache it if possible
     private final DateTimeFormatter dateTimeFormatter;
 
     private final String format;

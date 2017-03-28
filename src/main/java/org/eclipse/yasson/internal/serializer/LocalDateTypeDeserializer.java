@@ -39,7 +39,7 @@ public class LocalDateTypeDeserializer extends AbstractDateTimeDeserializer<Loca
 
     @Override
     protected LocalDate fromInstant(Instant instant) {
-        return instant.atZone(ZoneId.systemDefault()).toLocalDate();
+        return instant.atZone(UTC).toLocalDate();
     }
 
     @Override

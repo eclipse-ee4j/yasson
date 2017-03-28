@@ -73,7 +73,7 @@ public abstract class AbstractDateTimeSerializer<T> extends AbstractValueTypeSer
             return formatWithFormatter(object, formatter.getDateTimeFormatter());
         }
         if (jsonbContext.getConfigProperties().isStrictIJson()) {
-            return formatWithFormatter(object, JsonbDateFormatter.IJSON_DATE_FORMATTER);
+            return formatStrictIJson(object);
         }
         return formatDefault(object, jsonbContext.getConfigProperties().getLocale(formatter.getLocale()));
     }
@@ -83,6 +83,18 @@ public abstract class AbstractDateTimeSerializer<T> extends AbstractValueTypeSer
             return model.getCustomization().getSerializeDateFormatter();
         }
         return JsonbDateFormatter.getDefault();
+    }
+
+    /**
+     * Append UTC zone in case zone is not set on formatter.
+     *
+     * @param formatter formatter
+     * @return zoned formatter
+     */
+    protected DateTimeFormatter getZonedFormatter(DateTimeFormatter formatter) {
+        final DateTimeFormatter result = formatter.getZone() != null ?
+                formatter : formatter.withZone(UTC);
+        return result;
     }
 
     /**
@@ -120,6 +132,16 @@ public abstract class AbstractDateTimeSerializer<T> extends AbstractValueTypeSer
      */
     protected String formatWithFormatter(T value, DateTimeFormatter formatter) {
         return formatter.format(toTemporalAccessor(value));
+    }
+
+    /**
+     * Format date object as strict IJson date format.
+     *
+     * @param value value to format
+     * @return formatted result
+     */
+    protected String formatStrictIJson(T value) {
+        return JsonbDateFormatter.IJSON_DATE_FORMATTER.format(toTemporalAccessor(value));
     }
 
     @Override

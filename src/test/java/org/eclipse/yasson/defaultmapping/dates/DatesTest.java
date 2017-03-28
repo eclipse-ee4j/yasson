@@ -199,7 +199,7 @@ public class DatesTest {
         final LocalDatePojo pojo = new LocalDatePojo(localDate);
 
         // Get proper milliseconds
-        final long millis = localDate.atStartOfDay(ZoneId.systemDefault()).toInstant().toEpochMilli();
+        final long millis = localDate.atStartOfDay(ZoneId.of("Z")).toInstant().toEpochMilli();
 
         final String expected = "{\"defaultFormatted\":\"2015-04-10\"," +
                 "\"millisFormatted\":\"" + millis + "\"," +
@@ -247,7 +247,7 @@ public class DatesTest {
         final LocalDateTimePojo pojo = new LocalDateTimePojo(dateTime);
 
         // Get proper milliseconds
-        final long millis = dateTime.atZone(ZoneId.systemDefault()).toInstant().toEpochMilli();
+        final long millis = dateTime.atZone(ZoneId.of("Z")).toInstant().toEpochMilli();
 
         final String expected = "{\"defaultFormatted\":\"2015-02-16T13:21:00\"," +
                 "\"millisFormatted\":\"" + millis + "\"," +
@@ -276,7 +276,7 @@ public class DatesTest {
     @Test
     public void testDifferentConfigsLocalDateTime() {
         final LocalDateTime dateTime = LocalDateTime.of(2015, 2, 16, 13, 21);
-        final long millis = dateTime.atZone(ZoneId.systemDefault()).toInstant().toEpochMilli();
+        final long millis = dateTime.atZone(ZoneId.of("Z")).toInstant().toEpochMilli();
         final ScalarValueWrapper<LocalDateTime> pojo = new ScalarValueWrapper<>();
         pojo.setValue(dateTime);
 

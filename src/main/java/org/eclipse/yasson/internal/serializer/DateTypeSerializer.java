@@ -51,9 +51,12 @@ public class DateTypeSerializer extends AbstractDateTimeSerializer<Date> {
 
     @Override
     protected String formatWithFormatter(Date value, DateTimeFormatter formatter) {
-        DateTimeFormatter dateTimeFormatter = formatter.getZone() != null ?
-                formatter : formatter.withZone(UTC);
-        return dateTimeFormatter.format(toTemporalAccessor(value));
+        return getZonedFormatter(formatter).format(toTemporalAccessor(value));
+    }
+
+    @Override
+    protected String formatStrictIJson(Date value) {
+        return JsonbDateFormatter.IJSON_DATE_FORMATTER.withZone(UTC).format(toTemporalAccessor(value));
     }
 
     @Override

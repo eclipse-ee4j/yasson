@@ -39,7 +39,7 @@ public class LocalDateTimeTypeDeserializer extends AbstractDateTimeDeserializer<
 
     @Override
     protected LocalDateTime fromInstant(Instant instant) {
-        return LocalDateTime.ofInstant(instant, ZoneId.systemDefault());
+        return LocalDateTime.ofInstant(instant, UTC);
     }
 
     @Override

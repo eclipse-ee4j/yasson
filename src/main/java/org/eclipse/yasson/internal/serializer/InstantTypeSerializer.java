@@ -49,4 +49,10 @@ public class InstantTypeSerializer extends AbstractDateTimeSerializer<Instant> {
     protected String formatWithFormatter(Instant value, DateTimeFormatter formatter) {
         return formatter.withZone(UTC).format(value);
     }
+
+    @Override
+    protected String formatStrictIJson(Instant value) {
+        return JsonbDateFormatter.IJSON_DATE_FORMATTER.withZone(UTC).format(value);
+    }
+
 }

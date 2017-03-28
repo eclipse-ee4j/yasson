@@ -47,9 +47,8 @@ public class OffsetDateTimeTypeDeserializer extends AbstractDateTimeDeserializer
      */
     @Override
     protected OffsetDateTime fromInstant(Instant instant) {
-        final ZoneId zone = ZoneId.systemDefault();
-        log.warning(Messages.getMessage(MessageKeys.OFFSET_DATE_TIME_FROM_MILLIS, OffsetDateTime.class.getSimpleName(), zone));
-        return OffsetDateTime.ofInstant(instant, zone);
+        log.warning(Messages.getMessage(MessageKeys.OFFSET_DATE_TIME_FROM_MILLIS, OffsetDateTime.class.getSimpleName(), UTC));
+        return OffsetDateTime.ofInstant(instant, UTC);
     }
 
     @Override

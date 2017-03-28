@@ -12,6 +12,7 @@ import java.time.Instant;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.ZoneOffset;
+import java.time.ZonedDateTime;
 import java.util.Calendar;
 import java.util.Date;
 import java.util.TimeZone;
@@ -60,6 +61,19 @@ public class IJsonTest {
         Assert.assertEquals("{\"value\":\"2017-03-25T06:00:00Z+00:00\"}", json);
         ScalarValueWrapper<Instant> result = jsonb.fromJson("{\"value\":\"2017-03-25T06:00:00Z+00:00\"}", new TestTypeToken<ScalarValueWrapper<Instant>>() {}.getType());
         Assert.assertEquals(instant, result.getValue());
+    }
+
+    @Test
+    public void testLocalDate() {
+        final LocalDate localDate = LocalDate.of(1970, 1, 1);
+        final String json = jsonb.toJson(new ScalarValueWrapper<>(localDate));
+        Assert.assertEquals("{\"value\":\"1970-01-01T00:00:00Z+00:00\"}", json);
+
+        ScalarValueWrapper<LocalDate> result = jsonb.fromJson("{\"value\":\"1970-01-01T00:00:00Z+00:00\"}", new TestTypeToken<ScalarValueWrapper<LocalDate>>() {
+        }.getType());
+
+
+        Assert.assertEquals(localDate, result.getValue());
     }
 
 }

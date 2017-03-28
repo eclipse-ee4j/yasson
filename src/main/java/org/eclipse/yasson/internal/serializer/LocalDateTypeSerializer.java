@@ -17,7 +17,9 @@ import org.eclipse.yasson.model.JsonBindingModel;
 
 import java.time.Instant;
 import java.time.LocalDate;
+import java.time.LocalDateTime;
 import java.time.ZoneId;
+import java.time.ZonedDateTime;
 import java.time.format.DateTimeFormatter;
 import java.util.Locale;
 
@@ -27,6 +29,8 @@ import java.util.Locale;
  * @author David Kral
  */
 public class LocalDateTypeSerializer extends AbstractDateTimeSerializer<LocalDate> {
+
+    private static final DateTimeFormatter DEFAULT_FORMAT = DateTimeFormatter.ISO_LOCAL_DATE.withZone(UTC);
 
     /**
      * Creates a serializer.
@@ -39,11 +43,17 @@ public class LocalDateTypeSerializer extends AbstractDateTimeSerializer<LocalDat
 
     @Override
     protected Instant toInstant(LocalDate value) {
-        return Instant.from(value.atStartOfDay(ZoneId.systemDefault()));
+        return Instant.from(value.atStartOfDay(UTC));
     }
 
     @Override
     protected String formatDefault(LocalDate value, Locale locale) {
-        return DateTimeFormatter.ISO_LOCAL_DATE.withLocale(locale).format(value);
+        return DEFAULT_FORMAT.withLocale(locale).format(value);
+    }
+
+    @Override
+    protected String formatStrictIJson(LocalDate value) {
+        final ZonedDateTime zonedDateTime = value.atTime(0, 0, 0).atZone(UTC);
+        return JsonbDateFormatter.IJSON_DATE_FORMATTER.withZone(UTC).format(zonedDateTime);
     }
 }

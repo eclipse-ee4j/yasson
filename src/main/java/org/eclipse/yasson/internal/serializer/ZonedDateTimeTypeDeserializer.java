@@ -47,9 +47,8 @@ public class ZonedDateTimeTypeDeserializer extends AbstractDateTimeDeserializer<
      */
     @Override
     protected ZonedDateTime fromInstant(Instant instant) {
-        final ZoneId zone = ZoneId.systemDefault();
-        log.warning(Messages.getMessage(MessageKeys.OFFSET_DATE_TIME_FROM_MILLIS, ZonedDateTime.class.getSimpleName(), zone));
-        return ZonedDateTime.ofInstant(instant, zone);
+        log.warning(Messages.getMessage(MessageKeys.OFFSET_DATE_TIME_FROM_MILLIS, ZonedDateTime.class.getSimpleName(), UTC));
+        return ZonedDateTime.ofInstant(instant, UTC);
     }
 
     @Override
