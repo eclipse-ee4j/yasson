@@ -25,6 +25,7 @@ import org.eclipse.yasson.defaultmapping.dates.model.OffsetTimePojo;
 import org.eclipse.yasson.defaultmapping.dates.model.ZonedDateTimePojo;
 import org.eclipse.yasson.defaultmapping.generics.model.ScalarValueWrapper;
 import org.eclipse.yasson.internal.JsonBindingBuilder;
+import org.junit.Assert;
 import org.junit.Test;
 
 import javax.json.bind.Jsonb;
@@ -113,6 +114,18 @@ public class DatesTest {
         assertEquals(timeCalendar.getTime(), result.customCalendar.getTime());
         assertEquals(timeCalendar.getTime(), result.millisFormatted.getTime());
         assertEquals(timeCalendar.getTime(), result.defaultFormatted.getTime());
+    }
+
+    @Test
+    public void testCalendarWithoutTime() {
+        ScalarValueWrapper<Calendar> result = jsonb.fromJson("{\"value\":\"2015-04-03+01:00\"}", new TestTypeToken<ScalarValueWrapper<Calendar>>(){}.getType());
+        Assert.assertEquals(2015, result.getValue().get(Calendar.YEAR));
+        Assert.assertEquals(3, result.getValue().get(Calendar.MONTH));
+        Assert.assertEquals(3, result.getValue().get(Calendar.DAY_OF_MONTH));
+        Assert.assertEquals(0, result.getValue().get(Calendar.HOUR_OF_DAY));
+        Assert.assertEquals(0, result.getValue().get(Calendar.MINUTE));
+        Assert.assertEquals(0, result.getValue().get(Calendar.SECOND));
+        Assert.assertEquals("GMT+01:00", result.getValue().getTimeZone().toZoneId().toString());
     }
 
     @Test

@@ -13,23 +13,17 @@
 
 package org.eclipse.yasson.internal.serializer;
 
-import org.eclipse.yasson.internal.JsonbContext;
-import org.eclipse.yasson.internal.Unmarshaller;
 import org.eclipse.yasson.model.JsonBindingModel;
 
-import javax.json.bind.annotation.JsonbDateFormat;
-import java.lang.reflect.Type;
 import java.time.Instant;
 import java.time.LocalDate;
-import java.time.LocalDateTime;
+import java.time.LocalTime;
 import java.time.ZoneId;
-import java.time.ZoneOffset;
 import java.time.ZonedDateTime;
 import java.time.format.DateTimeFormatter;
-import java.time.temporal.ChronoField;
 import java.time.temporal.TemporalAccessor;
+import java.time.temporal.TemporalQueries;
 import java.util.Calendar;
-import java.util.Date;
 import java.util.GregorianCalendar;
 import java.util.Locale;
 import java.util.TimeZone;
@@ -42,6 +36,7 @@ import java.util.TimeZone;
 public class CalendarTypeDeserializer extends AbstractDateTimeDeserializer<Calendar> {
 
     private final Calendar calendarTemplate;
+    private final LocalTime ZERO_LOCAL_TIME = LocalTime.parse("00:00:00");
 
     /**
      * Creates an instance.
@@ -66,12 +61,21 @@ public class CalendarTypeDeserializer extends AbstractDateTimeDeserializer<Calen
     protected Calendar parseDefault(String jsonValue, Locale locale) {
         DateTimeFormatter formatter = jsonValue.contains("T") ?
                 DateTimeFormatter.ISO_DATE_TIME : DateTimeFormatter.ISO_DATE;
-        final TemporalAccessor parsed = formatter.withLocale(locale).parse(jsonValue);
-        return GregorianCalendar.from(ZonedDateTime.from(parsed));
+        return parseWithFormatter(jsonValue, formatter.withLocale(locale));
     }
 
     @Override
     protected Calendar parseWithFormatter(String jsonValue, DateTimeFormatter formatter) {
-        return GregorianCalendar.from(ZonedDateTime.from(formatter.parse(jsonValue)));
+        final TemporalAccessor parsed = formatter.parse(jsonValue);
+        LocalTime time = parsed.query(TemporalQueries.localTime());
+        ZoneId zone = parsed.query(TemporalQueries.zone());
+        if (zone == null) {
+            zone = UTC;
+        }
+        if (time == null) {
+            time = ZERO_LOCAL_TIME;
+        }
+        ZonedDateTime result = LocalDate.from(parsed).atTime(time).atZone(zone);
+        return GregorianCalendar.from(result);
     }
 }
