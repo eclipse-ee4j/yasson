@@ -49,6 +49,8 @@ import java.time.Period;
 import java.time.ZoneId;
 import java.time.ZoneOffset;
 import java.time.ZonedDateTime;
+import java.time.format.DateTimeFormatter;
+import java.util.Arrays;
 import java.util.Calendar;
 import java.util.Date;
 import java.util.GregorianCalendar;
@@ -406,5 +408,17 @@ public class DatesTest {
 
         final ScalarValueWrapper<ZonedDateTime> result = jsonb.fromJson(expected, new TestTypeToken<ScalarValueWrapper<ZonedDateTime>>(){}.getType());
         assertEquals(dateTime, result.getValue());
+    }
+
+    @Test
+    public void testDateGermanLocale() {
+        String format = "E DD MMM yyyy HH:mm:ss z";
+        Locale locale = Locale.GERMAN;
+        Jsonb jsonb = JsonbBuilder.create(new JsonbConfig().withDateFormat(format, locale));
+        final ScalarValueWrapper<Date> result = jsonb.fromJson("{ \"value\" : \"Do 01 Jan 1970 01:00:00 MEZ\" }", new TestTypeToken<ScalarValueWrapper<Date>>(){}.getType());
+
+        DateTimeFormatter formatter = DateTimeFormatter.ofPattern(format);
+        final Instant instant = Instant.from(formatter.withLocale(locale).parse("Do 01 Jan 1970 01:00:00 MEZ"));
+        Assert.assertEquals(instant, result.getValue().toInstant());
     }
 }

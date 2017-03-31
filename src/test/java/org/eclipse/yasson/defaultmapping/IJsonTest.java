@@ -8,6 +8,7 @@ import org.junit.Test;
 import javax.json.bind.Jsonb;
 import javax.json.bind.JsonbBuilder;
 import javax.json.bind.JsonbConfig;
+import java.time.Duration;
 import java.time.Instant;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
@@ -88,5 +89,17 @@ public class IJsonTest {
 
 
         Assert.assertEquals(localDateTime, result.getValue());
+    }
+
+    @Test
+    public void testDuration() {
+        Duration duration = Duration.ofDays(1).plus(Duration.ofHours(1)).plus(Duration.ofSeconds(1));
+
+        final String json = jsonb.toJson(new ScalarValueWrapper<>(duration));
+        Assert.assertEquals("{\"value\":\"PT25H1S\"}", json);
+
+        ScalarValueWrapper<Duration> result = jsonb.fromJson(json, new TestTypeToken<ScalarValueWrapper<Duration>>() {
+        }.getType());
+        Assert.assertEquals(duration, result.getValue());
     }
 }

@@ -16,6 +16,7 @@ package org.eclipse.yasson.defaultmapping.generics;
 import org.eclipse.yasson.TestTypeToken;
 import org.eclipse.yasson.defaultmapping.generics.model.ColoredCircle;
 import org.eclipse.yasson.defaultmapping.generics.model.MultiLevelExtendedGenericTestClass;
+import org.eclipse.yasson.defaultmapping.generics.model.MultipleBoundsContainer;
 import org.eclipse.yasson.defaultmapping.generics.model.WildCardClass;
 import org.eclipse.yasson.defaultmapping.generics.model.WildcardMultipleBoundsClass;
 import org.eclipse.yasson.serializers.model.Box;
@@ -30,6 +31,7 @@ import org.eclipse.yasson.defaultmapping.generics.model.GenericWithUnboundedWild
 import org.eclipse.yasson.defaultmapping.generics.model.MyCyclicGenericClass;
 import org.eclipse.yasson.defaultmapping.generics.model.PropagatedGenericClass;
 import org.eclipse.yasson.defaultmapping.generics.model.Shape;
+import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
 
@@ -373,6 +375,24 @@ public class GenericsTest {
         final Jsonb jsonb = JsonbBuilder.create();
         String result = jsonb.toJson(rawList);
         assertEquals("[\"1981-03-24T00:00:00Z[UTC]\",{\"boxStr\":\"box string\",\"crate\":{\"crate_str\":\"crate str\"}}]", result);
+    }
+
+    @Test
+    public void testMultipleBounds() {
+        final LinkedList<String> list = new LinkedList<>(Arrays.asList("Test 1", "Test 2"));
+        MultipleBoundsContainer<LinkedList<String>> container = new MultipleBoundsContainer<>();
+        container.setInstance(new ArrayList<>());
+        container.getInstance().add(list);
+
+        final Type type = new TestTypeToken<MultipleBoundsContainer<LinkedList<String>>>() {
+        }.getType();
+
+        String jsonString = jsonb.toJson(container, type);
+        Assert.assertEquals("{\"instance\":[[\"Test 1\",\"Test 2\"]]}", jsonString);
+
+        MultipleBoundsContainer<LinkedList<String>> result = jsonb.fromJson(jsonString, type);
+
+        assertEquals(container.getInstance(), result.getInstance());
     }
 
     public interface FunctionalInterface<T> {
