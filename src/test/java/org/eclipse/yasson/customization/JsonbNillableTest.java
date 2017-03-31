@@ -83,7 +83,7 @@ public class JsonbNillableTest {
         assertEquals("{}", jsonb.toJson(overridesInterface));
 
         JsonbNillableOverridesClass overridesClass = new JsonbNillableOverridesClass();
-        assertEquals("{\"overridesNillableInParent\":null}", jsonb.toJson(overridesClass));
+        assertEquals("{}", jsonb.toJson(overridesClass));
     }
 
     @Test
