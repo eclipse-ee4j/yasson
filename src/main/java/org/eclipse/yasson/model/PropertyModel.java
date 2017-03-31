@@ -150,7 +150,7 @@ public class PropertyModel implements JsonBindingModel, Comparable<PropertyModel
 
         if(!builder.isReadTransient()){
             builder.setJsonWriteName(introspector.getJsonbPropertyJsonWriteName(property));
-            builder.setNillable(classModel.getClassCustomization().isNillable() || introspector.isPropertyNillable(property));
+            builder.setNillable(introspector.isPropertyNillable(property).orElse(classModel.getClassCustomization().isNillable()));
             builder.setSerializerBinding(getUserSerializerBinding(property, jsonbContext));
         }
 

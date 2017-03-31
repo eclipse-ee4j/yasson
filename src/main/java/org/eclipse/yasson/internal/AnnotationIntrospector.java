@@ -253,11 +253,11 @@ public class AnnotationIntrospector {
      * @param property property to search in, not null
      * @return True if property should be serialized when null.
      */
-    public boolean isPropertyNillable(Property property) {
+    public Optional<Boolean> isPropertyNillable(Property property) {
         Objects.requireNonNull(property);
 
         final Optional<JsonbProperty> jsonbProperty = getAnnotationFromProperty(JsonbProperty.class, property);
-        return jsonbProperty.isPresent() && jsonbProperty.get().nillable();
+        return jsonbProperty.map(JsonbProperty::nillable);
 
     }
 

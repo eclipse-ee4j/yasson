@@ -29,7 +29,7 @@ public class AnnotationInheritanceTest {
     @Test
     public void testAnnotationInheritance() {
         InheritedAnnotationsPojo pojo = new InheritedAnnotationsPojo();
-        String expectedJson = "{\"renamedProperty\":null}";
+        String expectedJson = "{}";
         final Jsonb jsonb = JsonbBuilder.create();
         assertEquals(expectedJson, jsonb.toJson(pojo));
 

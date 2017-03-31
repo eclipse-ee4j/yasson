@@ -25,6 +25,17 @@ import java.math.BigDecimal;
  */
 public class BigDecimalTypeSerializer extends AbstractNumberSerializer<BigDecimal> {
 
+    // 53 means max bit value of number with sign bit included
+    private static final int MAX_BIT_SIZE = 53;
+
+    // -1022 is the lowest range of the exponent
+    // more https://en.wikipedia.org/wiki/Exponent_bias
+    private static final int MIN_RANGE = -1022;
+
+    // 1023 is the highest range of the exponent
+    // more https://en.wikipedia.org/wiki/Exponent_bias
+    private static final int MAX_RANGE = 1023;
+
     /**
      * Creates an instance.
      *
@@ -36,11 +47,30 @@ public class BigDecimalTypeSerializer extends AbstractNumberSerializer<BigDecima
 
     @Override
     protected void serializeNonFormatted(BigDecimal obj, JsonGenerator generator, String key) {
-        generator.write(key, obj);
+        if (isIEEE754(obj)) {
+            generator.write(key, obj);
+        } else {
+            generator.write(key, obj.toString());
+        }
     }
 
     @Override
     protected void serializeNonFormatted(BigDecimal obj, JsonGenerator generator) {
-        generator.write(obj);
+        if (isIEEE754(obj)) {
+            generator.write(obj);
+        } else {
+            generator.write(obj.toString());
+        }
+    }
+
+    private static boolean isIEEE754(BigDecimal value) {
+        //scale of the number
+        int scale = value.scale();
+        //bit value of number without scale
+        int valBits = value.unscaledValue().abs().bitLength();
+        //bit value of scaled number
+        int intBitsScaled = value.toBigInteger().bitLength();
+        // Number whose bit length is than 53 or is not in range is considered as non IEEE 754-2008 binary64 compliant
+        return valBits <= MAX_BIT_SIZE && intBitsScaled <= MAX_BIT_SIZE && MIN_RANGE <= scale && scale <= MAX_RANGE;
     }
 }
