@@ -25,9 +25,6 @@ import java.math.BigInteger;
  */
 public class BigIntegerTypeSerializer extends AbstractNumberSerializer<BigInteger> {
 
-    // 53 means max bit value of number with sign bit included
-    private static final int MAX_BIT_SIZE = 53;
-
     /**
      * Creates an instance.
      *
@@ -39,7 +36,7 @@ public class BigIntegerTypeSerializer extends AbstractNumberSerializer<BigIntege
 
     @Override
     protected void serializeNonFormatted(BigInteger obj, JsonGenerator generator, String key) {
-        if (isIEEE754(obj)) {
+        if (BigNumberUtil.isIEEE754(obj)) {
             generator.write(key, obj);
         } else {
             generator.write(key, obj.toString());
@@ -48,15 +45,10 @@ public class BigIntegerTypeSerializer extends AbstractNumberSerializer<BigIntege
 
     @Override
     protected void serializeNonFormatted(BigInteger obj, JsonGenerator generator) {
-        if (isIEEE754(obj)) {
+        if (BigNumberUtil.isIEEE754(obj)) {
             generator.write(obj);
         } else {
             generator.write(obj.toString());
         }
-    }
-
-    private static boolean isIEEE754(BigInteger value) {
-        // Number whose bit length is than 53 is considered as non IEEE 754-2008 binary64 compliant
-        return value.abs().bitLength() <= MAX_BIT_SIZE;
     }
 }
