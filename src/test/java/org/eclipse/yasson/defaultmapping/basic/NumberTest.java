@@ -1,6 +1,21 @@
+/*******************************************************************************
+ * Copyright (c) 2016, 2017 Oracle and/or its affiliates. All rights reserved.
+ * This program and the accompanying materials are made available under the
+ * terms of the Eclipse Public License v1.0 and Eclipse Distribution License v. 1.0
+ * which accompanies this distribution.
+ * The Eclipse Public License is available at http://www.eclipse.org/legal/epl-v10.html
+ * and the Eclipse Distribution License is available at
+ * http://www.eclipse.org/org/documents/edl-v10.php.
+ *
+ * Contributors:
+ * Roman Grigoriadi
+ * David Kral
+ ******************************************************************************/
+
 package org.eclipse.yasson.defaultmapping.basic;
 
 import org.eclipse.yasson.TestTypeToken;
+import org.eclipse.yasson.defaultmapping.basic.model.BigDecimalInNumber;
 import org.eclipse.yasson.defaultmapping.generics.model.ScalarValueWrapper;
 import org.junit.Assert;
 import org.junit.Test;
@@ -66,6 +81,23 @@ public class NumberTest {
     }
 
     @Test
+    public void testBigDecimalInNumber() {
+        BigDecimalInNumber testValueQuoted = new BigDecimalInNumber() {{setBigDecValue(new BigDecimal("9007199254740992"));}};
+        BigDecimalInNumber testValueUnQuoted = new BigDecimalInNumber() {{setBigDecValue(new BigDecimal("9007199254740991"));}};
+        String jsonString = jsonb.toJson(testValueQuoted);
+        Assert.assertEquals("{\"bigDecValue\":\"9007199254740992\"}", jsonString);
+
+        jsonString = jsonb.toJson(testValueUnQuoted);
+        Assert.assertEquals("{\"bigDecValue\":9007199254740991}", jsonString);
+
+        BigDecimalInNumber result = jsonb.fromJson("{\"bigDecValue\":\"9007199254740992\"}", BigDecimalInNumber.class);
+        Assert.assertEquals(testValueQuoted.getBigDecValue(), result.getBigDecValue());
+
+        result = jsonb.fromJson("{\"bigDecValue\":9007199254740991}", BigDecimalInNumber.class);
+        Assert.assertEquals(testValueUnQuoted.getBigDecValue(), result.getBigDecValue());
+    }
+
+    @Test
     public void testBigDecimalWrappedMarshalling() {
         String jsonString = jsonb.toJson(new ScalarValueWrapper<>(new BigDecimal("0.1000000000000001")));
         Assert.assertEquals("{\"value\":0.1000000000000001}", jsonString);
@@ -83,6 +115,9 @@ public class NumberTest {
     @Test
     public void testBigDecimalCastedToNumber() {
         String jsonString = jsonb.toJson(new Object() { public Number number = new BigDecimal("0.10000000000000001"); });
-        Assert.assertEquals("{\"number\":0.10000000000000001}", jsonString);
+        Assert.assertEquals("{\"number\":\"0.10000000000000001\"}", jsonString);
+
+        jsonString = jsonb.toJson(new Object() { public Number number = new BigDecimal("0.1000000000000001"); });
+        Assert.assertEquals("{\"number\":0.1000000000000001}", jsonString);
     }
 }
