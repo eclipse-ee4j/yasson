@@ -17,6 +17,7 @@ import org.eclipse.yasson.TestTypeToken;
 import org.eclipse.yasson.defaultmapping.generics.model.GenericTestClass;
 import org.eclipse.yasson.defaultmapping.generics.model.PropagatedGenericClass;
 import org.eclipse.yasson.defaultmapping.inheritance.model.PartialOverride;
+import org.eclipse.yasson.defaultmapping.inheritance.model.PropertyOrderSecond;
 import org.eclipse.yasson.defaultmapping.inheritance.model.SecondLevel;
 import org.eclipse.yasson.defaultmapping.inheritance.model.generics.ExtendsExtendsPropagatedGenericClass;
 import org.eclipse.yasson.defaultmapping.inheritance.model.generics.ExtendsPropagatedGenericClass;
@@ -219,5 +220,20 @@ public class InheritanceTest {
         PartialOverride result = jsonb.fromJson("{\"intValue\":5,\"strValue\":\"abc\"}", PartialOverride.class);
         Assert.assertEquals(5, result.getIntValue());
         Assert.assertEquals("abc", result.getStrValue());
+    }
+
+    @Test
+    public void testPropOrder() {
+
+        PropertyOrderSecond pojo = new PropertyOrderSecond();
+        pojo.setZero("ZERO");
+        pojo.setZeroOverriddenInFirst("ZERO_OVERRIDDEN_IN_FIRST");
+        pojo.setZeroOverriddenInSecond("ZERO_OVERRIDDEN_IN_SECOND");
+        pojo.setFirst("FIRST");
+        pojo.setSecond("SECOND");
+
+        String result = jsonb.toJson(pojo);
+        Assert.assertEquals("{\"zero\":\"ZERO\",\"first\":\"FIRST\",\"zeroOverriddenInFirst\":\"ZERO_OVERRIDDEN_IN_FIRST\",\"second\":\"SECOND\",\"zeroOverriddenInSecond\":\"ZERO_OVERRIDDEN_IN_SECOND\"}",
+                result);
     }
 }
