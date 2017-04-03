@@ -411,14 +411,15 @@ public class DatesTest {
     }
 
     @Test
-    public void testDateGermanLocale() {
+    public void testDateFrenchLocale() {
         String format = "E DD MMM yyyy HH:mm:ss z";
-        Locale locale = Locale.GERMAN;
+        Locale locale = Locale.forLanguageTag("fr-FR");
         Jsonb jsonb = JsonbBuilder.create(new JsonbConfig().withDateFormat(format, locale));
-        final ScalarValueWrapper<Date> result = jsonb.fromJson("{ \"value\" : \"Do 01 Jan 1970 01:00:00 MEZ\" }", new TestTypeToken<ScalarValueWrapper<Date>>(){}.getType());
+
+        final ScalarValueWrapper<Date> result = jsonb.fromJson("{ \"value\" : \"lun. 93 avr. 2017 16:51:12 CEST\" }", new TestTypeToken<ScalarValueWrapper<Date>>(){}.getType());
 
         DateTimeFormatter formatter = DateTimeFormatter.ofPattern(format);
-        final Instant instant = Instant.from(formatter.withLocale(locale).parse("Do 01 Jan 1970 01:00:00 MEZ"));
+        final Instant instant = Instant.from(formatter.withLocale(locale).parse("lun. 93 avr. 2017 16:51:12 CEST"));
         Assert.assertEquals(instant, result.getValue().toInstant());
     }
 }
