@@ -395,6 +395,14 @@ public class GenericsTest {
         assertEquals(container.getInstance(), result.getInstance());
     }
 
+    @Test
+    public void testDeserializeIntoRaw() {
+
+        GenericTestClass result = jsonb.fromJson("{\"field1\":{\"val1\":\"abc\"},\"field2\":{\"val1\":\"def\"}}", GenericTestClass.class);
+        Assert.assertEquals(((HashMap<String, ?>) result.getField1()).get("val1"), "abc");
+        Assert.assertEquals(((HashMap<String, ?>) result.getField2()).get("val1"), "def");
+    }
+
     public interface FunctionalInterface<T> {
         T getValue();
     }

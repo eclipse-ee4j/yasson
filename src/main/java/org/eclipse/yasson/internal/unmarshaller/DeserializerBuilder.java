@@ -201,27 +201,27 @@ public class DeserializerBuilder extends AbstractSerializerBuilder<DeserializerB
     }
 
     private Type resolveRuntimeType() {
-        Type toResolve = genericType != null ? genericType : getModel().getType();
+        Type result = ReflectionUtils.resolveType(wrapper, genericType != null ? genericType : getModel().getType());
         //Try to infer best from JSON event.
-        if (toResolve == Object.class) {
+        if (result == Object.class) {
             switch (jsonEvent) {
                 case VALUE_FALSE:
                 case VALUE_TRUE:
-                    return Boolean.class;
+                return Boolean.class;
                 case VALUE_NUMBER:
-                    return BigDecimal.class;
+                return BigDecimal.class;
                 case VALUE_STRING:
-                    return String.class;
+                return String.class;
                 case START_ARRAY:
-                    return ArrayList.class;
+                return ArrayList.class;
                 case START_OBJECT:
-                    return HashMap.class;
-                    default:
-                        throw new IllegalStateException("Can't infer deserialization type type: " + jsonEvent);
+                return HashMap.class;
+                default:
+                throw new IllegalStateException("Can't infer deserialization type type: " + jsonEvent);
 
             }
         }
-        return ReflectionUtils.resolveType(wrapper, toResolve);
+        return result;
     }
 
     /**
