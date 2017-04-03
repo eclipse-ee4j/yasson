@@ -70,7 +70,8 @@ public enum MessageKeys {
     UNKNOWN_BINARY_DATA_STRATEGY("unknownBinaryDataStrategy"),
     PROPERTY_NAMING_STRATEGY_INVALID("invalidPropertyNamingStrategy"),
     CREATOR_PARAMETER_NOT_ANNOTATED("creatorParameterNotAnnotated"),
-    UNKNOWN_JSON_PROPERTY("unknownJsonProperty")
+    UNKNOWN_JSON_PROPERTY("unknownJsonProperty"),
+    JSONB_CREATOR_MISSING_PROPERTY("jsonbCreatorMissingProperty")
     ;
 
     /** Message bundle key. */

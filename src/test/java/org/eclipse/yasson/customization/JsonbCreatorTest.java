@@ -90,18 +90,10 @@ public class JsonbCreatorTest {
         }
     }
 
-    @Test
-    public void testCreatorWithoutJsonbParameters() {
-        final CreatorWithoutJsonbProperty result = JsonbBuilder.create().fromJson("{\"s1\":\"abc\", \"arg1\":\"def\"}", CreatorWithoutJsonbProperty.class);
-        Assert.assertEquals("abc", result.getPar1());
-        Assert.assertEquals("def", result.getPar2());
-    }
-
-    @Test
+    @Test(expected = JsonbException.class)
     public void testCreatorWithoutJsonbParameters1() {
-        final CreatorWithoutJsonbProperty1 result = JsonbBuilder.create().fromJson("{\"arg0\":\"abc\", \"s2\":\"def\"}", CreatorWithoutJsonbProperty1.class);
-        Assert.assertEquals("abc", result.getPar1());
-        Assert.assertEquals("def", result.getPar2());
+        //arg2 is missing in json document
+        JsonbBuilder.create().fromJson("{\"arg0\":\"abc\", \"s2\":\"def\"}", CreatorWithoutJsonbProperty1.class);
     }
 
     @Test

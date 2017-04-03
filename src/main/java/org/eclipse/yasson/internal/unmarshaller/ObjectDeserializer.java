@@ -119,11 +119,11 @@ class ObjectDeserializer<T> extends AbstractContainerDeserializer<T> {
         final List<Object> paramValues = new ArrayList<>();
         for(CreatorParam param : creator.getParams()) {
             final ValueWrapper valueWrapper = values.get(param.getName());
-            Object value = valueWrapper == null ?
-                    defaultConstructorValue(param.getType())
-                    : valueWrapper.getValue();
-
-            paramValues.add(value);
+            //required by spec
+            if (valueWrapper == null){
+                throw new JsonbException(Messages.getMessage(MessageKeys.JSONB_CREATOR_MISSING_PROPERTY, param.getName()));
+            }
+            paramValues.add(valueWrapper.getValue());
         }
         instance = creator.call(paramValues.toArray(), rawType);
         return instance;
@@ -193,26 +193,6 @@ class ObjectDeserializer<T> extends AbstractContainerDeserializer<T> {
         }
         lastPropertyModel = new LastPropertyModel(lastKeyName, getClassModel().findPropertyModelByJsonReadName(lastKeyName));
         return lastPropertyModel.getPropertyModel();
-    }
-
-    private Object defaultConstructorValue(Type paramType) {
-        if (paramType == Boolean.TYPE) {
-            return false;
-        } else if (paramType == Byte.TYPE) {
-            return (byte) 0;
-        } else if (paramType == Short.TYPE) {
-            return (short) 0;
-        } else if (paramType == Integer.TYPE) {
-            return 0;
-        } else if (paramType == Float.TYPE) {
-            return 0f;
-        } else if (paramType == Double.TYPE) {
-            return 0d;
-        } else if (paramType == Long.TYPE) {
-            return 0L;
-        } else {
-            return null;
-        }
     }
 
     private static class ValueWrapper {
