@@ -422,4 +422,16 @@ public class DatesTest {
         final Instant instant = Instant.from(formatter.withLocale(locale).parse("lun. 93 avr. 2017 16:51:12 CEST"));
         Assert.assertEquals(instant, result.getValue().toInstant());
     }
+
+    @Test
+    public void testSimpleTimeZone() {
+        String json = jsonb.toJson(new ScalarValueWrapper<>(new SimpleTimeZone(0, "Europe/London")));
+        Assert.assertEquals("{\"value\":\"Europe/London\"}", json);
+
+        ScalarValueWrapper<TimeZone> result = jsonb.fromJson(json, new TestTypeToken<ScalarValueWrapper<TimeZone>>() {
+        }.getType());
+        Assert.assertEquals("Europe/London", result.getValue().getID());
+        Assert.assertEquals(LocalDateTime.now().atZone(ZoneId.of("Europe/London")).getOffset().getTotalSeconds() * 1000,
+                result.getValue().getOffset(System.currentTimeMillis()));
+    }
 }

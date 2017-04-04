@@ -14,10 +14,20 @@
 package org.eclipse.yasson.internal.serializer;
 
 import org.eclipse.yasson.internal.Unmarshaller;
+import org.eclipse.yasson.internal.properties.MessageKeys;
+import org.eclipse.yasson.internal.properties.Messages;
 import org.eclipse.yasson.model.JsonBindingModel;
 
 import javax.json.bind.JsonbException;
 import java.lang.reflect.Type;
+import java.time.Instant;
+import java.time.LocalDateTime;
+import java.time.ZoneId;
+import java.time.ZoneOffset;
+import java.time.ZonedDateTime;
+import java.time.temporal.ChronoField;
+import java.time.zone.ZoneRulesException;
+import java.util.SimpleTimeZone;
 import java.util.TimeZone;
 
 /**
@@ -38,10 +48,13 @@ public class TimeZoneTypeDeserializer extends AbstractValueTypeDeserializer<Time
 
     @Override
     protected TimeZone deserialize(String jsonValue, Unmarshaller unmarshaller, Type rtType) {
-        //Use of three-letter time zone ID has been already deprecated and is not supported.
-        if (jsonValue.length() == 3) {
-            throw new JsonbException("Unsupported TimeZone: " + jsonValue);
+        try {
+            final ZoneId zoneId = ZoneId.of(jsonValue);
+            final ZonedDateTime zonedDateTime = LocalDateTime.now().atZone(zoneId);
+            return new SimpleTimeZone(zonedDateTime.getOffset().getTotalSeconds() * 1000, zoneId.getId());
+        } catch (ZoneRulesException e) {
+            throw new JsonbException(Messages.getMessage(MessageKeys.ZONE_PARSE_ERROR), e);
         }
-        return TimeZone.getTimeZone(jsonValue);
     }
+
 }
