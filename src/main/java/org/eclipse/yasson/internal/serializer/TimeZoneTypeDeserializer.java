@@ -53,7 +53,7 @@ public class TimeZoneTypeDeserializer extends AbstractValueTypeDeserializer<Time
             final ZonedDateTime zonedDateTime = LocalDateTime.now().atZone(zoneId);
             return new SimpleTimeZone(zonedDateTime.getOffset().getTotalSeconds() * 1000, zoneId.getId());
         } catch (ZoneRulesException e) {
-            throw new JsonbException(Messages.getMessage(MessageKeys.ZONE_PARSE_ERROR), e);
+            throw new JsonbException(Messages.getMessage(MessageKeys.ZONE_PARSE_ERROR, jsonValue), e);
         }
     }
 

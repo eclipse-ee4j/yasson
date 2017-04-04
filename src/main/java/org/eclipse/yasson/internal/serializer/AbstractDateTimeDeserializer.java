@@ -14,13 +14,18 @@
 package org.eclipse.yasson.internal.serializer;
 
 import org.eclipse.yasson.internal.Unmarshaller;
+import org.eclipse.yasson.internal.properties.MessageKeys;
+import org.eclipse.yasson.internal.properties.Messages;
 import org.eclipse.yasson.model.JsonBindingModel;
 
+import javax.json.JsonException;
+import javax.json.bind.JsonbException;
 import javax.json.bind.annotation.JsonbDateFormat;
 import java.lang.reflect.Type;
 import java.time.Instant;
 import java.time.ZoneId;
 import java.time.format.DateTimeFormatter;
+import java.time.format.DateTimeParseException;
 import java.time.temporal.TemporalAccessor;
 import java.util.Locale;
 
@@ -49,13 +54,17 @@ public abstract class AbstractDateTimeDeserializer<T> extends AbstractValueTypeD
         if (JsonbDateFormat.TIME_IN_MILLIS.equals(formatter.getFormat())) {
             return fromInstant(Instant.ofEpochMilli(Long.parseLong(jsonValue)));
         } else if (formatter.getDateTimeFormatter() != null) {
-            return parseWithFormatter(jsonValue, formatter.getDateTimeFormatter());
+            return parseWithFormatterInternal(jsonValue, formatter.getDateTimeFormatter());
         }
         final boolean strictIJson = unmarshaller.getJsonbContext().getConfigProperties().isStrictIJson();
         if (strictIJson) {
-            return parseWithFormatter(jsonValue, JsonbDateFormatter.IJSON_DATE_FORMATTER);
+            return parseWithFormatterInternal(jsonValue, JsonbDateFormatter.IJSON_DATE_FORMATTER);
         }
-        return parseDefault(jsonValue, unmarshaller.getJsonbContext().getConfigProperties().getLocale(formatter.getLocale()));
+        try {
+            return parseDefault(jsonValue, unmarshaller.getJsonbContext().getConfigProperties().getLocale(formatter.getLocale()));
+        } catch (DateTimeParseException e) {
+            throw new JsonException(Messages.getMessage(MessageKeys.DATE_PARSE_ERROR, jsonValue), e);
+        }
     }
 
     protected JsonbDateFormatter getJsonbDateFormatter() {
@@ -104,4 +113,12 @@ public abstract class AbstractDateTimeDeserializer<T> extends AbstractValueTypeD
      * @return parsed date object
      */
     protected abstract T parseWithFormatter(String jsonValue, DateTimeFormatter formatter);
+
+    private T parseWithFormatterInternal(String jsonValue, DateTimeFormatter formatter) {
+        try {
+            return parseWithFormatter(jsonValue, formatter);
+        } catch (DateTimeParseException e) {
+            throw new JsonbException(Messages.getMessage(MessageKeys.DATE_PARSE_ERROR, jsonValue), e);
+        }
+    }
 }
