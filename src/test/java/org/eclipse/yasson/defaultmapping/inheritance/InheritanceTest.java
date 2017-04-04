@@ -33,6 +33,8 @@ import java.lang.reflect.Type;
 import java.math.BigDecimal;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.TimeZone;
+import java.util.function.BiPredicate;
 
 import static org.junit.Assert.assertEquals;
 
@@ -223,17 +225,18 @@ public class InheritanceTest {
     }
 
     @Test
-    public void testPropOrder() {
+    public void testPropOrderPartiallyOverriddenProperty() {
 
         PropertyOrderSecond pojo = new PropertyOrderSecond();
         pojo.setZero("ZERO");
-        pojo.setZeroOverriddenInFirst("ZERO_OVERRIDDEN_IN_FIRST");
+        pojo.setZeroPartiallyOverriddenInFirst("ZERO_PARTIALLY_OVERRIDDEN_IN_FIRST");
         pojo.setZeroOverriddenInSecond("ZERO_OVERRIDDEN_IN_SECOND");
         pojo.setFirst("FIRST");
         pojo.setSecond("SECOND");
 
         String result = jsonb.toJson(pojo);
-        Assert.assertEquals("{\"zero\":\"ZERO\",\"first\":\"FIRST\",\"zeroOverriddenInFirst\":\"ZERO_OVERRIDDEN_IN_FIRST\",\"second\":\"SECOND\",\"zeroOverriddenInSecond\":\"ZERO_OVERRIDDEN_IN_SECOND\"}",
+        Assert.assertEquals("{\"zero\":\"ZERO\",\"zeroPartiallyOverriddenInFirst\":\"ZERO_PARTIALLY_OVERRIDDEN_IN_FIRST\",\"first\":\"FIRST\",\"second\":\"SECOND\",\"zeroOverriddenInSecond\":\"ZERO_OVERRIDDEN_IN_SECOND\"}",
                 result);
     }
+
 }

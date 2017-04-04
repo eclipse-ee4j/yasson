@@ -425,13 +425,13 @@ public class DatesTest {
 
     @Test
     public void testSimpleTimeZone() {
-        String json = jsonb.toJson(new ScalarValueWrapper<>(new SimpleTimeZone(0, "Europe/London")));
-        Assert.assertEquals("{\"value\":\"Europe/London\"}", json);
+        String json = jsonb.toJson(new ScalarValueWrapper<>(new SimpleTimeZone(0, "America/Los_Angeles")));
+        Assert.assertEquals("{\"value\":\"America/Los_Angeles\"}", json);
 
         ScalarValueWrapper<TimeZone> result = jsonb.fromJson(json, new TestTypeToken<ScalarValueWrapper<TimeZone>>() {
         }.getType());
-        Assert.assertEquals("Europe/London", result.getValue().getID());
-        Assert.assertEquals(LocalDateTime.now().atZone(ZoneId.of("Europe/London")).getOffset().getTotalSeconds() * 1000,
+        Assert.assertEquals("America/Los_Angeles", result.getValue().getID());
+        Assert.assertEquals(LocalDateTime.now().atZone(ZoneId.of("America/Los_Angeles")).getOffset().getTotalSeconds() * 1000,
                 result.getValue().getOffset(System.currentTimeMillis()));
     }
 }

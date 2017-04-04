@@ -7,7 +7,8 @@ public class PropertyOrderZero {
 
     private String zeroOverriddenInSecond;
 
-    private String zeroOverriddenInFirst;
+    //only setter is overridden
+    private String zeroPartiallyOverriddenInFirst;
 
     private String zero;
 
@@ -27,11 +28,11 @@ public class PropertyOrderZero {
         this.zeroOverriddenInSecond = zeroOverriddenInSecond;
     }
 
-    public String getZeroOverriddenInFirst() {
-        return zeroOverriddenInFirst;
+    public String getZeroPartiallyOverriddenInFirst() {
+        return zeroPartiallyOverriddenInFirst;
     }
 
-    public void setZeroOverriddenInFirst(String zeroOverriddenInFirst) {
-        this.zeroOverriddenInFirst = zeroOverriddenInFirst;
+    public void setZeroPartiallyOverriddenInFirst(String zeroPartiallyOverriddenInFirst) {
+        this.zeroPartiallyOverriddenInFirst = zeroPartiallyOverriddenInFirst;
     }
 }

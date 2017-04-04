@@ -16,6 +16,7 @@ import org.eclipse.yasson.model.ClassModel;
 import org.eclipse.yasson.model.JsonbAnnotatedElement;
 import org.eclipse.yasson.model.Property;
 import org.eclipse.yasson.model.PropertyModel;
+import org.eclipse.yasson.model.ReflectionPropagation;
 
 import javax.json.bind.JsonbException;
 import java.beans.Introspector;
@@ -55,16 +56,10 @@ class ClassParser {
         parseFields(classElement, classProperties);
         parseClassAndInterfaceMethods(classElement, classProperties);
 
-        final  List<PropertyModel> sortedProperties = new ArrayList<>();
-        mergeWithParent(classModel.getParentClassModel(), classElement, classProperties, sortedProperties);
-
-
-        Map<String, PropertyModel> unsorted = new HashMap<>();
-        for (Map.Entry<String, Property> entry : classProperties.entrySet()) {
-            unsorted.put(entry.getKey(), new PropertyModel(classModel, entry.getValue(), jsonbContext));
-        }
-
-        sortedProperties.addAll(jsonbContext.getConfigProperties().getPropertyOrdering().orderProperties(unsorted, classModel));
+        //add sorted properties from parent, if they are not overridden in current class
+        final List<PropertyModel> sortedProperties = getSortedParentProperties(classModel, classElement, classProperties);
+        //sort and add properties from current class
+        sortedProperties.addAll(jsonbContext.getConfigProperties().getPropertyOrdering().orderProperties(classProperties, classModel, jsonbContext));
 
         checkPropertyNameClash(sortedProperties, classModel.getType());
         classModel.setProperties(sortedProperties);
@@ -174,11 +169,14 @@ class ClassParser {
      *
      * For example BaseClass contains field foo and getter getFoo. In BaseExtensions there is a setter setFoo.
      * All three will be merged for BaseExtension.
+     *
+     * Such property is sorted based on where its getter or field is located.
      */
-    private void mergeWithParent(ClassModel parentClassModel, JsonbAnnotatedElement<Class<?>> classElement, Map<String, Property> classProperties, List<PropertyModel> sortedProperties) {
+    private  List<PropertyModel> getSortedParentProperties(ClassModel classModel, JsonbAnnotatedElement<Class<?>> classElement, Map<String, Property> classProperties) {
+        List<PropertyModel> sortedProperties = new ArrayList<>();
         //Pull properties from parent
-        if (parentClassModel != null) {
-            for (PropertyModel parentProp : parentClassModel.getSortedProperties()) {
+        if (classModel.getParentClassModel() != null) {
+            for (PropertyModel parentProp : classModel.getParentClassModel().getSortedProperties()) {
                 final Property current = classProperties.get(parentProp.getPropertyName());
                 //don't replace overridden properties
                 if (current == null) {
@@ -186,10 +184,18 @@ class ClassParser {
                 } else {
                     //merge
                     final Property merged = mergeProperty(current, parentProp, classElement);
-                    classProperties.replace(current.getName(), merged);
+                    ReflectionPropagation propagation = new ReflectionPropagation(current, jsonbContext);
+                    if (propagation.isReadable()) {
+                        classProperties.replace(current.getName(), merged);
+                    } else {
+                        sortedProperties.add(new PropertyModel(classModel, merged, jsonbContext));
+                        classProperties.remove(current.getName());
+                    }
+
                 }
             }
         }
+        return sortedProperties;
     }
 
     private Property mergeProperty(Property current, PropertyModel parentProp, JsonbAnnotatedElement<Class<?>> classElement) {

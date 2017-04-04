@@ -28,7 +28,7 @@ public class ReflectionPropagation extends PropertyValuePropagation {
 
     private SetValueCommand setValueCommand;
 
-    ReflectionPropagation(Property property, JsonbContext ctx) {
+    public ReflectionPropagation(Property property, JsonbContext ctx) {
         super(property, ctx);
     }
 

@@ -5,8 +5,6 @@ package org.eclipse.yasson.defaultmapping.inheritance.model;
  */
 public class PropertyOrderFirst extends PropertyOrderZero {
 
-    private String zeroOverriddenInFirst;
-
     private String first;
 
     public String getFirst() {
@@ -18,13 +16,8 @@ public class PropertyOrderFirst extends PropertyOrderZero {
     }
 
     @Override
-    public String getZeroOverriddenInFirst() {
-        return zeroOverriddenInFirst;
-    }
-
-    @Override
-    public void setZeroOverriddenInFirst(String zeroOverriddenInFirst) {
-        this.zeroOverriddenInFirst = zeroOverriddenInFirst;
+    public void setZeroPartiallyOverriddenInFirst(String zeroPartiallyOverriddenInFirst) {
+        super.setZeroPartiallyOverriddenInFirst(zeroPartiallyOverriddenInFirst);
     }
 
 }

@@ -14,6 +14,7 @@ package org.eclipse.yasson.internal;
 
 import org.eclipse.yasson.internal.internalOrdering.PropOrderStrategy;
 import org.eclipse.yasson.model.ClassModel;
+import org.eclipse.yasson.model.Property;
 import org.eclipse.yasson.model.PropertyModel;
 
 import javax.json.bind.JsonbConfig;
@@ -22,6 +23,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 import java.util.Objects;
+import java.util.stream.Collectors;
 
 /**
  * Order properties in bean object. {@link javax.json.bind.annotation.JsonbPropertyOrder} have always precedence.
@@ -49,17 +51,18 @@ public class PropertyOrdering {
      *
      * @param properties Properties to sort.
      * @param classModel Class model.
+     * @param jsonbContext jsonb context.
      * @return Sorted list of properties.
      */
-    public List<PropertyModel> orderProperties(Map<String, PropertyModel> properties, ClassModel classModel) {
+    public List<PropertyModel> orderProperties(Map<String, Property> properties, ClassModel classModel, JsonbContext jsonbContext) {
         String[] order = classModel.getClassCustomization().getPropertyOrder();
         if (order != null) {
             //if @JsonbPropertyOrder annotation is defined on a class
             List<PropertyModel> sortedProperties = new ArrayList<>();
             for (String propName : order) {
-                final PropertyModel remove = properties.remove(propName);
+                final Property remove = properties.remove(propName);
                 if (remove != null) {
-                    sortedProperties.add(remove);
+                    sortedProperties.add(new PropertyModel(classModel, remove, jsonbContext));
                 }
             }
             /* TODO currently disabled, should remaining fields (unspecified in JsonbPropertyOrder) appear in json?
@@ -70,7 +73,9 @@ public class PropertyOrdering {
         }
 
         //No annotation, check JsonbConfig for ordering strategy use LEXICOGRAPHICAL as default
-        return propertyOrderStrategy.sortProperties(properties.values());
+        return propertyOrderStrategy.sortProperties(properties.values().stream()
+                .map((prop)->new PropertyModel(classModel, prop, jsonbContext))
+                .collect(Collectors.toList()));
     }
 
     /**
