@@ -18,7 +18,6 @@ import org.eclipse.yasson.internal.properties.MessageKeys;
 import org.eclipse.yasson.internal.properties.Messages;
 import org.eclipse.yasson.model.JsonBindingModel;
 
-import javax.json.JsonException;
 import javax.json.bind.JsonbException;
 import javax.json.bind.annotation.JsonbDateFormat;
 import java.lang.reflect.Type;
@@ -26,7 +25,6 @@ import java.time.Instant;
 import java.time.ZoneId;
 import java.time.format.DateTimeFormatter;
 import java.time.format.DateTimeParseException;
-import java.time.temporal.TemporalAccessor;
 import java.util.Locale;
 
 /**
@@ -63,7 +61,7 @@ public abstract class AbstractDateTimeDeserializer<T> extends AbstractValueTypeD
         try {
             return parseDefault(jsonValue, unmarshaller.getJsonbContext().getConfigProperties().getLocale(formatter.getLocale()));
         } catch (DateTimeParseException e) {
-            throw new JsonException(Messages.getMessage(MessageKeys.DATE_PARSE_ERROR, jsonValue), e);
+            throw new JsonbException(Messages.getMessage(MessageKeys.DATE_PARSE_ERROR, jsonValue), e);
         }
     }
 
