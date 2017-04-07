@@ -370,6 +370,7 @@
                             </goals>
                             <configuration>
                                 <instructions>
+                                    <_failok>true</_failok>
                                     <Bundle-SymbolicName>${project.artifactId}</Bundle-SymbolicName>
                                 </instructions>
                             </configuration>
