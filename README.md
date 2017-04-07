@@ -23,11 +23,11 @@ Jsonb jsonb = JsonbBuilder.create(config);
 String result = jsonb.toJson(someObject);
 ```
 
-##Licenses
+## Licenses
 - [Eclipse Distribution License 1.0 (BSD)](https://projects.eclipse.org/content/eclipse-distribution-license-1.0-bsd)
 - [Eclipse Public License 1.0](https://projects.eclipse.org/content/eclipse-public-license-1.0)
 
-##Links
+## Links
 - JSON-B official web site: https://json-b.net
 - Specification project: http://jsonb-spec.java.net
 - JSR-367 page on JCP site: https://jcp.org/en/jsr/detail?id=367
