@@ -12,7 +12,12 @@ import java.util.Objects;
 abstract class GetValueCommand {
 
     /**
-     * @see GetValueCommand#getValue(Object)
+     * Get a value with reflection on {@link java.lang.reflect.Field field} or {@link java.lang.reflect.Method getter}.
+     *
+     * @param object object to invoke get value on, not null.
+     * @throws IllegalAccessException if reflection fails.
+     * @throws InvocationTargetException if reflection fails.
+     * @return value
      */
     abstract Object internalGetValue(Object object) throws IllegalAccessException, InvocationTargetException;
 

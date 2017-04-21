@@ -105,6 +105,7 @@ public class Marshaller extends ProcessingContext implements SerializationContex
     /**
      * Serializes root element.
      *
+     * @param <T> Root type
      * @param root Root.
      * @param generator JSON generator.
      * @param model Binding model.

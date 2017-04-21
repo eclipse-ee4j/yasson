@@ -45,10 +45,10 @@ public class ObjectSerializer<T> extends AbstractContainerSerializer<T> {
     /**
      * Creates a new instance.
      *
-     * @param wrapper
-     * @param runtimeType
-     * @param classModel
-     * @param wrapperModel
+     * @param wrapper wrapped item
+     * @param runtimeType class type
+     * @param classModel model of the class
+     * @param wrapperModel data binding model
      */
     public ObjectSerializer(CurrentItem<?> wrapper, Type runtimeType, ClassModel classModel, JsonBindingModel wrapperModel) {
         super(wrapper, runtimeType, classModel, wrapperModel);

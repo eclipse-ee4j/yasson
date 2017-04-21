@@ -157,8 +157,9 @@ public class ClassModel {
     }
 
     /**
+     * Sets parsed properties of the class.
      *
-     * @param parsedProperties
+     * @param parsedProperties class properties
      */
     public void setProperties(List<PropertyModel> parsedProperties) {
         sortedProperties = parsedProperties.toArray(new PropertyModel[]{});

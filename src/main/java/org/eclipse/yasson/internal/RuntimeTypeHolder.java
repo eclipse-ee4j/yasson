@@ -26,9 +26,10 @@ public class RuntimeTypeHolder implements RuntimeTypeInfo {
     private final Type runtimeType;
 
     /**
+     * Creates a new instance.
      *
-     * @param wrapper
-     * @param runtimeType
+     * @param wrapper runtime info about class
+     * @param runtimeType class type
      */
     public RuntimeTypeHolder(RuntimeTypeInfo wrapper, Type runtimeType) {
         this.wrapper = wrapper;
