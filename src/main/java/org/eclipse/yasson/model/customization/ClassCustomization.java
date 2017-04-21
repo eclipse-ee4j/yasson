@@ -59,8 +59,9 @@ public class ClassCustomization extends Customization {
     }
 
     /**
+     * Returns instance of {@link JsonbCreator}.
      *
-     * @return
+     * @return instance of creator
      */
     public JsonbCreator getCreator() {
         return creator;
@@ -76,8 +77,9 @@ public class ClassCustomization extends Customization {
     }
 
     /**
+     * Sets sorted properties.
      *
-     * @param propertyOrder
+     * @param propertyOrder sorted names of properties
      */
     public void setPropertyOrder(String[] propertyOrder) {
         this.propertyOrder = propertyOrder;

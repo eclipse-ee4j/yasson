@@ -152,10 +152,11 @@ public class ReflectionUtils {
     }
 
     /**
+     * Resolves {@link TypeVariable} arguments of generic types.
      *
-     * @param typeToResolve
-     * @param typeToSearch
-     * @return
+     * @param typeToResolve type to resolve
+     * @param typeToSearch type to search
+     * @return resolved type
      */
     public static Type resolveTypeArguments(ParameterizedType typeToResolve, Type typeToSearch) {
         final Type[] unresolvedArgs = typeToResolve.getActualTypeArguments();

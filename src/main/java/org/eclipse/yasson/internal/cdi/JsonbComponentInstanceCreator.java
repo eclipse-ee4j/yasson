@@ -24,10 +24,11 @@ import java.io.Closeable;
 public interface JsonbComponentInstanceCreator extends Closeable {
 
     /**
+     * Returns instance of JsonbComponent for desired class
      *
-     * @param <T>
-     * @param componentClass
-     * @return
+     * @param <T> Jsonb component type
+     * @param componentClass component class
+     * @return component instance
      */
     <T> T getOrCreateComponent(Class<T> componentClass);
 }

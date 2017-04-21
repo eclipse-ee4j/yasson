@@ -24,7 +24,7 @@ import javax.json.stream.JsonGenerator;
  * Serializes an object with user defined serializer.
  *
  * @author Roman Grigoriadi
- * @param <T>
+ * @param <T> type of serializer
  */
 public class UserSerializerSerializer<T> implements JsonbSerializer<T> {
 

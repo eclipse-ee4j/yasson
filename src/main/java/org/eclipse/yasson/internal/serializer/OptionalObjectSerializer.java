@@ -31,7 +31,7 @@ import java.util.Optional;
  * Common serializer logic for java Optionals.
  *
  * @author Roman Grigoriadi
- * @param <T>
+ * @param <T> instantiated Optional type
  */
 public class OptionalObjectSerializer<T extends Optional<?>> implements CurrentItem<T>, JsonbSerializer<T> {
     private final JsonBindingModel wrapperModel;

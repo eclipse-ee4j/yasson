@@ -273,7 +273,8 @@ public class JsonbConfigProperties {
 
     /**
      * If strict IJSON patterns should be used.
-     * @return
+     *
+     * @return if IJSON is enabled
      */
     public boolean isStrictIJson() {
         return strictIJson;

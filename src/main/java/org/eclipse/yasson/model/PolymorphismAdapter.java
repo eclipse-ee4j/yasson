@@ -51,16 +51,18 @@ public class PolymorphismAdapter<T> implements JsonbAdapter<T, TypeWrapper<T>> {
     private final String[] allowedClasses;
 
     /**
+     * Create new instance.
      *
-     * @param allowedClasses
+     * @param allowedClasses allowed classes for loading by name
      */
     public PolymorphismAdapter(final Class... allowedClasses) {
         this.allowedClasses = Stream.of(allowedClasses).map(Class::getName).toArray(value -> new String[allowedClasses.length]);
     }
 
     /**
+     * Returns all classes which are allowed for loading.
      *
-     * @return
+     * @return allowed classes for loading by name
      */
     public String[] getAllowedClasses() {
         return allowedClasses;

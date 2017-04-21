@@ -101,6 +101,9 @@ public abstract class AbstractDateTimeSerializer<T> extends AbstractValueTypeSer
      * Convert date object to {@link TemporalAccessor}
      *
      * Only for legacy dates.
+     *
+     * @param object date object
+     * @return converted {@link TemporalAccessor}
      */
     protected TemporalAccessor toTemporalAccessor(T object) {
         return (TemporalAccessor) object;
