@@ -33,7 +33,7 @@ import java.lang.reflect.Type;
 
 /**
  * Serializer for adapted object.
- * Converts object using adapter first, than seriazizes result with standard process.
+ * Converts object using adapter first, than serializes result with standard process.
  *
  * @author Roman Grigoriadi
  */

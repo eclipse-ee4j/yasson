@@ -58,7 +58,7 @@ public class Unmarshaller extends ProcessingContext implements DeserializationCo
     }
 
     /**
-     * Get root value event, either for new deserialization process, or deserialization subprocess invoked from
+     * Get root value event, either for new deserialization process, or deserialization sub-process invoked from
      * custom user deserializer.
      */
     private JsonParser.Event getRootEvent(JsonParser parser) {

@@ -66,9 +66,9 @@ public class PropertyNamingStrategyTest {
 
     @Test
     public void testUpperCase() {
-        PropertyNamingStrategy upperCaseStrat = new UpperCamelCaseStrategy();
-        assertEquals("UpperCamelCase", upperCaseStrat.translateName("upperCamelCase"));
-        assertEquals("UpperCamelCase", upperCaseStrat.translateName("UpperCamelCase"));
+        PropertyNamingStrategy upperCaseStrategy = new UpperCamelCaseStrategy();
+        assertEquals("UpperCamelCase", upperCaseStrategy.translateName("upperCamelCase"));
+        assertEquals("UpperCamelCase", upperCaseStrategy.translateName("UpperCamelCase"));
 
         Jsonb jsonb = JsonbBuilder.create(new JsonbConfig().withPropertyNamingStrategy(PropertyNamingStrategy.UPPER_CAMEL_CASE));
         String upperCased = "{\"CAPS_UNDERSCORE_PROPERTY\":\"ghi\",\"UpperCasedProperty\":\"abc\",\"_startingWithUnderscoreProperty\":\"def\"}";
@@ -79,9 +79,9 @@ public class PropertyNamingStrategyTest {
 
     @Test
     public void testUpperCaseWithSpaces() {
-        PropertyNamingStrategy upperCaseWithSpacesStrat = new UpperCamelCaseWithSpacesStrategy();
-        assertEquals("Upper Camel Case", upperCaseWithSpacesStrat.translateName("upperCamelCase"));
-        assertEquals("Upper Camel Case", upperCaseWithSpacesStrat.translateName("UpperCamelCase"));
+        PropertyNamingStrategy upperCaseWithSpacesStrategy = new UpperCamelCaseWithSpacesStrategy();
+        assertEquals("Upper Camel Case", upperCaseWithSpacesStrategy.translateName("upperCamelCase"));
+        assertEquals("Upper Camel Case", upperCaseWithSpacesStrategy.translateName("UpperCamelCase"));
 
         Jsonb jsonb = JsonbBuilder.create(new JsonbConfig().withPropertyNamingStrategy(PropertyNamingStrategy.UPPER_CAMEL_CASE_WITH_SPACES));
         String upperCased = "{\"CAPS_UNDERSCORE_PROPERTY\":\"ghi\",\"Upper Cased Property\":\"abc\",\"_starting With Underscore Property\":\"def\"}";

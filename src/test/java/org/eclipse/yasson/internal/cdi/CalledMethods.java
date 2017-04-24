@@ -42,7 +42,7 @@ public class CalledMethods {
     }
 
     public void registerCall(@Observes MethodCalledEvent methodCalledEvent) {
-        results.compute(methodCalledEvent.getMethdoName(), (s, c) -> c == null ? 1 : c + 1);
+        results.compute(methodCalledEvent.getMethodName(), (s, c) -> c == null ? 1 : c + 1);
     }
 
 }

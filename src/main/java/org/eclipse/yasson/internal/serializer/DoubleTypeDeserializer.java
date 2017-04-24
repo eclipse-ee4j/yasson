@@ -51,7 +51,7 @@ public class DoubleTypeDeserializer extends AbstractNumberDeserializer<Double> {
             case NEGATIVE_INFINITY:
                 return Double.NEGATIVE_INFINITY;
         }
-        return deserializeForamtted(jsonValue, false, unmarshaller.getJsonbContext())
+        return deserializeFormatted(jsonValue, false, unmarshaller.getJsonbContext())
                 .map(num -> Double.parseDouble(num.toString()))
                 .orElseGet(() -> {
                     try {

@@ -29,7 +29,7 @@ public class LowerCaseWithUnderscoresStrategy extends LowerCaseStrategy {
     public static final Character UNDERSCORE = '_';
 
     @Override
-    protected char getSerarator() {
+    protected char getSeparator() {
         return UNDERSCORE;
     }
 }

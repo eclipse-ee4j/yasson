@@ -30,7 +30,7 @@ public class LowerCaseWithDashesStrategy extends LowerCaseStrategy {
     public final Character SEPARATOR = '-';
 
     @Override
-    protected char getSerarator() {
+    protected char getSeparator() {
         return SEPARATOR;
     }
 }

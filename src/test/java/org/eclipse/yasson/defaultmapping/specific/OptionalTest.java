@@ -126,7 +126,7 @@ public class OptionalTest {
     }
 
     @Test
-    public void testUnmarrshallOptioanlList() {
+    public void testUnmarshallOptionalList() {
         final Jsonb jsonb = (new JsonBindingBuilder()).build();
 
         final List<Optional<Integer>> result = jsonb.fromJson("[null, null]", new TestTypeToken<List<Optional<Integer>>>() {}.getType());

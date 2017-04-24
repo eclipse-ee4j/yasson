@@ -19,7 +19,7 @@ import org.eclipse.yasson.customization.model.JsonbNillableOverridesClass;
 import org.eclipse.yasson.customization.model.JsonbNillableOverridesInterface;
 import org.eclipse.yasson.customization.model.JsonbNillableValue;
 import org.eclipse.yasson.customization.model.packagelevelannotations.JsonbNillablePackageLevel;
-import org.eclipse.yasson.customization.model.packagelevelannotations.PackageLevelOverridenWithClassLevel;
+import org.eclipse.yasson.customization.model.packagelevelannotations.PackageLevelOverriddenWithClassLevel;
 import org.eclipse.yasson.defaultmapping.generics.model.ScalarValueWrapper;
 import org.junit.Assert;
 import org.junit.Before;
@@ -51,7 +51,7 @@ public class JsonbNillableTest {
     }
 
     @Test
-    public void testJsonbNillableOverridenWithJsonbProperty() {
+    public void testJsonbNillableOverriddenWithJsonbProperty() {
         JsonbNillableOverriddenWithJsonbProperty pojo = new JsonbNillableOverriddenWithJsonbProperty();
         assertEquals("{}", jsonb.toJson(pojo));
     }
@@ -63,8 +63,8 @@ public class JsonbNillableTest {
     }
 
     @Test
-    public void testPackageLevelOverridenWithClassLevel() {
-        PackageLevelOverridenWithClassLevel pojo = new PackageLevelOverridenWithClassLevel();
+    public void testPackageLevelOverriddenWithClassLevel() {
+        PackageLevelOverriddenWithClassLevel pojo = new PackageLevelOverriddenWithClassLevel();
         assertEquals("{}", jsonb.toJson(pojo));
     }
 

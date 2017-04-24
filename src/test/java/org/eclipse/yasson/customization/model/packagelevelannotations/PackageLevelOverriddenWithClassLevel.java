@@ -11,22 +11,23 @@
  * Roman Grigoriadi
  ******************************************************************************/
 
-package org.eclipse.yasson.customization.model;
+package org.eclipse.yasson.customization.model.packagelevelannotations;
+
+import javax.json.bind.annotation.JsonbNillable;
 
 /**
  * @author Roman Grigoriadi
  */
-public abstract class IntetrfacedPojoAbsImpl implements InterfacedPojoA {
+@JsonbNillable(false)
+public class PackageLevelOverriddenWithClassLevel {
 
-    private String propertyA;
+    private String nillableOverriddenField;
 
-    @Override
-    public String getPropertyA() {
-        return propertyA;
+    public String getNillableOverriddenField() {
+        return nillableOverriddenField;
     }
 
-    @Override
-    public void setPropertyA(String property) {
-        this.propertyA = property;
+    public void setNillableOverriddenField(String nillableOverriddenField) {
+        this.nillableOverriddenField = nillableOverriddenField;
     }
 }

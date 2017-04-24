@@ -18,13 +18,13 @@ package org.eclipse.yasson.internal.cdi;
  */
 public class MethodCalledEvent {
 
-    private final String methdoName;
+    private final String methodName;
 
-    public MethodCalledEvent(String methdoName) {
-        this.methdoName = methdoName;
+    public MethodCalledEvent(String methodName) {
+        this.methodName = methodName;
     }
 
-    public String getMethdoName() {
-        return methdoName;
+    public String getMethodName() {
+        return methodName;
     }
 }

@@ -26,7 +26,7 @@ public class JsonbPropertyName {
     private String methodAnnotName;
 
     @JsonbProperty("fieldAnnotatedNameToOverride")
-    private String fieldOverridedWithMethodAnnot;
+    private String fieldOverriddenWithMethodAnnot;
 
     public String getFieldAnnotatedName() {
         return fieldAnnotatedName;
@@ -47,12 +47,12 @@ public class JsonbPropertyName {
     }
 
     @JsonbProperty("getterOverriddenName")
-    public String getFieldOverridedWithMethodAnnot() {
-        return fieldOverridedWithMethodAnnot;
+    public String getFieldOverriddenWithMethodAnnot() {
+        return fieldOverriddenWithMethodAnnot;
     }
 
     @JsonbProperty("setterOverriddenName")
-    public void setFieldOverridedWithMethodAnnot(String fieldOverridedWithMethodAnnot) {
-        this.fieldOverridedWithMethodAnnot = fieldOverridedWithMethodAnnot;
+    public void setFieldOverriddenWithMethodAnnot(String fieldOverriddenWithMethodAnnot) {
+        this.fieldOverriddenWithMethodAnnot = fieldOverriddenWithMethodAnnot;
     }
 }

@@ -22,7 +22,7 @@ public class ContainerCustomization extends ClassCustomization {
     /**
      * Creates a new instance.
      *
-     * @param builder Builver to initialize from.
+     * @param builder Builder to initialize from.
      */
     public ContainerCustomization(ClassCustomizationBuilder builder) {
         super(builder);

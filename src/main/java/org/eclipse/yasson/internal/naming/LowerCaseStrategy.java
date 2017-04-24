@@ -31,7 +31,7 @@ public abstract class LowerCaseStrategy implements PropertyNamingStrategy {
         for(int i=0; i<propertyName.length(); i++) {
             final char current = propertyName.charAt(i);
             if (i > 0 && Character.isUpperCase(current) && isLowerCaseCharacter(last)) {
-                charBuffer.append(getSerarator());
+                charBuffer.append(getSeparator());
             }
             charBuffer.append(Character.toLowerCase(current));
             last = current;
@@ -47,5 +47,5 @@ public abstract class LowerCaseStrategy implements PropertyNamingStrategy {
      * Separator for replacing camel case.
      * @return separator
      */
-    protected abstract char getSerarator();
+    protected abstract char getSeparator();
 }

@@ -39,7 +39,7 @@ public class LongTypeDeserializer extends AbstractNumberDeserializer<Long> {
 
     @Override
     protected Long deserialize(String jsonValue, Unmarshaller unmarshaller, Type rtType) {
-        return deserializeForamtted(jsonValue, true, unmarshaller.getJsonbContext())
+        return deserializeFormatted(jsonValue, true, unmarshaller.getJsonbContext())
                 .map(num -> Long.parseLong(num.toString()))
                 .orElseGet(() -> {
                     try {

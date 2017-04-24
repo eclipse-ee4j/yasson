@@ -28,7 +28,7 @@ import static org.junit.Assert.assertArrayEquals;
 import static org.junit.Assert.assertEquals;
 
 /**
- * This class contains Convertor tests
+ * This class contains Converter tests
  *
  * @author David Kral
  */
@@ -45,21 +45,21 @@ public class DefaultSerializersTest {
     }
 
 
-    //TODO uncoment all
+    //TODO uncomment all
 
     /*private DefaultSerializers serializers = DefaultSerializers.getInstance();
 
 
 
     @Test
-    public void testBooleanConvetor() throws NoSuchFieldException {
+    public void testBooleanConverter() throws NoSuchFieldException {
         BooleanTypeConverter booleanTypeConverter = new BooleanTypeConverter();
         assertEquals("true", booleanTypeConverter.toJson(true, null));
         assertEquals(true, booleanTypeConverter.fromJson("true", Boolean.class, null));
     }
 
     @Test
-    public void testCalendarConvetor() throws NoSuchFieldException {
+    public void testCalendarConverter() throws NoSuchFieldException {
         Jsonb jsonb = (new JsonBindingBuilder()).build();
         final Calendar dateCalendar = Calendar.getInstance();
         dateCalendar.clear();
@@ -85,7 +85,7 @@ public class DefaultSerializersTest {
     }
 
     @Test
-    public void testDateConvetor() throws NoSuchFieldException, ParseException {
+    public void testDateConverter() throws NoSuchFieldException, ParseException {
         DateTypeConverter dateTypeConverter = new DateTypeConverter();
         SimpleDateFormat sdf = new SimpleDateFormat("dd.MM.yyyy HH:mm:ss");
         Date parsedDate = sdf.parse("04.03.2015 12:10:20");
@@ -103,7 +103,7 @@ public class DefaultSerializersTest {
     }
 
     @Test
-    public void testDoubleConvetor() {
+    public void testDoubleConverter() {
         DoubleTypeConverter doubleTypeConverter = new DoubleTypeConverter();
         assertEquals("1.2", doubleTypeConverter.toJson(1.2, null));
         assertEquals(1.2, doubleTypeConverter.fromJson("1.2", Double.class, null), 0);
@@ -122,21 +122,21 @@ public class DefaultSerializersTest {
     }
 
     @Test
-    public void testFloatConvetor() {
+    public void testFloatConverter() {
         FloatTypeConverter floatTypeConverter = new FloatTypeConverter();
         assertEquals("1.2", floatTypeConverter.toJson(1.2f, null));
         assertEquals(1.2f, floatTypeConverter.fromJson("1.2", Float.class, null), 0);
     }
 
     @Test
-    public void testInstantConvetor() {
+    public void testInstantConverter() {
         InstantTypeConverter instantTypeConverter = new InstantTypeConverter();
         assertEquals("2015-03-03T23:00:00Z", instantTypeConverter.toJson(Instant.parse("2015-03-03T23:00:00Z"), null));
         assertEquals(Instant.parse("2015-03-03T23:00:00Z"), instantTypeConverter.fromJson("2015-03-03T23:00:00Z", Instant.class, null));
     }
 
     @Test
-    public void testIntegerConvetor() {
+    public void testIntegerConverter() {
 
         IntegerTypeConverter integerTypeConverter = new IntegerTypeConverter();
         assertEquals("1", integerTypeConverter.toJson(1, null));
@@ -147,7 +147,7 @@ public class DefaultSerializersTest {
     }
 
     @Test
-    public void testLocalDateTimeConvetor() {
+    public void testLocalDateTimeConverter() {
         LocalDateTimeTypeConverter localDateTimeTypeConverter = new LocalDateTimeTypeConverter();
 
         PropertyCustomization customization = buildDefaultDateFormatterCustomization();
@@ -156,7 +156,7 @@ public class DefaultSerializersTest {
     }
 
     @Test
-    public void testLocalDateConvetor() {
+    public void testLocalDateConverter() {
         LocalDateTypeConverter localDateTypeConverter = new LocalDateTypeConverter();
 
         final PropertyCustomization defaultCustomization = buildDefaultDateFormatterCustomization();
@@ -172,7 +172,7 @@ public class DefaultSerializersTest {
     }
 
     @Test
-    public void testLocalTimeConvetor() {
+    public void testLocalTimeConverter() {
         LocalTimeTypeConverter localTimeTypeConverter = new LocalTimeTypeConverter();
 
         PropertyCustomization customization = buildDefaultDateFormatterCustomization();
@@ -181,7 +181,7 @@ public class DefaultSerializersTest {
     }
 
     @Test
-    public void testLongConvetor() {
+    public void testLongConverter() {
         LongTypeConverter longTypeConverter = new LongTypeConverter();
 
         assertEquals("10", longTypeConverter.toJson(10L, null));
@@ -189,7 +189,7 @@ public class DefaultSerializersTest {
     }
 
     @Test
-    public void testNumberConvetor() {
+    public void testNumberConverter() {
         NumberTypeConverter numberTypeConverter = new NumberTypeConverter();
 
         assertEquals("10.0", numberTypeConverter.toJson(10L, null));
@@ -198,7 +198,7 @@ public class DefaultSerializersTest {
     }
 
     @Test
-    public void testOffsetDateTimeConvetor() {
+    public void testOffsetDateTimeConverter() {
         OffsetDateTimeTypeConverter offsetDateTimeTypeConverter = new OffsetDateTimeTypeConverter();
 
         PropertyCustomization customization = buildDefaultDateFormatterCustomization();
@@ -208,7 +208,7 @@ public class DefaultSerializersTest {
     }
 
    *//* @Test
-    public void testOffsetTimeConvetor() {
+    public void testOffsetTimeConverter() {
         OffsetTimeTypeDeserializer offsetTimeTypeDeserializer = new OffsetTimeTypeDeserializer();
 
         PropertyCustomization customization = buildDefaultDateFormatterCustomization();
@@ -217,7 +217,7 @@ public class DefaultSerializersTest {
     }*//*
 
     @Test
-    public void testOptionalIntConvetor() {
+    public void testOptionalIntConverter() {
         OptionalIntTypeConverter optionalIntTypeConverter = new OptionalIntTypeConverter();
 
         assertEquals("null", optionalIntTypeConverter.toJson(OptionalInt.empty(), null));
@@ -227,7 +227,7 @@ public class DefaultSerializersTest {
     }
 
     @Test
-    public void testOptionalDoubleConvetor() {
+    public void testOptionalDoubleConverter() {
         OptionalDoubleTypeConverter optionalDoubleTypeConverter = new OptionalDoubleTypeConverter();
 
         assertEquals("null", optionalDoubleTypeConverter.toJson(OptionalDouble.empty(), null));
@@ -245,7 +245,7 @@ public class DefaultSerializersTest {
     }
 
     @Test
-    public void testOptionalLongConvetor() {
+    public void testOptionalLongConverter() {
         OptionalLongTypeConverter optionalLongTypeConverter = new OptionalLongTypeConverter();
 
         assertEquals("null", optionalLongTypeConverter.toJson(OptionalLong.empty(), null));
@@ -255,7 +255,7 @@ public class DefaultSerializersTest {
     }
 
     @Test
-    public void testShortConvetor() {
+    public void testShortConverter() {
         ShortTypeConverter shortTypeConverter = new ShortTypeConverter();
 
         assertEquals("10", shortTypeConverter.toJson((short) 10, null));
@@ -263,7 +263,7 @@ public class DefaultSerializersTest {
     }
 
     @Test
-    public void testStringConvetor() {
+    public void testStringConverter() {
         Jsonb jsonb = (new JsonBindingBuilder()).withConfig(new JsonbConfig().withStrictIJSON(true)).build();
         StringWrapper stringWrapper = new StringWrapper();
         stringWrapper.string = "test";
@@ -286,7 +286,7 @@ public class DefaultSerializersTest {
     }
 
     @Test
-    public void testTimeZoneConvetor() {
+    public void testTimeZoneConverter() {
         TimeZoneTypeConverter timeZoneTypeConverter = new TimeZoneTypeConverter();
 
         assertEquals("Europe/Prague", timeZoneTypeConverter.toJson(TimeZone.getTimeZone("Europe/Prague"), null));
@@ -301,7 +301,7 @@ public class DefaultSerializersTest {
     }
 
     @Test
-    public void testUriConvertor() throws URISyntaxException {
+    public void testUriConverter() throws URISyntaxException {
         URITypeConverter uriTypeConverter = new URITypeConverter();
 
         assertEquals("http://www.oracle.com", uriTypeConverter.toJson(new URI("http://www.oracle.com"), null));
@@ -309,7 +309,7 @@ public class DefaultSerializersTest {
     }
 
     @Test
-    public void testUrlConvertor() throws MalformedURLException {
+    public void testUrlConverter() throws MalformedURLException {
         URLTypeConverter urlTypeConverter = new URLTypeConverter();
 
         assertEquals("http://www.oracle.com", urlTypeConverter.toJson(new URL("http://www.oracle.com"), null));
@@ -317,7 +317,7 @@ public class DefaultSerializersTest {
     }
 
     @Test
-    public void testZonedDateTimeConvertor() {
+    public void testZonedDateTimeConverter() {
         ZonedDateTimeTypeConverter zonedDateTimeTypeConverter = new ZonedDateTimeTypeConverter();
 
         PropertyCustomization customization = buildDefaultDateFormatterCustomization();

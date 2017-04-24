@@ -43,7 +43,7 @@ public class JsonbPropertyTest {
         JsonbPropertyName pojo = new JsonbPropertyName();
         pojo.setFieldAnnotatedName("FIELD_ANNOTATED");
         pojo.setMethodAnnotName("METHOD_ANNOTATED");
-        pojo.setFieldOverridedWithMethodAnnot("OVERRIDDEN_GETTER");
+        pojo.setFieldOverriddenWithMethodAnnot("OVERRIDDEN_GETTER");
 
         assertEquals("{\"fieldAnnotatedNameCustomized\":\"FIELD_ANNOTATED\",\"getterAnnotatedName\":\"METHOD_ANNOTATED\",\"getterOverriddenName\":\"OVERRIDDEN_GETTER\"}",
                 jsonb.toJson(pojo));
@@ -52,7 +52,7 @@ public class JsonbPropertyTest {
         JsonbPropertyName result = jsonb.fromJson(toUnmarshall, JsonbPropertyName.class);
         assertEquals("FIELD_ANNOTATED", result.getFieldAnnotatedName());
         assertEquals("METHOD_ANNOTATED", result.getMethodAnnotName());
-        assertEquals("OVERRIDDEN_GETTER", result.getFieldOverridedWithMethodAnnot());
+        assertEquals("OVERRIDDEN_GETTER", result.getFieldOverriddenWithMethodAnnot());
     }
 
     @Test

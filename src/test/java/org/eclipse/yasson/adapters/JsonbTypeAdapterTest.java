@@ -41,8 +41,8 @@ public class JsonbTypeAdapterTest {
 
         @Override
         public Box adaptFromJson(String obj) throws Exception {
-            String[] strs = obj.split(":");
-            return new Box(strs[0], Integer.parseInt(strs[1]));
+            String[] strings = obj.split(":");
+            return new Box(strings[0], Integer.parseInt(strings[1]));
         }
 
         @Override

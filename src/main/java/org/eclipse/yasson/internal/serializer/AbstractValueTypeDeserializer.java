@@ -50,7 +50,7 @@ public abstract class AbstractValueTypeDeserializer<T> implements JsonbDeseriali
      * @param parser Parser to get value from.
      * @param ctx Unmarshaller.
      * @param rtType return type.
-     * @return Seserialized object.
+     * @return Deserialized object.
      */
     @Override
     public T deserialize(JsonParser parser, DeserializationContext ctx, Type rtType) {

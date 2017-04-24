@@ -40,7 +40,7 @@ public class BigIntegerTypeDeserializer extends AbstractNumberDeserializer<BigIn
 
     @Override
     public BigInteger deserialize(String jsonValue, Unmarshaller unmarshaller, Type rtType) {
-        return deserializeForamtted(jsonValue, true, unmarshaller.getJsonbContext())
+        return deserializeFormatted(jsonValue, true, unmarshaller.getJsonbContext())
                 .map(num -> new BigInteger(num.toString()))
                 .orElseGet(() -> {
                     try {

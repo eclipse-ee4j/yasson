@@ -48,7 +48,7 @@ public class ClassCustomization extends Customization {
     /**
      * Copy constructor.
      *
-     * @param other other customizaton instance
+     * @param other other customization instance
      */
     public ClassCustomization(ClassCustomization other) {
         super(other);

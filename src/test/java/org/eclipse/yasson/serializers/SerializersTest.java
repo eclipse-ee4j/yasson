@@ -57,16 +57,16 @@ public class SerializersTest {
 
         crate.annotatedType = new AnnotatedWithSerializerType();
         crate.annotatedType.value = "abc";
-        crate.annotatedTypeOverridenOnProperty = new AnnotatedWithSerializerType();
-        crate.annotatedTypeOverridenOnProperty.value = "def";
+        crate.annotatedTypeOverriddenOnProperty = new AnnotatedWithSerializerType();
+        crate.annotatedTypeOverriddenOnProperty.value = "def";
         final Jsonb jsonb = JsonbBuilder.create();
-        String expected = "{\"annotatedType\":{\"valueField\":\"replaced value\"},\"annotatedTypeOverridenOnProperty\":{\"valueField\":\"overridden value\"},\"crateBigDec\":10,\"crate_str\":\"crateStr\"}";
+        String expected = "{\"annotatedType\":{\"valueField\":\"replaced value\"},\"annotatedTypeOverriddenOnProperty\":{\"valueField\":\"overridden value\"},\"crateBigDec\":10,\"crate_str\":\"crateStr\"}";
 
         assertEquals(expected, jsonb.toJson(crate));
 
         Crate result = jsonb.fromJson(expected, Crate.class);
         assertEquals("replaced value", result.annotatedType.value);
-        assertEquals("overridden value", result.annotatedTypeOverridenOnProperty.value);
+        assertEquals("overridden value", result.annotatedTypeOverriddenOnProperty.value);
 
     }
 

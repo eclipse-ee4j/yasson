@@ -35,7 +35,7 @@ public class BigDecimalTypeDeserializer extends AbstractNumberDeserializer<BigDe
 
     @Override
     public BigDecimal deserialize(String jsonValue, Unmarshaller unmarshaller, Type rtType) {
-        return deserializeForamtted(jsonValue, false, unmarshaller.getJsonbContext())
+        return deserializeFormatted(jsonValue, false, unmarshaller.getJsonbContext())
                 .map(num -> new BigDecimal(num.toString()))
                 .orElseGet(() -> {
                     try {

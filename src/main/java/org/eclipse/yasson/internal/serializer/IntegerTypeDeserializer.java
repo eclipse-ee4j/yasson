@@ -39,7 +39,7 @@ public class IntegerTypeDeserializer extends AbstractNumberDeserializer<Integer>
 
     @Override
     protected Integer deserialize(String jsonValue, Unmarshaller unmarshaller, Type rtType) {
-        return deserializeForamtted(jsonValue, true, unmarshaller.getJsonbContext())
+        return deserializeFormatted(jsonValue, true, unmarshaller.getJsonbContext())
                 .map(num -> Integer.parseInt(num.toString()))
                 .orElseGet(() -> {
                     try {

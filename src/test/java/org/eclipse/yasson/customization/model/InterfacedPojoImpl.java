@@ -16,7 +16,7 @@ package org.eclipse.yasson.customization.model;
 /**
  * @author Roman Grigoriadi
  */
-public class InterfacedPojoImpl extends IntetrfacedPojoAbsImpl implements InterfacedPojoB {
+public class InterfacedPojoImpl extends InterfacedPojoAbsImpl implements InterfacedPojoB {
 
     private String propertyB;
 

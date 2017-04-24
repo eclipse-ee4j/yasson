@@ -20,7 +20,7 @@ public class FieldModifiersClass {
 
     private final String finalString = "FINAL_STRING";
 
-    private static final Long serialVerisonUID = Long.MAX_VALUE;
+    private static final Long serialVersionUID = Long.MAX_VALUE;
 
     private static String staticString = "STATIC_STRING";
 
@@ -34,7 +34,7 @@ public class FieldModifiersClass {
         throw new IllegalStateException();
     }
 
-    public static Long getSerialVerisonUID() {
+    public static Long getSerialVersionUID() {
         throw new IllegalStateException();
     }
 

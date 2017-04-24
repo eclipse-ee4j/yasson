@@ -23,9 +23,9 @@ public class ReflectionUtilsTest {
 
         public String resolvedStr;
 
-        public List<T> unresovledParameterizedField;
+        public List<T> unresolvedParameterizedField;
 
-        public List<Map<Integer, T>> unresovledNestedParameterizedField;
+        public List<Map<Integer, T>> unresolvedNestedParameterizedField;
 
         public T unresolvedField;
 
@@ -39,8 +39,8 @@ public class ReflectionUtilsTest {
         assertTrue(ReflectionUtils.isResolvedType(getFieldType("resolvedParameterizedField")));
         assertTrue(ReflectionUtils.isResolvedType(getFieldType("resolvedNestedParameterizedField")));
         assertTrue(ReflectionUtils.isResolvedType(getFieldType("resolvedStr")));
-        assertFalse(ReflectionUtils.isResolvedType(getFieldType("unresovledParameterizedField")));
-        assertFalse(ReflectionUtils.isResolvedType(getFieldType("unresovledNestedParameterizedField")));
+        assertFalse(ReflectionUtils.isResolvedType(getFieldType("unresolvedParameterizedField")));
+        assertFalse(ReflectionUtils.isResolvedType(getFieldType("unresolvedNestedParameterizedField")));
         assertFalse(ReflectionUtils.isResolvedType(getFieldType("unresolvedField")));
         assertFalse(ReflectionUtils.isResolvedType(getFieldType("unresolvedWildcardField")));
     }

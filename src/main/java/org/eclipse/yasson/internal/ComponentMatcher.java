@@ -18,7 +18,6 @@ import org.eclipse.yasson.internal.adapter.AdapterBinding;
 import org.eclipse.yasson.internal.adapter.ComponentBindings;
 import org.eclipse.yasson.internal.adapter.DeserializerBinding;
 import org.eclipse.yasson.internal.adapter.SerializerBinding;
-import org.eclipse.yasson.internal.serializer.JsonbDateFormatter;
 import org.eclipse.yasson.model.JsonBindingModel;
 import org.eclipse.yasson.model.PropertyModel;
 import org.eclipse.yasson.model.TypeWrapper;
@@ -89,7 +88,7 @@ public class ComponentMatcher {
         return userComponents.compute(type, (type1, bindingInfo) -> bindingInfo != null ? bindingInfo : new ComponentBindings(type1));
     }
 
-    private void addSeserializer(Type bindingType, SerializerBinding serializer) {
+    private void addSerializer(Type bindingType, SerializerBinding serializer) {
         userComponents.computeIfPresent(bindingType, (type, bindings) -> {
             if (bindings.getSerializer() != null) {
                 return bindings;
@@ -109,7 +108,7 @@ public class ComponentMatcher {
         });
     }
 
-    private void addApapter(Type bindingType, AdapterBinding adapter) {
+    private void addAdapter(Type bindingType, AdapterBinding adapter) {
         userComponents.computeIfPresent(bindingType, (type, bindings) -> {
             if (bindings.getAdapterInfo() != null) {
                 return bindings;
@@ -249,7 +248,7 @@ public class ComponentMatcher {
         }
         JsonbAdapter newAdapter = instance != null ? instance : jsonbContext.getComponentInstanceCreator().getOrCreateComponent(adapterClass);
         final AdapterBinding adapterInfo = new AdapterBinding(adaptFromType, adaptToType, newAdapter);
-        addApapter(adaptFromType, adapterInfo);
+        addAdapter(adaptFromType, adapterInfo);
         return adapterInfo;
     }
 
@@ -263,15 +262,15 @@ public class ComponentMatcher {
      */
     DeserializerBinding introspectDeserializerBinding(Class<? extends JsonbDeserializer> deserializerClass, JsonbDeserializer instance) {
         final ParameterizedType deserializerRuntimeType = ReflectionUtils.findParameterizedType(deserializerClass, JsonbDeserializer.class);
-        Type deserBindingType = resolveTypeArg(deserializerRuntimeType.getActualTypeArguments()[0], deserializerClass.getClass());
-        final ComponentBindings componentBindings = getBindingInfo(deserBindingType);
+        Type deserializerBindingType = resolveTypeArg(deserializerRuntimeType.getActualTypeArguments()[0], deserializerClass.getClass());
+        final ComponentBindings componentBindings = getBindingInfo(deserializerBindingType);
         if (componentBindings.getDeserializer() != null && componentBindings.getDeserializer().getClass().equals(deserializerClass)) {
             return componentBindings.getDeserializer();
         } else {
             JsonbDeserializer deserializer = instance != null ? instance : jsonbContext.getComponentInstanceCreator()
                     .getOrCreateComponent(deserializerClass);
-            final DeserializerBinding deserializerBinding = new DeserializerBinding(deserBindingType, deserializer);
-            addDeserializer(deserBindingType, deserializerBinding);
+            final DeserializerBinding deserializerBinding = new DeserializerBinding(deserializerBindingType, deserializer);
+            addDeserializer(deserializerBindingType, deserializerBinding);
             return deserializerBinding;
         }
     }
@@ -294,7 +293,7 @@ public class ComponentMatcher {
             JsonbSerializer serializer = instance != null ? instance : jsonbContext.getComponentInstanceCreator()
                     .getOrCreateComponent(serializerClass);
             final SerializerBinding serializerBinding = new SerializerBinding(serBindingType, serializer);
-            addSeserializer(serBindingType, serializerBinding);
+            addSerializer(serBindingType, serializerBinding);
             return serializerBinding;
         }
 

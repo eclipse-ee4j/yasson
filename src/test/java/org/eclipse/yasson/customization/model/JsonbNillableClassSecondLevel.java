@@ -14,7 +14,7 @@
 package org.eclipse.yasson.customization.model;
 
 /**
- * Extends a class which implements intefrace which is nillable.
+ * Extends a class which implements interface which is nillable.
  *
  * @author Roman Grigoriadi
  */

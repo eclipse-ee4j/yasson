@@ -5,7 +5,7 @@ package org.eclipse.yasson.defaultmapping.inheritance.model;
  */
 public class PropertyOrderSecond extends PropertyOrderFirst {
 
-    private String zeroOverriden;
+    private String zeroOverridden;
 
     private String second;
 
@@ -19,12 +19,12 @@ public class PropertyOrderSecond extends PropertyOrderFirst {
 
     @Override
     public String getZeroOverriddenInSecond() {
-        return zeroOverriden;
+        return zeroOverridden;
     }
 
     @Override
     public void setZeroOverriddenInSecond(String zeroOverriddenInSecond) {
-        this.zeroOverriden = zeroOverriddenInSecond;
+        this.zeroOverridden = zeroOverriddenInSecond;
     }
 
 }
