@@ -128,6 +128,15 @@ public class UnmarshallingUnsupportedTypesTest {
         assertEquals(11, result.getOptionalLong().getAsLong());
     }
 
+    @Test()
+    public void testMissingFieldDefaultNull() {
+        Jsonb defaultConfig = JsonbBuilder.create();
+        String json  = "{\"nestedPojo\":{\"integerValue\":10,\"missingField\":null},\"optionalLong\":11}";
+        SupportedTypes result = defaultConfig.fromJson(json, SupportedTypes.class);
+        assertEquals(Integer.valueOf(10), result.getNestedPojo().getIntegerValue());
+        assertEquals(11, result.getOptionalLong().getAsLong());
+    }
+
     @Test(expected = JsonbException.class)
     public void testMissingFieldIgnored() {
         Jsonb defaultConfig = JsonbBuilder.create(new JsonbConfig().setProperty(JsonbConfigProperties.FAIL_ON_UNKNOWN_PROPERTIES, true));

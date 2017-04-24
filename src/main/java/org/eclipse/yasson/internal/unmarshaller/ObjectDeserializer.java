@@ -137,6 +137,10 @@ class ObjectDeserializer<T> extends AbstractContainerDeserializer<T> {
     @Override
     public void appendResult(Object result) {
         final PropertyModel model = getModel();
+        //missing property for null values
+        if (model == null) {
+            return;
+        }
         values.put(model.getPropertyName(), new ValueWrapper(model, convertNullToOptionalEmpty(model, result)));
     }
 
