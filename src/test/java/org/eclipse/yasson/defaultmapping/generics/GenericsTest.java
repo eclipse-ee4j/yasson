@@ -19,7 +19,9 @@ import org.eclipse.yasson.serializers.model.Box;
 import org.eclipse.yasson.serializers.model.Crate;
 import org.junit.Assert;
 import org.junit.Before;
+import org.junit.Rule;
 import org.junit.Test;
+import org.junit.rules.ExpectedException;
 
 import javax.json.bind.Jsonb;
 import javax.json.bind.JsonbBuilder;
@@ -41,6 +43,9 @@ import static org.junit.Assert.assertTrue;
 public class GenericsTest {
 
     private Jsonb jsonb;
+
+    @Rule
+    public ExpectedException expectedException = ExpectedException.none();
 
     @Before
     public void before() {
@@ -288,17 +293,12 @@ public class GenericsTest {
     @Test
     public void testIncompatibleTypes() {
         //exception incompatible types
-        try {
-            BoundedGenericClass<HashSet<Integer>, Circle> otherGeneric = jsonb.fromJson("{\"boundedSet\":[3],\"lowerBoundedList\":[{\"radius\":2.5}]}",
-                    new TestTypeToken<BoundedGenericClass<HashSet<Double>, Circle>>(){}.getType());
-            HashSet<Integer> otherIntSet = otherGeneric.boundedSet;
-            Integer intValue = otherIntSet.iterator().next();
-            System.out.println("intValue=" + intValue);
-            assert (false);
-        } catch (ClassCastException e) {
-            //exception - incompatible types
-            //Double cannot be converted to Integer
-        }
+        expectedException.expect(ClassCastException.class);
+
+        BoundedGenericClass<HashSet<Integer>, Circle> otherGeneric = jsonb.fromJson("{\"boundedSet\":[3],\"lowerBoundedList\":[{\"radius\":2.5}]}",
+                new TestTypeToken<BoundedGenericClass<HashSet<Double>, Circle>>(){}.getType());
+        HashSet<Integer> otherIntSet = otherGeneric.boundedSet;
+        Integer intValue = otherIntSet.iterator().next();
     }
 
     @Test
