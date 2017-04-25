@@ -15,13 +15,7 @@ package org.eclipse.yasson.defaultmapping.jsonp;
 import org.eclipse.yasson.defaultmapping.jsonp.model.JsonpPojo;
 import org.junit.Test;
 
-import javax.json.Json;
-import javax.json.JsonArray;
-import javax.json.JsonArrayBuilder;
-import javax.json.JsonBuilderFactory;
-import javax.json.JsonObject;
-import javax.json.JsonObjectBuilder;
-import javax.json.JsonValue;
+import javax.json.*;
 import javax.json.bind.Jsonb;
 import javax.json.bind.JsonbBuilder;
 import javax.json.bind.JsonbConfig;

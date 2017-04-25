@@ -13,16 +13,7 @@
 package org.eclipse.yasson.defaultmapping.dates;
 
 import org.eclipse.yasson.TestTypeToken;
-import org.eclipse.yasson.defaultmapping.dates.model.CalendarPojo;
-import org.eclipse.yasson.defaultmapping.dates.model.ClassLevelDateAnnotation;
-import org.eclipse.yasson.defaultmapping.dates.model.DatePojo;
-import org.eclipse.yasson.defaultmapping.dates.model.InstantPojo;
-import org.eclipse.yasson.defaultmapping.dates.model.LocalDatePojo;
-import org.eclipse.yasson.defaultmapping.dates.model.LocalDateTimePojo;
-import org.eclipse.yasson.defaultmapping.dates.model.LocalTimePojo;
-import org.eclipse.yasson.defaultmapping.dates.model.OffsetDateTimePojo;
-import org.eclipse.yasson.defaultmapping.dates.model.OffsetTimePojo;
-import org.eclipse.yasson.defaultmapping.dates.model.ZonedDateTimePojo;
+import org.eclipse.yasson.defaultmapping.dates.model.*;
 import org.eclipse.yasson.defaultmapping.generics.model.ScalarValueWrapper;
 import org.eclipse.yasson.internal.JsonBindingBuilder;
 import org.junit.Assert;
@@ -37,26 +28,9 @@ import java.lang.reflect.Field;
 import java.lang.reflect.Method;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
-import java.time.Duration;
-import java.time.Instant;
-import java.time.LocalDate;
-import java.time.LocalDateTime;
-import java.time.LocalTime;
-import java.time.Month;
-import java.time.OffsetDateTime;
-import java.time.OffsetTime;
-import java.time.Period;
-import java.time.ZoneId;
-import java.time.ZoneOffset;
-import java.time.ZonedDateTime;
+import java.time.*;
 import java.time.format.DateTimeFormatter;
-import java.util.Arrays;
-import java.util.Calendar;
-import java.util.Date;
-import java.util.GregorianCalendar;
-import java.util.Locale;
-import java.util.SimpleTimeZone;
-import java.util.TimeZone;
+import java.util.*;
 
 import static org.junit.Assert.assertEquals;
 

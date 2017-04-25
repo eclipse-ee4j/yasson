@@ -12,11 +12,7 @@
  ******************************************************************************/
 package org.eclipse.yasson.internal;
 
-import org.eclipse.yasson.model.ClassModel;
-import org.eclipse.yasson.model.JsonbAnnotatedElement;
-import org.eclipse.yasson.model.Property;
-import org.eclipse.yasson.model.PropertyModel;
-import org.eclipse.yasson.model.ReflectionPropagation;
+import org.eclipse.yasson.model.*;
 
 import javax.json.bind.JsonbException;
 import java.beans.Introspector;
@@ -105,11 +101,7 @@ class ClassParser {
             }
             final String propertyName = toPropertyMethod(name);
 
-            Property property = classProperties.get(propertyName);
-            if (property == null) {
-                property= new Property(propertyName, classElement);
-                classProperties.put(propertyName, property);
-            }
+            Property property = classProperties.computeIfAbsent(propertyName, n -> new Property(n, classElement));
 
             if (isSetter(name)) {
                 property.setSetter(method);

@@ -46,7 +46,7 @@ public class MapSerializer<T extends Map> extends AbstractContainerSerializer<T>
     @Override
     protected void serializeInternal(T obj, JsonGenerator generator, SerializationContext ctx) {
         final Marshaller marshaller = (Marshaller) ctx;
-        obj.keySet().stream().forEach((key) -> {
+        obj.keySet().forEach((key) -> {
             final String keysString = String.valueOf(key);
             final Object value = obj.get(key);
             if (value == null) {

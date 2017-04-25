@@ -15,11 +15,7 @@ package org.eclipse.yasson.internal.serializer;
 
 import org.eclipse.yasson.model.JsonBindingModel;
 
-import java.time.Instant;
-import java.time.LocalDate;
-import java.time.LocalTime;
-import java.time.ZoneId;
-import java.time.ZonedDateTime;
+import java.time.*;
 import java.time.format.DateTimeFormatter;
 import java.time.temporal.TemporalAccessor;
 import java.time.temporal.TemporalQueries;

@@ -13,14 +13,7 @@
 
 package org.eclipse.yasson.customization;
 
-import org.eclipse.yasson.customization.model.CreatorConstructorPojo;
-import org.eclipse.yasson.customization.model.CreatorFactoryMethodPojo;
-import org.eclipse.yasson.customization.model.CreatorIncompatibleTypePojo;
-import org.eclipse.yasson.customization.model.CreatorMultipleDeclarationErrorPojo;
-import org.eclipse.yasson.customization.model.CreatorPackagePrivateConstructor;
-import org.eclipse.yasson.customization.model.CreatorWithoutJavabeanProperty;
-import org.eclipse.yasson.customization.model.CreatorWithoutJsonbProperty;
-import org.eclipse.yasson.customization.model.CreatorWithoutJsonbProperty1;
+import org.eclipse.yasson.customization.model.*;
 import org.junit.Assert;
 import org.junit.Test;
 

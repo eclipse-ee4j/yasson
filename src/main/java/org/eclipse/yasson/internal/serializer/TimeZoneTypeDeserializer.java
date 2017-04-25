@@ -20,12 +20,9 @@ import org.eclipse.yasson.model.JsonBindingModel;
 
 import javax.json.bind.JsonbException;
 import java.lang.reflect.Type;
-import java.time.Instant;
 import java.time.LocalDateTime;
 import java.time.ZoneId;
-import java.time.ZoneOffset;
 import java.time.ZonedDateTime;
-import java.time.temporal.ChronoField;
 import java.time.zone.ZoneRulesException;
 import java.util.SimpleTimeZone;
 import java.util.TimeZone;

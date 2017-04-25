@@ -14,20 +14,7 @@
 package org.eclipse.yasson.serializers;
 
 import org.eclipse.yasson.adapters.PolymorphismAdapterTest;
-import org.eclipse.yasson.serializers.model.AnnotatedWithSerializerType;
-import org.eclipse.yasson.serializers.model.Box;
-import org.eclipse.yasson.serializers.model.BoxWithAnnotations;
-import org.eclipse.yasson.serializers.model.Crate;
-import org.eclipse.yasson.serializers.model.CrateDeserializer;
-import org.eclipse.yasson.serializers.model.CrateDeserializerWithConversion;
-import org.eclipse.yasson.serializers.model.CrateInner;
-import org.eclipse.yasson.serializers.model.CrateJsonObjectDeserializer;
-import org.eclipse.yasson.serializers.model.CrateSerializer;
-import org.eclipse.yasson.serializers.model.CrateSerializerWithConversion;
-import org.eclipse.yasson.serializers.model.PolymorphicDeserializer;
-import org.eclipse.yasson.serializers.model.SimpleAnnotatedSerializedArrayContainer;
-import org.eclipse.yasson.serializers.model.SimpleContainer;
-import org.eclipse.yasson.serializers.model.StringWrapper;
+import org.eclipse.yasson.serializers.model.*;
 import org.junit.Assert;
 import org.junit.Test;
 
@@ -40,9 +27,7 @@ import java.util.Calendar;
 import java.util.Date;
 import java.util.TimeZone;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertNull;
-import static org.junit.Assert.assertTrue;
+import static org.junit.Assert.*;
 
 /**
  * @author Roman Grigoriadi

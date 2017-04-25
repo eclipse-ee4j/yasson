@@ -4,7 +4,6 @@ import org.eclipse.yasson.internal.JsonBindingBuilder;
 import org.eclipse.yasson.internal.properties.MessageKeys;
 import org.eclipse.yasson.internal.properties.Messages;
 import org.junit.Assert;
-import org.junit.Ignore;
 import org.junit.Test;
 
 import javax.json.bind.Jsonb;

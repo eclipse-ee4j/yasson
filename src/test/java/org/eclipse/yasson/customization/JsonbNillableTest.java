@@ -13,11 +13,7 @@
 
 package org.eclipse.yasson.customization;
 
-import org.eclipse.yasson.customization.model.JsonbNillableClassSecondLevel;
-import org.eclipse.yasson.customization.model.JsonbNillableOverriddenWithJsonbProperty;
-import org.eclipse.yasson.customization.model.JsonbNillableOverridesClass;
-import org.eclipse.yasson.customization.model.JsonbNillableOverridesInterface;
-import org.eclipse.yasson.customization.model.JsonbNillableValue;
+import org.eclipse.yasson.customization.model.*;
 import org.eclipse.yasson.customization.model.packagelevelannotations.JsonbNillablePackageLevel;
 import org.eclipse.yasson.customization.model.packagelevelannotations.PackageLevelOverriddenWithClassLevel;
 import org.eclipse.yasson.defaultmapping.generics.model.ScalarValueWrapper;

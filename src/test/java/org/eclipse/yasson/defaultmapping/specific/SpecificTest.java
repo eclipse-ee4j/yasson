@@ -12,8 +12,8 @@
  ******************************************************************************/
 package org.eclipse.yasson.defaultmapping.specific;
 
-import org.eclipse.yasson.internal.JsonBindingBuilder;
 import org.eclipse.yasson.defaultmapping.generics.model.ScalarValueWrapper;
+import org.eclipse.yasson.internal.JsonBindingBuilder;
 import org.junit.Test;
 
 import javax.json.bind.Jsonb;

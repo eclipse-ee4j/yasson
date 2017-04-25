@@ -19,7 +19,6 @@ import java.time.Instant;
 import java.time.ZonedDateTime;
 import java.time.format.DateTimeFormatter;
 import java.util.Locale;
-import java.util.logging.Logger;
 
 /**
  * Serializer for {@link ZonedDateTime} type.

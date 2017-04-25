@@ -13,9 +13,9 @@
 
 package org.eclipse.yasson.internal.unmarshaller;
 
-import org.eclipse.yasson.model.customization.Customization;
 import org.eclipse.yasson.model.JsonBindingModel;
 import org.eclipse.yasson.model.JsonContext;
+import org.eclipse.yasson.model.customization.Customization;
 
 import java.lang.reflect.Type;
 

@@ -181,8 +181,7 @@ public class JsonbRiParser implements JsonParser, JsonbParser {
 
     @Override
     public String getString() {
-        final String value = jsonParser.getString();
-        return value;
+        return jsonParser.getString();
     }
 
     @Override

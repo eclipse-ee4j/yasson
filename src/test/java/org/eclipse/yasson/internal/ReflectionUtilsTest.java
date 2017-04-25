@@ -35,7 +35,7 @@ public class ReflectionUtilsTest {
 
     @Test
     public void testIsTypeResolved() {
-        Types<String> types = new Types<String>();
+        Types<String> types = new Types<>();
         assertTrue(ReflectionUtils.isResolvedType(getFieldType("resolvedParameterizedField")));
         assertTrue(ReflectionUtils.isResolvedType(getFieldType("resolvedNestedParameterizedField")));
         assertTrue(ReflectionUtils.isResolvedType(getFieldType("resolvedStr")));

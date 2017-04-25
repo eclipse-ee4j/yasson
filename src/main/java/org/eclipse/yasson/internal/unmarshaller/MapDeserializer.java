@@ -22,11 +22,8 @@ import javax.json.bind.serializer.JsonbDeserializer;
 import javax.json.stream.JsonParser;
 import java.lang.reflect.ParameterizedType;
 import java.lang.reflect.Type;
-import java.util.EnumMap;
 import java.util.HashMap;
-import java.util.LinkedHashMap;
 import java.util.Map;
-import java.util.NavigableMap;
 import java.util.SortedMap;
 import java.util.TreeMap;
 

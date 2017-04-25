@@ -13,11 +13,7 @@
 
 package org.eclipse.yasson.defaultmapping.jsonp.model;
 
-import javax.json.JsonArray;
-import javax.json.JsonNumber;
-import javax.json.JsonObject;
-import javax.json.JsonString;
-import javax.json.JsonValue;
+import javax.json.*;
 
 /**
  * @author Roman Grigoriadi

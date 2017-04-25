@@ -13,10 +13,8 @@
 
 package org.eclipse.yasson.internal.serializer;
 
-import org.eclipse.yasson.internal.Unmarshaller;
 import org.eclipse.yasson.model.JsonBindingModel;
 
-import java.lang.reflect.Type;
 import java.time.Instant;
 import java.time.format.DateTimeFormatter;
 import java.util.Locale;

@@ -15,14 +15,7 @@ package org.eclipse.yasson.adapters;
 
 
 import org.eclipse.yasson.TestTypeToken;
-import org.eclipse.yasson.adapters.model.AdaptedPojo;
-import org.eclipse.yasson.adapters.model.Box;
-import org.eclipse.yasson.adapters.model.BoxToCrateCompatibleGenericsAdapter;
-import org.eclipse.yasson.adapters.model.BoxToCratePropagatedIntegerStringAdapter;
-import org.eclipse.yasson.adapters.model.Crate;
-import org.eclipse.yasson.adapters.model.GenericBox;
-import org.eclipse.yasson.adapters.model.IntegerListToStringAdapter;
-import org.eclipse.yasson.adapters.model.JsonObjectPojo;
+import org.eclipse.yasson.adapters.model.*;
 import org.junit.Test;
 
 import javax.json.bind.Jsonb;

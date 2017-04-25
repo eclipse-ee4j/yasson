@@ -14,9 +14,7 @@ package org.eclipse.yasson.model;
 
 import org.eclipse.yasson.internal.JsonbContext;
 
-import javax.json.bind.JsonbException;
 import java.lang.reflect.Field;
-import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 
 /**

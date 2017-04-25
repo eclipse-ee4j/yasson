@@ -102,12 +102,7 @@ public class PropertyNamingStrategyTest {
 
     @Test
     public void testCustom() {
-        Jsonb jsonb = JsonbBuilder.create(new JsonbConfig().withPropertyNamingStrategy(new PropertyNamingStrategy() {
-            @Override
-            public String translateName(String propertyName) {
-                return propertyName + "_" + propertyName.toUpperCase();
-            }
-        }));
+        Jsonb jsonb = JsonbBuilder.create(new JsonbConfig().withPropertyNamingStrategy(propertyName -> propertyName + "_" + propertyName.toUpperCase()));
 
         String custom = "{\"CAPS_UNDERSCORE_PROPERTY_CAPS_UNDERSCORE_PROPERTY\":\"ghi\",\"_startingWithUnderscoreProperty__STARTINGWITHUNDERSCOREPROPERTY\":\"def\",\"upperCasedProperty_UPPERCASEDPROPERTY\":\"abc\"}";
         assertEquals(custom, jsonb.toJson(pojo));

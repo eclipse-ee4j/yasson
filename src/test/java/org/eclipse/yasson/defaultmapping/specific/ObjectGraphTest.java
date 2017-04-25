@@ -13,8 +13,8 @@
 
 package org.eclipse.yasson.defaultmapping.specific;
 
-import org.eclipse.yasson.internal.JsonBindingBuilder;
 import org.eclipse.yasson.defaultmapping.specific.model.Customer;
+import org.eclipse.yasson.internal.JsonBindingBuilder;
 import org.junit.Test;
 
 import javax.json.bind.Jsonb;

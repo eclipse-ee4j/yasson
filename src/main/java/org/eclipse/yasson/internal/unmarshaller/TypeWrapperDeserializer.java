@@ -66,13 +66,12 @@ public class TypeWrapperDeserializer<T> extends ObjectDeserializer<TypeWrapper<T
             final JsonbDeserializer<?> deserializer = new StringTypeDeserializer(newPropertyModel);
 
             String className = (String) deserializer.deserialize(parser, context, String.class);
-            if (allowedClassNames.length > 0 && !Stream.of(allowedClassNames).anyMatch(Predicate.isEqual(className))) {
+            if (allowedClassNames.length > 0 && Stream.of(allowedClassNames).noneMatch(Predicate.isEqual(className))) {
                 throw new JsonbException(Messages.getMessage(MessageKeys.CLASS_LOAD_NOT_ALLOWED, className));
             }
 
             try {
                 concreteWrappedClass = Thread.currentThread().getContextClassLoader().loadClass(className);
-                return;
             } catch (ClassNotFoundException e) {
                 throw new JsonbException("Cannot load class for ", e);
             }

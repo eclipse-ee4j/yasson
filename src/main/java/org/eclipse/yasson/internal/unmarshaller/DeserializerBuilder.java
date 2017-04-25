@@ -36,11 +36,7 @@ import javax.json.stream.JsonParser;
 import java.lang.reflect.GenericArrayType;
 import java.lang.reflect.Type;
 import java.math.BigDecimal;
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.HashMap;
-import java.util.Map;
-import java.util.Optional;
+import java.util.*;
 
 /**
  * Builder for currently processed items by unmarshaller.

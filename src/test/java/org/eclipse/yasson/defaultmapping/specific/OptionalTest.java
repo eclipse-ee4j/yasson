@@ -13,19 +13,15 @@
 package org.eclipse.yasson.defaultmapping.specific;
 
 import org.eclipse.yasson.TestTypeToken;
+import org.eclipse.yasson.defaultmapping.generics.model.ScalarValueWrapper;
 import org.eclipse.yasson.defaultmapping.specific.model.OptionalWrapper;
 import org.eclipse.yasson.defaultmapping.specific.model.Street;
 import org.eclipse.yasson.internal.JsonBindingBuilder;
-import org.eclipse.yasson.defaultmapping.generics.model.ScalarValueWrapper;
 import org.junit.Assert;
 import org.junit.Test;
 
 import javax.json.bind.Jsonb;
-import java.util.List;
-import java.util.Optional;
-import java.util.OptionalDouble;
-import java.util.OptionalInt;
-import java.util.OptionalLong;
+import java.util.*;
 
 import static org.junit.Assert.assertEquals;
 

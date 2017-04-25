@@ -18,7 +18,6 @@ import org.eclipse.yasson.internal.properties.Messages;
 import org.eclipse.yasson.model.JsonBindingModel;
 
 import java.time.Instant;
-import java.time.ZoneId;
 import java.time.ZonedDateTime;
 import java.time.format.DateTimeFormatter;
 import java.util.Locale;

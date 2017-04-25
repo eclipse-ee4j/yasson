@@ -19,10 +19,10 @@ import org.eclipse.yasson.internal.properties.MessageKeys;
 import org.eclipse.yasson.internal.properties.Messages;
 import org.eclipse.yasson.internal.unmarshaller.CurrentItem;
 import org.eclipse.yasson.model.ClassModel;
-import org.eclipse.yasson.model.customization.Customization;
 import org.eclipse.yasson.model.JsonBindingModel;
 import org.eclipse.yasson.model.JsonContext;
 import org.eclipse.yasson.model.JsonbPropertyInfo;
+import org.eclipse.yasson.model.customization.Customization;
 
 import javax.json.bind.JsonbException;
 import javax.json.bind.adapter.JsonbAdapter;

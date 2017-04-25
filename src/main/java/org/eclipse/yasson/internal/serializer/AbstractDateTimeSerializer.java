@@ -15,9 +15,8 @@ package org.eclipse.yasson.internal.serializer;
 
 import org.eclipse.yasson.internal.JsonbContext;
 import org.eclipse.yasson.internal.Marshaller;
-import org.eclipse.yasson.model.JsonContext;
-import org.eclipse.yasson.model.PropertyModel;
 import org.eclipse.yasson.model.JsonBindingModel;
+import org.eclipse.yasson.model.JsonContext;
 
 import javax.json.bind.annotation.JsonbDateFormat;
 import javax.json.bind.serializer.SerializationContext;
@@ -92,9 +91,8 @@ public abstract class AbstractDateTimeSerializer<T> extends AbstractValueTypeSer
      * @return zoned formatter
      */
     protected DateTimeFormatter getZonedFormatter(DateTimeFormatter formatter) {
-        final DateTimeFormatter result = formatter.getZone() != null ?
+        return formatter.getZone() != null ?
                 formatter : formatter.withZone(UTC);
-        return result;
     }
 
     /**

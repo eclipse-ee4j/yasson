@@ -19,13 +19,7 @@ import org.eclipse.yasson.internal.unmarshaller.EmbeddedItem;
 import org.eclipse.yasson.internal.unmarshaller.ResolvedParameterizedType;
 
 import javax.json.bind.JsonbException;
-import java.lang.reflect.Constructor;
-import java.lang.reflect.GenericArrayType;
-import java.lang.reflect.InvocationTargetException;
-import java.lang.reflect.ParameterizedType;
-import java.lang.reflect.Type;
-import java.lang.reflect.TypeVariable;
-import java.lang.reflect.WildcardType;
+import java.lang.reflect.*;
 import java.util.Arrays;
 import java.util.Objects;
 import java.util.Optional;

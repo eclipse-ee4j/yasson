@@ -8,12 +8,7 @@ import org.junit.Test;
 import javax.json.bind.Jsonb;
 import javax.json.bind.JsonbBuilder;
 import javax.json.bind.JsonbConfig;
-import java.time.Duration;
-import java.time.Instant;
-import java.time.LocalDate;
-import java.time.LocalDateTime;
-import java.time.ZoneOffset;
-import java.time.ZonedDateTime;
+import java.time.*;
 import java.util.Calendar;
 import java.util.Date;
 import java.util.TimeZone;
@@ -23,7 +18,7 @@ import java.util.TimeZone;
  */
 public class IJsonTest {
 
-    private Jsonb jsonb = JsonbBuilder.create(new JsonbConfig().withStrictIJSON(true));;
+    private Jsonb jsonb = JsonbBuilder.create(new JsonbConfig().withStrictIJSON(true));
 
     @Test
     public void testStrictCalendar() {

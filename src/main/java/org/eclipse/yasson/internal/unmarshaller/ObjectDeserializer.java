@@ -12,11 +12,7 @@
  ******************************************************************************/
 package org.eclipse.yasson.internal.unmarshaller;
 
-import org.eclipse.yasson.internal.JsonbContext;
-import org.eclipse.yasson.internal.JsonbParser;
-import org.eclipse.yasson.internal.JsonbRiParser;
-import org.eclipse.yasson.internal.ReflectionUtils;
-import org.eclipse.yasson.internal.Unmarshaller;
+import org.eclipse.yasson.internal.*;
 import org.eclipse.yasson.internal.properties.MessageKeys;
 import org.eclipse.yasson.internal.properties.Messages;
 import org.eclipse.yasson.model.CreatorParam;
@@ -26,7 +22,6 @@ import org.eclipse.yasson.model.PropertyModel;
 import javax.json.bind.JsonbException;
 import javax.json.bind.serializer.JsonbDeserializer;
 import javax.json.stream.JsonParser;
-import java.lang.reflect.Type;
 import java.util.ArrayList;
 import java.util.LinkedHashMap;
 import java.util.List;
@@ -97,8 +92,7 @@ class ObjectDeserializer<T> extends AbstractContainerDeserializer<T> {
                 : ReflectionUtils.createNoArgConstructorInstance((Class<T>) rawType);
 
         //values must be set in order, in which they appears in JSON by spec
-        values.entrySet().forEach((entry)-> {
-            final ValueWrapper wrapper = entry.getValue();
+        values.forEach((key, wrapper) -> {
             //skip creator values
             if (wrapper.getCreatorParam() != null) {
                 return;

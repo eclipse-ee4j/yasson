@@ -15,28 +15,10 @@ package org.eclipse.yasson.internal;
 
 import org.eclipse.yasson.internal.cdi.JsonbComponentInstanceCreator;
 import org.eclipse.yasson.internal.cdi.JsonbComponentInstanceCreatorFactory;
-import org.eclipse.yasson.internal.internalOrdering.AnyOrderStrategy;
-import org.eclipse.yasson.internal.internalOrdering.LexicographicalOrderStrategy;
-import org.eclipse.yasson.internal.internalOrdering.PropOrderStrategy;
-import org.eclipse.yasson.internal.internalOrdering.ReverseOrderStrategy;
-import org.eclipse.yasson.internal.naming.DefaultNamingStrategies;
-import org.eclipse.yasson.internal.naming.IdentityStrategy;
-import org.eclipse.yasson.internal.properties.MessageKeys;
-import org.eclipse.yasson.internal.properties.Messages;
-import org.eclipse.yasson.internal.serializer.JsonbDateFormatter;
 
 import javax.json.bind.JsonbConfig;
-import javax.json.bind.JsonbException;
-import javax.json.bind.annotation.JsonbDateFormat;
-import javax.json.bind.config.BinaryDataStrategy;
-import javax.json.bind.config.PropertyNamingStrategy;
-import javax.json.bind.config.PropertyOrderStrategy;
-import javax.json.bind.config.PropertyVisibilityStrategy;
 import javax.json.spi.JsonProvider;
-import java.time.format.DateTimeFormatter;
-import java.util.Locale;
 import java.util.Objects;
-import java.util.Optional;
 
 /**
  * Jsonb context holding central components and configuration of jsonb runtime. Scoped to instance of Jsonb runtime.

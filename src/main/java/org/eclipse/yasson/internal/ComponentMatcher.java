@@ -13,11 +13,7 @@
 
 package org.eclipse.yasson.internal;
 
-import org.eclipse.yasson.internal.adapter.AbstractComponentBinding;
-import org.eclipse.yasson.internal.adapter.AdapterBinding;
-import org.eclipse.yasson.internal.adapter.ComponentBindings;
-import org.eclipse.yasson.internal.adapter.DeserializerBinding;
-import org.eclipse.yasson.internal.adapter.SerializerBinding;
+import org.eclipse.yasson.internal.adapter.*;
 import org.eclipse.yasson.model.JsonBindingModel;
 import org.eclipse.yasson.model.PropertyModel;
 import org.eclipse.yasson.model.TypeWrapper;

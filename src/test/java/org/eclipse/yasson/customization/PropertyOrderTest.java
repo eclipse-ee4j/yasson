@@ -13,12 +13,7 @@
 
 package org.eclipse.yasson.customization;
 
-import org.eclipse.yasson.customization.model.FieldCustomOrder;
-import org.eclipse.yasson.customization.model.FieldCustomOrderWrapper;
-import org.eclipse.yasson.customization.model.FieldOrder;
-import org.eclipse.yasson.customization.model.FieldOrderNameAnnotation;
-import org.eclipse.yasson.customization.model.FieldSpecificOrder;
-import org.eclipse.yasson.customization.model.RenamedPropertiesContainer;
+import org.eclipse.yasson.customization.model.*;
 import org.junit.Assert;
 import org.junit.Test;
 

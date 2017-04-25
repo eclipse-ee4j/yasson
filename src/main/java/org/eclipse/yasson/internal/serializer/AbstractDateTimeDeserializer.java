@@ -79,9 +79,8 @@ public abstract class AbstractDateTimeDeserializer<T> extends AbstractValueTypeD
      * @return zoned formatter
      */
     protected DateTimeFormatter getZonedFormatter(DateTimeFormatter formatter) {
-        final DateTimeFormatter result = formatter.getZone() != null ?
+        return formatter.getZone() != null ?
                 formatter : formatter.withZone(UTC);
-        return result;
     }
 
     /**

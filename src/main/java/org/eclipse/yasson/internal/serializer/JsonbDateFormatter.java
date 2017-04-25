@@ -14,14 +14,11 @@
 package org.eclipse.yasson.internal.serializer;
 
 import javax.json.bind.annotation.JsonbDateFormat;
-import java.time.ZoneId;
 import java.time.format.DateTimeFormatter;
 import java.time.format.DateTimeFormatterBuilder;
 import java.util.Locale;
 
-import static java.time.temporal.ChronoField.HOUR_OF_DAY;
-import static java.time.temporal.ChronoField.MINUTE_OF_HOUR;
-import static java.time.temporal.ChronoField.SECOND_OF_MINUTE;
+import static java.time.temporal.ChronoField.*;
 
 /**
  * Formatter wrapper for different types of dates.

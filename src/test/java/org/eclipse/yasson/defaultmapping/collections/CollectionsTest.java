@@ -18,7 +18,6 @@ import org.eclipse.yasson.defaultmapping.generics.model.ScalarValueWrapper;
 import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
-import sun.reflect.generics.tree.Tree;
 
 import javax.json.bind.Jsonb;
 import javax.json.bind.JsonbBuilder;
@@ -185,7 +184,7 @@ public class CollectionsTest {
     public void testMarshallEnum() {
 
         final Language language = Language.Russian;
-        assertEquals("{\"value\":\"Russian\"}", jsonb.toJson(new ScalarValueWrapper<Language>(language)));
+        assertEquals("{\"value\":\"Russian\"}", jsonb.toJson(new ScalarValueWrapper<>(language)));
     }
 
     @Test

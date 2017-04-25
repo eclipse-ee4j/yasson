@@ -14,7 +14,6 @@
 package org.eclipse.yasson.adapters.model;
 
 import javax.json.bind.adapter.JsonbAdapter;
-
 import java.util.List;
 
 /**

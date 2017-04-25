@@ -14,23 +14,9 @@
 package org.eclipse.yasson.defaultmapping.generics;
 
 import org.eclipse.yasson.TestTypeToken;
-import org.eclipse.yasson.defaultmapping.generics.model.ColoredCircle;
-import org.eclipse.yasson.defaultmapping.generics.model.MultiLevelExtendedGenericTestClass;
-import org.eclipse.yasson.defaultmapping.generics.model.MultipleBoundsContainer;
-import org.eclipse.yasson.defaultmapping.generics.model.WildCardClass;
-import org.eclipse.yasson.defaultmapping.generics.model.WildcardMultipleBoundsClass;
+import org.eclipse.yasson.defaultmapping.generics.model.*;
 import org.eclipse.yasson.serializers.model.Box;
 import org.eclipse.yasson.serializers.model.Crate;
-import org.eclipse.yasson.defaultmapping.generics.model.AnotherGenericTestClass;
-import org.eclipse.yasson.defaultmapping.generics.model.BoundedGenericClass;
-import org.eclipse.yasson.defaultmapping.generics.model.Circle;
-import org.eclipse.yasson.defaultmapping.generics.model.CyclicSubClass;
-import org.eclipse.yasson.defaultmapping.generics.model.GenericArrayClass;
-import org.eclipse.yasson.defaultmapping.generics.model.GenericTestClass;
-import org.eclipse.yasson.defaultmapping.generics.model.GenericWithUnboundedWildcardClass;
-import org.eclipse.yasson.defaultmapping.generics.model.MyCyclicGenericClass;
-import org.eclipse.yasson.defaultmapping.generics.model.PropagatedGenericClass;
-import org.eclipse.yasson.defaultmapping.generics.model.Shape;
 import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
@@ -199,7 +185,7 @@ public class GenericsTest {
 
     @Test
     public void testWithType() {
-        List<Optional<String>> expected = Arrays.asList(Optional.empty(), Optional.ofNullable("first"), Optional.of("second"));
+        List<Optional<String>> expected = Arrays.asList(Optional.empty(), Optional.of("first"), Optional.of("second"));
         //String json = jsonb.toJson(expected, DefaultMappingGenericsTest.class.getField("listOfOptionalStringField").getGenericType());
 
         // TODO according to Martin V this should not pass... but it is...

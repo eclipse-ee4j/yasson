@@ -29,7 +29,6 @@ import javax.json.stream.JsonGenerationException;
 import javax.json.stream.JsonGenerator;
 import java.lang.reflect.Type;
 import java.util.Objects;
-import java.util.OptionalLong;
 import java.util.logging.Logger;
 
 /**
