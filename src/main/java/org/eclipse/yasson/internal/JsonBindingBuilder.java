@@ -25,18 +25,18 @@ import java.util.Optional;
  * @author Dmitry Kornilov
  */
 public class JsonBindingBuilder implements JsonbBuilder {
-    private Optional<JsonbConfig> config = Optional.of(new JsonbConfig());
-    private Optional<JsonProvider> provider = Optional.empty();
+    private JsonbConfig config = new JsonbConfig();
+    private JsonProvider provider = null;
 
     @Override
     public JsonbBuilder withConfig(JsonbConfig config) {
-        this.config = Optional.of(config);
+        this.config = config;
         return this;
     }
 
     @Override
     public JsonbBuilder withProvider(JsonProvider jsonpProvider) {
-        this.provider = Optional.of(jsonpProvider);
+        this.provider = jsonpProvider;
         return this;
     }
 
@@ -46,7 +46,7 @@ public class JsonBindingBuilder implements JsonbBuilder {
      * @return configuration.
      */
     public JsonbConfig getConfig() {
-        return config.get();
+        return config;
     }
 
     /**
@@ -55,7 +55,7 @@ public class JsonBindingBuilder implements JsonbBuilder {
      * @return Provider.
      */
     public Optional<JsonProvider> getProvider() {
-        return provider;
+        return Optional.ofNullable(provider);
     }
 
     @Override
