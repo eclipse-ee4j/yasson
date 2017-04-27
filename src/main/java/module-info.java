@@ -10,7 +10,7 @@
  * Contributors:
  * Roman Grigoriadi
  ******************************************************************************/
-module yasson {
+module org.eclipse.yasson {
     requires java.json;
     requires java.json.bind;
 
