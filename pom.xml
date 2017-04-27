@@ -191,11 +191,6 @@
                     </plugin>
                     <plugin>
                         <artifactId>maven-javadoc-plugin</artifactId>
-                        <configuration>
-                            <!-- TODO: javadoc: error - No source files for package java.json.bind-->
-                            <failOnError>false</failOnError>
-                            <additionalparam>--module-path ${project.build.directory} --add-modules java.json,java.json.bind</additionalparam>
-                        </configuration>
                     </plugin>
                     <plugin>
                         <groupId>org.apache.maven.plugins</groupId>
@@ -318,7 +313,7 @@
                     <version>2.10.4</version>
                     <configuration>
                         <failOnError>true</failOnError>
-                        <doctitle>JSONB reference implementation</doctitle>
+                        <doctitle>Yasson</doctitle>
                         <bottom>
                             <![CDATA[Copyright &#169; 1996-2015,
                                 <a href="http://www.oracle.com">Oracle</a>
@@ -326,9 +321,7 @@
                                 Use is subject to
                                 <a href="{@docRoot}/doc-files/spec-license.html" target="_top">license terms</a>.]]>
                         </bottom>
-                        <sourceFileExcludes>
-                            <sourceFileExclude>module-info.java</sourceFileExclude>
-                        </sourceFileExcludes>
+                        <sourcepath>${basedir}/src/main/java/org/eclipse/yasson</sourcepath>
                     </configuration>
                     <executions>
                         <execution>
