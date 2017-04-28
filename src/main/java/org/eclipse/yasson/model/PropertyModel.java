@@ -17,14 +17,29 @@ import org.eclipse.yasson.internal.JsonbContext;
 import org.eclipse.yasson.internal.ReflectionUtils;
 import org.eclipse.yasson.internal.adapter.AdapterBinding;
 import org.eclipse.yasson.internal.adapter.SerializerBinding;
+import org.eclipse.yasson.internal.properties.MessageKeys;
+import org.eclipse.yasson.internal.properties.Messages;
 import org.eclipse.yasson.internal.serializer.*;
 import org.eclipse.yasson.model.customization.PropertyCustomization;
 import org.eclipse.yasson.model.customization.PropertyCustomizationBuilder;
 
+import javax.json.bind.JsonbException;
+import javax.json.bind.annotation.JsonbDateFormat;
+import javax.json.bind.annotation.JsonbNumberFormat;
+import javax.json.bind.annotation.JsonbProperty;
+import javax.json.bind.annotation.JsonbTransient;
+import javax.json.bind.annotation.JsonbTypeAdapter;
+import javax.json.bind.annotation.JsonbTypeDeserializer;
+import javax.json.bind.annotation.JsonbTypeSerializer;
 import javax.json.bind.config.PropertyNamingStrategy;
 import javax.json.bind.serializer.JsonbSerializer;
+import java.lang.annotation.Annotation;
+import java.lang.reflect.AnnotatedElement;
 import java.lang.reflect.Type;
+import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.EnumSet;
+import java.util.List;
 import java.util.Map;
 import java.util.Objects;
 import java.util.Optional;
@@ -148,6 +163,15 @@ public class PropertyModel implements JsonBindingModel, Comparable<PropertyModel
                 if(!transientInfo.contains(AnnotationTarget.SETTER)){
                     builder.setWriteTransient(true);
                 }
+            }
+
+            if (builder.isReadTransient()) {
+                introspector.checkTransientIncompatible(property.getFieldElement());
+                introspector.checkTransientIncompatible(property.getGetterElement());
+            }
+            if (builder.isWriteTransient()) {
+                introspector.checkTransientIncompatible(property.getFieldElement());
+                introspector.checkTransientIncompatible(property.getSetterElement());
             }
         }
 

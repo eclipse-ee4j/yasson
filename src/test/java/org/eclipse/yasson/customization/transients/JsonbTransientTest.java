@@ -76,30 +76,6 @@ public class JsonbTransientTest {
     }
 
     @Test
-    public void testTransientAcceptableAnnotationCombinationsSerialization() throws Exception {
-        JsonbTransientAcceptableAnnotationCollision pojo = new JsonbTransientAcceptableAnnotationCollision();
-        pojo.setAnnotatedPropertyTransientGetter("transient value");
-        pojo.setAnnotatedPropertyTransientSetter("Annotated property transient setter");
-        pojo.setAnnotatedPropertyTransientGetterAndSetter("transient value");
-
-        assertEquals("{\"annotated_property_transient_setter\":\"Annotated property transient setter\"}", jsonb.toJson(pojo));
-    }
-
-    @Test
-    public void testTransientAcceptableAnnotationCombinationsDeserialization() throws Exception {
-        Jsonb localJsonb = JsonbBuilder.create(new JsonbConfig());
-        JsonbTransientAcceptableAnnotationCollision result = localJsonb.fromJson(
-                "{\"annotated_property_transient_setter\":\"Annotated property transient setter\"," +
-                        "\"annotated_property_transient_getter\":\"Annotated property transient getter\"," +
-                        "\"annotated_property_transient_getter_and_setter\":\"Annotated property transient getter and setter\"},",
-                JsonbTransientAcceptableAnnotationCollision.class);
-
-        assertEquals("Annotated property transient getter", result.getAnnotatedPropertyTransientGetter());
-        assertNull(result.getAnnotatedPropertyTransientSetter());
-        assertNull(result.getAnnotatedPropertyTransientGetterAndSetter());
-    }
-
-    @Test
     public void testTransientCollidesOnProperty() throws Exception {
         JsonbTransientCollisionOnProperty pojo = new JsonbTransientCollisionOnProperty();
         pojo.setTransientProperty("TRANSIENT");
@@ -175,5 +151,24 @@ public class JsonbTransientTest {
         } catch (JsonbException e) {
             assertTrue(e.getMessage().startsWith(String.format("JsonbTransient annotation collides with %s", JsonbProperty.class)));
         }
+    }
+
+    @Test(expected = JsonbException.class)
+    public void testTransientGetterPlusJsonbPropertyField() {
+        TransientGetterPlusCustomizationAnnotatedFieldContainer pojo = new TransientGetterPlusCustomizationAnnotatedFieldContainer();
+        jsonb.toJson(pojo);
+    }
+
+    @Test(expected = JsonbException.class)
+    public void testTransientSetterPlusJsonbPropertyField() {
+        TransientSetterPlusCustomizationAnnotatedFieldContainer pojo = new TransientSetterPlusCustomizationAnnotatedFieldContainer();
+        jsonb.toJson(pojo);
+    }
+
+    @Test
+    public void testTransientSetterplusJsonbPropertyGetter() {
+        TransientSetterPlusCustomizationAnnotatedGetterContainer pojo = new TransientSetterPlusCustomizationAnnotatedGetterContainer();
+        String result = jsonb.toJson(pojo);
+        System.out.println("result = " + result);
     }
 }

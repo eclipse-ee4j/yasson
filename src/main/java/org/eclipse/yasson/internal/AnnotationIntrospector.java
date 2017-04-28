@@ -20,22 +20,54 @@ import org.eclipse.yasson.internal.properties.MessageKeys;
 import org.eclipse.yasson.internal.properties.Messages;
 import org.eclipse.yasson.internal.serializer.JsonbDateFormatter;
 import org.eclipse.yasson.internal.serializer.JsonbNumberFormatter;
-import org.eclipse.yasson.model.*;
+import org.eclipse.yasson.model.AnnotationTarget;
+import org.eclipse.yasson.model.CreatorParam;
+import org.eclipse.yasson.model.JsonbAnnotatedElement;
 import org.eclipse.yasson.model.JsonbCreator;
+import org.eclipse.yasson.model.Property;
 import org.eclipse.yasson.model.customization.ClassCustomization;
 import org.eclipse.yasson.model.customization.ClassCustomizationBuilder;
 
 import javax.json.bind.JsonbException;
 import javax.json.bind.adapter.JsonbAdapter;
-import javax.json.bind.annotation.*;
+import javax.json.bind.annotation.JsonbDateFormat;
+import javax.json.bind.annotation.JsonbNillable;
+import javax.json.bind.annotation.JsonbNumberFormat;
+import javax.json.bind.annotation.JsonbProperty;
+import javax.json.bind.annotation.JsonbPropertyOrder;
+import javax.json.bind.annotation.JsonbTransient;
+import javax.json.bind.annotation.JsonbTypeAdapter;
+import javax.json.bind.annotation.JsonbTypeDeserializer;
+import javax.json.bind.annotation.JsonbTypeSerializer;
+import javax.json.bind.annotation.JsonbVisibility;
 import javax.json.bind.config.PropertyVisibilityStrategy;
 import javax.json.bind.serializer.JsonbDeserializer;
 import javax.json.bind.serializer.JsonbSerializer;
 import java.lang.annotation.Annotation;
-import java.lang.reflect.*;
+import java.lang.reflect.Constructor;
+import java.lang.reflect.Executable;
+import java.lang.reflect.Field;
+import java.lang.reflect.Method;
+import java.lang.reflect.Modifier;
+import java.lang.reflect.Parameter;
 import java.time.format.DateTimeFormatter;
 import java.time.temporal.TemporalAccessor;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Calendar;
+import java.util.Date;
+import java.util.EnumSet;
+import java.util.HashMap;
+import java.util.HashSet;
+import java.util.LinkedHashSet;
+import java.util.LinkedList;
+import java.util.List;
+import java.util.Locale;
+import java.util.Map;
+import java.util.Objects;
+import java.util.Optional;
+import java.util.Queue;
+import java.util.Set;
 
 /**
  * Introspects configuration on classes and their properties by reading annotations.
@@ -45,6 +77,13 @@ import java.util.*;
 public class AnnotationIntrospector {
 
     private final JsonbContext jsonbContext;
+
+    /**
+     * Annotations to report exception when used in combination with {@link JsonbTransient}
+     */
+    public static final List<Class<? extends Annotation>> TRANSIENT_INCOMPATIBLE =
+            Arrays.asList(JsonbDateFormat.class, JsonbNumberFormat.class, JsonbProperty.class,
+                          JsonbTypeAdapter.class, JsonbTypeSerializer.class, JsonbTypeDeserializer.class);
 
     /**
      * Creates annotation introspecting component passing {@link JsonbContext} inside.
@@ -493,6 +532,21 @@ public class AnnotationIntrospector {
 
     private <T extends Annotation> T findAnnotation(Annotation[] declaredAnnotations, Class<T> annotationClass) {
         return findAnnotation(declaredAnnotations, annotationClass, new HashSet<>());
+    }
+
+    /**
+     * Finds annotations incompatible with {@link JsonbTransient} annotation.
+     * @param target target to check
+     * @throws JsonbException If incompatible annotation is found.
+     */
+    @SuppressWarnings("unchecked")
+    public void checkTransientIncompatible(JsonbAnnotatedElement<?> target) {
+        for (Class<? extends Annotation> ann : TRANSIENT_INCOMPATIBLE) {
+            Annotation annotation = findAnnotation(target.getAnnotations(), ann);
+            if (annotation != null) {
+                throw new JsonbException(Messages.getMessage(MessageKeys.JSONB_TRANSIENT_WITH_OTHER_ANNOTATIONS));
+            }
+        }
     }
 
     /**
