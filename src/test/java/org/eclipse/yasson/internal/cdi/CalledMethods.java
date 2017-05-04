@@ -31,18 +31,11 @@ public class CalledMethods {
      */
     private Map<String, Integer> results = new HashMap<>();
 
-    /**
-     * Returns true if given method method was called.
-     *
-     * @param methodName Method to check.
-     * @return True if given method was called.
-     */
-    public boolean isCalled(String methodName) {
-        return results.containsKey(methodName);
-    }
-
     public void registerCall(@Observes MethodCalledEvent methodCalledEvent) {
         results.compute(methodCalledEvent.getMethodName(), (s, c) -> c == null ? 1 : c + 1);
     }
 
+    public Map<String, Integer> getResults() {
+        return results;
+    }
 }

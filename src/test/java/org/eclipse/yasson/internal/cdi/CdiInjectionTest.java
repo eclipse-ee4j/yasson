@@ -24,6 +24,7 @@ import javax.json.bind.JsonbConfig;
 import javax.json.bind.config.PropertyVisibilityStrategy;
 import java.lang.reflect.Field;
 import java.lang.reflect.Method;
+import java.util.Map;
 
 import static org.junit.Assert.*;
 
@@ -45,23 +46,26 @@ public class CdiInjectionTest {
         assertEquals("{\"adaptedValue1\":1111,\"adaptedValue2\":1001,\"adaptedValue3\":1010}", result);
 
         //HelloService1 is @ApplicationScoped
-        assertTrue(getCalledMethods().isCalled(HelloService1.class.getName() + ".sayHello"));
-        assertFalse(getCalledMethods().isCalled(HelloService1.class.getName() + ".preDestroy"));
+        CalledMethods calledMethods = getCalledMethods();
+        Map<String, Integer> results = calledMethods.getResults();
+
+        assertTrue(results.containsKey(HelloService1.class.getName() + ".sayHello"));
+        assertFalse(results.containsKey(HelloService1.class.getName() + ".preDestroy"));
 
         //HelloService2 is @Dependent
-        assertTrue(getCalledMethods().isCalled(HelloService2.class.getName() + ".sayHello"));
-        assertTrue(getCalledMethods().isCalled(HelloService2.class.getName() + ".preDestroy"));
+        assertTrue(results.containsKey(HelloService2.class.getName() + ".sayHello"));
+        assertTrue(results.containsKey(HelloService2.class.getName() + ".preDestroy"));
 
         //CdiTestService is @ApplicationScoped
-        assertTrue(getCalledMethods().isCalled(CdiTestService.class.getName() + ".runService"));
-        assertFalse(getCalledMethods().isCalled(CdiTestService.class.getName() + ".preDestroy"));
+        assertTrue(results.containsKey(CdiTestService.class.getName() + ".runService"));
+        assertFalse(results.containsKey(CdiTestService.class.getName() + ".preDestroy"));
 //        getCalledMethods().printCalled();
 
 
         weldManager.shutdownWeld();
 
-        assertTrue(getCalledMethods().isCalled(CdiTestService.class.getName() + ".preDestroy"));
-        assertTrue(getCalledMethods().isCalled(HelloService1.class.getName() + ".preDestroy"));
+        assertTrue(results.containsKey(CdiTestService.class.getName() + ".preDestroy"));
+        assertTrue(results.containsKey(HelloService1.class.getName() + ".preDestroy"));
 
 //        getCalledMethods().printCalled();
     }
@@ -87,11 +91,9 @@ public class CdiInjectionTest {
     }
 
     private CalledMethods getCalledMethods() {
-        if (calledMethods == null) {
-            final BeanManager beanManager = CDI.current().getBeanManager();
-            final Bean<?> resolve = beanManager.resolve(beanManager.getBeans(CalledMethods.class));
-            calledMethods = (CalledMethods) beanManager.getReference(resolve, CalledMethods.class, beanManager.createCreationalContext(resolve));
-        }
-        return calledMethods;
+        final BeanManager beanManager = CDI.current().getBeanManager();
+        final Bean<?> resolve = beanManager.resolve(beanManager.getBeans(CalledMethods.class));
+        return (CalledMethods) beanManager.getReference(resolve, CalledMethods.class, beanManager.createCreationalContext(resolve));
     }
+
 }

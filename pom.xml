@@ -197,9 +197,10 @@
                         <artifactId>maven-surefire-plugin</artifactId>
                         <version>2.19.1</version>
                         <configuration>
-                            <excludes>
-                                <exclude>org.eclipse.yasson.internal.cdi.CdiInjectionTest</exclude>
-                            </excludes>
+                            <!-- TODO remove when fixed in weld/cdi -->
+                            <argLine>
+                                --add-opens java.base/java.lang=ALL-UNNAMED
+                            </argLine>
                         </configuration>
                     </plugin>
                 </plugins>
@@ -434,6 +435,9 @@
             <dependency>
                 <groupId>javax.enterprise</groupId>
                 <artifactId>cdi-api</artifactId>
+                <!--TODO change to 2.0 after release, 2.0.Beta1 was causing CDI.current() return null instead of
+                throwing IllegalStateException after weld.shutdown() -->
+                <!--<version>2.0.Beta1</version>-->
                 <version>1.2</version>
             </dependency>
             <dependency>
@@ -443,15 +447,9 @@
                 <scope>test</scope>
             </dependency>
             <dependency>
-                <groupId>org.jboss.weld</groupId>
-                <artifactId>weld-core</artifactId>
-                <version>2.3.3.Final</version>
-                <scope>test</scope>
-            </dependency>
-            <dependency>
                 <groupId>org.jboss.weld.se</groupId>
                 <artifactId>weld-se</artifactId>
-                <version>2.3.3.Final</version>
+                <version>2.4.3.Final</version>
                 <scope>test</scope>
             </dependency>
             <dependency>
@@ -480,10 +478,6 @@
             <groupId>org.glassfish</groupId>
             <artifactId>javax.json</artifactId>
         </dependency>
-        <!--<dependency>
-            <groupId>org.jboss.weld</groupId>
-            <artifactId>weld-core</artifactId>
-        </dependency>-->
         <dependency>
             <groupId>org.jboss.weld.se</groupId>
             <artifactId>weld-se</artifactId>

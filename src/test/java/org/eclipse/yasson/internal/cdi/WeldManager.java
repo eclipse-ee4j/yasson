@@ -41,6 +41,7 @@ public class WeldManager {
     public void shutdownWeld() throws NamingException {
         weld.shutdown();
         initialContext.unbind(JsonbComponentInstanceCreatorFactory.BEAN_MANAGER_NAME);
+        initialContext.close();
     }
 
 }
