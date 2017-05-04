@@ -20,6 +20,8 @@ import org.eclipse.yasson.internal.unmarshaller.ResolvedParameterizedType;
 
 import javax.json.bind.JsonbException;
 import java.lang.reflect.*;
+import java.security.AccessController;
+import java.security.PrivilegedAction;
 import java.util.Arrays;
 import java.util.Objects;
 import java.util.Optional;
@@ -183,14 +185,17 @@ public class ReflectionUtils {
      */
     public static <T> T createNoArgConstructorInstance(Class<T> clazz) {
         Objects.requireNonNull(clazz);
-        try {
-            final Constructor<T> declaredConstructor = clazz.getDeclaredConstructor();
-            return declaredConstructor.newInstance();
-        } catch (InstantiationException | IllegalAccessException | InvocationTargetException e) {
-            throw new JsonbException("Can't create instance", e);
-        } catch (NoSuchMethodException e) {
-            throw new JsonbException(Messages.getMessage(MessageKeys.NO_DEFAULT_CONSTRUCTOR, clazz), e);
-        }
+        return AccessController.doPrivileged((PrivilegedAction<T>) () -> {
+            try {
+                final Constructor<T> declaredConstructor = clazz.getDeclaredConstructor();
+                return declaredConstructor.newInstance();
+            } catch (InstantiationException | IllegalAccessException | InvocationTargetException e) {
+                throw new JsonbException("Can't create instance", e);
+            } catch (NoSuchMethodException e) {
+                throw new JsonbException(Messages.getMessage(MessageKeys.NO_DEFAULT_CONSTRUCTOR, clazz), e);
+            }
+        });
+
     }
 
     /**

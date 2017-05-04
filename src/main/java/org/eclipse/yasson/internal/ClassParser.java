@@ -19,6 +19,8 @@ import java.beans.Introspector;
 import java.lang.annotation.Annotation;
 import java.lang.reflect.Field;
 import java.lang.reflect.Method;
+import java.security.AccessController;
+import java.security.PrivilegedAction;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -71,7 +73,8 @@ class ClassParser {
     }
 
     private void parseIfaceMethodAnnotations(Class<?> ifc, Map<String, Property> classProperties) {
-        for(Method method : ifc.getDeclaredMethods()) {
+        Method[] declaredMethods = AccessController.doPrivileged((PrivilegedAction<Method[]>) ifc::getDeclaredMethods);
+        for(Method method : declaredMethods) {
             final String methodName = method.getName();
             if (!isPropertyMethod(methodName)) {
                 continue;
@@ -94,7 +97,8 @@ class ClassParser {
     }
 
     private void parseMethods(Class<?> clazz, JsonbAnnotatedElement<Class<?>> classElement, Map<String, Property> classProperties) {
-        for (Method method : clazz.getDeclaredMethods()) {
+        Method[] declaredMethods = AccessController.doPrivileged((PrivilegedAction<Method[]>) clazz::getDeclaredMethods);
+        for (Method method : declaredMethods) {
             String name = method.getName();
             if (!isPropertyMethod(name)) {
                 continue;
@@ -128,7 +132,9 @@ class ClassParser {
     }
 
     private void parseFields(JsonbAnnotatedElement<Class<?>> classElement, Map<String, Property> classProperties) {
-        for (Field field : classElement.getElement().getDeclaredFields()) {
+        Field[] declaredFields = AccessController.doPrivileged(
+                (PrivilegedAction<Field[]>) () -> classElement.getElement().getDeclaredFields());
+        for (Field field : declaredFields) {
             final String name = field.getName();
             if (field.isSynthetic()) {
                 continue;

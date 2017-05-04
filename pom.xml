@@ -230,6 +230,12 @@
     </profiles>
 
     <build>
+        <testResources>
+            <testResource>
+                <directory>src/test/resources</directory>
+                <filtering>true</filtering>
+            </testResource>
+        </testResources>
         <finalName>${project.artifactId}</finalName>
         <pluginManagement>
             <plugins>

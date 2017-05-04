@@ -50,6 +50,8 @@ import java.lang.reflect.Field;
 import java.lang.reflect.Method;
 import java.lang.reflect.Modifier;
 import java.lang.reflect.Parameter;
+import java.security.AccessController;
+import java.security.PrivilegedAction;
 import java.time.format.DateTimeFormatter;
 import java.time.temporal.TemporalAccessor;
 import java.util.ArrayList;
@@ -140,14 +142,19 @@ public class AnnotationIntrospector {
      */
     public JsonbCreator getCreator(Class<?> clazz) {
         JsonbCreator jsonbCreator = null;
-        for (Constructor<?> constructor : clazz.getDeclaredConstructors()) {
+        Constructor<?>[] declaredConstructors =
+                AccessController.doPrivileged((PrivilegedAction<Constructor<?>[]>) clazz::getDeclaredConstructors);
+
+        for (Constructor<?> constructor : declaredConstructors) {
             final javax.json.bind.annotation.JsonbCreator annot = findAnnotation(constructor.getDeclaredAnnotations(), javax.json.bind.annotation.JsonbCreator.class);
             if (annot != null) {
                 jsonbCreator = createJsonbCreator(constructor, jsonbCreator, clazz);
             }
         }
 
-        for (Method method : clazz.getDeclaredMethods()) {
+        Method[] declaredMethods =
+                AccessController.doPrivileged((PrivilegedAction<Method[]>) clazz::getDeclaredMethods);
+        for (Method method : declaredMethods) {
             final javax.json.bind.annotation.JsonbCreator annot = findAnnotation(method.getDeclaredAnnotations(), javax.json.bind.annotation.JsonbCreator.class);
             if (annot != null && Modifier.isStatic(method.getModifiers())) {
                 if (!clazz.equals(method.getReturnType())) {
