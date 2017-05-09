@@ -46,7 +46,7 @@ public class JsonbComponentInstanceCreatorFactory {
     public static JsonbComponentInstanceCreator getComponentInstanceCreator() {
         try {
             return new BeanManagerInstanceCreator(CDI.current().getBeanManager());
-        } catch (IllegalStateException e) {
+        } catch (Exception e) {
             log.finest(Messages.getMessage(MessageKeys.BEAN_MANAGER_NOT_FOUND_NO_PROVIDER));
             try {
                 InitialContext context = new InitialContext();
