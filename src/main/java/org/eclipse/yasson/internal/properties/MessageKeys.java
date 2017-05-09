@@ -73,7 +73,8 @@ public enum MessageKeys {
     UNKNOWN_JSON_PROPERTY("unknownJsonProperty"),
     JSONB_CREATOR_MISSING_PROPERTY("jsonbCreatorMissingProperty"),
     ZONE_PARSE_ERROR("zoneParseError"),
-    JSONB_TRANSIENT_WITH_OTHER_ANNOTATIONS("jsonbTransientWithOtherAnnotations")
+    JSONB_TRANSIENT_WITH_OTHER_ANNOTATIONS("jsonbTransientWithOtherAnnotations"),
+    NON_PARAMETRIZED_TYPE("nonParametrizedType"),
     ;
 
     /** Message bundle key. */

@@ -13,11 +13,13 @@
 
 package org.eclipse.yasson.internal.serializer;
 
+import org.eclipse.yasson.internal.JsonbParser;
 import org.eclipse.yasson.internal.Unmarshaller;
 
 import javax.json.JsonObject;
 import javax.json.JsonObjectBuilder;
 import javax.json.JsonValue;
+import javax.json.stream.JsonParser;
 import java.math.BigDecimal;
 
 /**
@@ -27,7 +29,12 @@ import java.math.BigDecimal;
  */
 public class JsonObjectDeserializer extends AbstractJsonpDeserializer<JsonObject> {
 
-    private JsonObjectBuilder objectBuilder;
+    private JsonObject jsonObject;
+
+    @Override
+    protected void deserializeInternal(JsonbParser parser, Unmarshaller context) {
+        this.jsonObject = parser.getObject();
+    }
 
     /**
      * Create instance of current item with its builder.
@@ -36,36 +43,11 @@ public class JsonObjectDeserializer extends AbstractJsonpDeserializer<JsonObject
      */
     protected JsonObjectDeserializer(DeserializerBuilder builder) {
         super(builder);
-        objectBuilder = builder.getJsonbContext().getJsonProvider().createObjectBuilder();
     }
 
-    @Override
-    protected void appendString(String key, String value) {
-        objectBuilder.add(key, value);
-    }
-
-    @Override
-    protected void appendNumber(String key, BigDecimal value) {
-        objectBuilder.add(key, value);
-    }
-
-    @Override
-    protected void appendBoolean(String key, Boolean value) {
-        objectBuilder.add(key, value);
-    }
-
-    @Override
-    protected void appendNull(String key) {
-        objectBuilder.addNull(key);
-    }
-
-    @Override
-    public void appendResult(Object result) {
-        objectBuilder.add(parserContext.getLastKeyName(), (JsonValue) result);
-    }
 
     @Override
     public JsonObject getInstance(Unmarshaller unmarshaller) {
-        return objectBuilder.build();
+        return jsonObject;
     }
 }

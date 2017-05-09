@@ -71,7 +71,6 @@ public class JsonbConfigProperties {
     private JsonbDateFormatter initDateFormatter(Locale locale) {
         final String dateFormat = getGlobalConfigJsonbDateFormat();
         //In case of java.time singleton formats will be used inside related (de)serializers,
-        //in case of java.util.Date and Calendar new instances will be created TODO Performance consider synchronization
         if (JsonbDateFormat.DEFAULT_FORMAT.equals(dateFormat) || JsonbDateFormat.TIME_IN_MILLIS.equals(dateFormat)) {
             return new JsonbDateFormatter(dateFormat, locale.toLanguageTag());
         }

@@ -13,8 +13,6 @@
 
 package org.eclipse.yasson.serializers.model;
 
-import org.eclipse.yasson.adapters.PolymorphismAdapterTest;
-
 import javax.json.bind.serializer.DeserializationContext;
 import javax.json.bind.serializer.JsonbDeserializer;
 import javax.json.stream.JsonParser;

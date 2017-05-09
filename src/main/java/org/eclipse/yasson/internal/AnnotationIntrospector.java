@@ -254,7 +254,6 @@ public class AnnotationIntrospector {
             //TODO will not work for type variable properties, which are bound to class that is annotated.
             return null;
         }
-        //TODO performance hit if class scanning is done often (jsonb is not reused)
         return findAnnotation(collectAnnotations(optionalRawType.get()).getAnnotations(), annotationClass);
     }
 
@@ -311,23 +310,6 @@ public class AnnotationIntrospector {
         EnumSet<AnnotationTarget> transientTarget = EnumSet.noneOf(AnnotationTarget.class);
         Map<AnnotationTarget, JsonbTransient> annotationFromPropertyCategorized = getAnnotationFromPropertyCategorized(JsonbTransient.class, property);
         if (annotationFromPropertyCategorized.size() > 0) {
-            final Class[] FORBIDDEN_ANNOTATIONS = new Class[]{JsonbProperty.class, JsonbNillable.class, JsonbCreator.class, JsonbDateFormat.class,
-                    JsonbNumberFormat.class, JsonbPropertyOrder.class, JsonbVisibility.class};
-
-            annotationFromPropertyCategorized.forEach((target, annotation) -> {
-                for (Class forbiddenAnnotation : FORBIDDEN_ANNOTATIONS) {
-                    Map forbiddenAnnotationOccurrence = getAnnotationFromPropertyCategorized(forbiddenAnnotation, property);
-                    if((forbiddenAnnotationOccurrence.size() > 0) && annotationFromPropertyCategorized.containsKey(AnnotationTarget.PROPERTY)){
-                        //  JsonbTransient is defined on property and its getter/setter has one of forbidden annotations
-                        throw new JsonbException(String.format("JsonbTransient annotation collides with %s for property %s", forbiddenAnnotation, property.getName()));
-                    } else if (forbiddenAnnotationOccurrence.containsKey(target)) {
-                        //  TODO: Clarify the message
-                        //  Conflicting annotation defined at the same scope of the JsonbTransient (both are on getter or setter)
-                        throw new JsonbException(String.format("JsonbTransient annotation collides with %s for property %s", forbiddenAnnotation, property.getName()));
-                    }
-                }
-            });
-
             transientTarget.addAll(annotationFromPropertyCategorized.keySet());
             return transientTarget;
         }

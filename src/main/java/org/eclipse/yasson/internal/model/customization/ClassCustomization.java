@@ -105,15 +105,4 @@ public class ClassCustomization extends Customization {
         return dateTimeFormatter;
     }
 
-    @Override
-    public boolean isReadTransient() {
-        //  TODO: Class level transient processing is not implemented
-        return false;
-    }
-
-    @Override
-    public boolean isWriteTransient() {
-        //  TODO: Class level transient processing is not implemented
-        return false;
-    }
 }

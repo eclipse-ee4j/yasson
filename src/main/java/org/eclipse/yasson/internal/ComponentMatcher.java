@@ -15,8 +15,6 @@ package org.eclipse.yasson.internal;
 
 import org.eclipse.yasson.internal.components.*;
 import org.eclipse.yasson.internal.model.JsonBindingModel;
-import org.eclipse.yasson.internal.model.PropertyModel;
-import org.eclipse.yasson.internal.model.TypeWrapper;
 
 import javax.json.bind.JsonbConfig;
 import javax.json.bind.adapter.JsonbAdapter;
@@ -162,10 +160,6 @@ public class ComponentMatcher {
      * @return components info if present
      */
     public Optional<AdapterBinding> getAdapterBinding(Type propertyRuntimeType, JsonBindingModel model) {
-        //TODO do we need type wrapper adapters at all? Make better check or remove.
-        if (model != null && model instanceof PropertyModel && ((PropertyModel) model).getClassModel().getType() == TypeWrapper.class) {
-            return Optional.empty();
-        }
         if (model == null || model.getCustomization() == null ||  model.getCustomization().getAdapterBinding() == null) {
             return searchComponentBinding(propertyRuntimeType, ComponentBindings::getAdapterInfo);
         }

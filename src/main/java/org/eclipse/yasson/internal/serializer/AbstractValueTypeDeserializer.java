@@ -72,7 +72,9 @@ public abstract class AbstractValueTypeDeserializer<T> implements JsonbDeseriali
      * @param rtType Runtime type.
      * @return Deserialized object.
      */
-    protected abstract T deserialize(String jsonValue, Unmarshaller unmarshaller, Type rtType);
+    protected T deserialize(String jsonValue, Unmarshaller unmarshaller, Type rtType) {
+        throw new UnsupportedOperationException("Operation not supported in " + getClass());
+    }
 
     protected JsonBindingModel getModel() {
         return model;

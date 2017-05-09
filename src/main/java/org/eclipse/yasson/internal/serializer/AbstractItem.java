@@ -108,7 +108,6 @@ public abstract class AbstractItem<T> implements CurrentItem<T> {
         if (classModel != null) {
             return new ContainerCustomization(classModel.getCustomization());
         }
-        // TODO deal with DefaultCustomization
         return new ContainerCustomization(new ClassCustomizationBuilder());
     }
 }

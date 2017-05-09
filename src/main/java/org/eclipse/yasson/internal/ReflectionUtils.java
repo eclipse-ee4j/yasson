@@ -163,9 +163,8 @@ public class ReflectionUtils {
             } else {
                 resolvedArgs[i] = new VariableTypeInheritanceSearch().searchParametrizedType(typeToSearch, (TypeVariable<?>) unresolvedArgs[i]);
                 if (resolvedArgs[i] == null) {
-                    //TODO happens with mistyped runtime type, better explanation whats wrong
-                    throw new IllegalStateException();
-//                    logger.warning(Messages.getMessage(MessageKeys.GENERIC_BOUND_NOT_FOUND, unresolvedArgs[i], typeToSearch));
+                    //No generic information available
+                    throw new IllegalStateException(Messages.getMessage(MessageKeys.GENERIC_BOUND_NOT_FOUND, unresolvedArgs[i], typeToSearch));
                 }
             }
             if (resolvedArgs[i] instanceof ParameterizedType) {
@@ -225,8 +224,7 @@ public class ReflectionUtils {
             }
             current = current.getSuperclass();
         }
-        //TODO messages
-        throw new JsonbException(String.format("Type: %s does not implement a parametrized type interface", parameterizedInterface));
+        throw new JsonbException(Messages.getMessage(MessageKeys.NON_PARAMETRIZED_TYPE, parameterizedInterface));
     }
 
     /**

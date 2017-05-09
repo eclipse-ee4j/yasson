@@ -31,10 +31,6 @@ import java.math.BigDecimal;
 /**
  * Common implementation for JSONP Object and Array.
  *
- * TODO JSONP 1.1
- * This is subject to change after JSONP 1.1 release,
- * which will have support for getting JsonObject and JsonArray directly from JsonParser.
- *
  * @author Roman Grigoriadi
  */
 public abstract class AbstractJsonpDeserializer<T extends JsonValue> extends AbstractContainerDeserializer<T> {
@@ -48,42 +44,6 @@ public abstract class AbstractJsonpDeserializer<T extends JsonValue> extends Abs
         super(builder);
     }
 
-    @Override
-    protected void deserializeInternal(JsonbParser parser, Unmarshaller context) {
-        this.parserContext = moveToFirst(parser);
-        while (parser.hasNext()) {
-            final JsonParser.Event event = parser.next();
-            final String lastKey = parserContext.getLastKeyName();
-            switch (event) {
-                case START_OBJECT:
-                case START_ARRAY:
-                    deserializeNext(parser, context);
-                    break;
-                case VALUE_STRING:
-                    appendString(lastKey, parser.getString());
-                    break;
-                case VALUE_NUMBER:
-                    appendNumber(lastKey, parser.getBigDecimal());
-                    break;
-                case VALUE_NULL:
-                    appendNull(lastKey);
-                    break;
-                case VALUE_FALSE:
-                    appendBoolean(lastKey, Boolean.FALSE);
-                    break;
-                case VALUE_TRUE:
-                    appendBoolean(lastKey, Boolean.TRUE);
-                    break;
-                case END_OBJECT:
-                case END_ARRAY:
-                    return;
-                case KEY_NAME:
-                    break;
-                default:
-                    throw new JsonbException(Messages.getMessage(MessageKeys.NOT_VALUE_TYPE, event));
-            }
-        }
-    }
 
     @Override
     protected JsonBindingModel getModel() {
@@ -99,13 +59,11 @@ public abstract class AbstractJsonpDeserializer<T extends JsonValue> extends Abs
 
     @Override
     protected void deserializeNext(JsonParser parser, Unmarshaller context) {
-        Class<?> type = parserContext.getLastEvent() == JsonParser.Event.START_OBJECT ? JsonObject.class : JsonArray.class;
-        final JsonbDeserializer<?> deserializer = newUnmarshallerItemBuilder(context.getJsonbContext()).withType(type).build();
-        appendResult(deserializer.deserialize(parser, context, type));
+        throw new UnsupportedOperationException("Inner json structures are deserialized by JsonParser.");
     }
 
-    protected abstract void appendString(String key, String value);
-    protected abstract void appendNumber(String key, BigDecimal value);
-    protected abstract void appendBoolean(String key, Boolean value);
-    protected abstract void appendNull(String key);
+    @Override
+    public void appendResult(Object result) {
+        throw new UnsupportedOperationException("Inner json structures are deserialized by JsonParser.");
+    }
 }
