@@ -15,8 +15,8 @@ package org.eclipse.yasson.internal;
 
 import org.eclipse.yasson.defaultmapping.modifiers.model.FieldModifiersClass;
 import org.eclipse.yasson.defaultmapping.modifiers.model.MethodModifiersClass;
-import org.eclipse.yasson.model.ClassModel;
-import org.eclipse.yasson.model.JsonbAnnotatedElement;
+import org.eclipse.yasson.internal.model.ClassModel;
+import org.eclipse.yasson.internal.model.JsonbAnnotatedElement;
 import org.junit.Before;
 import org.junit.Test;
 

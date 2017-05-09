@@ -17,10 +17,10 @@ import org.eclipse.yasson.internal.properties.Messages;
 import org.eclipse.yasson.internal.serializer.AbstractValueTypeSerializer;
 import org.eclipse.yasson.internal.serializer.ContainerSerializerProvider;
 import org.eclipse.yasson.internal.serializer.SerializerBuilder;
-import org.eclipse.yasson.internal.unmarshaller.ContainerModel;
-import org.eclipse.yasson.model.JsonBindingModel;
-import org.eclipse.yasson.model.JsonContext;
-import org.eclipse.yasson.model.JsonbPropertyInfo;
+import org.eclipse.yasson.internal.serializer.ContainerModel;
+import org.eclipse.yasson.internal.model.JsonBindingModel;
+import org.eclipse.yasson.internal.model.JsonContext;
+import org.eclipse.yasson.internal.model.JsonbPropertyInfo;
 
 import javax.json.bind.JsonbException;
 import javax.json.bind.serializer.JsonbSerializer;

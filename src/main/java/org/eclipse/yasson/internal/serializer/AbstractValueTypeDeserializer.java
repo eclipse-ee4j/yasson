@@ -15,7 +15,7 @@ package org.eclipse.yasson.internal.serializer;
 
 import org.eclipse.yasson.internal.JsonbParser;
 import org.eclipse.yasson.internal.Unmarshaller;
-import org.eclipse.yasson.model.JsonBindingModel;
+import org.eclipse.yasson.internal.model.JsonBindingModel;
 
 import javax.json.bind.serializer.DeserializationContext;
 import javax.json.bind.serializer.JsonbDeserializer;

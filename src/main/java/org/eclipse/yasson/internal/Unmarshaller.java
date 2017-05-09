@@ -13,9 +13,9 @@
 package org.eclipse.yasson.internal;
 
 
-import org.eclipse.yasson.internal.unmarshaller.ContainerModel;
-import org.eclipse.yasson.internal.unmarshaller.CurrentItem;
-import org.eclipse.yasson.internal.unmarshaller.DeserializerBuilder;
+import org.eclipse.yasson.internal.serializer.ContainerModel;
+import org.eclipse.yasson.internal.serializer.CurrentItem;
+import org.eclipse.yasson.internal.serializer.DeserializerBuilder;
 
 import javax.json.bind.serializer.DeserializationContext;
 import javax.json.bind.serializer.JsonbDeserializer;

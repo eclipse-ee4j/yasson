@@ -73,7 +73,7 @@ public class CdiInjectionTest {
     @Test
     public void testNonCdiEnvironment() {
         JsonbConfig config = new JsonbConfig();
-        //allow only field with adapter that doesn't has cdi dependencies.
+        //allow only field with components that doesn't has cdi dependencies.
         config.withPropertyVisibilityStrategy(new PropertyVisibilityStrategy() {
             @Override
             public boolean isVisible(Field field) {

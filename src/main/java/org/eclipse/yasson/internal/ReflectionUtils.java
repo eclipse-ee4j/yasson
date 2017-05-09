@@ -14,9 +14,9 @@ package org.eclipse.yasson.internal;
 
 import org.eclipse.yasson.internal.properties.MessageKeys;
 import org.eclipse.yasson.internal.properties.Messages;
-import org.eclipse.yasson.internal.unmarshaller.AbstractItem;
-import org.eclipse.yasson.internal.unmarshaller.EmbeddedItem;
-import org.eclipse.yasson.internal.unmarshaller.ResolvedParameterizedType;
+import org.eclipse.yasson.internal.serializer.AbstractItem;
+import org.eclipse.yasson.internal.serializer.EmbeddedItem;
+import org.eclipse.yasson.internal.serializer.ResolvedParameterizedType;
 
 import javax.json.bind.JsonbException;
 import java.lang.reflect.*;

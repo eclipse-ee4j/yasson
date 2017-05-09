@@ -13,8 +13,6 @@
 
 package org.eclipse.yasson.internal.serializer;
 
-import org.eclipse.yasson.internal.AbstractContainerSerializer;
-
 import javax.json.JsonValue;
 
 /**

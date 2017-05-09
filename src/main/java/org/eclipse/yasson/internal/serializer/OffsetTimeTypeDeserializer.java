@@ -15,7 +15,7 @@ package org.eclipse.yasson.internal.serializer;
 
 import org.eclipse.yasson.internal.properties.MessageKeys;
 import org.eclipse.yasson.internal.properties.Messages;
-import org.eclipse.yasson.model.JsonBindingModel;
+import org.eclipse.yasson.internal.model.JsonBindingModel;
 
 import javax.json.bind.JsonbException;
 import java.time.Instant;

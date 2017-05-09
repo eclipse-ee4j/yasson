@@ -15,7 +15,7 @@ package org.eclipse.yasson.internal.serializer;
 
 
 import org.eclipse.yasson.internal.Unmarshaller;
-import org.eclipse.yasson.model.JsonBindingModel;
+import org.eclipse.yasson.internal.model.JsonBindingModel;
 
 import java.lang.reflect.Type;
 import java.net.MalformedURLException;

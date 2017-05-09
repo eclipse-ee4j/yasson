@@ -13,12 +13,9 @@
 
 package org.eclipse.yasson.internal.serializer;
 
-import org.eclipse.yasson.internal.AbstractContainerSerializer;
 import org.eclipse.yasson.internal.Marshaller;
 import org.eclipse.yasson.internal.ReflectionUtils;
-import org.eclipse.yasson.internal.unmarshaller.ContainerModel;
-import org.eclipse.yasson.internal.unmarshaller.EmbeddedItem;
-import org.eclipse.yasson.model.JsonContext;
+import org.eclipse.yasson.internal.model.JsonContext;
 
 import javax.json.bind.serializer.JsonbSerializer;
 import javax.json.bind.serializer.SerializationContext;

@@ -14,15 +14,14 @@
 package org.eclipse.yasson.internal.serializer;
 
 import org.eclipse.yasson.internal.Marshaller;
-import org.eclipse.yasson.internal.adapter.AdapterBinding;
+import org.eclipse.yasson.internal.components.AdapterBinding;
 import org.eclipse.yasson.internal.properties.MessageKeys;
 import org.eclipse.yasson.internal.properties.Messages;
-import org.eclipse.yasson.internal.unmarshaller.CurrentItem;
-import org.eclipse.yasson.model.ClassModel;
-import org.eclipse.yasson.model.JsonBindingModel;
-import org.eclipse.yasson.model.JsonContext;
-import org.eclipse.yasson.model.JsonbPropertyInfo;
-import org.eclipse.yasson.model.customization.Customization;
+import org.eclipse.yasson.internal.model.ClassModel;
+import org.eclipse.yasson.internal.model.JsonBindingModel;
+import org.eclipse.yasson.internal.model.JsonContext;
+import org.eclipse.yasson.internal.model.JsonbPropertyInfo;
+import org.eclipse.yasson.internal.model.customization.Customization;
 
 import javax.json.bind.JsonbException;
 import javax.json.bind.adapter.JsonbAdapter;
@@ -33,7 +32,7 @@ import java.lang.reflect.Type;
 
 /**
  * Serializer for adapted object.
- * Converts object using adapter first, than serializes result with standard process.
+ * Converts object using components first, than serializes result with standard process.
  *
  * @author Roman Grigoriadi
  */

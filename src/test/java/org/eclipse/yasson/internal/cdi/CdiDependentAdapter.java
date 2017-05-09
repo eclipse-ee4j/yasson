@@ -18,7 +18,7 @@ import javax.inject.Inject;
 import javax.json.bind.adapter.JsonbAdapter;
 
 /**
- * Test scope adapter for testing CDI injection and cleanup.
+ * Test scope components for testing CDI injection and cleanup.
  *
  * @author Roman Grigoriadi
  */

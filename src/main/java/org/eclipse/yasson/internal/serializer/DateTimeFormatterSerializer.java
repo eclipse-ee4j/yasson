@@ -1,7 +1,7 @@
 package org.eclipse.yasson.internal.serializer;
 
 import org.eclipse.yasson.internal.JsonbContext;
-import org.eclipse.yasson.model.JsonBindingModel;
+import org.eclipse.yasson.internal.model.JsonBindingModel;
 
 import java.time.format.DateTimeFormatter;
 import java.time.temporal.TemporalAccessor;

@@ -1,6 +1,6 @@
 package org.eclipse.yasson.internal.serializer;
 
-import org.eclipse.yasson.model.JsonBindingModel;
+import org.eclipse.yasson.internal.model.JsonBindingModel;
 
 /**
  * Create instance of a serializer.

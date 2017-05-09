@@ -13,20 +13,20 @@
 
 package org.eclipse.yasson.internal;
 
-import org.eclipse.yasson.internal.adapter.AdapterBinding;
-import org.eclipse.yasson.internal.adapter.DeserializerBinding;
-import org.eclipse.yasson.internal.adapter.SerializerBinding;
+import org.eclipse.yasson.internal.components.AdapterBinding;
+import org.eclipse.yasson.internal.components.DeserializerBinding;
+import org.eclipse.yasson.internal.components.SerializerBinding;
 import org.eclipse.yasson.internal.properties.MessageKeys;
 import org.eclipse.yasson.internal.properties.Messages;
 import org.eclipse.yasson.internal.serializer.JsonbDateFormatter;
 import org.eclipse.yasson.internal.serializer.JsonbNumberFormatter;
-import org.eclipse.yasson.model.AnnotationTarget;
-import org.eclipse.yasson.model.CreatorParam;
-import org.eclipse.yasson.model.JsonbAnnotatedElement;
-import org.eclipse.yasson.model.JsonbCreator;
-import org.eclipse.yasson.model.Property;
-import org.eclipse.yasson.model.customization.ClassCustomization;
-import org.eclipse.yasson.model.customization.ClassCustomizationBuilder;
+import org.eclipse.yasson.internal.model.AnnotationTarget;
+import org.eclipse.yasson.internal.model.CreatorParam;
+import org.eclipse.yasson.internal.model.JsonbAnnotatedElement;
+import org.eclipse.yasson.internal.model.JsonbCreator;
+import org.eclipse.yasson.internal.model.Property;
+import org.eclipse.yasson.internal.model.customization.ClassCustomization;
+import org.eclipse.yasson.internal.model.customization.ClassCustomizationBuilder;
 
 import javax.json.bind.JsonbException;
 import javax.json.bind.adapter.JsonbAdapter;
@@ -190,7 +190,7 @@ public class AnnotationIntrospector {
     /**
      * Checks for {@link JsonbAdapter} on a property.
      * @param property property not null
-     * @return adapter info
+     * @return components info
      */
     public AdapterBinding getAdapterBinding(Property property) {
         Objects.requireNonNull(property);
@@ -216,7 +216,7 @@ public class AnnotationIntrospector {
     /**
      * Checks for {@link JsonbDeserializer} on a property.
      * @param property property not null
-     * @return adapter info
+     * @return components info
      */
     public DeserializerBinding getDeserializerBinding(Property property) {
         Objects.requireNonNull(property);
@@ -233,7 +233,7 @@ public class AnnotationIntrospector {
     /**
      * Checks for {@link JsonbSerializer} on a property.
      * @param property property not null
-     * @return adapter info
+     * @return components info
      */
     public SerializerBinding getSerializerBinding(Property property) {
         Objects.requireNonNull(property);

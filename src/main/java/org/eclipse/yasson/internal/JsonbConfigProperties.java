@@ -1,11 +1,12 @@
 package org.eclipse.yasson.internal;
 
-import org.eclipse.yasson.internal.internalOrdering.AnyOrderStrategy;
-import org.eclipse.yasson.internal.internalOrdering.LexicographicalOrderStrategy;
-import org.eclipse.yasson.internal.internalOrdering.PropOrderStrategy;
-import org.eclipse.yasson.internal.internalOrdering.ReverseOrderStrategy;
-import org.eclipse.yasson.internal.naming.DefaultNamingStrategies;
-import org.eclipse.yasson.internal.naming.IdentityStrategy;
+import org.eclipse.yasson.internal.model.customization.ordering.AnyOrderStrategy;
+import org.eclipse.yasson.internal.model.customization.ordering.LexicographicalOrderStrategy;
+import org.eclipse.yasson.internal.model.customization.ordering.PropOrderStrategy;
+import org.eclipse.yasson.internal.model.customization.ordering.PropertyOrdering;
+import org.eclipse.yasson.internal.model.customization.ordering.ReverseOrderStrategy;
+import org.eclipse.yasson.internal.model.customization.naming.DefaultNamingStrategies;
+import org.eclipse.yasson.internal.model.customization.naming.IdentityStrategy;
 import org.eclipse.yasson.internal.properties.MessageKeys;
 import org.eclipse.yasson.internal.properties.Messages;
 import org.eclipse.yasson.internal.serializer.JsonbDateFormatter;

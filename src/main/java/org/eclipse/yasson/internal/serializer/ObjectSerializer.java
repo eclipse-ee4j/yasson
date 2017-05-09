@@ -13,13 +13,11 @@
 
 package org.eclipse.yasson.internal.serializer;
 
-import org.eclipse.yasson.internal.AbstractContainerSerializer;
 import org.eclipse.yasson.internal.Marshaller;
 import org.eclipse.yasson.internal.ReflectionUtils;
-import org.eclipse.yasson.internal.unmarshaller.CurrentItem;
-import org.eclipse.yasson.model.ClassModel;
-import org.eclipse.yasson.model.JsonBindingModel;
-import org.eclipse.yasson.model.PropertyModel;
+import org.eclipse.yasson.internal.model.ClassModel;
+import org.eclipse.yasson.internal.model.JsonBindingModel;
+import org.eclipse.yasson.internal.model.PropertyModel;
 
 import javax.json.bind.serializer.JsonbSerializer;
 import javax.json.bind.serializer.SerializationContext;

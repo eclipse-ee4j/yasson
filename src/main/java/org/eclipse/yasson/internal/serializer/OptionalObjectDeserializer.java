@@ -3,8 +3,6 @@ package org.eclipse.yasson.internal.serializer;
 import org.eclipse.yasson.internal.JsonbContext;
 import org.eclipse.yasson.internal.JsonbParser;
 import org.eclipse.yasson.internal.ProcessingContext;
-import org.eclipse.yasson.internal.unmarshaller.CurrentItem;
-import org.eclipse.yasson.internal.unmarshaller.DeserializerBuilder;
 
 import javax.json.bind.serializer.DeserializationContext;
 import javax.json.bind.serializer.JsonbDeserializer;

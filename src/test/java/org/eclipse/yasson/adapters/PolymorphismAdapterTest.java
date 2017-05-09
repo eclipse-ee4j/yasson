@@ -16,7 +16,7 @@ package org.eclipse.yasson.adapters;
 
 import org.eclipse.yasson.internal.properties.MessageKeys;
 import org.eclipse.yasson.internal.properties.Messages;
-import org.eclipse.yasson.model.PolymorphismAdapter;
+import org.eclipse.yasson.internal.model.PolymorphismAdapter;
 import org.junit.Assert;
 import org.junit.Test;
 

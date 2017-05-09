@@ -13,10 +13,10 @@
 
 package org.eclipse.yasson.internal;
 
-import org.eclipse.yasson.internal.adapter.*;
-import org.eclipse.yasson.model.JsonBindingModel;
-import org.eclipse.yasson.model.PropertyModel;
-import org.eclipse.yasson.model.TypeWrapper;
+import org.eclipse.yasson.internal.components.*;
+import org.eclipse.yasson.internal.model.JsonBindingModel;
+import org.eclipse.yasson.internal.model.PropertyModel;
+import org.eclipse.yasson.internal.model.TypeWrapper;
 
 import javax.json.bind.JsonbConfig;
 import javax.json.bind.adapter.JsonbAdapter;
@@ -31,7 +31,7 @@ import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ConcurrentMap;
 
 /**
- * Searches for a registered adapter or Serializer for a given type.
+ * Searches for a registered components or Serializer for a given type.
  *
  * @author Roman Grigoriadi
  */
@@ -154,12 +154,12 @@ public class ComponentMatcher {
     }
 
     /**
-     * Get adapter from property model (if declared by annotation and runtime type matches),
-     * or return adapter searched by runtime type
+     * Get components from property model (if declared by annotation and runtime type matches),
+     * or return components searched by runtime type
      *
      * @param propertyRuntimeType runtime type not null
      * @param model model nullable
-     * @return adapter info if present
+     * @return components info if present
      */
     public Optional<AdapterBinding> getAdapterBinding(Type propertyRuntimeType, JsonBindingModel model) {
         //TODO do we need type wrapper adapters at all? Make better check or remove.
@@ -173,7 +173,7 @@ public class ComponentMatcher {
     }
 
     private <T extends AbstractComponentBinding> Optional<T> getComponentBinding(Type propertyRuntimeType, T componentBinding) {
-        //need runtime check, ParameterizedType property may have generic adapter assigned which is not compatible
+        //need runtime check, ParameterizedType property may have generic components assigned which is not compatible
         //for given runtime type
         if (matches(propertyRuntimeType, componentBinding.getBindingType())) {
             return Optional.of(componentBinding);
@@ -209,7 +209,7 @@ public class ComponentMatcher {
     }
 
     /**
-     * If runtimeType to adapt is a ParametrizedType, check all type args to match against adapter args.
+     * If runtimeType to adapt is a ParametrizedType, check all type args to match against components args.
      */
     private boolean matchTypeArguments(ParameterizedType requiredType, ParameterizedType componentBound) {
         final Type[] requiredTypeArguments = requiredType.getActualTypeArguments();
@@ -227,10 +227,10 @@ public class ComponentMatcher {
     }
 
     /**
-     * Introspect adapter generic information and put resolved types into metadata wrapper.
+     * Introspect components generic information and put resolved types into metadata wrapper.
      *
-     * @param adapterClass class of an adapter
-     * @param instance adapter instance
+     * @param adapterClass class of an components
+     * @param instance components instance
      * @return introspected info with resolved typevar types.
      */
     AdapterBinding introspectAdapterBinding(Class<? extends JsonbAdapter> adapterClass, JsonbAdapter instance) {

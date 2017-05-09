@@ -12,7 +12,7 @@
  ******************************************************************************/
 package org.eclipse.yasson.internal;
 
-import org.eclipse.yasson.model.*;
+import org.eclipse.yasson.internal.model.*;
 
 import javax.json.bind.JsonbException;
 import java.beans.Introspector;

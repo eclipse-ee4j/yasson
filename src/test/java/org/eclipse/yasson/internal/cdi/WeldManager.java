@@ -13,6 +13,7 @@
 
 package org.eclipse.yasson.internal.cdi;
 
+import org.eclipse.yasson.internal.components.JsonbComponentInstanceCreatorFactory;
 import org.jboss.weld.environment.se.Weld;
 import org.jboss.weld.environment.se.WeldContainer;
 

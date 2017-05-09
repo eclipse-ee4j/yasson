@@ -13,12 +13,11 @@
 
 package org.eclipse.yasson.internal.serializer;
 
-import org.eclipse.yasson.internal.AbstractSerializerBuilder;
 import org.eclipse.yasson.internal.ComponentMatcher;
 import org.eclipse.yasson.internal.JsonbContext;
 import org.eclipse.yasson.internal.ReflectionUtils;
-import org.eclipse.yasson.internal.adapter.AdapterBinding;
-import org.eclipse.yasson.internal.adapter.SerializerBinding;
+import org.eclipse.yasson.internal.components.AdapterBinding;
+import org.eclipse.yasson.internal.components.SerializerBinding;
 
 import javax.json.JsonObject;
 import javax.json.JsonValue;
@@ -75,7 +74,7 @@ public class SerializerBuilder extends AbstractSerializerBuilder<SerializerBuild
             return new UserSerializerSerializer<>(model, userSerializer.get().getJsonbSerializer());
         }
 
-        //Second user adapter is registered.
+        //Second user components is registered.
         final Optional<AdapterBinding> adapterInfoOptional = componentMatcher.getAdapterBinding(getRuntimeType(), getModel());
         if (adapterInfoOptional.isPresent()) {
             return new AdaptedObjectSerializer<>(getModel(), adapterInfoOptional.get());

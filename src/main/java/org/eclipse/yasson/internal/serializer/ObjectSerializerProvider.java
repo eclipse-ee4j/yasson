@@ -12,7 +12,7 @@
  ******************************************************************************/
 package org.eclipse.yasson.internal.serializer;
 
-import org.eclipse.yasson.model.JsonbPropertyInfo;
+import org.eclipse.yasson.internal.model.JsonbPropertyInfo;
 
 import javax.json.bind.serializer.JsonbSerializer;
 
