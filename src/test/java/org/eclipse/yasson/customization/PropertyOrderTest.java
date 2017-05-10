@@ -57,7 +57,7 @@ public class PropertyOrderTest {
     public void testPropertySetCustomOrder() {
         Jsonb jsonb = JsonbBuilder.create();
         FieldSpecificOrder fieldSpecificOrder = new FieldSpecificOrder();
-        String expectedSpecific = "{\"aField\":\"aValue\",\"dField\":\"dValue\"}";
+        String expectedSpecific = "{\"aField\":\"aValue\",\"dField\":\"dValue\",\"cField\":\"cValue\",\"bField\":\"bValue\"}";
         assertEquals(expectedSpecific, jsonb.toJson(fieldSpecificOrder));
     }
 

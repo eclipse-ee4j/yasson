@@ -65,12 +65,12 @@ public class PropertyOrdering {
                     sortedProperties.add(new PropertyModel(classModel, remove, jsonbContext));
                 }
             }
-            /*
-             * Properties that are not listed in @JsonbPropertyOrder are ignored.
-               for (Map.Entry<String, PropertyModel> entry : properties.entrySet()) {
-                  sortedProperties.add(entry.getValue());
-               }
-             */
+
+            for (Map.Entry<String, Property> entry : properties.entrySet()) {
+                sortedProperties.add(new PropertyModel(classModel, entry.getValue(), jsonbContext));
+            }
+
+
             return sortedProperties;
         }
 
