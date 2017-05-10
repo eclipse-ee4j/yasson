@@ -16,8 +16,13 @@ package org.eclipse.yasson.internal;
 import org.eclipse.yasson.internal.JsonbParser;
 import org.eclipse.yasson.internal.JsonbRiParser;
 
+import javax.json.JsonArray;
+import javax.json.JsonObject;
+import javax.json.JsonValue;
 import javax.json.stream.JsonLocation;
 import java.math.BigDecimal;
+import java.util.Map;
+import java.util.stream.Stream;
 
 /**
  * Decorator for JSONP parser. Adds some checks for parser cursor manipulation methods.
@@ -143,5 +148,46 @@ public class UserDeserializerParser implements JsonbParser {
     @Override
     public void skipJsonStructure() {
         jsonbParser.skipJsonStructure();
+    }
+
+
+    @Override
+    public JsonObject getObject() {
+        return jsonbParser.getObject();
+    }
+
+    @Override
+    public JsonValue getValue() {
+        return jsonbParser.getValue();
+    }
+
+    @Override
+    public JsonArray getArray() {
+        return jsonbParser.getArray();
+    }
+
+    @Override
+    public Stream<JsonValue> getArrayStream() {
+        return jsonbParser.getArrayStream();
+    }
+
+    @Override
+    public Stream<Map.Entry<String, JsonValue>> getObjectStream() {
+        return jsonbParser.getObjectStream();
+    }
+
+    @Override
+    public Stream<JsonValue> getValueStream() {
+        return jsonbParser.getValueStream();
+    }
+
+    @Override
+    public void skipArray() {
+        jsonbParser.skipArray();
+    }
+
+    @Override
+    public void skipObject() {
+        jsonbParser.skipObject();
     }
 }

@@ -55,11 +55,4 @@ public class BooleanTypeDeserializer extends AbstractValueTypeDeserializer<Boole
         }
     }
 
-    @Override
-    public Boolean deserialize(String jsonValue, Unmarshaller unmarshaller, Type rtType) {
-        // TODO: Fix API.
-        //       Unfortunately, the JSON API doesn't have a getBooleanValue method, so we need to override
-        //       the other deserialize method and parse the value manually
-        throw new UnsupportedOperationException();
-    }
 }

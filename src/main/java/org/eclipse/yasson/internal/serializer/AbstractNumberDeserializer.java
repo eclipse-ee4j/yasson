@@ -49,7 +49,7 @@ public abstract class AbstractNumberDeserializer<T extends Number> extends Abstr
         }
 
         final JsonbNumberFormatter numberFormat = getModel().getCustomization().getDeserializeNumberFormatter();
-        //TODO performance consider synchronizing on format instance or per thread cache.
+        //consider synchronizing on format instance or per thread cache.
         final NumberFormat format = NumberFormat.getInstance(jsonbContext.getConfigProperties().getLocale(numberFormat.getLocale()));
         ((DecimalFormat)format).applyPattern(numberFormat.getFormat());
         format.setParseIntegerOnly(integerOnly);

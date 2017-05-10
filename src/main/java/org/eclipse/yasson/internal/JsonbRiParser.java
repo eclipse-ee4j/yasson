@@ -16,12 +16,17 @@ package org.eclipse.yasson.internal;
 import org.eclipse.yasson.internal.properties.MessageKeys;
 import org.eclipse.yasson.internal.properties.Messages;
 
+import javax.json.JsonArray;
+import javax.json.JsonObject;
+import javax.json.JsonValue;
 import javax.json.bind.JsonbException;
 import javax.json.stream.JsonLocation;
 import javax.json.stream.JsonParser;
 import java.math.BigDecimal;
 import java.util.Arrays;
+import java.util.Map;
 import java.util.Stack;
+import java.util.stream.Stream;
 
 /**
  * Decorator for JSONP parser used by JSONB.
@@ -259,5 +264,51 @@ public class JsonbRiParser implements JsonParser, JsonbParser {
             default:
                 return;
         }
+    }
+
+    @Override
+    public JsonObject getObject() {
+        JsonObject object = jsonParser.getObject();
+        level.pop();
+        return object;
+    }
+
+    @Override
+    public JsonValue getValue() {
+        return jsonParser.getValue();
+    }
+
+    @Override
+    public JsonArray getArray() {
+        JsonArray result = jsonParser.getArray();
+        level.pop();
+        return result;
+    }
+
+    @Override
+    public Stream<JsonValue> getArrayStream() {
+        return jsonParser.getArrayStream();
+    }
+
+    @Override
+    public Stream<Map.Entry<String, JsonValue>> getObjectStream() {
+        return jsonParser.getObjectStream();
+    }
+
+    @Override
+    public Stream<JsonValue> getValueStream() {
+        return jsonParser.getValueStream();
+    }
+
+    @Override
+    public void skipArray() {
+        jsonParser.skipArray();
+        level.pop();
+    }
+
+    @Override
+    public void skipObject() {
+        jsonParser.skipObject();
+        level.pop();
     }
 }

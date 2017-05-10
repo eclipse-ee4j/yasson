@@ -193,7 +193,6 @@ public class GenericsTest {
         List<Optional<String>> expected = Arrays.asList(Optional.empty(), Optional.of("first"), Optional.of("second"));
         //String json = jsonb.toJson(expected, DefaultMappingGenericsTest.class.getField("listOfOptionalStringField").getGenericType());
 
-        // TODO according to Martin V this should not pass... but it is...
         String json = jsonb.toJson(expected);
         assertEquals("[null,\"first\",\"second\"]", json);
     }

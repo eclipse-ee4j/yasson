@@ -43,7 +43,7 @@ public class VariableTypeInheritanceSearch {
      * class GenericClass &lt;T&gt; {
      *     private T genericField;
      * }
-     * class ConcreteClass extends SomeTypeVarClass&lt;MyPojo&gt; {
+     * class ConcreteClass extends GenericClass&lt;MyPojo&gt; {
      *     //...
      * }
      *

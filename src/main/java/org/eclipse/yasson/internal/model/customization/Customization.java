@@ -129,17 +129,5 @@ public abstract class Customization {
      */
     public abstract JsonbDateFormatter getDeserializeDateFormatter();
 
-    /**
-     * The flag indicating whether the value of the underlying type/property should be processed during serialization process or not.
-     *
-     * @return  true indicates that the underlying type/property should be included in serialization process and false indicates it should not
-     */
-    public abstract boolean isReadTransient();
 
-    /**
-     * The flag indicating whether the value of the underlying type/property should be processed during deserialization process or not.
-     *
-     * @return  true indicates that the underlying type/property should be included in deserialization process and false indicates it should not
-     */
-    public abstract boolean isWriteTransient();
 }

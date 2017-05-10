@@ -65,10 +65,12 @@ public class PropertyOrdering {
                     sortedProperties.add(new PropertyModel(classModel, remove, jsonbContext));
                 }
             }
-            /* TODO currently disabled, should remaining fields (unspecified in JsonbPropertyOrder) appear in json?
-            for (Map.Entry<String, PropertyModel> entry : properties.entrySet()) {
-                sortedProperties.add(entry.getValue());
-            }*/
+            /*
+             * Properties that are not listed in @JsonbPropertyOrder are ignored.
+               for (Map.Entry<String, PropertyModel> entry : properties.entrySet()) {
+                  sortedProperties.add(entry.getValue());
+               }
+             */
             return sortedProperties;
         }
 

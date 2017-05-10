@@ -19,8 +19,6 @@ import org.eclipse.yasson.internal.components.AdapterBinding;
 import org.eclipse.yasson.internal.components.DeserializerBinding;
 import org.eclipse.yasson.internal.properties.MessageKeys;
 import org.eclipse.yasson.internal.properties.Messages;
-import org.eclipse.yasson.internal.model.PolymorphismAdapter;
-import org.eclipse.yasson.internal.model.TypeWrapper;
 
 import javax.json.JsonStructure;
 import javax.json.JsonValue;
@@ -146,10 +144,6 @@ public class DeserializerBuilder extends AbstractSerializerBuilder<DeserializerB
 
                 classModel = getClassModel(rawType);
 
-                if (TypeWrapper.class.isAssignableFrom(rawType)) {
-                    return wrapAdapted(adapterInfoOptional,  new TypeWrapperDeserializer<>(this,
-                            ((PolymorphismAdapter<?>) adapterInfoOptional.get().getAdapter()).getAllowedClasses()));
-                }
                 deserializer = new ObjectDeserializer<>(this);
                 return wrapAdapted(adapterInfoOptional, deserializer);
             }

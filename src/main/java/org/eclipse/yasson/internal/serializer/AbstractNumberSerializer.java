@@ -74,7 +74,7 @@ public abstract class AbstractNumberSerializer<T extends Number> extends Abstrac
         final Customization customization = model.getCustomization();
         if (customization != null && customization.getSerializeNumberFormatter() != null) {
             final JsonbNumberFormatter numberFormat = customization.getSerializeNumberFormatter();
-            //TODO performance consider synchronizing on format instance or per thread cache.
+            //consider synchronizing on format instance or per thread cache.
             final NumberFormat format = NumberFormat.getInstance(jsonbContext.getConfigProperties().getLocale(numberFormat.getLocale()));
             ((DecimalFormat)format).applyPattern(numberFormat.getFormat());
             formattedConsumer.accept(format.format(obj));

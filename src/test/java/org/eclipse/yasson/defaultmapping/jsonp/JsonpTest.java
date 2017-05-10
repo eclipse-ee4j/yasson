@@ -13,6 +13,7 @@
 package org.eclipse.yasson.defaultmapping.jsonp;
 
 import org.eclipse.yasson.defaultmapping.jsonp.model.JsonpPojo;
+import org.junit.Assert;
 import org.junit.Test;
 
 import javax.json.*;
@@ -45,7 +46,7 @@ public class JsonpTest {
     }
 
     @Test
-    public void testMarshallJsonObject() {
+    public void testInnerJsonObject() {
         
         final JsonBuilderFactory factory = Json.createBuilderFactory(null);
         final JsonObject jsonObject = factory.createObjectBuilder()
@@ -65,7 +66,14 @@ public class JsonpTest {
 
         final JsonObject wrapper = wrapperBuilder.build();
 
-        assertEquals("{\"f1\":\"abc\",\"cust\":{\"f1\":\"abc123\",\"f2\":10,\"f3\":12,\"city\":{\"name\":\"home\",\"city\":\"Prague\"}}}", jsonb.toJson(wrapper));
+        String expected = "{\"f1\":\"abc\",\"cust\":{\"f1\":\"abc123\",\"f2\":10,\"f3\":12,\"city\":{\"name\":\"home\",\"city\":\"Prague\"}}}";
+        assertEquals(expected, jsonb.toJson(wrapper));
+
+        JsonObject result = jsonb.fromJson(expected, JsonObject.class);
+        Assert.assertEquals("home", result.getJsonObject("cust").getJsonObject("city").getString("name"));
+        Assert.assertEquals("abc123", result.getJsonObject("cust").getString("f1"));
+        Assert.assertEquals("abc123", result.getJsonObject("cust").getString("f1"));
+
     }
 
     @Test
