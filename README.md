@@ -29,5 +29,5 @@ String result = jsonb.toJson(someObject);
 
 ## Links
 - JSON-B official web site: https://json-b.net
-- Specification project: http://jsonb-spec.java.net
+- JSON-B API & spec project: https://github.com/javaee/jsonb-spec
 - JSR-367 page on JCP site: https://jcp.org/en/jsr/detail?id=367
