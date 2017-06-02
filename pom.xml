@@ -207,10 +207,20 @@
             </build>
         </profile>
         <profile>
-            <id>release</id>
+            <id>release-central</id>
             <activation>
                 <activeByDefault>false</activeByDefault>
             </activation>
+            <distributionManagement>
+                <snapshotRepository>
+                    <id>ossrh</id>
+                    <url>https://oss.sonatype.org/content/repositories/snapshots</url>
+                </snapshotRepository>
+                <repository>
+                    <id>ossrh</id>
+                    <url>https://oss.sonatype.org/service/local/staging/deploy/maven2/</url>
+                </repository>
+            </distributionManagement>
             <build>
                 <plugins>
                     <plugin>
@@ -219,7 +229,7 @@
                     </plugin>
                     <plugin>
                         <groupId>org.apache.maven.plugins</groupId>
-                        <artifactId>maven-release-plugin</artifactId>
+                        <artifactId>maven-gpg-plugin</artifactId>
                     </plugin>
                     <plugin>
                         <groupId>org.apache.maven.plugins</groupId>
@@ -321,13 +331,6 @@
                     <configuration>
                         <failOnError>true</failOnError>
                         <doctitle>Yasson</doctitle>
-                        <bottom>
-                            <![CDATA[Copyright &#169; 1996-2015,
-                                <a href="http://www.oracle.com">Oracle</a>
-                                and/or its affiliates. All Rights Reserved.
-                                Use is subject to
-                                <a href="{@docRoot}/doc-files/spec-license.html" target="_top">license terms</a>.]]>
-                        </bottom>
                         <sourcepath>${basedir}/src/main/java/org/eclipse/yasson</sourcepath>
                     </configuration>
                     <executions>
@@ -351,11 +354,6 @@
                             </goals>
                         </execution>
                     </executions>
-                </plugin>
-                <plugin>
-                    <groupId>org.apache.maven.plugins</groupId>
-                    <artifactId>maven-release-plugin</artifactId>
-                    <version>2.5.3</version>
                 </plugin>
                 <plugin>
                     <groupId>org.apache.felix</groupId>
@@ -385,6 +383,20 @@
                     <groupId>org.apache.maven.plugins</groupId>
                     <artifactId>maven-deploy-plugin</artifactId>
                     <version>2.8.2</version>
+                </plugin>
+                <plugin>
+                    <groupId>org.apache.maven.plugins</groupId>
+                    <artifactId>maven-gpg-plugin</artifactId>
+                    <version>1.6</version>
+                    <executions>
+                        <execution>
+                            <id>sign-artifacts</id>
+                            <phase>verify</phase>
+                            <goals>
+                                <goal>sign</goal>
+                            </goals>
+                        </execution>
+                    </executions>
                 </plugin>
             </plugins>
         </pluginManagement>
