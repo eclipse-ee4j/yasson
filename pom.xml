@@ -58,32 +58,34 @@
     </organization>
 
     <issueManagement>
-        <system>jira</system>
-        <url>http://java.net/jira/browse/JSONB_SPEC</url>
+        <system>github</system>
+        <url>https://github.com/eclipse/yasson/issues</url>
     </issueManagement>
 
     <mailingLists>
         <mailingList>
-            <name>JSR367 Expert Group List</name>
-            <archive>jsr367-experts@jsonb-spec.java.net</archive>
-        </mailingList>
-        <mailingList>
-            <name>JSON-Binding Users List</name>
-            <archive>users@jsonb-spec.java.net</archive>
+            <name>Yasson mailing list</name>
+            <post>yasson-dev@eclipse.org</post>
+            <subscribe>https://dev.eclipse.org/mailman/listinfo/yasson-dev</subscribe>
+            <unsubscribe>https://dev.eclipse.org/mailman/listinfo/yasson-dev</unsubscribe>
+            <archive>https://dev.eclipse.org/mhonarc/lists/yasson-dev/</archive>
         </mailingList>
     </mailingLists>
 
     <licenses>
         <license>
-            <name>Eclipse Public License v1.0 and Eclipse Distribution License v1.0</name>
-            <url>http://www.eclipse.org/legal/epl-v10.html</url>
-            <distribution>repo</distribution>
+            <name>Eclipse Distribution License 1.0 (BSD)</name>
+            <url>https://projects.eclipse.org/content/eclipse-distribution-license-1.0-bsd</url>
+        </license>
+        <license>
+            <name>Eclipse Public License 1.0</name>
+            <url>https://projects.eclipse.org/content/eclipse-public-license-1.0</url>
         </license>
     </licenses>
 
     <scm>
         <connection>scm:git:git://git@github.com:eclipse/yasson.git</connection>
-        <developerConnection>scm:git:ssh:   //git@github.com:eclipse/yasson.git</developerConnection>
+        <developerConnection>scm:git:ssh://git@github.com:eclipse/yasson.git</developerConnection>
         <url>https://github.com/eclipse/yasson.git</url>
         <tag>HEAD</tag>
     </scm>
@@ -94,7 +96,6 @@
             <id>maiden168</id>
             <name>Dmitry Kornilov</name>
             <organization>Oracle</organization>
-            <organizationUrl>http://jsonb-spec.java.net</organizationUrl>
             <roles>
                 <role>JSON Binding 1.0 Spec Lead</role>
             </roles>
@@ -105,7 +106,6 @@
             <id>roman.grigoriadi</id>
             <name>Roman Grigoriadi</name>
             <organization>Oracle</organization>
-            <organizationUrl>http://jsonb-spec.java.net</organizationUrl>
             <roles>
                 <role>JSON Binding 1.0 Developer</role>
             </roles>
@@ -509,5 +509,4 @@
             </plugin>
         </plugins>
     </reporting>
-
 </project>
