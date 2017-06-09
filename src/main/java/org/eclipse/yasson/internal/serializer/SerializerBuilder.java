@@ -25,6 +25,7 @@ import javax.json.bind.config.BinaryDataStrategy;
 import javax.json.bind.serializer.JsonbSerializer;
 import java.lang.reflect.GenericArrayType;
 import java.lang.reflect.Type;
+import java.lang.reflect.TypeVariable;
 import java.util.Collection;
 import java.util.Map;
 import java.util.Optional;
@@ -150,10 +151,10 @@ public class SerializerBuilder extends AbstractSerializerBuilder<SerializerBuild
     }
 
     private Type resolveRuntimeType() {
-        if (genericType != null) {
+        if (genericType != null && genericType != Object.class) {
             return genericType;
         }
-        if (getModel() != null) {
+        if (getModel() != null && ! (getModel().getType() instanceof TypeVariable)) {
             return getModel().getType();
         }
         return objectClass;

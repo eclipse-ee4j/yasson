@@ -109,7 +109,7 @@ public class AdaptedObjectSerializer<T, A> implements CurrentItem<T>, JsonbSeria
     private JsonbSerializer<A> resolveSerializer(Marshaller ctx, A adapted) {
         final ContainerSerializerProvider cached = ctx.getMappingContext().getSerializerProvider(adapted.getClass());
         if (cached != null) {
-            return (JsonbSerializer<A>) cached.provideSerializer(new JsonbPropertyInfo().withWrapper(this).withRuntimeType(adapted.getClass()).withJsonBindingModel(model));
+            return (JsonbSerializer<A>) cached.provideSerializer(new JsonbPropertyInfo().withWrapper(this).withRuntimeType(model.getType()).withJsonBindingModel(model));
         }
         return (JsonbSerializer<A>) new SerializerBuilder(ctx.getJsonbContext()).withObjectClass(adapted.getClass()).withModel(model).withWrapper(this).build();
     }
