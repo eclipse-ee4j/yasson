@@ -13,6 +13,7 @@
 
 package org.eclipse.yasson.internal.serializer;
 
+import org.eclipse.yasson.internal.JsonbContext;
 import org.eclipse.yasson.internal.Marshaller;
 import org.eclipse.yasson.internal.components.AdapterBinding;
 import org.eclipse.yasson.internal.properties.MessageKeys;
@@ -95,13 +96,17 @@ public class AdaptedObjectSerializer<T, A> implements CurrentItem<T>, JsonbSeria
 
     @Override
     public void serialize(T obj, JsonGenerator generator, SerializationContext ctx) {
+        JsonbContext jsonbContext = ((Marshaller) ctx).getJsonbContext();
         try {
+            jsonbContext.addProcessedType(adapterInfo.getBindingType());
             final JsonbAdapter<T, A> adapter = (JsonbAdapter<T, A>) adapterInfo.getAdapter();
             A adapted = adapter.adaptToJson(obj);
             final JsonbSerializer<A> serializer = resolveSerializer((Marshaller) ctx, adapted);
             serializer.serialize(adapted, generator, ctx);
         } catch (Exception e) {
             throw new JsonbException(Messages.getMessage(MessageKeys.ADAPTER_EXCEPTION, adapterInfo.getBindingType(), adapterInfo.getToType(), adapterInfo.getAdapter().getClass()), e);
+        } finally {
+            jsonbContext.removeProcessedType(adapterInfo.getBindingType());
         }
     }
 

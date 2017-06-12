@@ -70,14 +70,13 @@ public class SerializerBuilder extends AbstractSerializerBuilder<SerializerBuild
         //First check if user deserializer is registered for such type
         final ComponentMatcher componentMatcher = jsonbContext.getComponentMatcher();
         Optional<SerializerBinding<?>> userSerializer = componentMatcher.getSerializerBinding(getRuntimeType(), getModel());
-        if (userSerializer.isPresent() &&
-                !(wrapper instanceof UserSerializerSerializer && ReflectionUtils.getRawType(wrapper.getRuntimeType()).isAssignableFrom(objectClass))) {
+        if (userSerializer.isPresent()  && !jsonbContext.containsProcessedType(userSerializer.get().getBindingType())) {
             return new UserSerializerSerializer<>(model, userSerializer.get().getJsonbSerializer());
         }
 
         //Second user components is registered.
         final Optional<AdapterBinding> adapterInfoOptional = componentMatcher.getAdapterBinding(getRuntimeType(), getModel());
-        if (adapterInfoOptional.isPresent()) {
+        if (adapterInfoOptional.isPresent() && !jsonbContext.containsProcessedType(adapterInfoOptional.get().getBindingType())) {
             return new AdaptedObjectSerializer<>(getModel(), adapterInfoOptional.get());
         }
 

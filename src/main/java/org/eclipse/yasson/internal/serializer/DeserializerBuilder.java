@@ -77,19 +77,19 @@ public class DeserializerBuilder extends AbstractSerializerBuilder<DeserializerB
         final ComponentMatcher componentMatcher = jsonbContext.getComponentMatcher();
         Optional<DeserializerBinding<?>> userDeserializer =
                 componentMatcher.getDeserializerBinding(getRuntimeType(), getModel());
-        if (userDeserializer.isPresent() &&
-                !(wrapper instanceof UserDeserializerDeserializer && ReflectionUtils.getRawType(wrapper.getRuntimeType()).isAssignableFrom(rawType))) {
-            return new UserDeserializerDeserializer<>(this, userDeserializer.get().getJsonbDeserializer());
+        if (userDeserializer.isPresent() && !jsonbContext.containsProcessedType(userDeserializer.get().getBindingType())) {
+            return new UserDeserializerDeserializer<>(this, userDeserializer.get());
         }
 
         //Second user components is registered.
-        final Optional<AdapterBinding> adapterInfoOptional = componentMatcher.getAdapterBinding(getRuntimeType(), getModel());
-        Optional<Class> rawTypeOptional = adapterInfoOptional.map(adapterInfo->{
-            runtimeType = adapterInfo.getToType();
+        Optional<AdapterBinding> adapterInfoOptional = componentMatcher.getAdapterBinding(getRuntimeType(), getModel());
+        if (adapterInfoOptional.isPresent() && !jsonbContext.containsProcessedType(adapterInfoOptional.get().getBindingType())) {
+            runtimeType = adapterInfoOptional.get().getToType();
             wrapper = new AdaptedObjectDeserializer<>(adapterInfoOptional.get(), (AbstractContainerDeserializer<?>) wrapper);
-            return ReflectionUtils.getRawType(getRuntimeType());
-        });
-        rawType = rawTypeOptional.orElse(rawType);
+            rawType = ReflectionUtils.getRawType(getRuntimeType());
+        } else {
+            adapterInfoOptional = Optional.empty();
+        }
 
         if (Optional.class == rawType) {
             return new OptionalObjectDeserializer(this);

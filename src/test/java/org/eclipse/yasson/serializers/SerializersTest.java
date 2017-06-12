@@ -216,7 +216,6 @@ public class SerializersTest {
         StringWrapper pojo = new StringWrapper();
         pojo.strField = "abc";
         final String result = jsonb.toJson(pojo);
-        System.out.println("result = " + result);
     }
 
     @Test
@@ -244,6 +243,21 @@ public class SerializersTest {
 
         Assert.assertEquals("Test List 1", unmarshalledObject.getListInstance().get(0).getInstance());
         Assert.assertEquals("Test List 2", unmarshalledObject.getListInstance().get(1).getInstance());
+    }
+
+    /**
+     * Tests avoiding StackOverflowError.
+     */
+    @Test
+    public void testRecursiveSerializer() {
+        Jsonb jsonb = JsonbBuilder.create(new JsonbConfig().withSerializers(new RecursiveSerializer()).withDeserializers(new RecursiveDeserializer()));
+
+        Box box = new Box();
+        box.boxStr = "Box to serialize";
+        Assert.assertEquals("{\"boxFieldName\":{\"boxStr\":\"Box to serialize\"}}", jsonb.toJson(box));
+
+        Box result = jsonb.fromJson("{\"boxStr\":\"Box to deserialize\"}", Box.class);
+        Assert.assertEquals("Box to deserialize", result.boxStr);
     }
 
     private Box createPojoWithDates() {

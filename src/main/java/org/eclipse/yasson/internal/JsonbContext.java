@@ -18,11 +18,14 @@ import org.eclipse.yasson.internal.components.JsonbComponentInstanceCreatorFacto
 
 import javax.json.bind.JsonbConfig;
 import javax.json.spi.JsonProvider;
+import java.lang.reflect.Type;
+import java.util.HashSet;
 import java.util.Objects;
+import java.util.Set;
 
 /**
  * Jsonb context holding central components and configuration of jsonb runtime. Scoped to instance of Jsonb runtime.
- * Thread safe.
+ * Thread bound.
  *
  * @author Roman Grigoriadi
  */
@@ -45,6 +48,16 @@ public class JsonbContext {
     private JsonbConfigProperties configProperties;
 
     /**
+     * Types which are being processed by {@linkplain javax.json.bind.serializer.JsonbSerializer},
+     * {@link javax.json.bind.serializer.JsonbDeserializer} or
+     * {@link javax.json.bind.adapter.JsonbAdapter}.
+     *
+     * Used to avoid StackOverflowError, when adapted / serialized object
+     * contains contains instance of its type inside it.
+     */
+    private Set<Type> bindingTypes;
+
+    /**
      * Creates and initialize context.
      *
      * @param jsonbConfig jsonb jsonbConfig not null
@@ -59,6 +72,7 @@ public class JsonbContext {
         this.annotationIntrospector = new AnnotationIntrospector(this);
         this.jsonProvider = jsonProvider;
         this.configProperties = new JsonbConfigProperties(jsonbConfig);
+        this.bindingTypes = new HashSet<>();
     }
 
     /**
@@ -135,5 +149,26 @@ public class JsonbContext {
 
     public JsonbConfigProperties getConfigProperties() {
         return configProperties;
+    }
+
+    public boolean addProcessedType(Type bindingTypes) {
+        return this.bindingTypes.add(bindingTypes);
+    }
+
+    public boolean removeProcessedType(Type bindingType) {
+        return bindingTypes.remove(bindingType);
+    }
+
+    /**
+     * Check if type is already being processed lower in call stack.
+     *
+     * This may happen when {@link javax.json.bind.adapter.JsonbAdapter}
+     * or {@link javax.json.bind.serializer.JsonbSerializer} are called recursively for same binding type.
+     *
+     * @param bindingType type to check
+     * @return true if type is processed
+     */
+    public boolean containsProcessedType(Type bindingType) {
+        return bindingTypes.contains(bindingType);
     }
 }

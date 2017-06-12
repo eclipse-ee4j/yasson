@@ -100,6 +100,5 @@ public class JsonbCreatorTest {
     public void testPackagePrivateCreator() {
         final CreatorPackagePrivateConstructor result = JsonbBuilder.create().fromJson(
                 "{\"strVal\":\"abc\", \"intVal\":5}", CreatorPackagePrivateConstructor.class);
-        System.out.println("result = " + result);
     }
 }

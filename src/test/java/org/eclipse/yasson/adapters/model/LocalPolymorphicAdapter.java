@@ -1,12 +1,13 @@
 package org.eclipse.yasson.adapters.model;
 
 import javax.json.bind.adapter.JsonbAdapter;
+import java.lang.reflect.Constructor;
 import java.util.stream.Stream;
 
 /**
- * Created by Roman Grigoriadi (roman.grigoriadi@oracle.com) on 08/06/2017.
+ * Causes {@link StackOverflowError} if recursive calls of user components are not checked by runtime.
  */
-public class LocalPolymorphicAdapter<T> implements JsonbAdapter<T, LocalTypeWrapper<T>> {
+public abstract class LocalPolymorphicAdapter<T> implements JsonbAdapter<T, LocalTypeWrapper<T>> {
 
     private final String[] allowedClasses;
 
@@ -30,7 +31,6 @@ public class LocalPolymorphicAdapter<T> implements JsonbAdapter<T, LocalTypeWrap
 
     @Override
     public LocalTypeWrapper<T> adaptToJson(T obj) throws Exception {
-        System.out.println("AdaptingToJson: " + obj);
         LocalTypeWrapper<T> wrapper = new LocalTypeWrapper<>();
         wrapper.setClassName(obj.getClass().getName());
         wrapper.setInstance(obj);
@@ -38,9 +38,25 @@ public class LocalPolymorphicAdapter<T> implements JsonbAdapter<T, LocalTypeWrap
     }
 
     @Override
-    public T adaptFromJson(LocalTypeWrapper<T> obj) throws Exception {
-        System.out.println("ADaptingFromJson: " + obj);
-        return obj.getInstance();
+    public final T adaptFromJson(LocalTypeWrapper<T> obj) throws Exception {
+        if (!isAllowed(obj.getClassName())) {
+            throw new ClassNotFoundException(obj.getClassName());
+        }
+        Constructor<T> constructor = (Constructor<T>) Class.forName(obj.getClassName()).getConstructor();
+        T instance = constructor.newInstance();
+        populateInstance(instance, obj);
+        return instance;
+    }
+
+    protected abstract void populateInstance(T instance, LocalTypeWrapper<T> obj);
+
+    private boolean isAllowed(String name) {
+        for (String className : allowedClasses) {
+            if (className.equals(name)) {
+                return true;
+            }
+        }
+        return false;
     }
 
 }

@@ -14,6 +14,7 @@
 package org.eclipse.yasson.customization.transients;
 
 import org.eclipse.yasson.customization.transients.models.*;
+import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
 
@@ -169,6 +170,6 @@ public class JsonbTransientTest {
     public void testTransientSetterplusJsonbPropertyGetter() {
         TransientSetterPlusCustomizationAnnotatedGetterContainer pojo = new TransientSetterPlusCustomizationAnnotatedGetterContainer();
         String result = jsonb.toJson(pojo);
-        System.out.println("result = " + result);
+        Assert.assertEquals("{\"instance\":\"INSTANCE\"}", result);
     }
 }

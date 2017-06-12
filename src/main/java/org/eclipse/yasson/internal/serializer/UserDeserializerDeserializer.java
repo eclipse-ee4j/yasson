@@ -15,6 +15,7 @@ package org.eclipse.yasson.internal.serializer;
 import org.eclipse.yasson.internal.JsonbParser;
 import org.eclipse.yasson.internal.JsonbRiParser;
 import org.eclipse.yasson.internal.Unmarshaller;
+import org.eclipse.yasson.internal.components.DeserializerBinding;
 import org.eclipse.yasson.internal.model.JsonBindingModel;
 import org.eclipse.yasson.internal.UserDeserializerParser;
 
@@ -28,7 +29,7 @@ import javax.json.stream.JsonParser;
  */
 public class UserDeserializerDeserializer<T> extends AbstractContainerDeserializer<T> {
 
-    private JsonbDeserializer<?> deserializer;
+    private DeserializerBinding<?> deserializerBinding;
 
     private T deserializerResult;
 
@@ -36,14 +37,14 @@ public class UserDeserializerDeserializer<T> extends AbstractContainerDeserializ
      * Create instance of current item with its builder.
      * Contains user provided component for custom deserialization.
      * Decorates calls to JsonParser, with validation logic so user can't left parser cursor
-     * in wrong position after returning from deserializer.
+     * in wrong position after returning from deserializerBinding.
      *
      * @param builder {@link DeserializerBuilder} used to build this instance
-     * @param deserializer Deserializer.
+     * @param deserializerBinding Deserializer.
      */
-    protected UserDeserializerDeserializer(DeserializerBuilder builder, JsonbDeserializer<?> deserializer) {
+    protected UserDeserializerDeserializer(DeserializerBuilder builder, DeserializerBinding<?> deserializerBinding) {
         super(builder);
-        this.deserializer = deserializer;
+        this.deserializerBinding = deserializerBinding;
     }
 
     @Override
@@ -62,7 +63,12 @@ public class UserDeserializerDeserializer<T> extends AbstractContainerDeserializ
     public void deserializeInternal(JsonbParser parser, Unmarshaller context) {
         parserContext = moveToFirst(parser);
         final UserDeserializerParser userDeserializerParser = new UserDeserializerParser(parser);
-        deserializerResult = (T) deserializer.deserialize(userDeserializerParser, context, getRuntimeType());
+        try {
+            context.getJsonbContext().addProcessedType(deserializerBinding.getBindingType());
+            deserializerResult = (T) deserializerBinding.getJsonbDeserializer().deserialize(userDeserializerParser, context, getRuntimeType());
+        } finally {
+            context.getJsonbContext().removeProcessedType(deserializerBinding.getBindingType());
+        }
         userDeserializerParser.advanceParserToEnd();
     }
 

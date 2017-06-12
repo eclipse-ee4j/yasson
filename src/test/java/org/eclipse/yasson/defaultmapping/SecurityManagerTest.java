@@ -56,8 +56,6 @@ public class SecurityManagerTest {
         pojo.setCrate(crate);
 
         String result = jsonb.toJson(pojo);
-        System.out.println("result = " + result);
-
     }
 
 

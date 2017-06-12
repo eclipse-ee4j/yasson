@@ -13,6 +13,8 @@
 
 package org.eclipse.yasson.internal.serializer;
 
+import org.eclipse.yasson.internal.JsonbContext;
+import org.eclipse.yasson.internal.Marshaller;
 import org.eclipse.yasson.internal.model.JsonBindingModel;
 import org.eclipse.yasson.internal.model.JsonContext;
 
@@ -48,6 +50,12 @@ public class UserSerializerSerializer<T> implements JsonbSerializer<T> {
         if (model.getContext() == JsonContext.JSON_OBJECT) {
             generator.writeKey(model.getWriteName());
         }
-        userSerializer.serialize(obj, generator, ctx);
+        JsonbContext jsonbContext = ((Marshaller) ctx).getJsonbContext();
+        try {
+            jsonbContext.addProcessedType(model.getType());
+            userSerializer.serialize(obj, generator, ctx);
+        } finally {
+            jsonbContext.removeProcessedType(model.getType());
+        }
     }
 }
