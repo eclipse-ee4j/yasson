@@ -447,10 +447,7 @@
             <dependency>
                 <groupId>javax.enterprise</groupId>
                 <artifactId>cdi-api</artifactId>
-                <!--TODO change to 2.0 after release, 2.0.Beta1 was causing CDI.current() return null instead of
-                throwing IllegalStateException after weld.shutdown() -->
-                <!--<version>2.0.Beta1</version>-->
-                <version>1.2</version>
+                <version>2.0</version>
             </dependency>
             <dependency>
                 <groupId>org.glassfish</groupId>
