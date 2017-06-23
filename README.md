@@ -28,6 +28,6 @@ String result = jsonb.toJson(someObject);
 - [Eclipse Public License 1.0](https://projects.eclipse.org/content/eclipse-public-license-1.0)
 
 ## Links
-- JSON-B official web site: https://json-b.net
+- JSON-B official web site: http://json-b.net
 - JSON-B API & spec project: https://github.com/javaee/jsonb-spec
 - JSR-367 page on JCP site: https://jcp.org/en/jsr/detail?id=367
