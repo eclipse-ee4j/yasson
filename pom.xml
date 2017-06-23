@@ -374,7 +374,12 @@
                                     <Bundle-Version>${project.version}</Bundle-Version>
                                     <Export-Package>org.eclipse.yasson;version=${project.version}</Export-Package>
                                     <Private-Package>org.eclipse.yasson.*;version=${project.version}</Private-Package>
-                                </instructions>
+                                    <Import-Package>
+                                        javax.enterprise.context.spi;version=!,
+                                        javax.enterprise.inject.spi;version=!,
+                                        *
+                                    </Import-Package>
+				                </instructions>
                             </configuration>
                         </execution>
                     </executions>
