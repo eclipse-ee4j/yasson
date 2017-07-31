@@ -24,6 +24,7 @@ import javax.json.bind.Jsonb;
 import java.util.*;
 
 import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertTrue;
 
 /**
  * Default mapping Optional* tests.
@@ -52,6 +53,7 @@ public class OptionalTest {
         assertEquals("{\"streetOptional\":{\"name\":\"Xaveriova\",\"number\":110}}", jsonb.toJson(optionalWrapper));
 
         OptionalWrapper result = jsonb.fromJson("{\"streetOptional\":{\"name\":\"Xaveriova\",\"number\":110}}", OptionalWrapper.class);
+        assertTrue(result.getStreetOptional().isPresent());
         assertEquals("Xaveriova", result.getStreetOptional().get().getName());
         assertEquals(Integer.valueOf(110), result.getStreetOptional().get().getNumber());
     }
@@ -86,8 +88,13 @@ public class OptionalTest {
         assertEquals("[1,2,null]", jsonb.toJson(array));
 
         OptionalInt[] result = jsonb.fromJson("[1,2,null]", new TestTypeToken<OptionalInt[]>() {}.getType());
+
+        assertTrue(result[0].isPresent());
         assertEquals(1, result[0].getAsInt());
+
+        assertTrue(result[1].isPresent());
         assertEquals(2, result[1].getAsInt());
+
         assertEquals(OptionalInt.empty(), result[2]);
     }
 

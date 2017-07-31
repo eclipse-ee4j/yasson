@@ -3,7 +3,6 @@ package org.eclipse.yasson.adapters;
 import org.eclipse.yasson.adapters.model.LocalPolymorphicAdapter;
 import org.eclipse.yasson.adapters.model.LocalTypeWrapper;
 import org.junit.Assert;
-import org.junit.Ignore;
 import org.junit.Test;
 
 import javax.json.bind.Jsonb;

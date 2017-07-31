@@ -16,17 +16,10 @@ package org.eclipse.yasson.internal.serializer;
 import org.eclipse.yasson.internal.JsonbParser;
 import org.eclipse.yasson.internal.JsonbRiParser;
 import org.eclipse.yasson.internal.Unmarshaller;
-import org.eclipse.yasson.internal.properties.MessageKeys;
-import org.eclipse.yasson.internal.properties.Messages;
 import org.eclipse.yasson.internal.model.JsonBindingModel;
 
-import javax.json.JsonArray;
-import javax.json.JsonObject;
 import javax.json.JsonValue;
-import javax.json.bind.JsonbException;
-import javax.json.bind.serializer.JsonbDeserializer;
 import javax.json.stream.JsonParser;
-import java.math.BigDecimal;
 
 /**
  * Common implementation for JSONP Object and Array.

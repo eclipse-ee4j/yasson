@@ -15,7 +15,6 @@ package org.eclipse.yasson.internal;
 
 import org.eclipse.yasson.internal.components.InstanceCreatorFactoryHelper;
 import org.eclipse.yasson.internal.components.JsonbComponentInstanceCreator;
-import org.eclipse.yasson.internal.components.JsonbComponentInstanceCreatorFactory;
 
 import javax.json.bind.JsonbConfig;
 import javax.json.spi.JsonProvider;

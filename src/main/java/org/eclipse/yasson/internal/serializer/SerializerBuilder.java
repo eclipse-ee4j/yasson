@@ -15,7 +15,6 @@ package org.eclipse.yasson.internal.serializer;
 
 import org.eclipse.yasson.internal.ComponentMatcher;
 import org.eclipse.yasson.internal.JsonbContext;
-import org.eclipse.yasson.internal.ReflectionUtils;
 import org.eclipse.yasson.internal.components.AdapterBinding;
 import org.eclipse.yasson.internal.components.SerializerBinding;
 

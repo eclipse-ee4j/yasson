@@ -17,10 +17,6 @@ import org.eclipse.yasson.internal.JsonbParser;
 import org.eclipse.yasson.internal.Unmarshaller;
 
 import javax.json.JsonObject;
-import javax.json.JsonObjectBuilder;
-import javax.json.JsonValue;
-import javax.json.stream.JsonParser;
-import java.math.BigDecimal;
 
 /**
  * Item for JsonObject.

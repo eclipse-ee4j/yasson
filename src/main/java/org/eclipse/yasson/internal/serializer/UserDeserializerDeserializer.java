@@ -19,7 +19,6 @@ import org.eclipse.yasson.internal.components.DeserializerBinding;
 import org.eclipse.yasson.internal.model.JsonBindingModel;
 import org.eclipse.yasson.internal.UserDeserializerParser;
 
-import javax.json.bind.serializer.JsonbDeserializer;
 import javax.json.stream.JsonParser;
 
 /**
