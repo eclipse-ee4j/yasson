@@ -25,7 +25,7 @@ import java.util.concurrent.ConcurrentMap;
 
 /**
  * CDI instance manager.
- * Instances are are created and stored per instance of {@link JsonBinding}.
+ * Instances are created and stored per instance of {@link JsonBinding}.
  * Calling close on JsonBinding, cleans up Jsonb CDI instances and in case of "dependant" scope its dependencies.
  *
  * @author Roman Grigoriadi
