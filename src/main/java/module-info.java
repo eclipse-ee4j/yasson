@@ -15,8 +15,7 @@ module org.eclipse.yasson {
     requires java.json.bind;
     requires java.naming;
     requires java.desktop;
-
-
+    requires java.logging;
 
     exports org.eclipse.yasson;
     provides javax.json.bind.spi.JsonbProvider with org.eclipse.yasson.JsonBindingProvider;
