@@ -186,6 +186,9 @@ public class ReflectionUtils {
         return AccessController.doPrivileged((PrivilegedAction<T>) () -> {
             try {
                 final Constructor<T> declaredConstructor = clazz.getDeclaredConstructor();
+                if (declaredConstructor.getModifiers() == Modifier.PROTECTED) {
+                    declaredConstructor.setAccessible(true);
+                }
                 return declaredConstructor.newInstance();
             } catch (InstantiationException | IllegalAccessException | InvocationTargetException e) {
                 throw new JsonbException("Can't create instance", e);
