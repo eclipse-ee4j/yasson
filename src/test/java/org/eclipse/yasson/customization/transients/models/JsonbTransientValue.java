@@ -23,6 +23,12 @@ public class JsonbTransientValue {
     private String plainProperty;
 
     @JsonbTransient
+    public String publicTransient = "publicTransient";
+
+    @JsonbTransient
+    private String transientFieldWithGetterNoSetter = "transientFieldWithGetterNoSetter";
+
+    @JsonbTransient
     private String propertyTransient;
 
     private String getterTransient;
@@ -125,5 +131,10 @@ public class JsonbTransientValue {
     @JsonbTransient
     public void setSetterAndGetterAndPropertyTransient(String setterAndGetterAndPropertyTransient) {
         this.setterAndGetterAndPropertyTransient = setterAndGetterAndPropertyTransient;
+    }
+
+
+    public String getTransientFieldWithGetterNoSetter() {
+        return transientFieldWithGetterNoSetter;
     }
 }
