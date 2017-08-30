@@ -244,16 +244,12 @@ public class PropertyModel implements JsonBindingModel, Comparable<PropertyModel
     }
 
     /**
-     * Read a property.
+     * Gets property's value.
      *
-     * @param object object to read property from.
-     * @return value in case property value is set and field is readable. If null or not readable (transient, static), return s null.
+     * @param object object to read property from
+     * @return property's value
      */
     public Object getValue(Object object) {
-        if (!isReadable()) {
-            //nulls are omitted in produced JSON, unless overridden
-            return null;
-        }
         return propagation.getValue(object);
     }
 

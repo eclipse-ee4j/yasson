@@ -23,6 +23,10 @@ public class JsonbNillableValue {
 
     private String nillableField;
 
+    private String privateField;
+
+    private static String staticField;
+
     public String getNillableField() {
         return nillableField;
     }

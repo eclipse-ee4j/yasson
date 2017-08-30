@@ -112,7 +112,8 @@ public class Marshaller extends ProcessingContext implements SerializationContex
     @SuppressWarnings("unchecked")
     public <T> void serializeRoot(T root, JsonGenerator generator, JsonBindingModel model) {
         final JsonbSerializer<T> rootSerializer = (JsonbSerializer<T>) getRootSerializer(root.getClass(), model);
-        if (jsonbContext.getConfigProperties().isStrictIJson() && rootSerializer instanceof AbstractValueTypeSerializer) {
+        if (jsonbContext.getConfigProperties().isStrictIJson() &&
+                rootSerializer instanceof AbstractValueTypeSerializer) {
             throw new JsonbException(Messages.getMessage(MessageKeys.IJSON_ENABLED_SINGLE_VALUE));
         }
         rootSerializer.serialize(root, generator, this);
@@ -121,11 +122,17 @@ public class Marshaller extends ProcessingContext implements SerializationContex
     private JsonbSerializer<?> getRootSerializer(Class<?> rootClazz, JsonBindingModel model) {
         final ContainerSerializerProvider serializerProvider = getMappingContext().getSerializerProvider(rootClazz);
         if (serializerProvider != null) {
-            return serializerProvider.provideSerializer(new JsonbPropertyInfo().withRuntimeType(runtimeType)
-                    .withClassModel(getMappingContext().getClassModel(rootClazz)).withJsonBindingModel(model));
+            return serializerProvider
+                    .provideSerializer(new JsonbPropertyInfo()
+                            .withRuntimeType(runtimeType)
+                            .withClassModel(getMappingContext().
+                                    getClassModel(rootClazz))
+                            .withJsonBindingModel(model));
         }
-        return new SerializerBuilder(jsonbContext).withObjectClass(rootClazz)
-                .withType(model.getType()).withModel(model).build();
+        return new SerializerBuilder(jsonbContext)
+                .withObjectClass(rootClazz)
+                .withType(model.getType())
+                .withModel(model).build();
     }
 
 }

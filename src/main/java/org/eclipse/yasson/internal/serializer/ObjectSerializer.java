@@ -73,22 +73,28 @@ public class ObjectSerializer<T> extends AbstractContainerSerializer<T> {
     @SuppressWarnings("unchecked")
     private void marshallProperty(T object, JsonGenerator generator, SerializationContext ctx, PropertyModel propertyModel) {
         Marshaller marshaller = (Marshaller) ctx;
-        final Object propertyValue = propertyModel.getValue(object);
-        if (propertyValue == null) {
-            if (propertyModel.getCustomization().isNillable()) {
-                generator.writeNull(propertyModel.getWriteName());
+
+        if (propertyModel.isReadable()) {
+            final Object propertyValue = propertyModel.getValue(object);
+            if (propertyValue == null) {
+                if (propertyModel.getCustomization().isNillable()) {
+                    generator.writeNull(propertyModel.getWriteName());
+                }
+                return;
             }
-            return;
+
+            final JsonbSerializer<?> propertyCachedSerializer = propertyModel.getPropertySerializer();
+            if (propertyCachedSerializer != null) {
+                serializerCaptor(propertyCachedSerializer, propertyValue, generator, ctx);
+                return;
+            }
+
+            Type genericType = ReflectionUtils.resolveType(this, propertyModel.getType());
+            final JsonbSerializer<?> serializer = new SerializerBuilder(marshaller.getJsonbContext())
+                    .withWrapper(this)
+                    .withObjectClass(propertyValue.getClass()).withModel(propertyModel)
+                    .withType(genericType).build();
+            serializerCaptor(serializer, propertyValue, generator, ctx);
         }
-        final JsonbSerializer<?> propertyCachedSerializer = propertyModel.getPropertySerializer();
-        if (propertyCachedSerializer != null) {
-            serializerCaptor(propertyCachedSerializer, propertyValue, generator, ctx);
-            return;
-        }
-        Type genericType = ReflectionUtils.resolveType(this, propertyModel.getType());
-        final JsonbSerializer<?> serializer = new SerializerBuilder(marshaller.getJsonbContext()).withWrapper(this)
-                .withObjectClass(propertyValue.getClass()).withModel(propertyModel)
-                .withType(genericType).build();
-        serializerCaptor(serializer, propertyValue, generator, ctx);
     }
 }
