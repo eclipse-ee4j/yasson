@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2015 Oracle and/or its affiliates. All rights reserved.
+ * Copyright (c) 2015, 2017 Oracle and/or its affiliates. All rights reserved.
  * This program and the accompanying materials are made available under the
  * terms of the Eclipse Public License v1.0 and Eclipse Distribution License v. 1.0
  * which accompanies this distribution.
@@ -15,14 +15,16 @@ package org.eclipse.yasson.defaultmapping.modifiers;
 
 import org.eclipse.yasson.defaultmapping.modifiers.model.FieldModifiersClass;
 import org.eclipse.yasson.defaultmapping.modifiers.model.MethodModifiersClass;
+import org.eclipse.yasson.defaultmapping.modifiers.model.PrivateConstructorClass;
+import org.eclipse.yasson.defaultmapping.modifiers.model.ProtectedConstructorClass;
 import org.junit.Before;
 import org.junit.Test;
 
 import javax.json.bind.Jsonb;
 import javax.json.bind.JsonbBuilder;
+import javax.json.bind.JsonbException;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertNull;
+import static org.junit.Assert.*;
 
 /**
  * Test access modifiers for default mapping.
@@ -60,5 +62,22 @@ public class DefaultMappingModifiersTest {
         result = jsonb.fromJson(validJson, MethodModifiersClass.class);
         assertEquals("WITHOUT_METHODS", result.publicFieldWithoutMethods);
 
+    }
+
+    @Test
+    public void testConstructorModifiers() {
+        try{
+            ProtectedConstructorClass instance = jsonb.fromJson("{\"randomField\":\"test\"}", ProtectedConstructorClass.class);
+            assertEquals(instance.randomField, "test");
+        } catch (JsonbException e){
+            fail("No exception should be thrown for protected constructor");
+            throw e;
+        }
+        try {
+            jsonb.fromJson("{\"randomField\":\"test\"}", PrivateConstructorClass.class);
+            fail("Exception should have been thrown");
+        }catch (JsonbException e){
+            assertTrue(e.getMessage().endsWith("Can't create instance"));
+        }
     }
 }
