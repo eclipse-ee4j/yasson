@@ -25,75 +25,7 @@ import org.eclipse.yasson.internal.serializer.JsonbNumberFormatter;
  *
  * @author Roman Grigoriadi
  */
-public abstract class Customization {
-
-    private final AdapterBinding adapterBinding;
-
-    private final SerializerBinding serializerBinding;
-
-    private final DeserializerBinding deserializerBinding;
-
-    private final boolean nillable;
-
-    /**
-     * Copies properties from builder an creates immutable instance.
-     *
-     * @param builder not null
-     */
-    public Customization(CustomizationBuilder builder) {
-        this.nillable = builder.isNillable();
-        this.adapterBinding = builder.getAdapterInfo();
-        this.serializerBinding = builder.getSerializerBinding();
-        this.deserializerBinding = builder.getDeserializerBinding();
-    }
-
-    /**
-     * Copy constructor.
-     *
-     * @param other other customization instance
-     */
-    public Customization(Customization other) {
-        this.nillable = other.isNillable();
-        this.adapterBinding = other.getAdapterBinding();
-        this.serializerBinding = other.getSerializerBinding();
-        this.deserializerBinding = other.getDeserializerBinding();
-    }
-
-    /**
-     * Returns true if <i>nillable</i> customization is present.
-     *
-     * @return True if <i>nillable</i> customization is present.
-     */
-    public boolean isNillable() {
-        return nillable;
-    }
-
-    /**
-     * Adapter wrapper class with resolved generic information.
-     *
-     * @return components wrapper
-     */
-    public AdapterBinding getAdapterBinding() {
-        return adapterBinding;
-    }
-
-    /**
-     * Serializer wrapper with resolved generic info.
-     *
-     * @return serializer wrapper
-     */
-    public SerializerBinding getSerializerBinding() {
-        return serializerBinding;
-    }
-
-    /**
-     * Deserializer wrapper with resolved generic info.
-     *
-     * @return deserializer wrapper
-     */
-    public DeserializerBinding getDeserializerBinding() {
-        return deserializerBinding;
-    }
+public interface Customization {
 
     /**
      * Number formatter for formatting numbers during serialization process. It could be the same formatter instance used for deserialization
@@ -101,7 +33,7 @@ public abstract class Customization {
      *
      * @return number formatter
      */
-    public abstract JsonbNumberFormatter getSerializeNumberFormatter();
+    JsonbNumberFormatter getSerializeNumberFormatter();
 
     /**
      * Number formatter for formatting numbers during deserialization process. It could be the same formatter instance used for serialization
@@ -109,7 +41,7 @@ public abstract class Customization {
      *
      * @return number formatter
      */
-    public abstract JsonbNumberFormatter getDeserializeNumberFormatter();
+    JsonbNumberFormatter getDeserializeNumberFormatter();
 
     /**
      * Date formatter for formatting date values during serialization process. It could be the same formatter instance used for deserialization
@@ -118,7 +50,7 @@ public abstract class Customization {
      *
      * @return date formatter
      */
-    public abstract JsonbDateFormatter getSerializeDateFormatter();
+    JsonbDateFormatter getSerializeDateFormatter();
 
     /**
      * Date formatter for formatting date values during deserialization process. It could be the same formatter instance used for serialization
@@ -127,7 +59,13 @@ public abstract class Customization {
      *
      * @return date formatter
      */
-    public abstract JsonbDateFormatter getDeserializeDateFormatter();
+    JsonbDateFormatter getDeserializeDateFormatter();
 
+    /**
+     * Returns true if <i>nillable</i> customization is present.
+     *
+     * @return True if <i>nillable</i> customization is present.
+     */
+    boolean isNillable();
 
 }

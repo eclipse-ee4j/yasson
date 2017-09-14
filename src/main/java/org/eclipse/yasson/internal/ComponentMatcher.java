@@ -15,6 +15,7 @@ package org.eclipse.yasson.internal;
 
 import org.eclipse.yasson.internal.components.*;
 import org.eclipse.yasson.internal.model.JsonBindingModel;
+import org.eclipse.yasson.internal.model.customization.ComponentBoundCustomization;
 
 import javax.json.bind.JsonbConfig;
 import javax.json.bind.adapter.JsonbAdapter;
@@ -126,29 +127,30 @@ public class ComponentMatcher {
     /**
      * Lookup serializer binding for a given property runtime type.
      * @param propertyRuntimeType runtime type of a property
-     * @param propertyModel model of a property
+     * @param customization with component info
      * @return serializer optional
      */
     @SuppressWarnings("unchecked")
-    public Optional<SerializerBinding<?>> getSerializerBinding(Type propertyRuntimeType, JsonBindingModel propertyModel) {
-        if (propertyModel == null || propertyModel.getCustomization() == null || propertyModel.getCustomization().getSerializerBinding() == null) {
+    public Optional<SerializerBinding<?>> getSerializerBinding(Type propertyRuntimeType, ComponentBoundCustomization customization) {
+
+        if (customization == null || customization.getSerializerBinding() == null) {
             return searchComponentBinding(propertyRuntimeType, ComponentBindings::getSerializer);
         }
-        return getComponentBinding(propertyRuntimeType, propertyModel.getCustomization().getSerializerBinding());
+        return getComponentBinding(propertyRuntimeType, customization.getSerializerBinding());
     }
 
     /**
      * Lookup deserializer binding for a given property runtime type.
      * @param propertyRuntimeType runtime type of a property
-     * @param model model of a property
+     * @param customization customization with component info
      * @return serializer optional
      */
     @SuppressWarnings("unchecked")
-    public Optional<DeserializerBinding<?>> getDeserializerBinding(Type propertyRuntimeType, JsonBindingModel model) {
-        if (model == null || model.getCustomization() == null || model.getCustomization().getDeserializerBinding() == null) {
+    public Optional<DeserializerBinding<?>> getDeserializerBinding(Type propertyRuntimeType, ComponentBoundCustomization customization) {
+        if (customization == null || customization.getDeserializerBinding() == null) {
             return searchComponentBinding(propertyRuntimeType, ComponentBindings::getDeserializer);
         }
-        return getComponentBinding(propertyRuntimeType, model.getCustomization().getDeserializerBinding());
+        return getComponentBinding(propertyRuntimeType, customization.getDeserializerBinding());
     }
 
     /**
@@ -156,14 +158,14 @@ public class ComponentMatcher {
      * or return components searched by runtime type
      *
      * @param propertyRuntimeType runtime type not null
-     * @param model model nullable
+     * @param customization customization with component info
      * @return components info if present
      */
-    public Optional<AdapterBinding> getAdapterBinding(Type propertyRuntimeType, JsonBindingModel model) {
-        if (model == null || model.getCustomization() == null ||  model.getCustomization().getAdapterBinding() == null) {
+    public Optional<AdapterBinding> getAdapterBinding(Type propertyRuntimeType, ComponentBoundCustomization customization) {
+        if (customization == null || customization.getAdapterBinding() == null) {
             return searchComponentBinding(propertyRuntimeType, ComponentBindings::getAdapterInfo);
         }
-        return getComponentBinding(propertyRuntimeType, model.getCustomization().getAdapterBinding());
+        return getComponentBinding(propertyRuntimeType, customization.getAdapterBinding());
     }
 
     private <T extends AbstractComponentBinding> Optional<T> getComponentBinding(Type propertyRuntimeType, T componentBinding) {

@@ -22,7 +22,7 @@ import org.eclipse.yasson.internal.model.JsonbCreator;
  *
  * @author Roman Grigoriadi
  */
-public class ClassCustomization extends Customization {
+public class ClassCustomization extends CustomizationBase {
 
     private final JsonbCreator creator;
 

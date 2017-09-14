@@ -17,6 +17,7 @@ import org.eclipse.yasson.internal.JsonbContext;
 import org.eclipse.yasson.internal.ReflectionUtils;
 import org.eclipse.yasson.internal.components.AdapterBinding;
 import org.eclipse.yasson.internal.components.DeserializerBinding;
+import org.eclipse.yasson.internal.model.customization.ComponentBoundCustomization;
 import org.eclipse.yasson.internal.properties.MessageKeys;
 import org.eclipse.yasson.internal.properties.Messages;
 
@@ -73,23 +74,29 @@ public class DeserializerBuilder extends AbstractSerializerBuilder<DeserializerB
         runtimeType = resolveRuntimeType();
         Class<?> rawType = ReflectionUtils.getRawType(getRuntimeType());
 
-        //First check if user deserializer is registered for such type
-        final ComponentMatcher componentMatcher = jsonbContext.getComponentMatcher();
-        Optional<DeserializerBinding<?>> userDeserializer =
-                componentMatcher.getDeserializerBinding(getRuntimeType(), getModel());
-        if (userDeserializer.isPresent() && !jsonbContext.containsProcessedType(userDeserializer.get().getBindingType())) {
-            return new UserDeserializerDeserializer<>(this, userDeserializer.get());
+        Optional<AdapterBinding> adapterInfoOptional = Optional.empty();
+        if (getModel() != null && (getModel().getCustomization() == null
+                || getModel().getCustomization() instanceof ComponentBoundCustomization)) {
+            ComponentBoundCustomization customization = (ComponentBoundCustomization) getModel().getCustomization();
+
+            //First check if user deserializer is registered for such type
+            final ComponentMatcher componentMatcher = jsonbContext.getComponentMatcher();
+            Optional<DeserializerBinding<?>> userDeserializer =
+                    componentMatcher.getDeserializerBinding(getRuntimeType(), customization);
+            if (userDeserializer.isPresent() && !jsonbContext.containsProcessedType(userDeserializer.get().getBindingType())) {
+                return new UserDeserializerDeserializer<>(this, userDeserializer.get());
+            }
+
+            //Second user components is registered.
+            Optional<AdapterBinding> adapterBinding = componentMatcher.getAdapterBinding(getRuntimeType(), customization);
+            if (adapterBinding.isPresent() && !jsonbContext.containsProcessedType(adapterBinding.get().getBindingType())) {
+                adapterInfoOptional = adapterBinding;
+                runtimeType = adapterInfoOptional.get().getToType();
+                wrapper = new AdaptedObjectDeserializer<>(adapterInfoOptional.get(), (AbstractContainerDeserializer<?>) wrapper);
+                rawType = ReflectionUtils.getRawType(getRuntimeType());
+            }
         }
 
-        //Second user components is registered.
-        Optional<AdapterBinding> adapterInfoOptional = componentMatcher.getAdapterBinding(getRuntimeType(), getModel());
-        if (adapterInfoOptional.isPresent() && !jsonbContext.containsProcessedType(adapterInfoOptional.get().getBindingType())) {
-            runtimeType = adapterInfoOptional.get().getToType();
-            wrapper = new AdaptedObjectDeserializer<>(adapterInfoOptional.get(), (AbstractContainerDeserializer<?>) wrapper);
-            rawType = ReflectionUtils.getRawType(getRuntimeType());
-        } else {
-            adapterInfoOptional = Optional.empty();
-        }
 
         if (Optional.class == rawType) {
             return new OptionalObjectDeserializer(this);
