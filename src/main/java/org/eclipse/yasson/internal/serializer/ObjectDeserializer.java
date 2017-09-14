@@ -15,7 +15,7 @@ package org.eclipse.yasson.internal.serializer;
 import org.eclipse.yasson.internal.*;
 import org.eclipse.yasson.internal.properties.MessageKeys;
 import org.eclipse.yasson.internal.properties.Messages;
-import org.eclipse.yasson.internal.model.CreatorParam;
+import org.eclipse.yasson.internal.model.CreatorModel;
 import org.eclipse.yasson.internal.model.JsonbCreator;
 import org.eclipse.yasson.internal.model.PropertyModel;
 
@@ -94,7 +94,7 @@ class ObjectDeserializer<T> extends AbstractContainerDeserializer<T> {
         //values must be set in order, in which they appears in JSON by spec
         values.forEach((key, wrapper) -> {
             //skip creator values
-            if (wrapper.getCreatorParam() != null) {
+            if (wrapper.getCreatorModel() != null) {
                 return;
             }
             final PropertyModel propertyModel = wrapper.getPropertyModel();
@@ -111,7 +111,7 @@ class ObjectDeserializer<T> extends AbstractContainerDeserializer<T> {
     private T createInstance(Class<T> rawType, JsonbCreator creator) {
         final T instance;
         final List<Object> paramValues = new ArrayList<>();
-        for(CreatorParam param : creator.getParams()) {
+        for(CreatorModel param : creator.getParams()) {
             final ValueWrapper valueWrapper = values.get(param.getName());
             //required by spec
             if (valueWrapper == null){
@@ -144,9 +144,9 @@ class ObjectDeserializer<T> extends AbstractContainerDeserializer<T> {
         final JsonbCreator creator = getClassModel().getClassCustomization().getCreator();
         //first check jsonb creator param, since it can be different from property name
         if (creator != null) {
-            final CreatorParam param = creator.findByName(parserContext.getLastKeyName());
+            final CreatorModel param = creator.findByName(parserContext.getLastKeyName());
             if (param != null) {
-                final JsonbDeserializer<?> deserializer = newUnmarshallerItemBuilder(context.getJsonbContext()).withType(param.getType()).build();
+                final JsonbDeserializer<?> deserializer = newUnmarshallerItemBuilder(context.getJsonbContext()).withType(param.getType()).withModel(param).build();
                 Object result = deserializer.deserialize(parser, context, param.getType());
                 values.put(param.getName(), new ValueWrapper(param, result));
                 return;
@@ -195,12 +195,12 @@ class ObjectDeserializer<T> extends AbstractContainerDeserializer<T> {
 
     private static class ValueWrapper {
 
-        private final CreatorParam creatorParam;
+        private final CreatorModel creatorModel;
         private final PropertyModel propertyModel;
         private final Object value;
 
-        public ValueWrapper(CreatorParam creator, Object value) {
-            this.creatorParam = creator;
+        public ValueWrapper(CreatorModel creator, Object value) {
+            this.creatorModel = creator;
             this.value = value;
             propertyModel = null;
         }
@@ -208,11 +208,11 @@ class ObjectDeserializer<T> extends AbstractContainerDeserializer<T> {
         public ValueWrapper(PropertyModel propertyModel, Object value) {
             this.propertyModel = propertyModel;
             this.value = value;
-            creatorParam = null;
+            creatorModel = null;
         }
 
-        public CreatorParam getCreatorParam() {
-            return creatorParam;
+        public CreatorModel getCreatorModel() {
+            return creatorModel;
         }
 
         public PropertyModel getPropertyModel() {

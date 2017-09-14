@@ -20,7 +20,12 @@ import org.junit.Test;
 import javax.json.bind.Jsonb;
 import javax.json.bind.JsonbBuilder;
 import javax.json.bind.JsonbException;
+import javax.json.bind.annotation.JsonbCreator;
+import javax.json.bind.annotation.JsonbDateFormat;
+import javax.json.bind.annotation.JsonbNumberFormat;
+import javax.json.bind.annotation.JsonbProperty;
 import java.math.BigDecimal;
+import java.time.LocalDate;
 
 import static org.junit.Assert.*;
 
@@ -101,4 +106,48 @@ public class JsonbCreatorTest {
         final CreatorPackagePrivateConstructor result = JsonbBuilder.create().fromJson(
                 "{\"strVal\":\"abc\", \"intVal\":5}", CreatorPackagePrivateConstructor.class);
     }
+
+    @Test
+    public void testLocalizedConstructor() {
+        String json = "{\"localDate\":\"05-09-2017\"}";
+        DateConstructor result = JsonbBuilder.create().fromJson(json, DateConstructor.class);
+        Assert.assertEquals(LocalDate.of(2017, 9, 5), result.localDate);
+    }
+
+    @Test
+    public void testLocalizedFactoryParameter() {
+        String json = "{\"number\":\"10.000\"}";
+        FactoryNumberParam result = JsonbBuilder.create().fromJson(json, FactoryNumberParam.class);
+        Assert.assertEquals(BigDecimal.TEN, result.number);
+    }
+
+
+    public static final class DateConstructor {
+        @JsonbDateFormat(value = "dd-MM-yyyy", locale = "nl-NL")
+        public LocalDate localDate;
+
+        @JsonbCreator
+        public DateConstructor(@JsonbProperty("localDate") @JsonbDateFormat(value = "dd-MM-yyyy", locale = "nl-NL") LocalDate localDate) {
+            this.localDate = localDate;
+        }
+
+    }
+
+    public static final class FactoryNumberParam {
+        public BigDecimal number;
+
+        private FactoryNumberParam(BigDecimal number) {
+            this.number = number;
+        }
+
+        @JsonbCreator
+        public static FactoryNumberParam createInstance(
+                @JsonbProperty("number") @JsonbNumberFormat(value = "000.000", locale = "en-us")
+                        BigDecimal number) {
+            return new FactoryNumberParam(number);
+        }
+
+    }
+
+
 }
