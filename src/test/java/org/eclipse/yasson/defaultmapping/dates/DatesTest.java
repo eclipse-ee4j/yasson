@@ -408,4 +408,52 @@ public class DatesTest {
         Assert.assertEquals(LocalDateTime.now().atZone(ZoneId.of("America/Los_Angeles")).getOffset().getTotalSeconds() * 1000,
                 result.getValue().getOffset(System.currentTimeMillis()));
     }
+
+    @Test
+    public void testDateInMap() {
+
+        JsonbConfig config = new JsonbConfig()
+                .withDateFormat("yyyy", Locale.ENGLISH);
+
+        Jsonb jsonb = JsonbBuilder.create(config);
+        LocalDate localDate = LocalDate.of(2017, 9, 14);
+
+        DateInMapPojo pojo = new DateInMapPojo();
+        pojo.setLocalDate(localDate);
+        pojo.setDateMap(new HashMap<>());
+        pojo.getDateMap().put("first", localDate);
+
+        String json = jsonb.toJson(pojo);
+
+        Assert.assertEquals("{\"dateMap\":{\"first\":\"2017\"},\"localDate\":\"2017\"}", json);
+
+        config = new JsonbConfig()
+                .withDateFormat("dd.MM.yyyy", Locale.ENGLISH);
+        jsonb = JsonbBuilder.create(config);
+        DateInMapPojo result = jsonb.fromJson("{\"dateMap\":{\"first\":\"01.01.2017\"},\"localDate\":\"01.01.2017\"}", DateInMapPojo.class);
+        Assert.assertEquals(LocalDate.of(2017,1,1), result.localDate);
+        Assert.assertEquals(LocalDate.of(2017,1,1), result.dateMap.get("first"));
+    }
+
+
+    public static class DateInMapPojo {
+        private LocalDate localDate;
+        private Map<String, LocalDate> dateMap;
+
+        public LocalDate getLocalDate() {
+            return localDate;
+        }
+
+        public void setLocalDate(LocalDate localDate) {
+            this.localDate = localDate;
+        }
+
+        public Map<String, LocalDate> getDateMap() {
+            return dateMap;
+        }
+
+        public void setDateMap(Map<String, LocalDate> dateMap) {
+            this.dateMap = dateMap;
+        }
+    }
 }
