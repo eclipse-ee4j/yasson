@@ -115,19 +115,43 @@ public class JsonbCreatorTest {
     }
 
     @Test
+    public void testLocalizedConstructorMergedWithProperty() {
+        String json = "{\"localDate\":\"05-09-2017\"}";
+        DateConstructorMergedWithProperty result = JsonbBuilder.create().fromJson(json, DateConstructorMergedWithProperty.class);
+        Assert.assertEquals(LocalDate.of(2017, 9, 5), result.localDate);
+    }
+
+    @Test
     public void testLocalizedFactoryParameter() {
         String json = "{\"number\":\"10.000\"}";
         FactoryNumberParam result = JsonbBuilder.create().fromJson(json, FactoryNumberParam.class);
         Assert.assertEquals(BigDecimal.TEN, result.number);
     }
 
+    @Test
+    public void testLocalizedFactoryParameterMergedWithProperty() {
+        String json = "{\"number\":\"10.000\"}";
+        FactoryNumberParamMergedWithProperty result = JsonbBuilder.create().fromJson(json, FactoryNumberParamMergedWithProperty.class);
+        Assert.assertEquals(BigDecimal.TEN, result.number);
+    }
+
 
     public static final class DateConstructor {
-        @JsonbDateFormat(value = "dd-MM-yyyy", locale = "nl-NL")
         public LocalDate localDate;
 
         @JsonbCreator
         public DateConstructor(@JsonbProperty("localDate") @JsonbDateFormat(value = "dd-MM-yyyy", locale = "nl-NL") LocalDate localDate) {
+            this.localDate = localDate;
+        }
+
+    }
+
+    public static final class DateConstructorMergedWithProperty {
+        @JsonbDateFormat(value = "dd-MM-yyyy", locale = "cs-CZ")
+        public LocalDate localDate;
+
+        @JsonbCreator
+        public DateConstructorMergedWithProperty(@JsonbProperty("localDate") LocalDate localDate) {
             this.localDate = localDate;
         }
 
@@ -145,6 +169,22 @@ public class JsonbCreatorTest {
                 @JsonbProperty("number") @JsonbNumberFormat(value = "000.000", locale = "en-us")
                         BigDecimal number) {
             return new FactoryNumberParam(number);
+        }
+
+    }
+
+    public static final class FactoryNumberParamMergedWithProperty {
+
+        @JsonbNumberFormat(value = "000.000", locale = "en-us")
+        public BigDecimal number;
+
+        private FactoryNumberParamMergedWithProperty(BigDecimal number) {
+            this.number = number;
+        }
+
+        @JsonbCreator
+        public static FactoryNumberParamMergedWithProperty createInstance(@JsonbProperty("number") BigDecimal number) {
+            return new FactoryNumberParamMergedWithProperty(number);
         }
 
     }

@@ -13,6 +13,7 @@
 package org.eclipse.yasson.internal;
 
 import org.eclipse.yasson.internal.model.*;
+import org.eclipse.yasson.internal.model.customization.CreatorCustomization;
 
 import javax.json.bind.JsonbException;
 import java.beans.Introspector;
@@ -60,6 +61,19 @@ class ClassParser {
         sortedProperties.addAll(jsonbContext.getConfigProperties().getPropertyOrdering().orderProperties(classProperties, classModel, jsonbContext));
 
         checkPropertyNameClash(sortedProperties, classModel.getType());
+
+        //reference property to creator parameter by name to merge configuration in runtime
+        JsonbCreator creator = classModel.getClassCustomization().getCreator();
+        if (creator != null) {
+            sortedProperties.forEach((propertyModel -> {
+                for (CreatorModel creatorModel : creator.getParams()) {
+                    if (creatorModel.getName().equals(propertyModel.getPropertyName())) {
+                        CreatorCustomization customization = (CreatorCustomization) creatorModel.getCustomization();
+                        customization.setPropertyModel(propertyModel);
+                    }
+                }
+            }));
+        }
         classModel.setProperties(sortedProperties);
 
     }
