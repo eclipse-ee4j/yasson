@@ -1,8 +1,6 @@
 package org.eclipse.yasson.internal.model.customization;
 
-import org.eclipse.yasson.internal.components.AdapterBinding;
-import org.eclipse.yasson.internal.components.DeserializerBinding;
-import org.eclipse.yasson.internal.components.SerializerBinding;
+import org.eclipse.yasson.internal.model.PropertyModel;
 import org.eclipse.yasson.internal.serializer.JsonbDateFormatter;
 import org.eclipse.yasson.internal.serializer.JsonbNumberFormatter;
 
@@ -14,6 +12,8 @@ public class CreatorCustomization implements Customization {
     private JsonbNumberFormatter numberFormatter;
 
     private JsonbDateFormatter dateFormatter;
+
+    private PropertyModel propertyModel;
 
     public CreatorCustomization(JsonbNumberFormatter numberFormatter, JsonbDateFormatter dateFormatter) {
         this.numberFormatter = numberFormatter;
@@ -27,7 +27,12 @@ public class CreatorCustomization implements Customization {
 
     @Override
     public JsonbNumberFormatter getDeserializeNumberFormatter() {
-        return numberFormatter;
+        if (numberFormatter != null) {
+            return numberFormatter;
+        } else if (propertyModel != null) {
+            return propertyModel.getCustomization().getDeserializeNumberFormatter();
+        }
+        return null;
     }
 
     @Override
@@ -37,7 +42,12 @@ public class CreatorCustomization implements Customization {
 
     @Override
     public JsonbDateFormatter getDeserializeDateFormatter() {
-        return dateFormatter;
+        if (dateFormatter != null) {
+            return dateFormatter;
+        } else if (propertyModel != null) {
+            return propertyModel.getCustomization().getDeserializeDateFormatter();
+        }
+        return null;
     }
 
     @Override
@@ -45,4 +55,11 @@ public class CreatorCustomization implements Customization {
         throw new UnsupportedOperationException("Not supported for creator parameters.");
     }
 
+    /**
+     * Set property referenced model.
+     * @param propertyModel referenced property model
+     */
+    public void setPropertyModel(PropertyModel propertyModel) {
+        this.propertyModel = propertyModel;
+    }
 }
