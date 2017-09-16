@@ -49,7 +49,7 @@ public abstract class AbstractDateTimeSerializer<T> extends AbstractValueTypeSer
     @Override
     public void serialize(T obj, JsonGenerator generator, SerializationContext ctx) {
         final JsonbContext jsonbContext = ((Marshaller) ctx).getJsonbContext();
-        final JsonbDateFormatter formatter = getJsonbDateFormatter();
+        final JsonbDateFormatter formatter = getJsonbDateFormatter(jsonbContext);
         if (model.getContext() == JsonContext.JSON_OBJECT) {
             generator.write(model.getWriteName(), toJson(obj, formatter, jsonbContext));
         } else {
@@ -70,6 +70,11 @@ public abstract class AbstractDateTimeSerializer<T> extends AbstractValueTypeSer
             return String.valueOf(toInstant(object).toEpochMilli());
         } else if (formatter.getDateTimeFormatter() != null) {
             return formatWithFormatter(object, formatter.getDateTimeFormatter());
+        } else {
+            DateTimeFormatter configDateTimeFormatter = jsonbContext.getConfigProperties().getConfigDateFormatter().getDateTimeFormatter();
+            if (configDateTimeFormatter != null) {
+                return formatWithFormatter(object, configDateTimeFormatter);
+            }
         }
         if (jsonbContext.getConfigProperties().isStrictIJson()) {
             return formatStrictIJson(object);
@@ -77,11 +82,11 @@ public abstract class AbstractDateTimeSerializer<T> extends AbstractValueTypeSer
         return formatDefault(object, jsonbContext.getConfigProperties().getLocale(formatter.getLocale()));
     }
 
-    protected JsonbDateFormatter getJsonbDateFormatter() {
+    protected JsonbDateFormatter getJsonbDateFormatter(JsonbContext context) {
         if (model != null && model.getCustomization() != null && model.getCustomization().getSerializeDateFormatter() != null) {
             return model.getCustomization().getSerializeDateFormatter();
         }
-        return JsonbDateFormatter.getDefault();
+        return context.getConfigProperties().getConfigDateFormatter();
     }
 
     /**

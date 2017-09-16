@@ -13,6 +13,7 @@
 
 package org.eclipse.yasson.internal.serializer;
 
+import org.eclipse.yasson.internal.JsonbContext;
 import org.eclipse.yasson.internal.Unmarshaller;
 import org.eclipse.yasson.internal.properties.MessageKeys;
 import org.eclipse.yasson.internal.properties.Messages;
@@ -48,11 +49,16 @@ public abstract class AbstractDateTimeDeserializer<T> extends AbstractValueTypeD
 
     @Override
     public T deserialize(String jsonValue, Unmarshaller unmarshaller, Type rtType) {
-        final JsonbDateFormatter formatter = getJsonbDateFormatter();
+        final JsonbDateFormatter formatter = getJsonbDateFormatter(unmarshaller.getJsonbContext());
         if (JsonbDateFormat.TIME_IN_MILLIS.equals(formatter.getFormat())) {
             return fromInstant(Instant.ofEpochMilli(Long.parseLong(jsonValue)));
         } else if (formatter.getDateTimeFormatter() != null) {
             return parseWithFormatterInternal(jsonValue, formatter.getDateTimeFormatter());
+        } else {
+            DateTimeFormatter configDateTimeFormatter = unmarshaller.getJsonbContext().getConfigProperties().getConfigDateFormatter().getDateTimeFormatter();
+            if (configDateTimeFormatter != null) {
+                return parseWithFormatterInternal(jsonValue, configDateTimeFormatter);
+            }
         }
         final boolean strictIJson = unmarshaller.getJsonbContext().getConfigProperties().isStrictIJson();
         if (strictIJson) {
@@ -65,11 +71,11 @@ public abstract class AbstractDateTimeDeserializer<T> extends AbstractValueTypeD
         }
     }
 
-    protected JsonbDateFormatter getJsonbDateFormatter() {
+    protected JsonbDateFormatter getJsonbDateFormatter(JsonbContext context) {
         if (getModel() != null && getModel().getCustomization() != null && getModel().getCustomization().getDeserializeDateFormatter() != null) {
             return getModel().getCustomization().getDeserializeDateFormatter();
         }
-        return JsonbDateFormatter.getDefault();
+        return context.getConfigProperties().getConfigDateFormatter();
     }
 
     /**
