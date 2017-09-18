@@ -80,6 +80,7 @@ public class AdaptedObjectSerializer<T, A> implements CurrentItem<T>, JsonbSeria
     }
 
     @Override
+    @SuppressWarnings("unchecked")
     public void serialize(T obj, JsonGenerator generator, SerializationContext ctx) {
         JsonbContext jsonbContext = ((Marshaller) ctx).getJsonbContext();
         try {
@@ -95,7 +96,7 @@ public class AdaptedObjectSerializer<T, A> implements CurrentItem<T>, JsonbSeria
         }
     }
 
-    @SuppressWarnings("unchekced")
+    @SuppressWarnings("unchecked")
     private JsonbSerializer<A> resolveSerializer(Marshaller ctx, A adapted) {
         final ContainerSerializerProvider cached = ctx.getMappingContext().getSerializerProvider(adapted.getClass());
         if (cached != null) {

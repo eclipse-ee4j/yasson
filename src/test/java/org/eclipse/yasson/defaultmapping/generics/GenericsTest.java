@@ -346,6 +346,7 @@ public class GenericsTest {
     }
 
     @Test
+    @SuppressWarnings("unchecked")
     public void testMarshallRawList() throws ParseException {
         List rawList = new ArrayList();
         final SimpleDateFormat ddMMyyyy = new SimpleDateFormat("ddMMyyyy");
@@ -381,6 +382,7 @@ public class GenericsTest {
     }
 
     @Test
+    @SuppressWarnings("unchecked")
     public void testDeserializeIntoRaw() {
 
         GenericTestClass result = jsonb.fromJson("{\"field1\":{\"val1\":\"abc\"},\"field2\":{\"val1\":\"def\"}}", GenericTestClass.class);

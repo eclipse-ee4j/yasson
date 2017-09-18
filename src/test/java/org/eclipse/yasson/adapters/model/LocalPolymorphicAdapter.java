@@ -38,6 +38,7 @@ public abstract class LocalPolymorphicAdapter<T> implements JsonbAdapter<T, Loca
     }
 
     @Override
+    @SuppressWarnings("unchecked")
     public final T adaptFromJson(LocalTypeWrapper<T> obj) throws Exception {
         if (!isAllowed(obj.getClassName())) {
             throw new ClassNotFoundException(obj.getClassName());

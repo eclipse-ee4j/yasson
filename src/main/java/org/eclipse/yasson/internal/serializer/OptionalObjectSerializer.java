@@ -92,6 +92,7 @@ public class OptionalObjectSerializer<T extends Optional<?>> implements CurrentI
         serialCaptor(serializer, optionalValue, generator, ctx);
     }
 
+    @SuppressWarnings("unchecked")
     private <T> void serialCaptor(JsonbSerializer<?> serializer, T object, JsonGenerator generator, SerializationContext context) {
         ((JsonbSerializer<T>) serializer).serialize(object, generator, context);
     }

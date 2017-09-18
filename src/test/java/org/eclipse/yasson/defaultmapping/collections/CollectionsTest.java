@@ -146,6 +146,7 @@ public class CollectionsTest {
 
 
     @Test
+    @SuppressWarnings("unchecked")
     public void testMarshallArray() {
 
         //support of arrays of types that JSON Binding is able to serialize
@@ -212,6 +213,7 @@ public class CollectionsTest {
     }
 
     @Test
+    @SuppressWarnings("unchecked")
     public void testRawCollection() {
         List rawList = new ArrayList();
         rawList.add("first");

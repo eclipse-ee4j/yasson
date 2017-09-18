@@ -348,7 +348,7 @@ public class AdaptersTest {
         }};
         jsonb = JsonbBuilder.create(new JsonbConfig().setProperty(JsonbConfig.ADAPTERS, adapters));
 
-        AdaptedPojo<Integer> pojo = new AdaptedPojo();
+        AdaptedPojo<Integer> pojo = new AdaptedPojo<>();
         pojo.stringIntegerMap = new HashMap<>();
         pojo.stringIntegerMap.put("first", 11);
         pojo.stringIntegerMap.put("second", 22);

@@ -86,6 +86,7 @@ public class AdaptedObjectDeserializer<A, T> implements CurrentItem<T>, JsonbDes
     }
 
     @Override
+    @SuppressWarnings("unchecked")
     public T deserialize(JsonParser parser, DeserializationContext context, Type rtType) {
         Unmarshaller unmarshaller = (Unmarshaller) context;
         unmarshaller.setCurrent(this);

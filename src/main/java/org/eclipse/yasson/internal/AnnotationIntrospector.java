@@ -563,6 +563,7 @@ public class AnnotationIntrospector {
     /**
      * Searches for annotation, collects processed, to avoid StackOverflow.
      */
+    @SuppressWarnings("unchecked")
     private <T extends Annotation> T findAnnotation(Annotation[] declaredAnnotations, Class<T> annotationClass, Set<Annotation> processed) {
         for (Annotation candidate : declaredAnnotations) {
             final Class<? extends Annotation> annType = candidate.annotationType();

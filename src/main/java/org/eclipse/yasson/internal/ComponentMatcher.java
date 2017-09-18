@@ -253,6 +253,7 @@ public class ComponentMatcher {
      * @param instance instance to use if not cached already
      * @return wrapper used in property models
      */
+    @SuppressWarnings("unchecked")
     DeserializerBinding introspectDeserializerBinding(Class<? extends JsonbDeserializer> deserializerClass, JsonbDeserializer instance) {
         final ParameterizedType deserializerRuntimeType = ReflectionUtils.findParameterizedType(deserializerClass, JsonbDeserializer.class);
         Type deserializerBindingType = resolveTypeArg(deserializerRuntimeType.getActualTypeArguments()[0], deserializerClass.getClass());
@@ -274,6 +275,7 @@ public class ComponentMatcher {
      * @param instance instance to use if not cached
      * @return wrapper used in property models
      */
+    @SuppressWarnings("unchecked")
     SerializerBinding introspectSerializerBinding(Class<? extends JsonbSerializer> serializerClass, JsonbSerializer instance) {
         final ParameterizedType serializerRuntimeType = ReflectionUtils.findParameterizedType(serializerClass, JsonbSerializer.class);
         Type serBindingType = resolveTypeArg(serializerRuntimeType.getActualTypeArguments()[0], serializerClass.getClass());

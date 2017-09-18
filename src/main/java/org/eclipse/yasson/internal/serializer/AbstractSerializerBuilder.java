@@ -72,6 +72,7 @@ public class AbstractSerializerBuilder<T extends AbstractSerializerBuilder> {
      * @param wrapper not null.
      * @return Builder instance for call chaining.
      */
+    @SuppressWarnings("unchecked")
     public T withWrapper(CurrentItem<?> wrapper) {
         this.wrapper = wrapper;
         return (T) this;
@@ -83,6 +84,7 @@ public class AbstractSerializerBuilder<T extends AbstractSerializerBuilder> {
      * @param model Model of a field, not null.
      * @return Builder instance for call chaining.
      */
+    @SuppressWarnings("unchecked")
     public T withModel(JsonBindingModel model) {
         this.model = model;
         return (T) this;
@@ -147,6 +149,7 @@ public class AbstractSerializerBuilder<T extends AbstractSerializerBuilder> {
      * @param type type of instance not null
      * @return builder instance for call chaining
      */
+    @SuppressWarnings("unchecked")
     public T withType(Type type) {
         this.genericType = type;
         return (T) this;

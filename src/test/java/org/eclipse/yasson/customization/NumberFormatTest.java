@@ -58,15 +58,15 @@ public class NumberFormatTest {
 
         assertEquals(BigDecimal.TEN, pojo.bigDecimal);
         assertEquals(BigInteger.ONE, pojo.bigInteger);
-        assertEquals(new Byte((byte) 127), pojo.aByte);
-        assertEquals(new Double(.1d), pojo.aDouble);
-        assertEquals(new Float(.35f), pojo.aFloat);
+        assertEquals(Byte.valueOf((byte) 127), pojo.aByte);
+        assertEquals(Double.valueOf(.1d), pojo.aDouble);
+        assertEquals(Float.valueOf(.35f), pojo.aFloat);
         assertEquals((Integer)Integer.MAX_VALUE, pojo.integer);
-        assertEquals(new Short((short) 1), pojo.aShort);
+        assertEquals(Short.valueOf((short) 1), pojo.aShort);
         assertEquals((Long)Long.MAX_VALUE, pojo.aLong);
-        assertEquals(new Double(.1d), pojo.getDoubleGetterFormatted());
-        assertEquals(new Double(.005d), pojo.getDoubleSetterFormatted());
-        assertEquals(new Double(.6d), pojo.getDoubleSetterAndPropertyFormatter());
+        assertEquals(Double.valueOf(.1d), pojo.getDoubleGetterFormatted());
+        assertEquals(Double.valueOf(.005d), pojo.getDoubleSetterFormatted());
+        assertEquals(Double.valueOf(.6d), pojo.getDoubleSetterAndPropertyFormatter());
     }
 
     @Test
@@ -86,8 +86,8 @@ public class NumberFormatTest {
         String expectedJson = "{\"doubleGetterFormatted\":\"000.10000\",\"doubleSetterFormatted\":\",005\",\"doubleSetterAndPropertyFormatter\":\"000,600\"}";
         NumberFormatPojoWithoutClassLevelFormatter pojo = jsonb.fromJson(expectedJson, NumberFormatPojoWithoutClassLevelFormatter.class);
 
-        assertEquals(new Double(.1d), pojo.getDoubleGetterFormatted());
-        assertEquals(new Double(.005d), pojo.getDoubleSetterFormatted());
-        assertEquals(new Double(.6d), pojo.getDoubleSetterAndPropertyFormatter());
+        assertEquals(Double.valueOf(.1d), pojo.getDoubleGetterFormatted());
+        assertEquals(Double.valueOf(.005d), pojo.getDoubleSetterFormatted());
+        assertEquals(Double.valueOf(.6d), pojo.getDoubleSetterAndPropertyFormatter());
     }
 }

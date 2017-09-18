@@ -91,6 +91,7 @@ public abstract class AbstractContainerSerializer<T> extends AbstractItem<T> imp
      */
     protected abstract void writeStart(String key, JsonGenerator generator);
 
+    @SuppressWarnings("unchecked")
     protected <X> void serializerCaptor(JsonbSerializer<?> serializer, X object, JsonGenerator generator, SerializationContext ctx) {
         ((JsonbSerializer<X>) serializer).serialize(object, generator, ctx);
     }

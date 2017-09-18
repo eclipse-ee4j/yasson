@@ -180,6 +180,7 @@ public class DeserializerBuilder extends AbstractSerializerBuilder<DeserializerB
         return Optional.empty();
     }
 
+    @SuppressWarnings("unchecked")
     private JsonbDeserializer<?> wrapAdapted(Optional<AdapterBinding> adapterInfoOptional, JsonbDeserializer<?> item) {
         final Optional<JsonbDeserializer<?>> adaptedDeserializerOptional = adapterInfoOptional.map(adapterInfo -> {
             setAdaptedItemCaptor((AdaptedObjectDeserializer)wrapper, item);

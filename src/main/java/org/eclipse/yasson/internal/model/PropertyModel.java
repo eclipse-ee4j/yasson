@@ -96,6 +96,7 @@ public class PropertyModel implements JsonBindingModel, Comparable<PropertyModel
      *
      * @return serializer instance to be cached
      */
+    @SuppressWarnings("unchecked")
     private JsonbSerializer<?> resolveCachedSerializer() {
         if (!ReflectionUtils.isResolvedType(propertyType)) {
             return null;

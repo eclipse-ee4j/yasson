@@ -43,6 +43,7 @@ public class MapSerializer<T extends Map<?,?>> extends AbstractContainerSerializ
                 resolveContainerModelCustomization(mapValueRuntimeType, builder.getJsonbContext()));
     }
 
+    @SuppressWarnings("unchecked")
     @Override
     protected void serializeInternal(T obj, JsonGenerator generator, SerializationContext ctx) {
         for (Map.Entry<?,?> entry : obj.entrySet()) {
