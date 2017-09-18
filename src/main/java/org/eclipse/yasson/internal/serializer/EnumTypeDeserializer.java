@@ -35,13 +35,8 @@ public class EnumTypeDeserializer extends AbstractValueTypeDeserializer<Enum> {
     }
 
     @Override
+    @SuppressWarnings("unchecked")
     protected Enum deserialize(String jsonValue, Unmarshaller unmarshaller, Type rtType) {
-        Class<? extends Enum> en = (Class<? extends Enum>) rtType;
-        for (Enum c : en.getEnumConstants()) {
-            if (c.name().equals(jsonValue)) {
-                return c;
-            }
-        }
-        return null;
+        return Enum.valueOf((Class<Enum>) rtType, jsonValue);
     }
 }
