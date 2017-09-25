@@ -21,7 +21,7 @@ import org.eclipse.yasson.internal.serializer.JsonbNumberFormatter;
  *
  * @author Roman Grigoriadi
  */
-public class PropertyCustomization extends Customization {
+public class PropertyCustomization extends CustomizationBase {
 
     private final String jsonReadName;
 

@@ -12,6 +12,7 @@
  ******************************************************************************/
 package org.eclipse.yasson.internal.model.customization;
 
+import org.eclipse.yasson.internal.model.JsonbCreator;
 import org.eclipse.yasson.internal.serializer.JsonbDateFormatter;
 import org.eclipse.yasson.internal.serializer.JsonbNumberFormatter;
 
@@ -21,6 +22,8 @@ import org.eclipse.yasson.internal.serializer.JsonbNumberFormatter;
  * @author Ehsan Zaery Moghaddam (zaerymoghaddam@gmail.com)
  */
 public class ClassCustomizationBuilder extends CustomizationBuilder {
+
+    private JsonbCreator jsonbCreator;
 
     /**
      * The class level number formatter that would be used by default for all number properties that don't have a dedicated number formatter
@@ -77,5 +80,23 @@ public class ClassCustomizationBuilder extends CustomizationBuilder {
      */
     public void setDateFormatter(JsonbDateFormatter dateFormatter) {
         this.dateFormatter = dateFormatter;
+    }
+
+    /**
+     * Gets custom constructor or method for user instantiation.
+     *
+     * @return Custom creator.
+     */
+    public JsonbCreator getCreator() {
+        return jsonbCreator;
+    }
+
+    /**
+     * Sets custom constructor or method for user instantiation.
+     *
+     * @param jsonbCreator Creator to set.
+     */
+    public void setCreator(JsonbCreator jsonbCreator) {
+        this.jsonbCreator = jsonbCreator;
     }
 }
