@@ -36,11 +36,11 @@ public class EnumTypeSerializer extends AbstractValueTypeSerializer<Enum> {
 
     @Override
     protected void serialize(Enum obj, JsonGenerator generator, String key, Marshaller marshaller) {
-        generator.write(key, obj.toString());
+        generator.write(key, obj.name());
     }
 
     @Override
     protected void serialize(Enum obj, JsonGenerator generator, Marshaller marshaller) {
-        generator.write(obj.toString());
+        generator.write(obj.name());
     }
 }

@@ -109,7 +109,7 @@ public class DefaultSerializers {
     }
 
     private <T> Optional<SerializerProviderWrapper> findByCondition(Class<T> clazz) {
-        if (clazz.isEnum()) {
+        if (Enum.class.isAssignableFrom(clazz)) {
             return Optional.of(enumProvider);
         } else if (JsonString.class.isAssignableFrom(clazz)) {
             return Optional.of(serializers.get(JsonString.class));

@@ -181,13 +181,6 @@ public class CollectionsTest {
     }
 
     @Test
-    public void testMarshallEnum() {
-
-        final Language language = Language.Russian;
-        assertEquals("{\"value\":\"Russian\"}", jsonb.toJson(new ScalarValueWrapper<>(language)));
-    }
-
-    @Test
     public void testMarshallEnumSet() {
 
         final EnumSet<Language> languageEnumSet = EnumSet.of(Language.Czech, Language.Slovak);

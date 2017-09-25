@@ -22,6 +22,7 @@ import org.eclipse.yasson.internal.model.PropertyModel;
 import javax.json.bind.JsonbException;
 import javax.json.bind.serializer.JsonbDeserializer;
 import javax.json.stream.JsonParser;
+import java.lang.reflect.Type;
 import java.util.ArrayList;
 import java.util.LinkedHashMap;
 import java.util.List;
@@ -160,7 +161,8 @@ class ObjectDeserializer<T> extends AbstractContainerDeserializer<T> {
             final JsonbDeserializer<?> deserializer = newUnmarshallerItemBuilder(context.getJsonbContext()).
                     withModel(newPropertyModel).build();
 
-            Object result = deserializer.deserialize(parser, context, newPropertyModel.getPropertyType());
+            Type resolvedType = ReflectionUtils.resolveType(this, newPropertyModel.getPropertyType());
+            Object result = deserializer.deserialize(parser, context, resolvedType);
             values.put(newPropertyModel.getPropertyName(), new ValueWrapper(newPropertyModel, result));
             return;
         }
