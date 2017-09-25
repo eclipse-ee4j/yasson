@@ -75,6 +75,7 @@ public enum MessageKeys {
     ZONE_PARSE_ERROR("zoneParseError"),
     JSONB_TRANSIENT_WITH_OTHER_ANNOTATIONS("jsonbTransientWithOtherAnnotations"),
     NON_PARAMETRIZED_TYPE("nonParametrizedType"),
+    PROPERTY_NAME_CLASH("propertyNameClash"),
     ;
 
     /** Message bundle key. */

@@ -13,6 +13,8 @@
 package org.eclipse.yasson.internal;
 
 import org.eclipse.yasson.internal.model.*;
+import org.eclipse.yasson.internal.properties.MessageKeys;
+import org.eclipse.yasson.internal.properties.Messages;
 
 import javax.json.bind.JsonbException;
 import java.beans.Introspector;
@@ -150,10 +152,13 @@ class ClassParser {
         for (PropertyModel collectedPropertyModel : collectedProperties) {
             for (PropertyModel checkedPropertyModel : checkedProperties) {
 
-                if (checkedPropertyModel.getReadName().equals(collectedPropertyModel.getReadName()) ||
-                        checkedPropertyModel.getWriteName().equals(collectedPropertyModel.getWriteName())) {
-                    throw new JsonbException(String.format("Property %s clashes with property %s by read or write name in class %s.",
-                            checkedPropertyModel.getPropertyName(), collectedPropertyModel.getPropertyName(), cls.getName()));
+                if ((checkedPropertyModel.getReadName().equals(collectedPropertyModel.getReadName())
+                && checkedPropertyModel.isReadable() && collectedPropertyModel.isReadable()) ||
+                        (checkedPropertyModel.getWriteName().equals(collectedPropertyModel.getWriteName()))
+                        && checkedPropertyModel.isWritable() && collectedPropertyModel.isWritable()) {
+                    throw new JsonbException(Messages.getMessage(MessageKeys.PROPERTY_NAME_CLASH,
+                            checkedPropertyModel.getPropertyName(), collectedPropertyModel.getPropertyName(),
+                            cls.getName()));
                 }
             }
             checkedProperties.add(collectedPropertyModel);

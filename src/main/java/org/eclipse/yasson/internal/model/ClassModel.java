@@ -86,7 +86,7 @@ public class ClassModel {
     private PropertyModel searchProperty(ClassModel classModel, String jsonReadName) {
         //Standard javabean properties without overridden name (most of the cases)
         final PropertyModel result = classModel.getPropertyModel(jsonReadName);
-        if (result != null && result.getPropertyName().equals(result.getCustomization().getJsonReadName())) {
+        if (result != null && result.getPropertyName().equals(result.getReadName())) {
             return result;
         }
         //Search for overridden name on setter with @JsonbProperty annotation
