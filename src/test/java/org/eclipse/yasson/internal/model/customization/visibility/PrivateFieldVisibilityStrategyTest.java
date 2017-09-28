@@ -9,7 +9,7 @@ import org.junit.Test;
 
 /**
  *
- * @author airhacks.com
+ * @author Adam Bien
  */
 public class PrivateFieldVisibilityStrategyTest {
 

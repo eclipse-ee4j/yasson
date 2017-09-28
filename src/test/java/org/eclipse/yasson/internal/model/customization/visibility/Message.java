@@ -3,7 +3,7 @@ package org.eclipse.yasson.internal.model.customization.visibility;
 
 /**
  *
- * @author airhacks.com
+ * @author Adam Bien
  */
 public class Message {
 

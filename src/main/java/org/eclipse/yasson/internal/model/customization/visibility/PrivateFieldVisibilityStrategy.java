@@ -7,7 +7,7 @@ import javax.json.bind.config.PropertyVisibilityStrategy;
 
 /**
  *
- * @author adam-bien.com
+ * @author Adam Bien
  */
 public class PrivateFieldVisibilityStrategy implements PropertyVisibilityStrategy {
 
