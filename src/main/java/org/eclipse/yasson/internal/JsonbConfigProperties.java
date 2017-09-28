@@ -1,16 +1,8 @@
 package org.eclipse.yasson.internal;
 
-import org.eclipse.yasson.internal.model.customization.ordering.AnyOrderStrategy;
-import org.eclipse.yasson.internal.model.customization.ordering.LexicographicalOrderStrategy;
-import org.eclipse.yasson.internal.model.customization.ordering.PropOrderStrategy;
-import org.eclipse.yasson.internal.model.customization.ordering.PropertyOrdering;
-import org.eclipse.yasson.internal.model.customization.ordering.ReverseOrderStrategy;
-import org.eclipse.yasson.internal.model.customization.naming.DefaultNamingStrategies;
-import org.eclipse.yasson.internal.model.customization.naming.IdentityStrategy;
-import org.eclipse.yasson.internal.properties.MessageKeys;
-import org.eclipse.yasson.internal.properties.Messages;
-import org.eclipse.yasson.internal.serializer.JsonbDateFormatter;
-
+import java.time.format.DateTimeFormatter;
+import java.util.Locale;
+import java.util.Optional;
 import javax.json.bind.JsonbConfig;
 import javax.json.bind.JsonbException;
 import javax.json.bind.annotation.JsonbDateFormat;
@@ -18,9 +10,17 @@ import javax.json.bind.config.BinaryDataStrategy;
 import javax.json.bind.config.PropertyNamingStrategy;
 import javax.json.bind.config.PropertyOrderStrategy;
 import javax.json.bind.config.PropertyVisibilityStrategy;
-import java.time.format.DateTimeFormatter;
-import java.util.Locale;
-import java.util.Optional;
+import org.eclipse.yasson.internal.model.customization.naming.DefaultNamingStrategies;
+import org.eclipse.yasson.internal.model.customization.naming.IdentityStrategy;
+import org.eclipse.yasson.internal.model.customization.ordering.AnyOrderStrategy;
+import org.eclipse.yasson.internal.model.customization.ordering.LexicographicalOrderStrategy;
+import org.eclipse.yasson.internal.model.customization.ordering.PropOrderStrategy;
+import org.eclipse.yasson.internal.model.customization.ordering.PropertyOrdering;
+import org.eclipse.yasson.internal.model.customization.ordering.ReverseOrderStrategy;
+import org.eclipse.yasson.internal.model.customization.visibility.PrivateFieldVisibilityStrategy;
+import org.eclipse.yasson.internal.properties.MessageKeys;
+import org.eclipse.yasson.internal.properties.Messages;
+import org.eclipse.yasson.internal.serializer.JsonbDateFormatter;
 
 /**
  * Resolved properties from JSONB config.
@@ -131,7 +131,9 @@ public class JsonbConfigProperties {
     private PropertyVisibilityStrategy initPropertyVisibilityStrategy() {
         final Optional<Object> property = jsonbConfig.getProperty(JsonbConfig.PROPERTY_VISIBILITY_STRATEGY);
         if (!property.isPresent()) {
-            return null;
+            PrivateFieldVisibilityStrategy privateVisibilityStrategy = new PrivateFieldVisibilityStrategy();
+            jsonbConfig.setProperty(JsonbConfig.PROPERTY_VISIBILITY_STRATEGY, privateVisibilityStrategy);
+            return privateVisibilityStrategy;
         }
         final Object propertyVisibilityStrategy = property.get();
         if (!(propertyVisibilityStrategy instanceof PropertyVisibilityStrategy)) {
