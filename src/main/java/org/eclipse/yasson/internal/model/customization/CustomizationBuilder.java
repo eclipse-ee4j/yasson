@@ -33,8 +33,6 @@ public abstract class CustomizationBuilder {
 
     private DeserializerBinding deserializerBinding;
 
-    private JsonbCreator creator;
-
     private String[] propertyOrder;
 
     /**
@@ -107,24 +105,6 @@ public abstract class CustomizationBuilder {
      */
     public void setDeserializerBinding(DeserializerBinding deserializerBinding) {
         this.deserializerBinding = deserializerBinding;
-    }
-
-    /**
-     * Gets custom constructor or method for user instantiation.
-     *
-     * @return Custom creator.
-     */
-    public JsonbCreator getCreator() {
-        return creator;
-    }
-
-    /**
-     * Sets custom constructor or method for user instantiation.
-     *
-     * @param creator Creator to set.
-     */
-    public void setCreator(JsonbCreator creator) {
-        this.creator = creator;
     }
 
     /**
