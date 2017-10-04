@@ -15,7 +15,6 @@ package org.eclipse.yasson.internal.serializer;
 
 import org.eclipse.yasson.internal.ReflectionUtils;
 import org.eclipse.yasson.internal.model.JsonBindingModel;
-import org.eclipse.yasson.internal.model.JsonContext;
 
 import javax.json.stream.JsonGenerator;
 import java.lang.reflect.GenericArrayType;
@@ -37,8 +36,7 @@ public abstract class AbstractArraySerializer<T> extends AbstractContainerSerial
     protected AbstractArraySerializer(SerializerBuilder builder) {
         super(builder);
         arrayValType = resolveArrayType();
-        containerModel = new ContainerModel(arrayValType, resolveContainerModelCustomization(arrayValType, builder.getJsonbContext()),
-                JsonContext.JSON_ARRAY);
+        containerModel = new ContainerModel(arrayValType, resolveContainerModelCustomization(arrayValType, builder.getJsonbContext()));
     }
 
     private Type resolveArrayType() {

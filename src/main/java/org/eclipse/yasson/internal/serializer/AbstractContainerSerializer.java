@@ -15,7 +15,6 @@ package org.eclipse.yasson.internal.serializer;
 
 import org.eclipse.yasson.internal.model.ClassModel;
 import org.eclipse.yasson.internal.model.JsonBindingModel;
-import org.eclipse.yasson.internal.model.JsonContext;
 
 import javax.json.bind.serializer.JsonbSerializer;
 import javax.json.bind.serializer.SerializationContext;
@@ -52,11 +51,7 @@ public abstract class AbstractContainerSerializer<T> extends AbstractItem<T> imp
 
     @Override
     public final void serialize(T obj, JsonGenerator generator, SerializationContext ctx) {
-        if (getWrapperModel().getContext() == JsonContext.JSON_OBJECT) {
-            writeStart(getWrapperModel().getWriteName(), generator);
-        } else {
-            writeStart(generator);
-        }
+        writeStart(generator);
         serializeInternal(obj, generator, ctx);
         writeEnd(generator);
     }

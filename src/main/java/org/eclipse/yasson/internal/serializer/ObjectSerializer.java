@@ -23,6 +23,10 @@ import javax.json.bind.serializer.JsonbSerializer;
 import javax.json.bind.serializer.SerializationContext;
 import javax.json.stream.JsonGenerator;
 import java.lang.reflect.Type;
+import java.util.Optional;
+import java.util.OptionalDouble;
+import java.util.OptionalInt;
+import java.util.OptionalLong;
 
 /**
  * Serializes arbitrary object by reading its properties.
@@ -76,12 +80,14 @@ public class ObjectSerializer<T> extends AbstractContainerSerializer<T> {
 
         if (propertyModel.isReadable()) {
             final Object propertyValue = propertyModel.getValue(object);
-            if (propertyValue == null) {
+            if (propertyValue == null || isEmptyOptional(propertyValue)) {
                 if (propertyModel.getCustomization().isNillable()) {
                     generator.writeNull(propertyModel.getWriteName());
                 }
                 return;
             }
+
+            generator.writeKey(propertyModel.getWriteName());
 
             final JsonbSerializer<?> propertyCachedSerializer = propertyModel.getPropertySerializer();
             if (propertyCachedSerializer != null) {
@@ -97,4 +103,18 @@ public class ObjectSerializer<T> extends AbstractContainerSerializer<T> {
             serializerCaptor(serializer, propertyValue, generator, ctx);
         }
     }
+
+    private boolean isEmptyOptional(Object object) {
+        if (object instanceof Optional) {
+            return !((Optional) object).isPresent();
+        } else if (object instanceof OptionalInt) {
+            return !((OptionalInt) object).isPresent();
+        } else if (object instanceof OptionalLong) {
+            return !((OptionalLong) object).isPresent();
+        } else if (object instanceof OptionalDouble) {
+            return !((OptionalDouble) object).isPresent();
+        }
+        return false;
+    }
+
 }

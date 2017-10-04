@@ -15,7 +15,6 @@ package org.eclipse.yasson.internal.serializer;
 
 import org.eclipse.yasson.internal.Marshaller;
 import org.eclipse.yasson.internal.ReflectionUtils;
-import org.eclipse.yasson.internal.model.JsonContext;
 
 import javax.json.bind.serializer.JsonbSerializer;
 import javax.json.bind.serializer.SerializationContext;
@@ -50,9 +49,10 @@ public class MapSerializer<T extends Map> extends AbstractContainerSerializer<T>
                 generator.writeNull(keysString);
                 return;
             }
+            generator.writeKey(keysString);
             final JsonbSerializer<?> serializer = new SerializerBuilder(marshaller.getJsonbContext()).withObjectClass(value.getClass())
                     .withModel(new ContainerModel(mapValueRuntimeType,
-                            resolveContainerModelCustomization(mapValueRuntimeType, marshaller.getJsonbContext()), JsonContext.JSON_OBJECT, keysString)).build();
+                            resolveContainerModelCustomization(mapValueRuntimeType, marshaller.getJsonbContext()))).build();
             serializerCaptor(serializer, value, generator, ctx);
         });
     }

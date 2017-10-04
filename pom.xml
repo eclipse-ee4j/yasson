@@ -115,7 +115,7 @@
 
     <properties>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
-        <javax.json.version>1.1</javax.json.version>
+        <javax.json.version>1.2-SNAPSHOT</javax.json.version>
         <javax.json.bind.version>1.0</javax.json.bind.version>
         <netbeans.hint.jdkPlatform>JDK_9</netbeans.hint.jdkPlatform>
     </properties>

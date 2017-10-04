@@ -74,14 +74,4 @@ public class CreatorModel implements JsonBindingModel {
         return type;
     }
 
-    @Override
-    public String getWriteName() {
-        return name;
-    }
-
-    @Override
-    public JsonContext getContext() {
-        return JsonContext.JSON_OBJECT;
-    }
-
 }

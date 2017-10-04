@@ -16,7 +16,6 @@ package org.eclipse.yasson.internal.serializer;
 import org.eclipse.yasson.internal.JsonbContext;
 import org.eclipse.yasson.internal.Marshaller;
 import org.eclipse.yasson.internal.model.JsonBindingModel;
-import org.eclipse.yasson.internal.model.JsonContext;
 
 import javax.json.bind.serializer.JsonbSerializer;
 import javax.json.bind.serializer.SerializationContext;
@@ -47,9 +46,6 @@ public class UserSerializerSerializer<T> implements JsonbSerializer<T> {
 
     @Override
     public void serialize(T obj, JsonGenerator generator, SerializationContext ctx) {
-        if (model.getContext() == JsonContext.JSON_OBJECT) {
-            generator.writeKey(model.getWriteName());
-        }
         JsonbContext jsonbContext = ((Marshaller) ctx).getJsonbContext();
         try {
             jsonbContext.addProcessedType(model.getType());

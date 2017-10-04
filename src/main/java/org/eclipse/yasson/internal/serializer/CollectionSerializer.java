@@ -17,7 +17,6 @@ import org.eclipse.yasson.internal.JsonbContext;
 import org.eclipse.yasson.internal.Marshaller;
 import org.eclipse.yasson.internal.ReflectionUtils;
 import org.eclipse.yasson.internal.model.JsonBindingModel;
-import org.eclipse.yasson.internal.model.JsonContext;
 
 import javax.json.bind.serializer.JsonbSerializer;
 import javax.json.bind.serializer.SerializationContext;
@@ -43,8 +42,7 @@ public class CollectionSerializer<T extends Collection> extends AbstractContaine
     protected CollectionSerializer(SerializerBuilder builder) {
         super(builder);
         collectionValueType = getValueType();
-        containerModel = new ContainerModel(collectionValueType, resolveContainerModelCustomization(collectionValueType, builder.getJsonbContext()),
-                JsonContext.JSON_ARRAY);
+        containerModel = new ContainerModel(collectionValueType, resolveContainerModelCustomization(collectionValueType, builder.getJsonbContext()));
         valueSerializer = resolveValueSerializer(collectionValueType, builder.getJsonbContext());
     }
 

@@ -20,7 +20,6 @@ import org.eclipse.yasson.internal.properties.MessageKeys;
 import org.eclipse.yasson.internal.properties.Messages;
 import org.eclipse.yasson.internal.model.ClassModel;
 import org.eclipse.yasson.internal.model.JsonBindingModel;
-import org.eclipse.yasson.internal.model.JsonContext;
 import org.eclipse.yasson.internal.model.JsonbPropertyInfo;
 import org.eclipse.yasson.internal.model.customization.Customization;
 
@@ -48,20 +47,6 @@ public class AdaptedObjectSerializer<T, A> implements CurrentItem<T>, JsonbSeria
         public AdaptedObjectSerializerModel(JsonBindingModel wrapperSerializerModel, Type adaptedType) {
             this.wrapperSerializerModel = wrapperSerializerModel;
             this.adaptedType = adaptedType;
-        }
-
-        @Override
-        public String getWriteName() {
-            return wrapperSerializerModel.getWriteName();
-        }
-
-        /**
-         * Array context if root.
-         */
-        @Override
-        public JsonContext getContext() {
-            return wrapperSerializerModel != null ?
-                    wrapperSerializerModel.getContext() : JsonContext.JSON_ARRAY;
         }
 
         /**

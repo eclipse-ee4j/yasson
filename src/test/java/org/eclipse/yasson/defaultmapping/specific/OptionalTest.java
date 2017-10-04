@@ -21,6 +21,7 @@ import org.junit.Assert;
 import org.junit.Test;
 
 import javax.json.bind.Jsonb;
+import javax.json.bind.JsonbBuilder;
 import java.util.*;
 
 import static org.junit.Assert.assertEquals;
@@ -139,6 +140,16 @@ public class OptionalTest {
         for (Optional<Integer> item : result) {
             Assert.assertEquals(Optional.empty(), item);
         }
+    }
+
+    @Test
+    public void testMarshallOptionalMap() {
+        Map<String, OptionalInt> ints = new HashMap<>();
+        ints.put("first", OptionalInt.empty());
+        ints.put("second", OptionalInt.empty());
+        final Jsonb jsonb = JsonbBuilder.create();
+        String result = jsonb.toJson(ints);
+        Assert.assertEquals("{\"first\":null,\"second\":null}", result);
     }
 
 

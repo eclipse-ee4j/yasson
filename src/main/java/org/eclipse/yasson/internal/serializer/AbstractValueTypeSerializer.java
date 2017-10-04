@@ -15,7 +15,6 @@ package org.eclipse.yasson.internal.serializer;
 
 import org.eclipse.yasson.internal.Marshaller;
 import org.eclipse.yasson.internal.model.JsonBindingModel;
-import org.eclipse.yasson.internal.model.JsonContext;
 
 import javax.json.bind.serializer.JsonbSerializer;
 import javax.json.bind.serializer.SerializationContext;
@@ -49,11 +48,7 @@ public abstract class AbstractValueTypeSerializer<T> implements JsonbSerializer<
     @Override
     public void serialize(T obj, JsonGenerator generator, SerializationContext ctx) {
         Marshaller marshaller = (Marshaller) ctx;
-        if (model.getContext() == JsonContext.JSON_OBJECT) {
-            serialize(obj, generator, model.getWriteName(), marshaller);
-        } else {
-            serialize(obj, generator, marshaller);
-        }
+        serialize(obj, generator, marshaller);
     }
 
     protected abstract void serialize(T obj, JsonGenerator generator, String key, Marshaller marshaller);

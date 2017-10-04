@@ -19,7 +19,6 @@ import org.eclipse.yasson.internal.serializer.ContainerSerializerProvider;
 import org.eclipse.yasson.internal.serializer.SerializerBuilder;
 import org.eclipse.yasson.internal.serializer.ContainerModel;
 import org.eclipse.yasson.internal.model.JsonBindingModel;
-import org.eclipse.yasson.internal.model.JsonContext;
 import org.eclipse.yasson.internal.model.JsonbPropertyInfo;
 
 import javax.json.bind.JsonbException;
@@ -72,7 +71,7 @@ public class Marshaller extends ProcessingContext implements SerializationContex
      */
     public void marshall(Object object, JsonGenerator jsonGenerator) {
         try {
-            final ContainerModel model = new ContainerModel(runtimeType != null ? runtimeType : object.getClass(), null, JsonContext.ROOT, null);
+            final ContainerModel model = new ContainerModel(runtimeType != null ? runtimeType : object.getClass(), null);
             serializeRoot(object, jsonGenerator, model);
         } catch (JsonbException e) {
             logger.severe(e.getMessage());
@@ -90,14 +89,15 @@ public class Marshaller extends ProcessingContext implements SerializationContex
     public <T> void serialize(String key, T object, JsonGenerator generator) {
         Objects.requireNonNull(key);
         Objects.requireNonNull(object);
-        final ContainerModel model = new ContainerModel(object.getClass(), null, JsonContext.JSON_OBJECT, key);
+        final ContainerModel model = new ContainerModel(object.getClass(), null);
+        generator.writeKey(key);
         serializeRoot(object, generator, model);
     }
 
     @Override
     public <T> void serialize(T object, JsonGenerator generator) {
         Objects.requireNonNull(object);
-        final ContainerModel model = new ContainerModel(object.getClass(), null, JsonContext.JSON_ARRAY, null);
+        final ContainerModel model = new ContainerModel(object.getClass(), null);
         serializeRoot(object, generator, model);
     }
 

@@ -16,7 +16,6 @@ package org.eclipse.yasson.internal.serializer;
 import org.eclipse.yasson.internal.JsonbContext;
 import org.eclipse.yasson.internal.Marshaller;
 import org.eclipse.yasson.internal.model.JsonBindingModel;
-import org.eclipse.yasson.internal.model.JsonContext;
 
 import javax.json.bind.annotation.JsonbDateFormat;
 import javax.json.bind.serializer.SerializationContext;
@@ -50,11 +49,7 @@ public abstract class AbstractDateTimeSerializer<T> extends AbstractValueTypeSer
     public void serialize(T obj, JsonGenerator generator, SerializationContext ctx) {
         final JsonbContext jsonbContext = ((Marshaller) ctx).getJsonbContext();
         final JsonbDateFormatter formatter = getJsonbDateFormatter(jsonbContext);
-        if (model.getContext() == JsonContext.JSON_OBJECT) {
-            generator.write(model.getWriteName(), toJson(obj, formatter, jsonbContext));
-        } else {
-            generator.write(toJson(obj, formatter, jsonbContext));
-        }
+        generator.write(toJson(obj, formatter, jsonbContext));
     }
 
     /**

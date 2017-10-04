@@ -348,11 +348,6 @@ public class PropertyModel implements JsonBindingModel, Comparable<PropertyModel
         return Objects.hash(propertyName);
     }
 
-    @Override
-    public JsonContext getContext() {
-        return JsonContext.JSON_OBJECT;
-    }
-
     /**
      * Gets a name of JSON document property to read this property from.
      *
@@ -362,7 +357,6 @@ public class PropertyModel implements JsonBindingModel, Comparable<PropertyModel
         return readName;
     }
 
-    @Override
     public String getWriteName() {
         return writeName;
     }

@@ -14,7 +14,6 @@
 package org.eclipse.yasson.internal.serializer;
 
 import org.eclipse.yasson.internal.model.JsonBindingModel;
-import org.eclipse.yasson.internal.model.JsonContext;
 import org.eclipse.yasson.internal.model.customization.Customization;
 
 import java.lang.reflect.Type;
@@ -29,10 +28,6 @@ import java.lang.reflect.Type;
  */
 public class ContainerModel implements JsonBindingModel {
 
-    private final JsonContext context;
-
-    private final String writeName;
-
     private final Type valueRuntimeType;
 
     private final Customization customization;
@@ -42,41 +37,10 @@ public class ContainerModel implements JsonBindingModel {
      *
      * @param valueRuntimeType collection or map value type
      * @param customization customization parsed from value type
-     * @param context Object context used for serialization
-     * @param writeName write name used for serialization
-     */
-    public ContainerModel(Type valueRuntimeType, Customization customization, JsonContext context, String writeName) {
-        this.valueRuntimeType = valueRuntimeType;
-        this.customization = customization;
-        this.context = context;
-        this.writeName = writeName;
-    }
-
-    /**
-     * Construct model.
-     *
-     * @param valueRuntimeType collection or map value type
-     * @param customization customization parsed from value type
-     * @param context Object context used for serialization
-     */
-    public ContainerModel(Type valueRuntimeType, Customization customization, JsonContext context) {
-        this.valueRuntimeType = valueRuntimeType;
-        this.customization = customization;
-        this.context = context;
-        this.writeName = null;
-    }
-
-    /**
-     * Minimal constructor.
-     *
-     * @param valueRuntimeType collection or map value type
-     * @param customization customization parsed from value type
      */
     public ContainerModel(Type valueRuntimeType, Customization customization) {
         this.valueRuntimeType = valueRuntimeType;
         this.customization = customization;
-        this.context = null;
-        this.writeName = null;
     }
 
     /**
@@ -97,26 +61,6 @@ public class ContainerModel implements JsonBindingModel {
     @Override
     public Type getType() {
         return valueRuntimeType;
-    }
-
-    /**
-     * Returns a name of JSON key that will be written by marshaller.
-     *
-     * @return name of JSON key
-     */
-    @Override
-    public String getWriteName() {
-        return writeName;
-    }
-
-    /**
-     * Current context of json generator.
-     *
-     * @return context
-     */
-    @Override
-    public JsonContext getContext() {
-        return context;
     }
 
 }

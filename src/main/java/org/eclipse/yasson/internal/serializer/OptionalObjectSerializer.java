@@ -17,7 +17,6 @@ import org.eclipse.yasson.internal.JsonbContext;
 import org.eclipse.yasson.internal.ProcessingContext;
 import org.eclipse.yasson.internal.model.ClassModel;
 import org.eclipse.yasson.internal.model.JsonBindingModel;
-import org.eclipse.yasson.internal.model.JsonContext;
 
 import javax.json.bind.serializer.JsonbSerializer;
 import javax.json.bind.serializer.SerializationContext;
@@ -84,11 +83,7 @@ public class OptionalObjectSerializer<T extends Optional<?>> implements CurrentI
             if (!wrapperModel.getCustomization().isNillable()) {
                 return;
             }
-            if (wrapperModel.getContext() == JsonContext.JSON_OBJECT) {
-                generator.writeNull(wrapperModel.getWriteName());
-            } else {
-                generator.writeNull();
-            }
+            generator.writeNull();
             return;
         }
         Object optionalValue = obj.get();
