@@ -36,11 +36,6 @@ public class ZoneOffsetTypeSerializer extends AbstractValueTypeSerializer<ZoneOf
     }
 
     @Override
-    protected void serialize(ZoneOffset obj, JsonGenerator generator, String key, Marshaller marshaller) {
-        generator.write(key, obj.getId());
-    }
-
-    @Override
     protected void serialize(ZoneOffset obj, JsonGenerator generator, Marshaller marshaller) {
         generator.write(obj.getId());
     }

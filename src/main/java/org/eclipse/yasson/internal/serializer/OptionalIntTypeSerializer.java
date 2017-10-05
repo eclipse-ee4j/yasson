@@ -36,15 +36,6 @@ public class OptionalIntTypeSerializer extends AbstractValueTypeSerializer<Optio
     }
 
     @Override
-    protected void serialize(OptionalInt obj, JsonGenerator generator, String key, Marshaller marshaller) {
-        if (obj.isPresent()) {
-            generator.write(key, obj.getAsInt());
-        } else if (model.getCustomization().isNillable()) {
-            generator.writeNull(key);
-        }
-    }
-
-    @Override
     protected void serialize(OptionalInt obj, JsonGenerator generator, Marshaller marshaller) {
         if (obj.isPresent()) {
             generator.write(obj.getAsInt());

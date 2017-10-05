@@ -36,11 +36,6 @@ public class DurationTypeSerializer extends AbstractValueTypeSerializer<Duration
     }
 
     @Override
-    protected void serialize(Duration obj, JsonGenerator generator, String key, Marshaller marshaller) {
-        generator.write(key, obj.toString());
-    }
-
-    @Override
     protected void serialize(Duration obj, JsonGenerator generator, Marshaller marshaller) {
         generator.write(obj.toString());
     }

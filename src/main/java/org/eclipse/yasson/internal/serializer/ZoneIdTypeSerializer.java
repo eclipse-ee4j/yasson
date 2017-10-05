@@ -36,11 +36,6 @@ public class ZoneIdTypeSerializer extends AbstractValueTypeSerializer<ZoneId> {
     }
 
     @Override
-    protected void serialize(ZoneId obj, JsonGenerator generator, String key, Marshaller marshaller) {
-        generator.write(key, obj.getId());
-    }
-
-    @Override
     protected void serialize(ZoneId obj, JsonGenerator generator, Marshaller marshaller) {
         generator.write(obj.getId());
     }

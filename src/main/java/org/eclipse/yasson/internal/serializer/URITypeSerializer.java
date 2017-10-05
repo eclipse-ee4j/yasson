@@ -37,11 +37,6 @@ public class URITypeSerializer extends AbstractValueTypeSerializer<URI> {
     }
 
     @Override
-    protected void serialize(URI obj, JsonGenerator generator, String key, Marshaller marshaller) {
-        generator.write(key, obj.toString());
-    }
-
-    @Override
     protected void serialize(URI obj, JsonGenerator generator, Marshaller marshaller) {
         generator.write(obj.toString());
     }

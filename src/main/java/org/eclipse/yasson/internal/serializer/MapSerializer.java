@@ -32,11 +32,24 @@ public class MapSerializer<T extends Map> extends AbstractContainerSerializer<T>
 
     private Type mapValueRuntimeType;
 
+    private final JsonbSerializer<?> valueSerializer;
+
     protected MapSerializer(SerializerBuilder builder) {
         super(builder);
         mapValueRuntimeType = getRuntimeType() instanceof ParameterizedType ?
                 ReflectionUtils.resolveType(this, ((ParameterizedType) getRuntimeType()).getActualTypeArguments()[1])
                 : Object.class;
+
+        //Lets try to cache value serializer, runtime type must be unambiguous
+        Class<?> valueClass = ReflectionUtils.getRawType(mapValueRuntimeType);
+        if (valueClass == Object.class) {
+            valueSerializer = null;
+            return;
+        }
+
+        valueSerializer = new SerializerBuilder(builder.getJsonbContext()).withObjectClass(valueClass)
+                .withModel(new ContainerModel(mapValueRuntimeType,
+                        resolveContainerModelCustomization(mapValueRuntimeType, builder.getJsonbContext()))).build();
     }
 
     @Override
@@ -50,9 +63,12 @@ public class MapSerializer<T extends Map> extends AbstractContainerSerializer<T>
                 return;
             }
             generator.writeKey(keysString);
-            final JsonbSerializer<?> serializer = new SerializerBuilder(marshaller.getJsonbContext()).withObjectClass(value.getClass())
-                    .withModel(new ContainerModel(mapValueRuntimeType,
-                            resolveContainerModelCustomization(mapValueRuntimeType, marshaller.getJsonbContext()))).build();
+            JsonbSerializer<?> serializer = valueSerializer;
+            if (serializer == null) {
+                serializer = new SerializerBuilder(marshaller.getJsonbContext()).withObjectClass(value.getClass())
+                        .withModel(new ContainerModel(mapValueRuntimeType,
+                                resolveContainerModelCustomization(mapValueRuntimeType, marshaller.getJsonbContext()))).build();
+            }
             serializerCaptor(serializer, value, generator, ctx);
         });
     }

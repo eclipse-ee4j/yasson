@@ -30,6 +30,8 @@ import java.util.function.Consumer;
  */
 public abstract class AbstractNumberSerializer<T extends Number> extends AbstractValueTypeSerializer<T> {
 
+    private final JsonbNumberFormatter formatter;
+
     /**
      * Creates an instance.
      *
@@ -37,13 +39,8 @@ public abstract class AbstractNumberSerializer<T extends Number> extends Abstrac
      */
     public AbstractNumberSerializer(JsonBindingModel model) {
         super(model);
-    }
-
-    @Override
-    protected final void serialize(T obj, JsonGenerator generator, String key, Marshaller marshaller) {
-        if (!serializeFormatted(obj, formatted -> generator.write(key, formatted), marshaller.getJsonbContext())) {
-            serializeNonFormatted(obj, generator, key);
-        }
+        formatter = model.getCustomization() != null ?
+                model.getCustomization().getSerializeNumberFormatter() : null;
     }
 
     /**
@@ -57,7 +54,11 @@ public abstract class AbstractNumberSerializer<T extends Number> extends Abstrac
 
     @Override
     protected void serialize(T obj, JsonGenerator generator, Marshaller marshaller) {
-        if (!serializeFormatted(obj, generator::write, marshaller.getJsonbContext())) {
+        if (formatter != null) {
+            final NumberFormat format = NumberFormat.getInstance(marshaller.getJsonbContext().getConfigProperties().getLocale(formatter.getLocale()));
+            ((DecimalFormat)format).applyPattern(formatter.getFormat());
+            generator.write(format.format(obj));
+        } else {
             serializeNonFormatted(obj, generator);
         }
     }
@@ -70,16 +71,4 @@ public abstract class AbstractNumberSerializer<T extends Number> extends Abstrac
      */
     protected abstract void serializeNonFormatted(T obj, JsonGenerator generator);
 
-    private boolean serializeFormatted(T obj, Consumer<String> formattedConsumer, JsonbContext jsonbContext) {
-        final Customization customization = model.getCustomization();
-        if (customization != null && customization.getSerializeNumberFormatter() != null) {
-            final JsonbNumberFormatter numberFormat = customization.getSerializeNumberFormatter();
-            //consider synchronizing on format instance or per thread cache.
-            final NumberFormat format = NumberFormat.getInstance(jsonbContext.getConfigProperties().getLocale(numberFormat.getLocale()));
-            ((DecimalFormat)format).applyPattern(numberFormat.getFormat());
-            formattedConsumer.accept(format.format(obj));
-            return true;
-        }
-        return false;
-    }
 }

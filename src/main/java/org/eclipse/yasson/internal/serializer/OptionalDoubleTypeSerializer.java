@@ -36,15 +36,6 @@ public class OptionalDoubleTypeSerializer extends AbstractValueTypeSerializer<Op
     }
 
     @Override
-    protected void serialize(OptionalDouble obj, JsonGenerator generator, String key, Marshaller marshaller) {
-        if (obj.isPresent()) {
-            generator.write(key, obj.getAsDouble());
-        } else if (model.getCustomization().isNillable()) {
-            generator.writeNull(key);
-        }
-    }
-
-    @Override
     protected void serialize(OptionalDouble obj, JsonGenerator generator, Marshaller marshaller) {
         if (obj.isPresent()) {
             generator.write(obj.getAsDouble());

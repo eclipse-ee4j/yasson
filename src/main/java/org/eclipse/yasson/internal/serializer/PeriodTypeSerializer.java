@@ -36,11 +36,6 @@ public class PeriodTypeSerializer extends AbstractValueTypeSerializer<Period> {
     }
 
     @Override
-    protected void serialize(Period obj, JsonGenerator generator, String key, Marshaller marshaller) {
-        generator.write(key, obj.toString());
-    }
-
-    @Override
     protected void serialize(Period obj, JsonGenerator generator, Marshaller marshaller) {
         generator.write(obj.toString());
     }

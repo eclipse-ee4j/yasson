@@ -36,11 +36,6 @@ public class TimeZoneTypeSerializer extends AbstractValueTypeSerializer<TimeZone
     }
 
     @Override
-    protected void serialize(TimeZone obj, JsonGenerator generator, String key, Marshaller marshaller) {
-        generator.write(key, obj.getID());
-    }
-
-    @Override
     protected void serialize(TimeZone obj, JsonGenerator generator, Marshaller marshaller) {
         generator.write(obj.getID());
     }

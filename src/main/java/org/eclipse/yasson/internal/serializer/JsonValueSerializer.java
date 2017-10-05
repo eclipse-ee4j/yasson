@@ -36,11 +36,6 @@ public class JsonValueSerializer extends AbstractValueTypeSerializer<JsonValue> 
     }
 
     @Override
-    protected void serialize(JsonValue obj, JsonGenerator generator, String key, Marshaller marshaller) {
-        generator.write(key, obj);
-    }
-
-    @Override
     protected void serialize(JsonValue obj, JsonGenerator generator, Marshaller marshaller) {
         generator.write(obj);
     }

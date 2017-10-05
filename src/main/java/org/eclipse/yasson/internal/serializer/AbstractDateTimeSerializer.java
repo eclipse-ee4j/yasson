@@ -146,11 +146,6 @@ public abstract class AbstractDateTimeSerializer<T> extends AbstractValueTypeSer
     }
 
     @Override
-    protected void serialize(T obj, JsonGenerator generator, String key, Marshaller marshaller) {
-        throw new UnsupportedOperationException("Not supported in DateTimeSerializer");
-    }
-
-    @Override
     protected void serialize(T obj, JsonGenerator generator, Marshaller marshaller) {
         throw new UnsupportedOperationException("Not supported in DateTimeSerializer");
     }

@@ -35,11 +35,6 @@ public class CharacterTypeSerializer extends AbstractValueTypeSerializer<Charact
     }
 
     @Override
-    protected void serialize(Character obj, JsonGenerator generator, String key, Marshaller marshaller) {
-        generator.write(key, String.valueOf(obj));
-    }
-
-    @Override
     protected void serialize(Character obj, JsonGenerator generator, Marshaller marshaller) {
         generator.write(String.valueOf(obj));
     }

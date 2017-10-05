@@ -36,15 +36,6 @@ public class OptionalLongTypeSerializer extends AbstractValueTypeSerializer<Opti
     }
 
     @Override
-    protected void serialize(OptionalLong obj, JsonGenerator generator, String key, Marshaller marshaller) {
-        if (obj.isPresent()) {
-            generator.write(key, obj.getAsLong());
-        } else if (model.getCustomization().isNillable()) {
-            generator.writeNull(key);
-        }
-    }
-
-    @Override
     protected void serialize(OptionalLong obj, JsonGenerator generator, Marshaller marshaller) {
         if (obj.isPresent()) {
             generator.write(obj.getAsLong());

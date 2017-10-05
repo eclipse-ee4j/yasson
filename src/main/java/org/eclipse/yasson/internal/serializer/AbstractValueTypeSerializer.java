@@ -51,7 +51,5 @@ public abstract class AbstractValueTypeSerializer<T> implements JsonbSerializer<
         serialize(obj, generator, marshaller);
     }
 
-    protected abstract void serialize(T obj, JsonGenerator generator, String key, Marshaller marshaller);
-
     protected abstract void serialize(T obj, JsonGenerator generator, Marshaller marshaller);
 }

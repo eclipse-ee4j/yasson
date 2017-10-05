@@ -55,11 +55,6 @@ public class StringTypeSerializer extends AbstractValueTypeSerializer<String> {
     }
 
     @Override
-    protected void serialize(String obj, JsonGenerator generator, String key, Marshaller marshaller) {
-        generator.write(key, toJson(obj, marshaller.getJsonbContext()));
-    }
-
-    @Override
     protected void serialize(String obj, JsonGenerator generator, Marshaller marshaller) {
         generator.write(toJson(obj, marshaller.getJsonbContext()));
     }
