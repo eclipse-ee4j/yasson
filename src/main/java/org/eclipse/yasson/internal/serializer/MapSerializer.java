@@ -15,6 +15,7 @@ package org.eclipse.yasson.internal.serializer;
 
 import org.eclipse.yasson.internal.Marshaller;
 import org.eclipse.yasson.internal.ReflectionUtils;
+import org.eclipse.yasson.internal.model.JsonBindingModel;
 
 import javax.json.bind.serializer.JsonbSerializer;
 import javax.json.bind.serializer.SerializationContext;
@@ -28,49 +29,32 @@ import java.util.Map;
  * 
  * @author Roman Grigoriadi
  */
-public class MapSerializer<T extends Map> extends AbstractContainerSerializer<T> implements EmbeddedItem {
+public class MapSerializer<T extends Map<?,?>> extends AbstractContainerSerializer<T> implements EmbeddedItem {
 
-    private Type mapValueRuntimeType;
-
-    private final JsonbSerializer<?> valueSerializer;
+    private final JsonBindingModel containerModel;
 
     protected MapSerializer(SerializerBuilder builder) {
         super(builder);
-        mapValueRuntimeType = getRuntimeType() instanceof ParameterizedType ?
+        Type mapValueRuntimeType = getRuntimeType() instanceof ParameterizedType ?
                 ReflectionUtils.resolveType(this, ((ParameterizedType) getRuntimeType()).getActualTypeArguments()[1])
                 : Object.class;
 
-        //Lets try to cache value serializer, runtime type must be unambiguous
-        Class<?> valueClass = ReflectionUtils.getRawType(mapValueRuntimeType);
-        if (valueClass == Object.class) {
-            valueSerializer = null;
-            return;
-        }
-
-        valueSerializer = new SerializerBuilder(builder.getJsonbContext()).withObjectClass(valueClass)
-                .withModel(new ContainerModel(mapValueRuntimeType,
-                        resolveContainerModelCustomization(mapValueRuntimeType, builder.getJsonbContext()))).build();
+        containerModel = new ContainerModel(mapValueRuntimeType,
+                resolveContainerModelCustomization(mapValueRuntimeType, builder.getJsonbContext()));
     }
 
     @Override
     protected void serializeInternal(T obj, JsonGenerator generator, SerializationContext ctx) {
-        final Marshaller marshaller = (Marshaller) ctx;
-        obj.keySet().forEach((key) -> {
-            final String keysString = String.valueOf(key);
-            final Object value = obj.get(key);
+        for (Map.Entry<?,?> entry : obj.entrySet()) {
+            final String keysString = String.valueOf(entry.getKey());
+            final Object value = entry.getValue();
             if (value == null) {
                 generator.writeNull(keysString);
                 return;
             }
             generator.writeKey(keysString);
-            JsonbSerializer<?> serializer = valueSerializer;
-            if (serializer == null) {
-                serializer = new SerializerBuilder(marshaller.getJsonbContext()).withObjectClass(value.getClass())
-                        .withModel(new ContainerModel(mapValueRuntimeType,
-                                resolveContainerModelCustomization(mapValueRuntimeType, marshaller.getJsonbContext()))).build();
-            }
-            serializerCaptor(serializer, value, generator, ctx);
-        });
+            serializeItem(value, generator, ctx, containerModel);
+        }
     }
 
     @Override

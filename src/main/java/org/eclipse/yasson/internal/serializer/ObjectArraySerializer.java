@@ -13,9 +13,6 @@
 
 package org.eclipse.yasson.internal.serializer;
 
-import org.eclipse.yasson.internal.Marshaller;
-
-import javax.json.bind.serializer.JsonbSerializer;
 import javax.json.bind.serializer.SerializationContext;
 import javax.json.stream.JsonGenerator;
 
@@ -33,17 +30,7 @@ public class ObjectArraySerializer<T> extends AbstractArraySerializer<T[]> {
     @Override
     protected void serializeInternal(T[] arr, JsonGenerator generator, SerializationContext ctx) {
         for (T obj : arr) {
-            if (obj == null) {
-                generator.writeNull();
-                continue;
-            }
-            final JsonbSerializer<?> serializer = new SerializerBuilder(((Marshaller) ctx)
-                    .getJsonbContext())
-                    .withObjectClass(obj.getClass())
-                    .withWrapper(this)
-                    .withModel(containerModel)
-                    .build();
-            serializerCaptor(serializer, obj, generator, ctx);
+            serializeItem(obj, generator, ctx, containerModel);
         }
     }
 }

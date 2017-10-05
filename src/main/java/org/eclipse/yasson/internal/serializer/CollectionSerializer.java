@@ -13,18 +13,14 @@
 
 package org.eclipse.yasson.internal.serializer;
 
-import org.eclipse.yasson.internal.JsonbContext;
-import org.eclipse.yasson.internal.Marshaller;
 import org.eclipse.yasson.internal.ReflectionUtils;
 import org.eclipse.yasson.internal.model.JsonBindingModel;
 
-import javax.json.bind.serializer.JsonbSerializer;
 import javax.json.bind.serializer.SerializationContext;
 import javax.json.stream.JsonGenerator;
 import java.lang.reflect.ParameterizedType;
 import java.lang.reflect.Type;
 import java.util.Collection;
-import java.util.Optional;
 
 /**
  * Serializer for collections.
@@ -35,26 +31,10 @@ public class CollectionSerializer<T extends Collection> extends AbstractContaine
 
     private final JsonBindingModel containerModel;
 
-    private final Type collectionValueType;
-
-    private final JsonbSerializer valueSerializer;
-
     protected CollectionSerializer(SerializerBuilder builder) {
         super(builder);
-        collectionValueType = getValueType();
+        Type collectionValueType = getValueType();
         containerModel = new ContainerModel(collectionValueType, resolveContainerModelCustomization(collectionValueType, builder.getJsonbContext()));
-        valueSerializer = resolveValueSerializer(collectionValueType, builder.getJsonbContext());
-    }
-
-    private JsonbSerializer resolveValueSerializer(Type collectionValueType, JsonbContext jsonbContext) {
-        if (collectionValueType == Object.class) {
-            return null;
-        }
-        final Optional<Class<?>> optionalRawType = ReflectionUtils.getOptionalRawType(collectionValueType);
-        if (!optionalRawType.isPresent()) {
-            return null;
-        }
-        return new SerializerBuilder(jsonbContext).withType(collectionValueType).withObjectClass(optionalRawType.get()).withWrapper(this).withModel(containerModel).build();
     }
 
     private Type getValueType() {
@@ -66,16 +46,7 @@ public class CollectionSerializer<T extends Collection> extends AbstractContaine
     @Override
     protected void serializeInternal(T collection, JsonGenerator generator, SerializationContext ctx) {
         for (Object item : collection) {
-            if (item == null) {
-                generator.writeNull();
-                continue;
-            }
-            if (valueSerializer != null) {
-                serializerCaptor(valueSerializer, item, generator, ctx);
-            } else {
-                final JsonbSerializer<?> serializer = new SerializerBuilder(((Marshaller)ctx).getJsonbContext()).withObjectClass(item.getClass()).withWrapper(this).withModel(containerModel).build();
-                serializerCaptor(serializer, item, generator, ctx);
-            }
+            serializeItem(item, generator, ctx, containerModel);
         }
     }
 

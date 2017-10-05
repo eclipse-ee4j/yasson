@@ -62,6 +62,16 @@ public class CollectionsTest {
     }
 
     @Test
+    public void testListOfNumbers() {
+        List<Number> numberList = new ArrayList<>();
+        numberList.add(1L);
+        numberList.add(2f);
+        numberList.add(10);
+
+        String result = jsonb.toJson(numberList, new TestTypeToken<List<Number>>(){}.getType());
+    }
+
+    @Test
     public void testListOfListsOfStrings() {
 
         List<List<String>> listOfListsOfStrings = new ArrayList<>();
