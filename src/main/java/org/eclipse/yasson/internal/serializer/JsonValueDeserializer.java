@@ -13,11 +13,14 @@
 
 package org.eclipse.yasson.internal.serializer;
 
+import org.eclipse.yasson.internal.JsonbRiParser;
 import org.eclipse.yasson.internal.Unmarshaller;
 import org.eclipse.yasson.internal.properties.MessageKeys;
 import org.eclipse.yasson.internal.properties.Messages;
 import org.eclipse.yasson.internal.model.JsonBindingModel;
 
+import javax.json.Json;
+import javax.json.JsonObject;
 import javax.json.JsonValue;
 import javax.json.bind.JsonbException;
 import javax.json.bind.serializer.DeserializationContext;
@@ -25,7 +28,7 @@ import javax.json.stream.JsonParser;
 import java.lang.reflect.Type;
 
 /**
- * Deserializer for {@link JsonValue} containing null, false and true.
+ * Deserializer for {@link JsonValue} containing null, false, true, string and number.
  * 
  * @author Roman Grigoriadi
  */
@@ -42,7 +45,7 @@ public class JsonValueDeserializer extends AbstractValueTypeDeserializer<JsonVal
 
     @Override
     public JsonValue deserialize(JsonParser parser, DeserializationContext ctx, Type rtType) {
-        final JsonParser.Event next = parser.next();
+        final JsonParser.Event next = ((JsonbRiParser)parser).getLastEvent();
         switch (next) {
             case VALUE_TRUE:
                 return JsonValue.TRUE;
@@ -50,6 +53,9 @@ public class JsonValueDeserializer extends AbstractValueTypeDeserializer<JsonVal
                 return JsonValue.FALSE;
             case VALUE_NULL:
                 return JsonValue.NULL;
+            case VALUE_STRING:
+            case VALUE_NUMBER:
+                return parser.getValue();
             default:
                 throw new JsonbException(Messages.getMessage(MessageKeys.INTERNAL_ERROR, "Unknown JSON value: "+next));
         }

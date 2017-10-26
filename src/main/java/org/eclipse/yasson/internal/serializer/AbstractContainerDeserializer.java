@@ -29,7 +29,8 @@ import java.util.OptionalInt;
 import java.util.OptionalLong;
 
 /**
- * Base class for all deserializers.
+ * Base class for all deserializers producing non single value result.
+ * Deserialize bean objects, collections, maps, arrays, etc.
  *
  * @author Roman Grigoriadi
  */

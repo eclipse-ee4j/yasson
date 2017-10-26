@@ -61,6 +61,7 @@ public class UserDeserializerDeserializer<T> extends AbstractContainerDeserializ
     @Override
     public void deserializeInternal(JsonbParser parser, Unmarshaller context) {
         parserContext = moveToFirst(parser);
+        JsonParser.Event lastEvent = parserContext.getLastEvent();
         final UserDeserializerParser userDeserializerParser = new UserDeserializerParser(parser);
         try {
             context.getJsonbContext().addProcessedType(deserializerBinding.getBindingType());
@@ -68,7 +69,10 @@ public class UserDeserializerDeserializer<T> extends AbstractContainerDeserializ
         } finally {
             context.getJsonbContext().removeProcessedType(deserializerBinding.getBindingType());
         }
-        userDeserializerParser.advanceParserToEnd();
+        //Avoid moving parser to the end of the object, if deserializer was for one value only.
+        if (lastEvent == JsonParser.Event.START_ARRAY || lastEvent == JsonParser.Event.START_OBJECT) {
+            userDeserializerParser.advanceParserToEnd();
+        }
     }
 
     @Override

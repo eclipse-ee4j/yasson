@@ -194,4 +194,50 @@ public class JsonpTest {
         assertEquals("Test String", ((JsonObject) jsonValueWrapper.jsonValue).getString("stringInstance"));
     }
 
+    @Test
+    public void testJsonValueString() {
+        JsonValueWrapper pojo = new JsonValueWrapper(Json.createValue("abc"));
+        String json = jsonb.toJson(pojo);
+        Assert.assertEquals("{\"jsonValue\":\"abc\"}", json);
+
+        JsonValueWrapper result = jsonb.fromJson("{\"jsonValue\":\"def\"}", JsonValueWrapper.class);
+        Assert.assertTrue(result.jsonValue instanceof  JsonString);
+        Assert.assertEquals("def", ((JsonString)result.jsonValue).getString());
+    }
+
+    @Test
+    public void testJsonValueAsObject() {
+        JsonObject build = Json.createObjectBuilder().add("prop1", "val1")
+                .add("prop2", "val2")
+                .add("innerObj1", Json.createObjectBuilder().add("inner1", "innerVal1").build())
+                .build();
+        JsonValueWrapper pojo = new JsonValueWrapper(build);
+        String expected = "{\"jsonValue\":{\"prop1\":\"val1\",\"prop2\":\"val2\",\"innerObj1\":{\"inner1\":\"innerVal1\"}}}";
+        String json = jsonb.toJson(pojo);
+        Assert.assertEquals(expected, json);
+
+        JsonValueWrapper result = jsonb.fromJson(expected, JsonValueWrapper.class);
+        Assert.assertTrue(result.jsonValue instanceof JsonObject);
+        JsonObject jsonObject = (JsonObject) result.jsonValue;
+        Assert.assertEquals("val1", jsonObject.getString("prop1"));
+        Assert.assertEquals("innerVal1", jsonObject.getJsonObject("innerObj1").getString("inner1"));
+    }
+
+    @Test
+    public void testJsonValueAsArray() {
+        JsonArray jsonArray = Json.createArrayBuilder().add(1).add(2).add(3).add(Json.createObjectBuilder().add("a","b").build()).build();
+        JsonValueWrapper pojo = new JsonValueWrapper(jsonArray);
+        String expected = "{\"jsonValue\":[1,2,3,{\"a\":\"b\"}]}";
+        String json = jsonb.toJson(pojo);
+        Assert.assertEquals(expected, json);
+
+        JsonValueWrapper result = jsonb.fromJson(expected, JsonValueWrapper.class);
+        Assert.assertTrue(result.jsonValue instanceof JsonArray);
+        JsonArray resultArray = (JsonArray) result.jsonValue;
+        Assert.assertEquals(1, resultArray.getInt(0));
+        Assert.assertEquals(2, resultArray.getInt(1));
+        Assert.assertEquals(3, resultArray.getInt(2));
+        Assert.assertEquals("b", resultArray.getJsonObject(3).getString("a"));
+
+    }
 }

@@ -36,7 +36,7 @@ import java.lang.reflect.Type;
  */
 public class AdaptedObjectDeserializer<A, T> implements CurrentItem<T>, JsonbDeserializer<T> {
 
-    private JsonbDeserializer<A> adaptedItem;
+    private JsonbDeserializer<A> adaptedTypeDeserializer;
 
     private final AdapterBinding adapterInfo;
 
@@ -65,24 +65,24 @@ public class AdaptedObjectDeserializer<A, T> implements CurrentItem<T>, JsonbDes
 
     @Override
     public JsonBindingModel getWrapperModel() {
-        return ((AbstractContainerDeserializer) adaptedItem).getWrapperModel();
+        return ((AbstractContainerDeserializer) adaptedTypeDeserializer).getWrapperModel();
     }
 
     @Override
     public Type getRuntimeType() {
-        if (adaptedItem instanceof AbstractContainerDeserializer) {
-            return ((AbstractContainerDeserializer) adaptedItem).getRuntimeType();
+        if (adaptedTypeDeserializer instanceof AbstractContainerDeserializer) {
+            return ((AbstractContainerDeserializer) adaptedTypeDeserializer).getRuntimeType();
         }
-        throw new JsonbException(Messages.getMessage(MessageKeys.INTERNAL_ERROR, "Deserialization propagation is not allowed for:" + adaptedItem));
+        throw new JsonbException(Messages.getMessage(MessageKeys.INTERNAL_ERROR, "Deserialization propagation is not allowed for:" + adaptedTypeDeserializer));
     }
 
     /**
      * Sets adapted item.
      *
-     * @param adaptedItem Adapted item to set.
+     * @param adaptedTypeDeserializer Adapted item to set.
      */
-    public void setAdaptedItem(JsonbDeserializer<A> adaptedItem) {
-        this.adaptedItem = adaptedItem;
+    public void setAdaptedTypeDeserializer(JsonbDeserializer<A> adaptedTypeDeserializer) {
+        this.adaptedTypeDeserializer = adaptedTypeDeserializer;
     }
 
     @Override
@@ -91,7 +91,7 @@ public class AdaptedObjectDeserializer<A, T> implements CurrentItem<T>, JsonbDes
         unmarshaller.setCurrent(this);
         try {
             unmarshaller.getJsonbContext().addProcessedType(adapterInfo.getBindingType());
-            final A result =  adaptedItem.deserialize(parser, context, rtType);
+            final A result =  adaptedTypeDeserializer.deserialize(parser, context, rtType);
             final T adapted = ((JsonbAdapter<T, A>) adapterInfo.getAdapter()).adaptFromJson(result);
             unmarshaller.setCurrent(wrapperItem);
             return adapted;

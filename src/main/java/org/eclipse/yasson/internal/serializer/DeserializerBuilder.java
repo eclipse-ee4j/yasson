@@ -124,7 +124,7 @@ public class DeserializerBuilder extends AbstractSerializerBuilder<DeserializerB
 
         JsonbDeserializer<?> deserializer;
         if (jsonEvent == JsonParser.Event.START_ARRAY) {
-            if (JsonStructure.class.isAssignableFrom(rawType)) {
+            if (JsonValue.class.isAssignableFrom(rawType)) {
                 return wrapAdapted(adapterInfoOptional, new JsonArrayDeserializer(this));
             } else if (rawType.isArray() || getRuntimeType() instanceof GenericArrayType) {
                 deserializer = createArrayItem(rawType.getComponentType());
@@ -189,7 +189,7 @@ public class DeserializerBuilder extends AbstractSerializerBuilder<DeserializerB
     }
 
     private <T,A> void setAdaptedItemCaptor(AdaptedObjectDeserializer<T,A> decoratorItem, JsonbDeserializer<T> adaptedItem) {
-        decoratorItem.setAdaptedItem(adaptedItem);
+        decoratorItem.setAdaptedTypeDeserializer(adaptedItem);
     }
 
     private Type resolveRuntimeType() {

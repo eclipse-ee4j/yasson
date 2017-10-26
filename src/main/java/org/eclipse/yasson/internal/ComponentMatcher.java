@@ -66,16 +66,19 @@ public class ComponentMatcher {
     void init() {
         final JsonbSerializer<?>[] serializers = (JsonbSerializer<?>[])jsonbContext.getConfig().getProperty(JsonbConfig.SERIALIZERS).orElseGet(()->new JsonbSerializer<?>[]{});
         for (JsonbSerializer serializer : serializers) {
-            introspectSerializerBinding(serializer.getClass(), serializer);
+            SerializerBinding serializerBinding = introspectSerializerBinding(serializer.getClass(), serializer);
+            addSerializer(serializerBinding.getBindingType(), serializerBinding);
         }
         final JsonbDeserializer<?>[] deserializers = (JsonbDeserializer<?>[])jsonbContext.getConfig().getProperty(JsonbConfig.DESERIALIZERS).orElseGet(()->new JsonbDeserializer<?>[]{});
         for (JsonbDeserializer deserializer : deserializers) {
-            introspectDeserializerBinding(deserializer.getClass(), deserializer);
+            DeserializerBinding deserializerBinding = introspectDeserializerBinding(deserializer.getClass(), deserializer);
+            addDeserializer(deserializerBinding.getBindingType(), deserializerBinding);
         }
 
         final JsonbAdapter<?, ?>[] adapters = (JsonbAdapter<?, ?>[]) jsonbContext.getConfig().getProperty(JsonbConfig.ADAPTERS).orElseGet(()->new JsonbAdapter<?, ?>[]{});
         for (JsonbAdapter<?, ?> adapter : adapters) {
-            introspectAdapterBinding(adapter.getClass(), adapter);
+            AdapterBinding adapterBinding = introspectAdapterBinding(adapter.getClass(), adapter);
+            addAdapter(adapterBinding.getBindingType(), adapterBinding);
         }
     }
 
@@ -239,9 +242,7 @@ public class ComponentMatcher {
             return componentBindings.getAdapterInfo();
         }
         JsonbAdapter newAdapter = instance != null ? instance : jsonbContext.getComponentInstanceCreator().getOrCreateComponent(adapterClass);
-        final AdapterBinding adapterInfo = new AdapterBinding(adaptFromType, adaptToType, newAdapter);
-        addAdapter(adaptFromType, adapterInfo);
-        return adapterInfo;
+        return new AdapterBinding(adaptFromType, adaptToType, newAdapter);
     }
 
     /**
@@ -261,9 +262,7 @@ public class ComponentMatcher {
         } else {
             JsonbDeserializer deserializer = instance != null ? instance : jsonbContext.getComponentInstanceCreator()
                     .getOrCreateComponent(deserializerClass);
-            final DeserializerBinding deserializerBinding = new DeserializerBinding(deserializerBindingType, deserializer);
-            addDeserializer(deserializerBindingType, deserializerBinding);
-            return deserializerBinding;
+            return new DeserializerBinding(deserializerBindingType, deserializer);
         }
     }
 
@@ -284,9 +283,7 @@ public class ComponentMatcher {
         } else {
             JsonbSerializer serializer = instance != null ? instance : jsonbContext.getComponentInstanceCreator()
                     .getOrCreateComponent(serializerClass);
-            final SerializerBinding serializerBinding = new SerializerBinding(serBindingType, serializer);
-            addSerializer(serBindingType, serializerBinding);
-            return serializerBinding;
+            return new SerializerBinding(serBindingType, serializer);
         }
 
     }

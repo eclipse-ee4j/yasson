@@ -311,4 +311,8 @@ public class JsonbRiParser implements JsonParser, JsonbParser {
         jsonParser.skipObject();
         level.pop();
     }
+
+    public JsonParser.Event getLastEvent() {
+        return level.peek().getLastEvent();
+    }
 }

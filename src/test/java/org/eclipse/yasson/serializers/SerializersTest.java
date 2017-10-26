@@ -17,6 +17,7 @@ import org.eclipse.yasson.serializers.model.*;
 import org.junit.Assert;
 import org.junit.Test;
 
+import javax.json.JsonBuilderFactory;
 import javax.json.bind.Jsonb;
 import javax.json.bind.JsonbBuilder;
 import javax.json.bind.JsonbConfig;
@@ -258,6 +259,20 @@ public class SerializersTest {
 
         Box result = jsonb.fromJson("{\"boxStr\":\"Box to deserialize\"}", Box.class);
         Assert.assertEquals("Box to deserialize", result.boxStr);
+    }
+
+    @Test
+    public void testAuthor() {
+        Author author = new Author("Sarah", "Connor");
+        Jsonb jsonb = JsonbBuilder.create();
+        String expected = "{\"firstName\":\"S\",\"lastName\":\"Connor\"}";
+        String json = jsonb.toJson(author);
+
+        Assert.assertEquals(expected, json);
+
+        Author result = jsonb.fromJson(expected, Author.class);
+        Assert.assertEquals("John", result.getFirstName());
+        Assert.assertEquals("Connor", result.getLastName());
     }
 
     private Box createPojoWithDates() {

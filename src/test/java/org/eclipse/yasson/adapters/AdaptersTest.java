@@ -16,6 +16,7 @@ package org.eclipse.yasson.adapters;
 
 import org.eclipse.yasson.TestTypeToken;
 import org.eclipse.yasson.adapters.model.*;
+import org.junit.Assert;
 import org.junit.Test;
 
 import javax.json.bind.Jsonb;
@@ -403,5 +404,19 @@ public class AdaptersTest {
         JsonObjectPojo result = jsonb.fromJson(json, JsonObjectPojo.class);
         assertEquals("strFieldValue", result.box.getBoxStrField());
         assertEquals(Integer.valueOf(110), result.box.getBoxIntegerField());
+    }
+
+    @Test
+    public void testAdaptAuthor() {
+        Author author = new Author();
+        author.setFirstName("John");
+        author.setLastName("Connor");
+
+        Jsonb jsonb = JsonbBuilder.create();
+        String json = jsonb.toJson(author);
+        Assert.assertEquals("{\"firstName\":\"J\",\"lastName\":\"Connor\"}", json);
+
+        Author result = jsonb.fromJson("{\"firstName\":\"J\",\"lastName\":\"Connor\"}", Author.class);
+        System.out.println(result);
     }
 }
