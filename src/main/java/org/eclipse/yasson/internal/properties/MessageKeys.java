@@ -34,6 +34,7 @@ public enum MessageKeys {
     RESOLVE_PARAMETRIZED_TYPE("resolveParametrizedType"),
     CANT_CREATE_INSTANCE("cantCreateInstance"),
     INFER_TYPE_FOR_UNMARSHALL("inferTypeForUnmarshall"),
+    IMPL_CLASS_INCOMPATIBLE("implClassIncompatible"),
     NOT_VALUE_TYPE("notValueType"),
     UNEXPECTED_PARSE_EVENT("unexpectedParseEvent"),
     CREATING_HANDLES("creatingHandles"),

@@ -18,10 +18,11 @@ import org.eclipse.yasson.internal.ReflectionUtils;
 import org.eclipse.yasson.internal.components.AdapterBinding;
 import org.eclipse.yasson.internal.components.DeserializerBinding;
 import org.eclipse.yasson.internal.model.customization.ComponentBoundCustomization;
+import org.eclipse.yasson.internal.model.customization.Customization;
+import org.eclipse.yasson.internal.model.customization.PropertyCustomization;
 import org.eclipse.yasson.internal.properties.MessageKeys;
 import org.eclipse.yasson.internal.properties.Messages;
 
-import javax.json.JsonStructure;
 import javax.json.JsonValue;
 import javax.json.bind.JsonbException;
 import javax.json.bind.config.BinaryDataStrategy;
@@ -30,7 +31,11 @@ import javax.json.stream.JsonParser;
 import java.lang.reflect.GenericArrayType;
 import java.lang.reflect.Type;
 import java.math.BigDecimal;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.Collection;
+import java.util.HashMap;
+import java.util.Map;
+import java.util.Optional;
 
 /**
  * Builder for currently processed items by unmarshaller.
@@ -75,20 +80,21 @@ public class DeserializerBuilder extends AbstractSerializerBuilder<DeserializerB
         Class<?> rawType = ReflectionUtils.getRawType(getRuntimeType());
 
         Optional<AdapterBinding> adapterInfoOptional = Optional.empty();
-        if (getModel() != null && (getModel().getCustomization() == null
-                || getModel().getCustomization() instanceof ComponentBoundCustomization)) {
-            ComponentBoundCustomization customization = (ComponentBoundCustomization) getModel().getCustomization();
+        Customization customization = getModel() != null ? getModel().getCustomization() : null;
+        if (customization == null
+                || customization instanceof ComponentBoundCustomization) {
+            ComponentBoundCustomization componentBoundCustomization = (ComponentBoundCustomization) customization;
 
             //First check if user deserializer is registered for such type
             final ComponentMatcher componentMatcher = jsonbContext.getComponentMatcher();
             Optional<DeserializerBinding<?>> userDeserializer =
-                    componentMatcher.getDeserializerBinding(getRuntimeType(), customization);
+                    componentMatcher.getDeserializerBinding(getRuntimeType(), componentBoundCustomization);
             if (userDeserializer.isPresent() && !jsonbContext.containsProcessedType(userDeserializer.get().getBindingType())) {
                 return new UserDeserializerDeserializer<>(this, userDeserializer.get());
             }
 
             //Second user components is registered.
-            Optional<AdapterBinding> adapterBinding = componentMatcher.getAdapterBinding(getRuntimeType(), customization);
+            Optional<AdapterBinding> adapterBinding = componentMatcher.getAdapterBinding(getRuntimeType(), componentBoundCustomization);
             if (adapterBinding.isPresent() && !jsonbContext.containsProcessedType(adapterBinding.get().getBindingType())) {
                 adapterInfoOptional = adapterBinding;
                 runtimeType = adapterInfoOptional.get().getToType();
@@ -142,7 +148,13 @@ public class DeserializerBuilder extends AbstractSerializerBuilder<DeserializerB
                 final JsonbDeserializer<?> mapDeserializer = new MapDeserializer(this);
                 return wrapAdapted(adapterInfoOptional, mapDeserializer);
             } else if (rawType.isInterface()) {
-                throw new JsonbException(Messages.getMessage(MessageKeys.INFER_TYPE_FOR_UNMARSHALL, rawType.getName()));
+                Class<?> mappedType = getInterfaceMappedType(rawType);
+                if (mappedType == null) {
+                    throw new JsonbException(Messages.getMessage(MessageKeys.INFER_TYPE_FOR_UNMARSHALL, rawType.getName()));
+                }
+                runtimeType = mappedType;
+                classModel = getClassModel(mappedType);
+                return new ObjectDeserializer<>(this);
             } else {
                 if (adapterInfoOptional.isPresent()) {
                     runtimeType = adapterInfoOptional.get().getToType();
@@ -215,6 +227,27 @@ public class DeserializerBuilder extends AbstractSerializerBuilder<DeserializerB
             }
         }
         return result;
+    }
+
+    private Class<?> getInterfaceMappedType(Class<?> interfaceType) {
+        if (interfaceType.isInterface()) {
+            Class implementationClass = null;
+            //annotation
+            if (getModel().getCustomization() instanceof PropertyCustomization) {
+                 implementationClass = ((PropertyCustomization) getModel().getCustomization()).getImplementationClass();
+            }
+            //JsonbConfig
+            if (implementationClass == null) {
+                implementationClass = jsonbContext.getConfigProperties().getUserTypeMapping().get(interfaceType);
+            }
+            if (implementationClass != null) {
+                if (!interfaceType.isAssignableFrom(implementationClass)) {
+                    throw new JsonbException(Messages.getMessage(MessageKeys.IMPL_CLASS_INCOMPATIBLE, implementationClass, interfaceType));
+                }
+                return implementationClass;
+            }
+        }
+        return null;
     }
 
     /**
