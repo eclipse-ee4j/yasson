@@ -19,7 +19,9 @@ import javax.json.bind.config.PropertyNamingStrategy;
 import javax.json.bind.config.PropertyOrderStrategy;
 import javax.json.bind.config.PropertyVisibilityStrategy;
 import java.time.format.DateTimeFormatter;
+import java.util.Collections;
 import java.util.Locale;
+import java.util.Map;
 import java.util.Optional;
 
 /**
@@ -34,6 +36,8 @@ public class JsonbConfigProperties {
      * which doesn't exist in the target class. Default value is 'true'.
      */
     public static final String FAIL_ON_UNKNOWN_PROPERTIES = "jsonb.fail-on-unknown-properties";
+
+    public static final String USER_TYPE_MAPPING = "jsonb.user-type-mapping";
 
     private final JsonbConfig jsonbConfig;
 
@@ -55,6 +59,8 @@ public class JsonbConfigProperties {
 
     private final boolean strictIJson;
 
+    private final Map<Class<?>, Class<?>> userTypeMapping;
+
     public JsonbConfigProperties(JsonbConfig jsonbConfig) {
         this.jsonbConfig = jsonbConfig;
         this.binaryDataStrategy = initBinaryDataStrategy();
@@ -66,6 +72,20 @@ public class JsonbConfigProperties {
         this.nullable = initConfigNullable();
         this.failOnUnknownProperties = initConfigFailOnUnknownProperties();
         this.strictIJson = initStrictJson();
+        this.userTypeMapping = initUserTypeMapping();
+    }
+
+    @SuppressWarnings("unchecked")
+    private Map<Class<?>,Class<?>> initUserTypeMapping() {
+        Optional<Object> property = jsonbConfig.getProperty(USER_TYPE_MAPPING);
+        if (!property.isPresent()) {
+            return Collections.emptyMap();
+        }
+        Object result = property.get();
+        if (!(result instanceof Map)) {
+            throw new JsonbException(Messages.getMessage(MessageKeys.JSONB_CONFIG_PROPERTY_INVALID_TYPE, USER_TYPE_MAPPING, Map.class.getSimpleName()));
+        }
+        return (Map<Class<?>, Class<?>>) result;
     }
 
     private JsonbDateFormatter initDateFormatter(Locale locale) {
@@ -276,5 +296,14 @@ public class JsonbConfigProperties {
      */
     public boolean isStrictIJson() {
         return strictIJson;
+    }
+
+    /**
+     * User type mapping for map interface to implementation classes.
+     *
+     * @return User type mapping.
+     */
+    public Map<Class<?>, Class<?>> getUserTypeMapping() {
+        return userTypeMapping;
     }
 }

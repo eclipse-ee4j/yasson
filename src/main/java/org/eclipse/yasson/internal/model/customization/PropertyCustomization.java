@@ -39,8 +39,11 @@ public class PropertyCustomization extends CustomizationBase {
 
     private boolean writeTransient;
 
+    private final Class implementationClass;
+
     /**
      * Copies properties from builder an creates immutable instance.
+     *
      * @param builder not null
      */
     public PropertyCustomization(PropertyCustomizationBuilder builder) {
@@ -53,10 +56,12 @@ public class PropertyCustomization extends CustomizationBase {
         this.deserializeDateFormatter = builder.getDeserializeDateFormatter();
         this.readTransient = builder.isReadTransient();
         this.writeTransient = builder.isWriteTransient();
+        this.implementationClass = builder.getImplementationClass();
     }
 
     /**
      * Name if specified for property setter with {@link javax.json.bind.annotation.JsonbProperty}.
+     *
      * @return read name
      */
     public String getJsonReadName() {
@@ -65,6 +70,7 @@ public class PropertyCustomization extends CustomizationBase {
 
     /**
      * Name if specified for property getter with {@link javax.json.bind.annotation.JsonbProperty}.
+     *
      * @return write name
      */
     public String getJsonWriteName() {
@@ -95,7 +101,7 @@ public class PropertyCustomization extends CustomizationBase {
     /**
      * The flag indicating whether the value of the underlying type/property should be processed during serialization process or not.
      *
-     * @return  true indicates that the underlying type/property should be included in serialization process and false indicates it should not
+     * @return true indicates that the underlying type/property should be included in serialization process and false indicates it should not
      */
     public boolean isReadTransient() {
         return readTransient;
@@ -104,9 +110,19 @@ public class PropertyCustomization extends CustomizationBase {
     /**
      * The flag indicating whether the value of the underlying type/property should be processed during deserialization process or not.
      *
-     * @return  true indicates that the underlying type/property should be included in deserialization process and false indicates it should not
+     * @return true indicates that the underlying type/property should be included in deserialization process and false indicates it should not
      */
     public boolean isWriteTransient() {
         return writeTransient;
     }
+
+    /**
+     * Implementation class if property is interface type.
+     *
+     * @return class implementing property interface
+     */
+    public Class getImplementationClass() {
+        return implementationClass;
+    }
+
 }
