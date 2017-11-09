@@ -89,8 +89,8 @@
     </licenses>
 
     <scm>
-        <connection>scm:git:ssh://git@github.com:eclipse/yasson.git</connection>
-        <developerConnection>scm:git:ssh://git@github.com:eclipse/yasson.git</developerConnection>
+        <connection>scm:git:ssh://git@github.com/eclipse/yasson.git</connection>
+        <developerConnection>scm:git:ssh://git@github.com/eclipse/yasson.git</developerConnection>
         <url>https://github.com/eclipse/yasson.git</url>
         <tag>HEAD</tag>
     </scm>
