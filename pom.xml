@@ -50,7 +50,7 @@
 
     <groupId>org.eclipse</groupId>
     <artifactId>yasson</artifactId>
-    <version>1.0.1</version>
+    <version>1.0.2-SNAPSHOT</version>
     <packaging>jar</packaging>
     <name>org.eclipse.yasson</name>
 
@@ -92,7 +92,7 @@
         <connection>scm:git:ssh://git@github.com/eclipse/yasson.git</connection>
         <developerConnection>scm:git:ssh://git@github.com/eclipse/yasson.git</developerConnection>
         <url>https://github.com/eclipse/yasson.git</url>
-        <tag>yasson-1.0.1</tag>
+        <tag>HEAD</tag>
     </scm>
 
     <developers>
