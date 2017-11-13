@@ -39,6 +39,8 @@ public class PropertyCustomizationBuilder extends CustomizationBuilder {
 
     private boolean writeTransient;
 
+    private Class implementationClass;
+
     /**
      * Creates a customization for class properties.
      *
@@ -193,4 +195,21 @@ public class PropertyCustomizationBuilder extends CustomizationBuilder {
     }
 
 
+    /**
+     * Implementation class if property is interface type.
+     *
+     * @return class implementing property interface
+     */
+    public Class getImplementationClass() {
+        return implementationClass;
+    }
+
+    /**
+     * Implementation class if property is interface type.
+     *
+     * @param implementationClass implementing property interface
+     */
+    public void setImplementationClass(Class implementationClass) {
+        this.implementationClass = implementationClass;
+    }
 }

@@ -176,6 +176,7 @@ public class PropertyModel implements JsonBindingModel, Comparable<PropertyModel
 
         introspectDateFormatter(property, introspector, builder, jsonbContext);
         introspectNumberFormatter(property, introspector, builder);
+        builder.setImplementationClass(introspector.getImplementationClass(property));
 
         return builder.buildPropertyCustomization();
     }

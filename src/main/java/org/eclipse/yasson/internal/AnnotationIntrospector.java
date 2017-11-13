@@ -13,6 +13,7 @@
 
 package org.eclipse.yasson.internal;
 
+import org.eclipse.yasson.ImplementationClass;
 import org.eclipse.yasson.internal.components.AdapterBinding;
 import org.eclipse.yasson.internal.components.DeserializerBinding;
 import org.eclipse.yasson.internal.components.SerializerBinding;
@@ -633,6 +634,11 @@ public class AnnotationIntrospector {
         builder.setCreator(getCreator(clsElement.getElement()));
         builder.setPropertyOrder(getPropertyOrder(clsElement));
         return builder.buildClassCustomization();
+    }
+
+    public Class<?> getImplementationClass(Property property) {
+        Optional<ImplementationClass> annotationFromProperty = getAnnotationFromProperty(ImplementationClass.class, property);
+        return annotationFromProperty.<Class<?>>map(ImplementationClass::value).orElse(null);
     }
 
     /**
