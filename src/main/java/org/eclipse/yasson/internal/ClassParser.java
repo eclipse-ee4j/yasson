@@ -92,7 +92,7 @@ class ClassParser {
         Method[] declaredMethods = AccessController.doPrivileged((PrivilegedAction<Method[]>) ifc::getDeclaredMethods);
         for(Method method : declaredMethods) {
             final String methodName = method.getName();
-            if (!isPropertyMethod(methodName)) {
+            if (!isPropertyMethod(method)) {
                 continue;
             }
             String propertyName = toPropertyMethod(methodName);
@@ -101,7 +101,7 @@ class ClassParser {
                 //May happen for classes which both extend a class with some method and implement interface with same method.
                 continue;
             }
-            JsonbAnnotatedElement<Method> methodElement = isGetter(methodName) ?
+            JsonbAnnotatedElement<Method> methodElement = isGetter(method) ?
                     property.getGetterElement() : property.getSetterElement();
             //Only push iface annotations if not overridden on impl classes
             for (Annotation ann : method.getDeclaredAnnotations()) {
@@ -116,14 +116,14 @@ class ClassParser {
         Method[] declaredMethods = AccessController.doPrivileged((PrivilegedAction<Method[]>) clazz::getDeclaredMethods);
         for (Method method : declaredMethods) {
             String name = method.getName();
-            if (!isPropertyMethod(name)) {
+            if (!isPropertyMethod(method)) {
                 continue;
             }
             final String propertyName = toPropertyMethod(name);
 
             Property property = classProperties.computeIfAbsent(propertyName, n -> new Property(n, classElement));
 
-            if (isSetter(name)) {
+            if (isSetter(method)) {
                 property.setSetter(method);
             } else {
                 property.setGetter(method);
@@ -131,20 +131,20 @@ class ClassParser {
         }
     }
 
-    private boolean isGetter(String methodName) {
-        return methodName.startsWith(GET_PREFIX) || methodName.startsWith(IS_PREFIX);
+    private boolean isGetter(Method m) {
+        return (m.getName().startsWith(GET_PREFIX) || m.getName().startsWith(IS_PREFIX)) && m.getParameterCount() == 0;
     }
 
-    private boolean isSetter(String methodName) {
-        return methodName.startsWith(SET_PREFIX);
+    private boolean isSetter(Method m) {
+        return m.getName().startsWith(SET_PREFIX) && m.getParameterCount() == 1;
     }
 
     private String toPropertyMethod(String name) {
         return Introspector.decapitalize(name.substring(name.startsWith(IS_PREFIX) ? 2 : 3, name.length()));
     }
 
-    private boolean isPropertyMethod(String name) {
-        return name.startsWith(GET_PREFIX) || name.startsWith(SET_PREFIX) || name.startsWith(IS_PREFIX);
+    private boolean isPropertyMethod(Method m) {
+    	return isGetter(m) || isSetter(m);
     }
 
     private void parseFields(JsonbAnnotatedElement<Class<?>> classElement, Map<String, Property> classProperties) {
