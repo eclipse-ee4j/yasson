@@ -19,7 +19,14 @@ import org.eclipse.yasson.internal.serializer.EmbeddedItem;
 import org.eclipse.yasson.internal.serializer.ResolvedParameterizedType;
 
 import javax.json.bind.JsonbException;
-import java.lang.reflect.*;
+import java.lang.reflect.Constructor;
+import java.lang.reflect.GenericArrayType;
+import java.lang.reflect.InvocationTargetException;
+import java.lang.reflect.Modifier;
+import java.lang.reflect.ParameterizedType;
+import java.lang.reflect.Type;
+import java.lang.reflect.TypeVariable;
+import java.lang.reflect.WildcardType;
 import java.security.AccessController;
 import java.security.PrivilegedAction;
 import java.util.Arrays;
@@ -109,6 +116,15 @@ public class ReflectionUtils {
             return resolveTypeArguments((ParameterizedType) type, item.getRuntimeType());
         }
         return type;
+    }
+
+
+    public static Optional<Type> resolveOptionalType(RuntimeTypeInfo info, Type type) {
+        try {
+            return Optional.of(resolveType(info, type));
+        } catch (RuntimeException e) {
+            return Optional.empty();
+        }
     }
 
     /**

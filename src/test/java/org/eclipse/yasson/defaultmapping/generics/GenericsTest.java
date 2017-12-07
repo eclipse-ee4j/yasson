@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2015 Oracle and/or its affiliates. All rights reserved.
+ * Copyright (c) 2015, 2017 Oracle and/or its affiliates. All rights reserved.
  * This program and the accompanying materials are made available under the
  * terms of the Eclipse Public License v1.0 and Eclipse Distribution License v. 1.0
  * which accompanies this distribution.
@@ -14,7 +14,22 @@
 package org.eclipse.yasson.defaultmapping.generics;
 
 import org.eclipse.yasson.TestTypeToken;
-import org.eclipse.yasson.defaultmapping.generics.model.*;
+import org.eclipse.yasson.defaultmapping.generics.model.AnotherGenericTestClass;
+import org.eclipse.yasson.defaultmapping.generics.model.BoundedGenericClass;
+import org.eclipse.yasson.defaultmapping.generics.model.Circle;
+import org.eclipse.yasson.defaultmapping.generics.model.CollectionWrapper;
+import org.eclipse.yasson.defaultmapping.generics.model.ColoredCircle;
+import org.eclipse.yasson.defaultmapping.generics.model.CyclicSubClass;
+import org.eclipse.yasson.defaultmapping.generics.model.GenericArrayClass;
+import org.eclipse.yasson.defaultmapping.generics.model.GenericTestClass;
+import org.eclipse.yasson.defaultmapping.generics.model.GenericWithUnboundedWildcardClass;
+import org.eclipse.yasson.defaultmapping.generics.model.MultiLevelExtendedGenericTestClass;
+import org.eclipse.yasson.defaultmapping.generics.model.MultipleBoundsContainer;
+import org.eclipse.yasson.defaultmapping.generics.model.MyCyclicGenericClass;
+import org.eclipse.yasson.defaultmapping.generics.model.PropagatedGenericClass;
+import org.eclipse.yasson.defaultmapping.generics.model.Shape;
+import org.eclipse.yasson.defaultmapping.generics.model.WildCardClass;
+import org.eclipse.yasson.defaultmapping.generics.model.WildcardMultipleBoundsClass;
 import org.eclipse.yasson.serializers.model.Box;
 import org.eclipse.yasson.serializers.model.Crate;
 import org.junit.Assert;
@@ -30,7 +45,15 @@ import java.lang.reflect.Type;
 import java.math.BigDecimal;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.HashMap;
+import java.util.HashSet;
+import java.util.LinkedList;
+import java.util.List;
+import java.util.Map;
+import java.util.Optional;
+import java.util.TimeZone;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertTrue;
@@ -388,6 +411,17 @@ public class GenericsTest {
         GenericTestClass result = jsonb.fromJson("{\"field1\":{\"val1\":\"abc\"},\"field2\":{\"val1\":\"def\"}}", GenericTestClass.class);
         Assert.assertEquals(((HashMap<String, ?>) result.getField1()).get("val1"), "abc");
         Assert.assertEquals(((HashMap<String, ?>) result.getField2()).get("val1"), "def");
+    }
+
+    @Test
+    public void collectionWrapperTest() {
+        CollectionWrapper<String> collectionWrapper = new CollectionWrapper<>();
+        collectionWrapper.setCollection(new ArrayList<>());
+
+        collectionWrapper.setWrappedCollection(new ArrayList<>());
+        collectionWrapper.setWrappedMap(new HashMap<>());
+        String s = jsonb.toJson(collectionWrapper);
+        System.out.println("s = " + s);
     }
 
     public interface FunctionalInterface<T> {

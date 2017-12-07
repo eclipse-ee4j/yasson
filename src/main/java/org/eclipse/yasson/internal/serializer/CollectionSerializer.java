@@ -21,6 +21,7 @@ import javax.json.stream.JsonGenerator;
 import java.lang.reflect.ParameterizedType;
 import java.lang.reflect.Type;
 import java.util.Collection;
+import java.util.Optional;
 
 /**
  * Serializer for collections.
@@ -38,9 +39,11 @@ public class CollectionSerializer<T extends Collection> extends AbstractContaine
     }
 
     private Type getValueType() {
-        return getRuntimeType() instanceof ParameterizedType ?
-                ReflectionUtils.resolveType(this, ((ParameterizedType) getRuntimeType()).getActualTypeArguments()[0])
-                : Object.class;
+        if (getRuntimeType() instanceof ParameterizedType) {
+            Optional<Type> runtimeTypeOptional = ReflectionUtils.resolveOptionalType(this, ((ParameterizedType) getRuntimeType()).getActualTypeArguments()[0]);
+            return runtimeTypeOptional.orElse(Object.class);
+        }
+        return Object.class;
     }
 
     @Override
