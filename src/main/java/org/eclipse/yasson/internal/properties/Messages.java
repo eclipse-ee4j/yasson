@@ -29,7 +29,7 @@ import java.util.ResourceBundle;
  */
 public class Messages {
 
-    private final static String MESSAGE_BUNDLE = "messages";
+    private final static String MESSAGE_BUNDLE = "yasson-messages";
     private final static String ENCODING = "UTF-8";
 
     private Messages() {
