@@ -15,7 +15,6 @@ package org.eclipse.yasson.customization;
 
 import org.eclipse.yasson.customization.model.NumberFormatPojo;
 import org.eclipse.yasson.customization.model.NumberFormatPojoWithoutClassLevelFormatter;
-import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
 
@@ -24,6 +23,7 @@ import javax.json.bind.JsonbBuilder;
 import java.math.BigDecimal;
 import java.math.BigInteger;
 import java.util.Locale;
+import javax.json.bind.JsonbConfig;
 
 import static org.junit.Assert.assertEquals;
 
@@ -33,18 +33,10 @@ import static org.junit.Assert.assertEquals;
  */
 public class NumberFormatTest {
     private Jsonb jsonb;
-    private Locale systemDefaultLocale;
 
     @Before
     public void setUp() {
-        systemDefaultLocale = Locale.getDefault();
-        Locale.setDefault(Locale.US);
-        jsonb = JsonbBuilder.create();
-    }
-
-    @After
-    public void tearDown() {
-        Locale.setDefault(systemDefaultLocale);
+        jsonb = JsonbBuilder.create(new JsonbConfig().withLocale(Locale.US));
     }
 
     @Test
