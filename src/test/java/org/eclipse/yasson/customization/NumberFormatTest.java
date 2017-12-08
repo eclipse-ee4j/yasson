@@ -15,12 +15,15 @@ package org.eclipse.yasson.customization;
 
 import org.eclipse.yasson.customization.model.NumberFormatPojo;
 import org.eclipse.yasson.customization.model.NumberFormatPojoWithoutClassLevelFormatter;
+import org.junit.After;
+import org.junit.Before;
 import org.junit.Test;
 
 import javax.json.bind.Jsonb;
 import javax.json.bind.JsonbBuilder;
 import java.math.BigDecimal;
 import java.math.BigInteger;
+import java.util.Locale;
 
 import static org.junit.Assert.assertEquals;
 
@@ -29,7 +32,20 @@ import static org.junit.Assert.assertEquals;
  * @author Roman Grigoriadi
  */
 public class NumberFormatTest {
-    private Jsonb jsonb = JsonbBuilder.create();
+    private Jsonb jsonb;
+    private Locale systemDefaultLocale;
+
+    @Before
+    public void setUp() {
+        systemDefaultLocale = Locale.getDefault();
+        Locale.setDefault(Locale.US);
+        jsonb = JsonbBuilder.create();
+    }
+
+    @After
+    public void tearDown() {
+        Locale.setDefault(systemDefaultLocale);
+    }
 
     @Test
     public void testSerialize() {
