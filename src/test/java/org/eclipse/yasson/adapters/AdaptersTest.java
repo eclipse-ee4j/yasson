@@ -419,4 +419,20 @@ public class AdaptersTest {
         Author result = jsonb.fromJson("{\"firstName\":\"J\",\"lastName\":\"Connor\"}", Author.class);
         System.out.println(result);
     }
+
+    @Test
+    public void testAdaptUUID() {
+        jsonb = JsonbBuilder.create();
+        UUIDContainer pojo = new UUIDContainer();
+        UUID uuid = UUID.fromString("b329da91-0d96-44b6-b466-56c2458b2877");
+        pojo.setUuidClsBased(uuid);
+        pojo.setUuidIfcBased(uuid);
+
+        String result = jsonb.toJson(pojo);
+        Assert.assertEquals("{\"uuidClsBased\":\"b329da91-0d96-44b6-b466-56c2458b2877\",\"uuidIfcBased\":\"b329da91-0d96-44b6-b466-56c2458b2877\"}", result);
+
+        UUIDContainer uuidContainer = jsonb.fromJson(result, UUIDContainer.class);
+        Assert.assertEquals(uuid, uuidContainer.getUuidClsBased());
+        Assert.assertEquals(uuid, uuidContainer.getUuidIfcBased());
+    }
 }

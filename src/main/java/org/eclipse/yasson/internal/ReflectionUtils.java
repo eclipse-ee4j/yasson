@@ -236,7 +236,8 @@ public class ReflectionUtils {
         while (current != Object.class) {
             for (Type currentInterface : current.getGenericInterfaces()) {
                 if (currentInterface instanceof ParameterizedType &&
-                        ((ParameterizedType) currentInterface).getRawType().equals(parameterizedInterface)) {
+                        parameterizedInterface.isAssignableFrom(
+                                ReflectionUtils.getRawType(((ParameterizedType) currentInterface).getRawType()))) {
                     return (ParameterizedType) currentInterface;
                 }
             }
