@@ -8,7 +8,7 @@ public class UUIDContainer {
     @JsonbTypeAdapter(UUIDMapperClsBased.class)
     private UUID uuidClsBased;
 
-    @JsonbTypeAdapter(UUIDMapperClsBased.class)
+    @JsonbTypeAdapter(UUIDMapperIfcBased.class)
     private UUID uuidIfcBased;
 
     public UUID getUuidClsBased() {
