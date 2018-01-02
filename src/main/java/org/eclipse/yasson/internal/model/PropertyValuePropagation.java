@@ -38,8 +38,6 @@ public abstract class PropertyValuePropagation {
 
     private final Method setter;
 
-    private static final DefaultVisibilityStrategy DEFAULT_STRATEGY = new DefaultVisibilityStrategy();
-
     /**
      * Mode of property propagation get or set.
      */
@@ -90,13 +88,10 @@ public abstract class PropertyValuePropagation {
             readable = false;
             return;
         }
-        if (getter != null) {
-            if (!isVisible(getter, ctx)) {
-                return; //don't check field if getter is not visible
-            }
+        if (getter != null && isMethodVisible(field, getter, ctx)) {
             acceptMethod(getter, OperationMode.GET);
             readable = true;
-        } else if (isVisible(field, ctx)) {
+        } else if (isFieldVisible(field, getter, ctx)) {
             acceptField(field, OperationMode.GET);
             readable = true;
         }
@@ -109,23 +104,20 @@ public abstract class PropertyValuePropagation {
             writable = false;
             return;
         }
-        if (setter != null) {
-            if (!isVisible(setter, ctx) || setter.getDeclaringClass().isAnonymousClass()) {
-                return;
-            }
+        if (setter != null && isMethodVisible(field, setter, ctx) && !setter.getDeclaringClass().isAnonymousClass()) {
             acceptMethod(setter, OperationMode.SET);
             writable = true;
-        } else if (isVisible(field, ctx) && !field.getDeclaringClass().isAnonymousClass()) {
+        } else if (isFieldVisible(field, setter, ctx) && !field.getDeclaringClass().isAnonymousClass()) {
             acceptField(field, OperationMode.SET);
             writable = true;
         }
     }
 
-    private boolean isVisible(Field field, JsonbContext ctx) {
+    private boolean isFieldVisible(Field field, Method method, JsonbContext ctx) {
         if (field == null) {
             return false;
         }
-        Boolean accessible = isVisible(strategy -> strategy.isVisible(field), field.getDeclaringClass(), ctx);
+        Boolean accessible = isVisible(strategy -> strategy.isVisible(field), field.getDeclaringClass(), field, method, ctx);
         //overridden by strategy, or anonymous class (readable by spec)
         if (accessible && (!Modifier.isPublic(field.getModifiers()) || field.getDeclaringClass().isAnonymousClass())) {
             overrideAccessible(field);
@@ -133,12 +125,12 @@ public abstract class PropertyValuePropagation {
         return accessible;
     }
 
-    private boolean isVisible(Method method, JsonbContext ctx) {
+    private boolean isMethodVisible(Field field, Method method, JsonbContext ctx) {
         if (method == null || Modifier.isStatic(method.getModifiers())) {
             return false;
         }
 
-        Boolean accessible = isVisible(strategy -> strategy.isVisible(method), method.getDeclaringClass(), ctx);
+        Boolean accessible = isVisible(strategy -> strategy.isVisible(method), method.getDeclaringClass(), field, method, ctx);
         //overridden by strategy, or anonymous class
         if (accessible && (!Modifier.isPublic(method.getModifiers()) || method.getDeclaringClass().isAnonymousClass())) {
             overrideAccessible(method);
@@ -162,13 +154,13 @@ public abstract class PropertyValuePropagation {
      * @param ctx jsonb context
      * @return Optional with result of visibility check, or empty optional if no strategy is found
      */
-    private Boolean isVisible(Function<PropertyVisibilityStrategy, Boolean> visibilityCheckFunction, Class<?> declaringClass, JsonbContext ctx) {
+    private Boolean isVisible(Function<PropertyVisibilityStrategy, Boolean> visibilityCheckFunction, Class<?> declaringClass, Field field, Method method, JsonbContext ctx) {
         final Optional<PropertyVisibilityStrategy> classLevelStrategy =
                 ctx.getAnnotationIntrospector().getPropertyVisibilityStrategy(declaringClass);
         Optional<PropertyVisibilityStrategy> strategy =
                 Optional.ofNullable(classLevelStrategy.orElseGet(()->ctx.getConfigProperties().getPropertyVisibilityStrategy()));
 
-        PropertyVisibilityStrategy str = strategy.orElse(DEFAULT_STRATEGY);
+        PropertyVisibilityStrategy str = strategy.orElse(new DefaultVisibilityStrategy(field, method));
         return visibilityCheckFunction.apply(str);
     }
 
@@ -246,8 +238,21 @@ public abstract class PropertyValuePropagation {
 
     private static final class DefaultVisibilityStrategy implements PropertyVisibilityStrategy {
 
+        private final Field field;
+
+        private final Method method;
+
+        public DefaultVisibilityStrategy(Field field, Method method) {
+            this.field = field;
+            this.method = method;
+        }
+
         @Override
         public boolean isVisible(Field field) {
+            //don't check field if getter is not visible (forced by spec)
+            if (method != null && !isVisible(method)) {
+                return false;
+            }
             return Modifier.isPublic(field.getModifiers());
         }
 
