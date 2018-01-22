@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2015, 2017 Oracle and/or its affiliates. All rights reserved.
+ * Copyright (c) 2015, 2018 Oracle and/or its affiliates. All rights reserved.
  * This program and the accompanying materials are made available under the
  * terms of the Eclipse Public License v1.0 and Eclipse Distribution License v. 1.0
  * which accompanies this distribution.
@@ -23,6 +23,7 @@ import javax.json.bind.JsonbBuilder;
 import javax.json.bind.JsonbConfig;
 import javax.json.bind.config.BinaryDataStrategy;
 import java.util.Base64;
+import java.util.UUID;
 
 import static org.junit.Assert.assertArrayEquals;
 import static org.junit.Assert.assertEquals;
@@ -111,5 +112,14 @@ public class DefaultSerializersTest {
         assertEquals(base64UrlEncodedJson, jsonb.toJson(byteArrayWrapper));
         result = jsonb.fromJson(base64UrlEncodedJson, ByteArrayWrapper.class);
         assertArrayEquals(array, result.array);
+    }
+
+    @Test
+    public void testUUID() {
+        Jsonb jsonb = JsonbBuilder.create();
+        UUID uuid = UUID.randomUUID();
+        String json = jsonb.toJson(uuid);
+        UUID result = jsonb.fromJson(json, UUID.class);
+        assertEquals(uuid, result);
     }
 }
