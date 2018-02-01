@@ -55,13 +55,14 @@ public class JsonbConfigProperties {
 
     /**
      * <p>Makes parsing dates defaulting to zero hour, minute and second.
-     * This will made available to parse patterns like yyyy.MM.dd to {@link java.time.Instant} {@link java.time.LocalDate} or even
-     * {@link java.time.ZonedDateTime}.
+     * This will made available to parse patterns like yyyy.MM.dd to
+     * {@link java.util.Date}, {@link java.util.Calendar}, {@link java.time.Instant} {@link java.time.LocalDate}
+     * or even {@link java.time.ZonedDateTime}.
      * <p>If time zone is not set in the pattern than UTC time zone is used.
      * So for example json value 2018.01.01 becomes 2018.01.01 00:00:00 UTC when parsed
      * to instant {@link java.time.Instant} or {@link java.time.ZonedDateTime}.
      */
-    public static final String ZERO_TIME_DEFAULTING_FOR_JAVA_TIME = "jsonb.zero-time-defaulting-for-java-time";
+    public static final String ZERO_TIME_DEFAULTING = "jsonb.zero-time-defaulting";
 
     private final JsonbConfig jsonbConfig;
 
@@ -83,7 +84,7 @@ public class JsonbConfigProperties {
 
     private final boolean strictIJson;
 
-    private final boolean zeroTimeDefaultingForJavaTime;
+    private final boolean zeroTimeDefaulting;
 
     private final Map<Class<?>, Class<?>> userTypeMapping;
 
@@ -99,11 +100,11 @@ public class JsonbConfigProperties {
         this.failOnUnknownProperties = initConfigFailOnUnknownProperties();
         this.strictIJson = initStrictJson();
         this.userTypeMapping = initUserTypeMapping();
-        this.zeroTimeDefaultingForJavaTime = initZeroTimeDefaultingForJavaTime();
+        this.zeroTimeDefaulting = initZeroTimeDefaultingForJavaTime();
     }
 
     private boolean initZeroTimeDefaultingForJavaTime() {
-        return getBooleanConfigProperty(ZERO_TIME_DEFAULTING_FOR_JAVA_TIME, false);
+        return getBooleanConfigProperty(ZERO_TIME_DEFAULTING, false);
     }
 
     @SuppressWarnings("unchecked")
@@ -126,7 +127,7 @@ public class JsonbConfigProperties {
         }
         DateTimeFormatterBuilder builder = new DateTimeFormatterBuilder();
         builder.appendPattern(dateFormat);
-        if (isZeroTimeDefaultingForJavaTime()) {
+        if (isZeroTimeDefaulting()) {
             builder.parseDefaulting(ChronoField.SECOND_OF_MINUTE, 0);
             builder.parseDefaulting(ChronoField.MINUTE_OF_HOUR, 0);
             builder.parseDefaulting(ChronoField.HOUR_OF_DAY, 0);
@@ -348,16 +349,16 @@ public class JsonbConfigProperties {
 
     /**
      * <p>Makes parsing dates defaulting to zero hour, minute and second.
-     * This will made available to parse patterns like yyyy.MM.dd to {@link java.time.Instant} {@link java.time.LocalDate} or even
-     * {@link java.time.ZonedDateTime}.
-     *
+     * This will made available to parse patterns like yyyy.MM.dd to
+     * {@link java.util.Date}, {@link java.util.Calendar}, {@link java.time.Instant} {@link java.time.LocalDate}
+     * or even {@link java.time.ZonedDateTime}.
      * <p>If time zone is not set in the pattern than UTC time zone is used.
      * So for example json value 2018.01.01 becomes 2018.01.01 00:00:00 UTC when parsed
-     * to instant {@link java.time.Instant} or {@link java.time.ZonedDateTime}.
+     * to instant {@link java.time.Instant}.
      *
      * @return true if time should be defaulted to zero.
      */
-    public boolean isZeroTimeDefaultingForJavaTime() {
-        return zeroTimeDefaultingForJavaTime;
+    public boolean isZeroTimeDefaulting() {
+        return zeroTimeDefaulting;
     }
 }

@@ -456,7 +456,7 @@ public class AnnotationIntrospector {
 
         DateTimeFormatterBuilder builder = new DateTimeFormatterBuilder();
         builder.appendPattern(format);
-        if (jsonbContext.getConfigProperties().isZeroTimeDefaultingForJavaTime()) {
+        if (jsonbContext.getConfigProperties().isZeroTimeDefaulting()) {
             builder.parseDefaulting(ChronoField.SECOND_OF_MINUTE, 0);
             builder.parseDefaulting(ChronoField.MINUTE_OF_HOUR, 0);
             builder.parseDefaulting(ChronoField.HOUR_OF_DAY, 0);

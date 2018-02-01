@@ -147,7 +147,7 @@ public class JsonbDateFormatterTest {
         pojo.setZonedInstant(zdt.withZoneSameInstant(ZoneId.of("Europe/Paris")).toInstant());
 
         Jsonb zeroDefaultingJsonb = new JsonBindingBuilder()
-                .withConfig(new JsonbConfig().setProperty(JsonbConfigProperties.ZERO_TIME_DEFAULTING_FOR_JAVA_TIME, true))
+                .withConfig(new JsonbConfig().setProperty(JsonbConfigProperties.ZERO_TIME_DEFAULTING, true))
                 .build();
 
         String serialized = zeroDefaultingJsonb.toJson(pojo);
