@@ -77,6 +77,7 @@ public enum MessageKeys {
     JSONB_TRANSIENT_WITH_OTHER_ANNOTATIONS("jsonbTransientWithOtherAnnotations"),
     NON_PARAMETRIZED_TYPE("nonParametrizedType"),
     PROPERTY_NAME_CLASH("propertyNameClash"),
+    SQL_DATE_IJSON_ERROR("sqlDateIJsonError"),
     ;
 
     /** Message bundle key. */
