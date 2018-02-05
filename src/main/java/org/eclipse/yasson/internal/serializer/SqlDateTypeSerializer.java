@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2016, 2018 Oracle and/or its affiliates. All rights reserved.
+ * Copyright (c) 2018 Oracle and/or its affiliates. All rights reserved.
  * This program and the accompanying materials are made available under the
  * terms of the Eclipse Public License v1.0 and Eclipse Distribution License v. 1.0
  * which accompanies this distribution.
@@ -15,28 +15,29 @@ package org.eclipse.yasson.internal.serializer;
 
 import org.eclipse.yasson.internal.model.JsonBindingModel;
 
+import java.sql.Date;
 import java.time.format.DateTimeFormatter;
-import java.util.Date;
 
 /**
- * Serializer for {@link Date} type.
+ * Serializer for {@link java.sql.Date} type.
+ * {@link java.sql.Date} has no time portion, so it uses {@code ISO_DATE} format.
  *
- * @author David Kral
+ * @author Roman Grigoriadi
  */
-public class DateTypeSerializer<T extends Date> extends AbstractDateTypeSerializer<T> {
+public class SqlDateTypeSerializer extends AbstractDateTypeSerializer<Date> {
 
-    private DateTimeFormatter DEFAULT_FORMATTER = DateTimeFormatter.ISO_DATE_TIME.withZone(UTC);
+    public static DateTimeFormatter DEFAULT_FORMATTER = DateTimeFormatter.ISO_DATE.withZone(UTC);
 
     /**
      * Construct serializer with its class.
      *
      * @param model Binding model.
      */
-    public DateTypeSerializer(JsonBindingModel model) {
+    public SqlDateTypeSerializer(JsonBindingModel model) {
         super(model);
     }
 
-
+    @Override
     protected DateTimeFormatter getDefaultFormatter() {
         return DEFAULT_FORMATTER;
     }

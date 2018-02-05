@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2015 Oracle and/or its affiliates. All rights reserved.
+ * Copyright (c) 2015, 2018 Oracle and/or its affiliates. All rights reserved.
  * This program and the accompanying materials are made available under the
  * terms of the Eclipse Public License v1.0 and Eclipse Distribution License v. 1.0
  * which accompanies this distribution.
@@ -13,9 +13,20 @@
 package org.eclipse.yasson.defaultmapping.dates;
 
 import org.eclipse.yasson.TestTypeToken;
-import org.eclipse.yasson.defaultmapping.dates.model.*;
+import org.eclipse.yasson.defaultmapping.dates.model.CalendarPojo;
+import org.eclipse.yasson.defaultmapping.dates.model.ClassLevelDateAnnotation;
+import org.eclipse.yasson.defaultmapping.dates.model.DatePojo;
+import org.eclipse.yasson.defaultmapping.dates.model.InstantPojo;
+import org.eclipse.yasson.defaultmapping.dates.model.LocalDatePojo;
+import org.eclipse.yasson.defaultmapping.dates.model.LocalDateTimePojo;
+import org.eclipse.yasson.defaultmapping.dates.model.LocalTimePojo;
+import org.eclipse.yasson.defaultmapping.dates.model.OffsetDateTimePojo;
+import org.eclipse.yasson.defaultmapping.dates.model.OffsetTimePojo;
+import org.eclipse.yasson.defaultmapping.dates.model.ZonedDateTimePojo;
 import org.eclipse.yasson.defaultmapping.generics.model.ScalarValueWrapper;
 import org.eclipse.yasson.internal.JsonBindingBuilder;
+import org.eclipse.yasson.internal.JsonbConfigProperties;
+import org.eclipse.yasson.internal.serializer.SqlDateTypeDeserializer;
 import org.junit.Assert;
 import org.junit.Test;
 
@@ -23,14 +34,34 @@ import javax.json.bind.Jsonb;
 import javax.json.bind.JsonbBuilder;
 import javax.json.bind.JsonbConfig;
 import javax.json.bind.annotation.JsonbDateFormat;
+import javax.json.bind.annotation.JsonbTypeDeserializer;
 import javax.json.bind.config.PropertyVisibilityStrategy;
+import java.io.Serializable;
 import java.lang.reflect.Field;
 import java.lang.reflect.Method;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
-import java.time.*;
+import java.time.Duration;
+import java.time.Instant;
+import java.time.LocalDate;
+import java.time.LocalDateTime;
+import java.time.LocalTime;
+import java.time.Month;
+import java.time.OffsetDateTime;
+import java.time.OffsetTime;
+import java.time.Period;
+import java.time.ZoneId;
+import java.time.ZoneOffset;
+import java.time.ZonedDateTime;
 import java.time.format.DateTimeFormatter;
-import java.util.*;
+import java.util.Calendar;
+import java.util.Date;
+import java.util.GregorianCalendar;
+import java.util.HashMap;
+import java.util.Locale;
+import java.util.Map;
+import java.util.SimpleTimeZone;
+import java.util.TimeZone;
 
 import static org.junit.Assert.assertEquals;
 
@@ -42,6 +73,55 @@ import static org.junit.Assert.assertEquals;
 public class DatesTest {
 
     private final Jsonb jsonb = (new JsonBindingBuilder()).build();
+
+    private static LocalDate localDate = LocalDate.of(2008, 1, 31);
+
+    public static class LocalDateObj implements Serializable {
+        public LocalDate date = localDate;
+    }
+
+    public static class SqlDateObj implements Serializable {
+        public java.sql.Date sqlDate = new java.sql.Date(localDate.atStartOfDay(ZoneId.of("UTC")).toInstant().toEpochMilli());
+        //no way for runtime to choose java.sql.Date deserializer here without a hint
+        @JsonbTypeDeserializer(SqlDateTypeDeserializer.class)
+        public java.util.Date utilDate = new java.sql.Date(localDate.atStartOfDay(ZoneId.of("UTC")).toInstant().toEpochMilli());
+
+    }
+
+    @Test
+    public void testMarshallSqlDate() {
+        Jsonb jsonb = new JsonBindingBuilder().withConfig(new JsonbConfig().setProperty(JsonbConfigProperties.ZERO_TIME_DEFAULTING, true)).build();
+        String jsonString = jsonb.toJson(new SqlDateObj());
+        Assert.assertEquals("{\"sqlDate\":\"2008-01-31Z\",\"utilDate\":\"2008-01-31Z\"}", jsonString);
+    }
+
+    @Test
+    public void testUnmarshallSqlDate() {
+        JsonBindingBuilder builder = new JsonBindingBuilder();
+        Jsonb json = builder.build();
+        SqlDateObj result = json.fromJson("{\"sqlDate\":\"2008-01-31Z\",\"utilDate\":\"2008-01-31Z\"}", SqlDateObj.class);
+        long expectedUtcMillis = localDate.atStartOfDay(ZoneId.of("UTC")).toInstant().toEpochMilli();
+        Assert.assertEquals(new java.sql.Date(expectedUtcMillis), result.sqlDate);
+        Assert.assertEquals(new java.sql.Date(expectedUtcMillis), result.utilDate);
+    }
+
+    @Test
+    public void testMarshallLocalDate() {
+        JsonBindingBuilder builder = new JsonBindingBuilder();
+        Jsonb json = builder.build();
+        String jsonString = json.toJson(new LocalDateObj());
+        if (jsonString.contains("T")) {
+            Assert.fail("JSON contains time for a non Date that doesn't include time");
+        }
+    }
+
+    @Test
+    public void testUnmarshallLocalDate() {
+        JsonBindingBuilder builder = new JsonBindingBuilder();
+        Jsonb json = builder.build();
+        LocalDateObj localDateObj = json.fromJson("{\"date\":\"1955-03-28\"}", LocalDateObj.class);
+        Assert.assertEquals(localDate, localDateObj.date);
+    }
 
     @Test
     public void testDate() throws ParseException {

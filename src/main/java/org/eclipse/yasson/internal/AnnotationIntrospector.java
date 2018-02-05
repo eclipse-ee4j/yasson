@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2016, 2017 Oracle and/or its affiliates. All rights reserved.
+ * Copyright (c) 2016, 2018 Oracle and/or its affiliates. All rights reserved.
  * This program and the accompanying materials are made available under the
  * terms of the Eclipse Public License v1.0 and Eclipse Distribution License v. 1.0
  * which accompanies this distribution.
@@ -17,10 +17,6 @@ import org.eclipse.yasson.ImplementationClass;
 import org.eclipse.yasson.internal.components.AdapterBinding;
 import org.eclipse.yasson.internal.components.DeserializerBinding;
 import org.eclipse.yasson.internal.components.SerializerBinding;
-import org.eclipse.yasson.internal.properties.MessageKeys;
-import org.eclipse.yasson.internal.properties.Messages;
-import org.eclipse.yasson.internal.serializer.JsonbDateFormatter;
-import org.eclipse.yasson.internal.serializer.JsonbNumberFormatter;
 import org.eclipse.yasson.internal.model.AnnotationTarget;
 import org.eclipse.yasson.internal.model.CreatorModel;
 import org.eclipse.yasson.internal.model.JsonbAnnotatedElement;
@@ -28,6 +24,10 @@ import org.eclipse.yasson.internal.model.JsonbCreator;
 import org.eclipse.yasson.internal.model.Property;
 import org.eclipse.yasson.internal.model.customization.ClassCustomization;
 import org.eclipse.yasson.internal.model.customization.ClassCustomizationBuilder;
+import org.eclipse.yasson.internal.properties.MessageKeys;
+import org.eclipse.yasson.internal.properties.Messages;
+import org.eclipse.yasson.internal.serializer.JsonbDateFormatter;
+import org.eclipse.yasson.internal.serializer.JsonbNumberFormatter;
 
 import javax.json.bind.JsonbException;
 import javax.json.bind.adapter.JsonbAdapter;
@@ -54,6 +54,8 @@ import java.lang.reflect.Parameter;
 import java.security.AccessController;
 import java.security.PrivilegedAction;
 import java.time.format.DateTimeFormatter;
+import java.time.format.DateTimeFormatterBuilder;
+import java.time.temporal.ChronoField;
 import java.time.temporal.TemporalAccessor;
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -452,7 +454,14 @@ public class AnnotationIntrospector {
             throw new IllegalStateException(Messages.getMessage(MessageKeys.UNSUPPORTED_DATE_TYPE, propertyRawType));
         }
 
-        DateTimeFormatter dateTimeFormatter = DateTimeFormatter.ofPattern(format, Locale.forLanguageTag(locale));
+        DateTimeFormatterBuilder builder = new DateTimeFormatterBuilder();
+        builder.appendPattern(format);
+        if (jsonbContext.getConfigProperties().isZeroTimeDefaulting()) {
+            builder.parseDefaulting(ChronoField.SECOND_OF_MINUTE, 0);
+            builder.parseDefaulting(ChronoField.MINUTE_OF_HOUR, 0);
+            builder.parseDefaulting(ChronoField.HOUR_OF_DAY, 0);
+        }
+        DateTimeFormatter dateTimeFormatter = builder.toFormatter(Locale.forLanguageTag(locale));
         return new JsonbDateFormatter(dateTimeFormatter, format, locale);
     }
 
