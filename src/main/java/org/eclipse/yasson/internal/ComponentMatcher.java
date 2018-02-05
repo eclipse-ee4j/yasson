@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2016, 2017 Oracle and/or its affiliates. All rights reserved.
+ * Copyright (c) 2016, 2018 Oracle and/or its affiliates. All rights reserved.
  * This program and the accompanying materials are made available under the
  * terms of the Eclipse Public License v1.0 and Eclipse Distribution License v. 1.0
  * which accompanies this distribution.
@@ -13,8 +13,11 @@
 
 package org.eclipse.yasson.internal;
 
-import org.eclipse.yasson.internal.components.*;
-import org.eclipse.yasson.internal.model.JsonBindingModel;
+import org.eclipse.yasson.internal.components.AbstractComponentBinding;
+import org.eclipse.yasson.internal.components.AdapterBinding;
+import org.eclipse.yasson.internal.components.ComponentBindings;
+import org.eclipse.yasson.internal.components.DeserializerBinding;
+import org.eclipse.yasson.internal.components.SerializerBinding;
 import org.eclipse.yasson.internal.model.customization.ComponentBoundCustomization;
 
 import javax.json.bind.JsonbConfig;
@@ -153,7 +156,7 @@ public class ComponentMatcher {
         if (customization == null || customization.getDeserializerBinding() == null) {
             return searchComponentBinding(propertyRuntimeType, ComponentBindings::getDeserializer);
         }
-        return getComponentBinding(propertyRuntimeType, customization.getDeserializerBinding());
+        return Optional.of(customization.getDeserializerBinding());
     }
 
     /**
@@ -256,7 +259,7 @@ public class ComponentMatcher {
     @SuppressWarnings("unchecked")
     DeserializerBinding introspectDeserializerBinding(Class<? extends JsonbDeserializer> deserializerClass, JsonbDeserializer instance) {
         final ParameterizedType deserializerRuntimeType = ReflectionUtils.findParameterizedType(deserializerClass, JsonbDeserializer.class);
-        Type deserializerBindingType = resolveTypeArg(deserializerRuntimeType.getActualTypeArguments()[0], deserializerClass.getClass());
+        Type deserializerBindingType = resolveTypeArg(deserializerRuntimeType.getActualTypeArguments()[0], deserializerClass);
         final ComponentBindings componentBindings = getBindingInfo(deserializerBindingType);
         if (componentBindings.getDeserializer() != null && componentBindings.getDeserializer().getClass().equals(deserializerClass)) {
             return componentBindings.getDeserializer();
