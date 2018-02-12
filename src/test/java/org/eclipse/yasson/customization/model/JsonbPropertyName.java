@@ -32,6 +32,22 @@ public class JsonbPropertyName {
         return fieldAnnotatedName;
     }
 
+    /**
+     * The field is not annotated and its getter and setter methods have a different name (not just get/set + fieldName) and
+     * methods are annotated with the same name as the attribute
+     */
+    private String fieldAnnotatedViaMethodSameName;
+
+    @JsonbProperty("fieldAnnotatedViaMethodSameName")
+    public String getNotAnnotatedField() {
+        return fieldAnnotatedViaMethodSameName;
+    }
+
+    @JsonbProperty("fieldAnnotatedViaMethodSameName")
+    public void setNotAnnotatedField(String fieldAnnotatedViaMethodSameName) {
+        this.fieldAnnotatedViaMethodSameName = fieldAnnotatedViaMethodSameName;
+    }
+
     public void setFieldAnnotatedName(String fieldAnnotatedName) {
         this.fieldAnnotatedName = fieldAnnotatedName;
     }
