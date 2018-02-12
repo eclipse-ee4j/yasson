@@ -13,11 +13,11 @@
 
 package org.eclipse.yasson.customization;
 
+import org.eclipse.yasson.YassonProperties;
 import org.eclipse.yasson.customization.model.DateFormatPojo;
 import org.eclipse.yasson.customization.model.DateFormatPojoWithClassLevelFormatter;
 import org.eclipse.yasson.customization.model.TrimmedDatePojo;
 import org.eclipse.yasson.internal.JsonBindingBuilder;
-import org.eclipse.yasson.internal.JsonbConfigProperties;
 import org.junit.Assert;
 import org.junit.Test;
 
@@ -147,7 +147,7 @@ public class JsonbDateFormatterTest {
         pojo.setZonedInstant(zdt.withZoneSameInstant(ZoneId.of("Europe/Paris")).toInstant());
 
         Jsonb zeroDefaultingJsonb = new JsonBindingBuilder()
-                .withConfig(new JsonbConfig().setProperty(JsonbConfigProperties.ZERO_TIME_DEFAULTING, true))
+                .withConfig(new JsonbConfig().setProperty(YassonProperties.ZERO_TIME_PARSE_DEFAULTING, true))
                 .build();
 
         String serialized = zeroDefaultingJsonb.toJson(pojo);

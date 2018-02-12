@@ -12,6 +12,7 @@
  ******************************************************************************/
 package org.eclipse.yasson.internal;
 
+import org.eclipse.yasson.YassonProperties;
 import org.eclipse.yasson.internal.model.customization.naming.DefaultNamingStrategies;
 import org.eclipse.yasson.internal.model.customization.naming.IdentityStrategy;
 import org.eclipse.yasson.internal.model.customization.ordering.AnyOrderStrategy;
@@ -44,25 +45,6 @@ import java.util.Optional;
  * @author Roman Grigoriadi
  */
 public class JsonbConfigProperties {
-
-    /**
-     * Property used to specify behaviour on deserialization when JSON document contains properties
-     * which doesn't exist in the target class. Default value is 'true'.
-     */
-    public static final String FAIL_ON_UNKNOWN_PROPERTIES = "jsonb.fail-on-unknown-properties";
-
-    public static final String USER_TYPE_MAPPING = "jsonb.user-type-mapping";
-
-    /**
-     * <p>Makes parsing dates defaulting to zero hour, minute and second.
-     * This will made available to parse patterns like yyyy.MM.dd to
-     * {@link java.util.Date}, {@link java.util.Calendar}, {@link java.time.Instant} {@link java.time.LocalDate}
-     * or even {@link java.time.ZonedDateTime}.
-     * <p>If time zone is not set in the pattern than UTC time zone is used.
-     * So for example json value 2018.01.01 becomes 2018.01.01 00:00:00 UTC when parsed
-     * to instant {@link java.time.Instant} or {@link java.time.ZonedDateTime}.
-     */
-    public static final String ZERO_TIME_DEFAULTING = "jsonb.zero-time-defaulting";
 
     private final JsonbConfig jsonbConfig;
 
@@ -104,18 +86,18 @@ public class JsonbConfigProperties {
     }
 
     private boolean initZeroTimeDefaultingForJavaTime() {
-        return getBooleanConfigProperty(ZERO_TIME_DEFAULTING, false);
+        return getBooleanConfigProperty(YassonProperties.ZERO_TIME_PARSE_DEFAULTING, false);
     }
 
     @SuppressWarnings("unchecked")
     private Map<Class<?>,Class<?>> initUserTypeMapping() {
-        Optional<Object> property = jsonbConfig.getProperty(USER_TYPE_MAPPING);
+        Optional<Object> property = jsonbConfig.getProperty(YassonProperties.USER_TYPE_MAPPING);
         if (!property.isPresent()) {
             return Collections.emptyMap();
         }
         Object result = property.get();
         if (!(result instanceof Map)) {
-            throw new JsonbException(Messages.getMessage(MessageKeys.JSONB_CONFIG_PROPERTY_INVALID_TYPE, USER_TYPE_MAPPING, Map.class.getSimpleName()));
+            throw new JsonbException(Messages.getMessage(MessageKeys.JSONB_CONFIG_PROPERTY_INVALID_TYPE, YassonProperties.USER_TYPE_MAPPING, Map.class.getSimpleName()));
         }
         return (Map<Class<?>, Class<?>>) result;
     }
@@ -214,7 +196,7 @@ public class JsonbConfigProperties {
     }
 
     private boolean initConfigFailOnUnknownProperties() {
-        return getBooleanConfigProperty(FAIL_ON_UNKNOWN_PROPERTIES, false);
+        return getBooleanConfigProperty(YassonProperties.FAIL_ON_UNKNOWN_PROPERTIES, false);
     }
 
     /**
