@@ -12,9 +12,9 @@
  ******************************************************************************/
 package org.eclipse.yasson.internal.model;
 
+import org.eclipse.yasson.internal.AnnotationIntrospector;
 import org.eclipse.yasson.internal.JsonbContext;
-import org.eclipse.yasson.internal.model.customization.CreatorCustomization;
-import org.eclipse.yasson.internal.model.customization.Customization;
+import org.eclipse.yasson.internal.model.customization.*;
 import org.eclipse.yasson.internal.serializer.JsonbDateFormatter;
 import org.eclipse.yasson.internal.serializer.JsonbNumberFormatter;
 
@@ -45,10 +45,17 @@ public class CreatorModel implements JsonBindingModel {
         this.name = name;
         this.type = parameter.getType();
 
+        AnnotationIntrospector annotationIntrospector = context.getAnnotationIntrospector();
+
         JsonbAnnotatedElement<Parameter> annotated = new JsonbAnnotatedElement<>(parameter);
         JsonbNumberFormatter constructorNumberFormatter = context.getAnnotationIntrospector().getConstructorNumberFormatter(annotated);
         JsonbDateFormatter constructorDateFormatter = context.getAnnotationIntrospector().getConstructorDateFormatter(annotated);
-        this.creatorCustomization = new CreatorCustomization(constructorNumberFormatter, constructorDateFormatter);
+        final JsonbAnnotatedElement<Class<?>> clsElement = annotationIntrospector.collectAnnotations(parameter.getType());
+        final CustomizationBuilder builder = new ClassCustomizationBuilder();
+        builder.setAdapterInfo(annotationIntrospector.getAdapterBinding(clsElement));
+        builder.setDeserializerBinding(annotationIntrospector.getDeserializerBinding(clsElement));
+        builder.setSerializerBinding(annotationIntrospector.getSerializerBinding(clsElement));
+        this.creatorCustomization = new CreatorCustomization(builder, constructorNumberFormatter, constructorDateFormatter);
     }
 
     /**

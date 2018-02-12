@@ -204,6 +204,22 @@ public class AnnotationIntrospector {
         return getAdapterBindingFromAnnotation(adapterAnnotation, ReflectionUtils.getOptionalRawType(property.getPropertyType()));
     }
 
+    /**
+     * Checks for {@link JsonbAdapter} on a type.
+     * @param clsElement type not null
+     * @return components info
+     */
+    public AdapterBinding getAdapterBinding(JsonbAnnotatedElement<Class<?>> clsElement) {
+        Objects.requireNonNull(clsElement);
+
+        JsonbTypeAdapter adapterAnnotation = clsElement.getElement().getAnnotation(JsonbTypeAdapter.class);
+        if (adapterAnnotation == null) {
+            return null;
+        }
+
+        return getAdapterBindingFromAnnotation(adapterAnnotation, Optional.ofNullable(clsElement.getElement()));
+    }
+
     private AdapterBinding getAdapterBindingFromAnnotation(JsonbTypeAdapter adapterAnnotation, Optional<Class<?>> expectedClass) {
         final Class<? extends JsonbAdapter> adapterClass = adapterAnnotation.value();
         final AdapterBinding adapterBinding = jsonbContext.getComponentMatcher().introspectAdapterBinding(adapterClass, null);
@@ -232,6 +248,22 @@ public class AnnotationIntrospector {
     }
 
     /**
+     * Checks for {@link JsonbDeserializer} on a type.
+     * @param clsElement type not null
+     * @return components info
+     */
+    public DeserializerBinding getDeserializerBinding(JsonbAnnotatedElement<Class<?>> clsElement) {
+        Objects.requireNonNull(clsElement);
+        JsonbTypeDeserializer deserializerAnnotation = clsElement.getElement().getAnnotation(JsonbTypeDeserializer.class);
+        if (deserializerAnnotation == null) {
+            return null;
+        }
+
+        final Class<? extends JsonbDeserializer> deserializerClass = deserializerAnnotation.value();
+        return jsonbContext.getComponentMatcher().introspectDeserializerBinding(deserializerClass, null);
+    }
+
+    /**
      * Checks for {@link JsonbSerializer} on a property.
      * @param property property not null
      * @return components info
@@ -247,6 +279,22 @@ public class AnnotationIntrospector {
         final Class<? extends JsonbSerializer> serializerClass = serializerAnnotation.value();
         return jsonbContext.getComponentMatcher().introspectSerializerBinding(serializerClass, null);
 
+    }
+
+    /**
+     * Checks for {@link JsonbSerializer} on a type.
+     * @param clsElement type not null
+     * @return components info
+     */
+    public SerializerBinding getSerializerBinding(JsonbAnnotatedElement<Class<?>> clsElement) {
+        Objects.requireNonNull(clsElement);
+        JsonbTypeSerializer serializerAnnotation = clsElement.getElement().getAnnotation(JsonbTypeSerializer.class);
+        if (serializerAnnotation == null) {
+            return null;
+        }
+
+        final Class<? extends JsonbSerializer> serializerClass = serializerAnnotation.value();
+        return jsonbContext.getComponentMatcher().introspectSerializerBinding(serializerClass, null);
     }
 
     private <T extends Annotation> T getAnnotationFromPropertyType(Property property, Class<T> annotationClass) {
@@ -633,6 +681,9 @@ public class AnnotationIntrospector {
         builder.setNumberFormatter(getJsonbNumberFormat(clsElement));
         builder.setCreator(getCreator(clsElement.getElement()));
         builder.setPropertyOrder(getPropertyOrder(clsElement));
+        builder.setAdapterInfo(getAdapterBinding(clsElement));
+        builder.setSerializerBinding(getSerializerBinding(clsElement));
+        builder.setDeserializerBinding(getDeserializerBinding(clsElement));
         return builder.buildClassCustomization();
     }
 
