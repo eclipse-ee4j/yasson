@@ -13,11 +13,12 @@
 package org.eclipse.yasson.internal;
 
 import org.eclipse.yasson.internal.model.*;
+import org.eclipse.yasson.internal.model.customization.CreatorCustomization;
 import org.eclipse.yasson.internal.properties.MessageKeys;
 import org.eclipse.yasson.internal.properties.Messages;
-import org.eclipse.yasson.internal.model.customization.CreatorCustomization;
 
 import javax.json.bind.JsonbException;
+import javax.json.bind.annotation.JsonbProperty;
 import java.beans.Introspector;
 import java.lang.annotation.Annotation;
 import java.lang.reflect.Field;
@@ -120,8 +121,17 @@ class ClassParser {
                 continue;
             }
             final String propertyName = toPropertyMethod(name);
-
-            Property property = classProperties.computeIfAbsent(propertyName, n -> new Property(n, classElement));
+            Property property = classProperties.get(propertyName);
+            if(property == null) {
+                if(method.isAnnotationPresent(JsonbProperty.class)) {
+                    //  Method is annotated with JsonbProperty, check if the name specified for the property is the same as the name of a field in the
+                    //  class. If it's, ignore this property as given field would have its own getter/setter parsed and encapsulated on its own
+                    //  instance of PropertyModel class
+                    property = classProperties.computeIfAbsent(method.getAnnotation(JsonbProperty.class).value(), n -> new Property(n, classElement));
+                } else {
+                    property = classProperties.computeIfAbsent(propertyName, n -> new Property(n, classElement));
+                }
+            }
 
             if (isSetter(method)) {
                 property.setSetter(method);
