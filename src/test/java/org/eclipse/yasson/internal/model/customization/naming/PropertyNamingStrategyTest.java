@@ -13,6 +13,7 @@
 
 package org.eclipse.yasson.internal.model.customization.naming;
 
+import org.eclipse.yasson.customization.model.JsonbPropertyName;
 import org.junit.Test;
 
 import javax.json.bind.Jsonb;
@@ -108,6 +109,18 @@ public class PropertyNamingStrategyTest {
         assertEquals(custom, jsonb.toJson(pojo));
         NamingPojo result = jsonb.fromJson(custom, NamingPojo.class);
         assertResult(result);
+    }
+
+    @Test
+    public void testAccessMethodNamedDifferentThanFieldAndAnnotatedSameAsFieldDeserialized() {
+        final Jsonb jsonb = JsonbBuilder.create(new JsonbConfig().withPropertyNamingStrategy(PropertyNamingStrategy.CASE_INSENSITIVE));
+
+        final JsonbPropertyName bean1 = new JsonbPropertyName();
+        bean1.setNotAnnotatedField("Sample Value");
+
+        final String json = jsonb.toJson(bean1);
+        final JsonbPropertyName bean2 = jsonb.fromJson(json, JsonbPropertyName.class);
+        assertEquals( bean1.getNotAnnotatedField(), bean2.getNotAnnotatedField());
     }
 
     private void assertResult(NamingPojo result) {
