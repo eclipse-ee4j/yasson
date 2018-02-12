@@ -7,7 +7,7 @@ import org.eclipse.yasson.internal.serializer.JsonbNumberFormatter;
 /**
  * Customization for creator (constructor / factory methods) parameters.
  */
-public class CreatorCustomization implements Customization {
+public class CreatorCustomization extends CustomizationBase {
 
     private JsonbNumberFormatter numberFormatter;
 
@@ -15,7 +15,8 @@ public class CreatorCustomization implements Customization {
 
     private PropertyModel propertyModel;
 
-    public CreatorCustomization(JsonbNumberFormatter numberFormatter, JsonbDateFormatter dateFormatter) {
+    public CreatorCustomization(CustomizationBuilder customization, JsonbNumberFormatter numberFormatter, JsonbDateFormatter dateFormatter) {
+        super(customization);
         this.numberFormatter = numberFormatter;
         this.dateFormatter = dateFormatter;
     }
