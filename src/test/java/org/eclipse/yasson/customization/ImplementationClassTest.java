@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2017 Oracle and/or its affiliates. All rights reserved.
+ * Copyright (c) 2017, 2018 Oracle and/or its affiliates. All rights reserved.
  * This program and the accompanying materials are made available under the
  * terms of the Eclipse Public License v1.0 and Eclipse Distribution License v. 1.0
  * which accompanies this distribution.
@@ -12,10 +12,10 @@
  ******************************************************************************/
 package org.eclipse.yasson.customization;
 
+import org.eclipse.yasson.YassonProperties;
 import org.eclipse.yasson.customization.model.Animal;
 import org.eclipse.yasson.customization.model.Dog;
 import org.eclipse.yasson.customization.model.ImplementationClassPojo;
-import org.eclipse.yasson.internal.JsonbConfigProperties;
 import org.junit.Assert;
 import org.junit.Test;
 
@@ -46,7 +46,7 @@ public class ImplementationClassTest {
     public void testJsonbConfigUserImplementation() {
         HashMap<Class, Class> userMapping = new HashMap<>();
         userMapping.put(Animal.class, Dog.class);
-        Jsonb jsonb = JsonbBuilder.create(new JsonbConfig().setProperty(JsonbConfigProperties.USER_TYPE_MAPPING, userMapping));
+        Jsonb jsonb = JsonbBuilder.create(new JsonbConfig().setProperty(YassonProperties.USER_TYPE_MAPPING, userMapping));
         Animal animal = new Dog("Bulldog");
         String expected = "{\"dogProperty\":\"Bulldog\"}";
         String json = jsonb.toJson(animal);

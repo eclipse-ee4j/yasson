@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2016, 2017 Oracle and/or its affiliates. All rights reserved.
+ * Copyright (c) 2016, 2018 Oracle and/or its affiliates. All rights reserved.
  * This program and the accompanying materials are made available under the
  * terms of the Eclipse Public License v1.0 and Eclipse Distribution License v. 1.0
  * which accompanies this distribution.
@@ -15,17 +15,17 @@ package org.eclipse.yasson.internal.serializer;
 
 import org.eclipse.yasson.internal.JsonbContext;
 import org.eclipse.yasson.internal.Unmarshaller;
+import org.eclipse.yasson.internal.model.JsonBindingModel;
 import org.eclipse.yasson.internal.properties.MessageKeys;
 import org.eclipse.yasson.internal.properties.Messages;
-import org.eclipse.yasson.internal.model.JsonBindingModel;
 
 import javax.json.bind.JsonbException;
 import javax.json.bind.annotation.JsonbDateFormat;
 import java.lang.reflect.Type;
+import java.time.DateTimeException;
 import java.time.Instant;
 import java.time.ZoneId;
 import java.time.format.DateTimeFormatter;
-import java.time.format.DateTimeParseException;
 import java.util.Locale;
 
 /**
@@ -66,8 +66,8 @@ public abstract class AbstractDateTimeDeserializer<T> extends AbstractValueTypeD
         }
         try {
             return parseDefault(jsonValue, unmarshaller.getJsonbContext().getConfigProperties().getLocale(formatter.getLocale()));
-        } catch (DateTimeParseException e) {
-            throw new JsonbException(Messages.getMessage(MessageKeys.DATE_PARSE_ERROR, jsonValue), e);
+        } catch (DateTimeException e) {
+            throw new JsonbException(Messages.getMessage(MessageKeys.DATE_PARSE_ERROR, jsonValue, getPropertyType()), e);
         }
     }
 
@@ -120,8 +120,8 @@ public abstract class AbstractDateTimeDeserializer<T> extends AbstractValueTypeD
     private T parseWithFormatterInternal(String jsonValue, DateTimeFormatter formatter) {
         try {
             return parseWithFormatter(jsonValue, formatter);
-        } catch (DateTimeParseException e) {
-            throw new JsonbException(Messages.getMessage(MessageKeys.DATE_PARSE_ERROR, jsonValue), e);
+        } catch (DateTimeException e) {
+            throw new JsonbException(Messages.getMessage(MessageKeys.DATE_PARSE_ERROR, jsonValue, getPropertyType()), e);
         }
     }
 }
