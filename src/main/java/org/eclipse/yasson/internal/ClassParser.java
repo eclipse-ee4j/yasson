@@ -1,4 +1,4 @@
-/*******************************************************************************
+/** *****************************************************************************
  * Copyright (c) 2015, 2017 Oracle and/or its affiliates. All rights reserved.
  * This program and the accompanying materials are made available under the
  * terms of the Eclipse Public License v1.0 and Eclipse Distribution License v. 1.0
@@ -84,19 +84,28 @@ class ClassParser {
         Class<?> concreteClass = classElement.getElement();
         parseMethods(concreteClass, classElement, classProperties);
         for (Class<?> ifc : jsonbContext.getAnnotationIntrospector().collectInterfaces(concreteClass)) {
-            parseIfaceMethodAnnotations(ifc, classProperties);
+            parseIfaceMethodAnnotations(ifc, classElement, classProperties);
         }
     }
 
-    private void parseIfaceMethodAnnotations(Class<?> ifc, Map<String, Property> classProperties) {
+    private void parseIfaceMethodAnnotations(Class<?> ifc, JsonbAnnotatedElement<Class<?>> classElement, Map<String, Property> classProperties) {
         Method[] declaredMethods = AccessController.doPrivileged((PrivilegedAction<Method[]>) ifc::getDeclaredMethods);
-        for(Method method : declaredMethods) {
+        for (Method method : declaredMethods) {
             final String methodName = method.getName();
             if (!isPropertyMethod(method)) {
                 continue;
             }
             String propertyName = toPropertyMethod(methodName);
-            final Property property = classProperties.get(propertyName);
+
+            final Property property;
+
+            if (method.isDefault()) {
+                property = registerMethod(propertyName, method, classElement, classProperties);
+            } else {
+                property = classProperties.get(propertyName);
+            }
+
+
             if (property == null) {
                 //May happen for classes which both extend a class with some method and implement interface with same method.
                 continue;
@@ -112,6 +121,17 @@ class ClassParser {
         }
     }
 
+    private Property registerMethod(String propertyName, Method method, JsonbAnnotatedElement<Class<?>> classElement, Map<String, Property> classProperties){
+        Property property = classProperties.computeIfAbsent(propertyName, n -> new Property(n, classElement));
+        if (isSetter(method)) {
+            property.setSetter(method);
+        } else {
+            property.setGetter(method);
+        }
+
+        return property;
+    }
+
     private void parseMethods(Class<?> clazz, JsonbAnnotatedElement<Class<?>> classElement, Map<String, Property> classProperties) {
         Method[] declaredMethods = AccessController.doPrivileged((PrivilegedAction<Method[]>) clazz::getDeclaredMethods);
         for (Method method : declaredMethods) {
@@ -121,13 +141,7 @@ class ClassParser {
             }
             final String propertyName = toPropertyMethod(name);
 
-            Property property = classProperties.computeIfAbsent(propertyName, n -> new Property(n, classElement));
-
-            if (isSetter(method)) {
-                property.setSetter(method);
-            } else {
-                property.setGetter(method);
-            }
+            Property property = registerMethod(propertyName, method, classElement, classProperties);
         }
     }
 
@@ -144,7 +158,7 @@ class ClassParser {
     }
 
     private boolean isPropertyMethod(Method m) {
-    	return isGetter(m) || isSetter(m);
+        return isGetter(m) || isSetter(m);
     }
 
     private void parseFields(JsonbAnnotatedElement<Class<?>> classElement, Map<String, Property> classProperties) {
