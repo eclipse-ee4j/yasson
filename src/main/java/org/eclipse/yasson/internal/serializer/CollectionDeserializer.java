@@ -88,6 +88,9 @@ class CollectionDeserializer<T extends Collection<?>> extends AbstractContainerD
         if (Queue.class.isAssignableFrom(ifcType)) {
             return (T) new ArrayDeque<>();
         }
+        if (Collection.class == ifcType) {
+            return (T) new ArrayList();
+        }
         return null;
     }
 
