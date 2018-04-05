@@ -1,3 +1,5 @@
+[![Build Status](https://travis-ci.org/eclipse-ee4j/yasson.svg?branch=master)](https://travis-ci.org/eclipse-ee4j/yasson)
+
 # Yasson
 Yasson is a Java framework which provides a standard binding layer between Java classes and JSON documents. This is similar to what JAXB is doing in the XML world. Yasson is an official reference implementation of JSON Binding ([JSR-367](https://jcp.org/en/jsr/detail?id=367)).
 

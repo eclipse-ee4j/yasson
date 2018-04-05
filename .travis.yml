@@ -1,0 +1,15 @@
+language: java
+
+jdk:
+  - oraclejdk8
+  - oraclejdk9
+
+cache:
+  directories:
+    - .autoconf
+    - $HOME/.m2
+
+install: true
+
+script:
+- mvn -U -C clean verify
