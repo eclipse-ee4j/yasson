@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2016, 2017 Oracle and/or its affiliates. All rights reserved.
+ * Copyright (c) 2016, 2018 Oracle and/or its affiliates. All rights reserved.
  * This program and the accompanying materials are made available under the
  * terms of the Eclipse Public License v1.0 and Eclipse Distribution License v. 1.0
  * which accompanies this distribution.
@@ -13,6 +13,7 @@
 package org.eclipse.yasson.internal;
 
 
+import org.eclipse.yasson.internal.model.ClassModel;
 import org.eclipse.yasson.internal.serializer.ContainerModel;
 import org.eclipse.yasson.internal.serializer.CurrentItem;
 import org.eclipse.yasson.internal.serializer.DeserializerBuilder;
@@ -32,6 +33,7 @@ public class Unmarshaller extends ProcessingContext implements DeserializationCo
 
     /**
      * Creates instance of unmarshaller.
+     *
      * @param jsonbContext context to use
      */
     public Unmarshaller(JsonbContext jsonbContext) {
@@ -43,17 +45,20 @@ public class Unmarshaller extends ProcessingContext implements DeserializationCo
     @Override
     public <T> T deserialize(Class<T> clazz, JsonParser parser) {
         return deserializeItem(clazz, parser);
-                }
+    }
 
     @Override
     public <T> T deserialize(Type type, JsonParser parser) {
         return deserializeItem(type, parser);
-            }
+    }
 
     @SuppressWarnings("unchecked")
     private <T> T deserializeItem(Type type, JsonParser parser) {
+        ClassModel classModel = getMappingContext().getOrCreateClassModel(ReflectionUtils.getRawType(type));
         final JsonbDeserializer<?> item = new DeserializerBuilder(jsonbContext).withWrapper(current)
-                .withType(type).withJsonValueType(getRootEvent(parser)).withModel(new ContainerModel(type, null)).build();
+                .withType(type).withJsonValueType(getRootEvent(parser))
+                .withModel(new ContainerModel(type, classModel == null ? null : classModel.getCustomization()))
+                .build();
         return (T) item.deserialize(parser, this, type);
     }
 
@@ -67,10 +72,11 @@ public class Unmarshaller extends ProcessingContext implements DeserializationCo
         }
         final JsonParser.Event lastEvent = ((JsonbParser) parser).getCurrentLevel().getLastEvent();
         return lastEvent == JsonParser.Event.KEY_NAME ? parser.next() : lastEvent;
-        }
+    }
 
     /**
      * Get currently processed json item.
+     *
      * @return current item
      */
     public CurrentItem<?> getCurrent() {
@@ -79,6 +85,7 @@ public class Unmarshaller extends ProcessingContext implements DeserializationCo
 
     /**
      * Set currently processed item.
+     *
      * @param current current item
      */
     public void setCurrent(CurrentItem<?> current) {

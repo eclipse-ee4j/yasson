@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2015, 2017 Oracle and/or its affiliates. All rights reserved.
+ * Copyright (c) 2015, 2018 Oracle and/or its affiliates. All rights reserved.
  * This program and the accompanying materials are made available under the
  * terms of the Eclipse Public License v1.0 and Eclipse Distribution License v. 1.0
  * which accompanies this distribution.
@@ -12,6 +12,7 @@
  ******************************************************************************/
 package org.eclipse.yasson.internal;
 
+import org.eclipse.yasson.internal.model.ClassModel;
 import org.eclipse.yasson.internal.properties.MessageKeys;
 import org.eclipse.yasson.internal.properties.Messages;
 import org.eclipse.yasson.internal.serializer.AbstractValueTypeSerializer;
@@ -71,7 +72,8 @@ public class Marshaller extends ProcessingContext implements SerializationContex
      */
     public void marshall(Object object, JsonGenerator jsonGenerator) {
         try {
-            final ContainerModel model = new ContainerModel(runtimeType != null ? runtimeType : object.getClass(), null);
+            ClassModel classModel = getMappingContext().getOrCreateClassModel(object.getClass());
+            final ContainerModel model = new ContainerModel(runtimeType != null ? runtimeType : object.getClass(), classModel.getClassCustomization());
             serializeRoot(object, jsonGenerator, model);
         } catch (JsonbException e) {
             logger.severe(e.getMessage());

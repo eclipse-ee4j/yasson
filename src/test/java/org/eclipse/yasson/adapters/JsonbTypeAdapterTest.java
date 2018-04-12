@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2016 Oracle and/or its affiliates. All rights reserved.
+ * Copyright (c) 2016, 2018 Oracle and/or its affiliates. All rights reserved.
  * This program and the accompanying materials are made available under the
  * terms of the Eclipse Public License v1.0 and Eclipse Distribution License v. 1.0
  * which accompanies this distribution.
@@ -14,9 +14,7 @@
 package org.eclipse.yasson.adapters;
 
 import org.eclipse.yasson.TestTypeToken;
-import org.eclipse.yasson.adapters.model.Box;
-import org.eclipse.yasson.adapters.model.BoxToCratePropagatedIntegerStringAdapter;
-import org.eclipse.yasson.adapters.model.GenericBox;
+import org.eclipse.yasson.adapters.model.*;
 import org.junit.Before;
 import org.junit.Test;
 
@@ -112,6 +110,31 @@ public class JsonbTypeAdapterTest {
         AnnotatedPojo<?, ?> result = jsonb.fromJson("{\"box\":\"STR:110\"}", AnnotatedPojo.class);
         assertEquals("STR", result.box.getBoxStrField());
         assertEquals(Integer.valueOf(110), result.box.getBoxIntegerField());
+    }
+
+    @Test
+    public void testBoxWithTypeAdapter() {
+        BoxWithAdapter boxWithAdapter = new BoxWithAdapter("STR", 101);
+        String marshalledJson = jsonb.toJson(boxWithAdapter);
+        assertEquals("{\"boxInteger\":101,\"boxStr\":\"STR\"}", marshalledJson);
+
+        BoxWithAdapter result = jsonb.fromJson("{\"boxInteger\":101,\"boxStr\":\"STR\"}", BoxWithAdapter.class);
+        assertEquals("STR", result.getBoxStrField());
+        assertEquals(Integer.valueOf(101), result.getBoxIntegerField());
+    }
+
+    @Test
+    public void testBoxWithTypeSerializer() {
+        BoxWithSerializer boxWithSerializer = new BoxWithSerializer("STR", 101);
+        String marshalledJson = jsonb.toJson(boxWithSerializer);
+        assertEquals("{\"boxInteger\":101,\"boxStr\":\"STR\"}", marshalledJson);
+    }
+
+    @Test
+    public void testBoxWithTypeDeserializer() {
+        BoxWithDeserializer result = jsonb.fromJson("{\"boxInteger\":101,\"boxStr\":\"STR\"}", BoxWithDeserializer.class);
+        assertEquals("STR", result.getBoxStrField());
+        assertEquals(Integer.valueOf(101), result.getBoxIntegerField());
     }
 
 }
