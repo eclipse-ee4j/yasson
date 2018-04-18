@@ -17,6 +17,7 @@ import org.eclipse.yasson.TestTypeToken;
 import org.eclipse.yasson.defaultmapping.generics.model.AnotherGenericTestClass;
 import org.eclipse.yasson.defaultmapping.generics.model.BoundedGenericClass;
 import org.eclipse.yasson.defaultmapping.generics.model.Circle;
+import org.eclipse.yasson.defaultmapping.generics.model.CollectionContainer;
 import org.eclipse.yasson.defaultmapping.generics.model.CollectionWrapper;
 import org.eclipse.yasson.defaultmapping.generics.model.ColoredCircle;
 import org.eclipse.yasson.defaultmapping.generics.model.CyclicSubClass;
@@ -41,6 +42,8 @@ import org.junit.rules.ExpectedException;
 import javax.json.bind.Jsonb;
 import javax.json.bind.JsonbBuilder;
 import javax.json.bind.JsonbConfig;
+import javax.json.bind.JsonbException;
+
 import java.lang.reflect.Type;
 import java.math.BigDecimal;
 import java.text.ParseException;
@@ -57,6 +60,7 @@ import java.util.TimeZone;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertTrue;
+import static org.junit.Assert.fail;
 
 /**
  * This class contains JSONB default mapping generics tests.
@@ -411,6 +415,17 @@ public class GenericsTest {
         GenericTestClass result = jsonb.fromJson("{\"field1\":{\"val1\":\"abc\"},\"field2\":{\"val1\":\"def\"}}", GenericTestClass.class);
         Assert.assertEquals(((HashMap<String, ?>) result.getField1()).get("val1"), "abc");
         Assert.assertEquals(((HashMap<String, ?>) result.getField2()).get("val1"), "def");
+    }
+
+    @Test
+       @SuppressWarnings("unchecked")
+       public void testDeserializeCollectionIntoRawMustThrowException() {
+        try {
+            Object result = jsonb.fromJson("{ \"stringCollection\" : [ \"Test 1\", \"Test 2\" ]", CollectionContainer.class);
+            fail("unmarshalling a collection didn't throw expected JsonbException, instead unmarshalled object = " + result);
+        } catch (JsonbException expected) {
+            // success
+        }
     }
 
     @Test
