@@ -80,9 +80,6 @@ public class OptionalObjectSerializer<T extends Optional<?>> implements CurrentI
     public void serialize(T obj, JsonGenerator generator, SerializationContext ctx) {
         JsonbContext jsonbContext = ((ProcessingContext) ctx).getJsonbContext();
         if (obj == null || !obj.isPresent()) {
-            if (!wrapperModel.getCustomization().isNillable()) {
-                return;
-            }
             generator.writeNull();
             return;
         }

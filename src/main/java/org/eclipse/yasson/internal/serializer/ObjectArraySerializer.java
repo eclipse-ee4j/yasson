@@ -30,7 +30,7 @@ public class ObjectArraySerializer<T> extends AbstractArraySerializer<T[]> {
     @Override
     protected void serializeInternal(T[] arr, JsonGenerator generator, SerializationContext ctx) {
         for (T obj : arr) {
-            serializeItem(obj, generator, ctx, containerModel);
+            serializeItem(obj, generator, ctx);
         }
     }
 }

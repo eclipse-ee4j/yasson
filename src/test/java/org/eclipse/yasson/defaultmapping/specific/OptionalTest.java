@@ -34,10 +34,41 @@ import static org.junit.Assert.assertTrue;
  */
 public class OptionalTest {
 
+    @Test
+    public void testOptionalIntRoot() {
+        final Jsonb jsonb = new JsonBindingBuilder().build();
+        OptionalInt testOptional = OptionalInt.of(1);
+        String result = jsonb.toJson(testOptional);
+        assertEquals("1", result);
+    }
+
+    @Test
+    public void testOptionalRoot() {
+        final Jsonb jsonb = new JsonBindingBuilder().build();
+        Optional testOptional = Optional.of("money");
+        String result = jsonb.toJson(testOptional);
+        assertEquals("\"money\"", result);
+    }
+
+    @Test
+    public void testOptionalEmptyRoot() {
+        final Jsonb jsonb = new JsonBindingBuilder().build();
+        Optional<String> testOptional = Optional.empty();
+        String result = jsonb.toJson(testOptional);
+        assertEquals("null", result);
+    }
+
+    @Test
+    public void testOptionalIntEmptyRoot() {
+        final Jsonb jsonb = new JsonBindingBuilder().build();
+        OptionalInt testOptionalInt = OptionalInt.empty();
+        String result = jsonb.toJson(testOptionalInt);
+        assertEquals("null", result);
+    }
 
     @Test
     public void testOptionalString() {
-        final Jsonb jsonb = (new JsonBindingBuilder()).build();
+        final Jsonb jsonb = new JsonBindingBuilder().build();
         assertEquals("{\"value\":\"abc\"}", jsonb.toJson(new ScalarValueWrapper<>(Optional.of("abc"))));
 
         ScalarValueWrapper<Optional> result = jsonb.fromJson("{\"value\":\"abc\"}", new TestTypeToken<ScalarValueWrapper<Optional>>() {}.getType());
@@ -46,7 +77,7 @@ public class OptionalTest {
 
     @Test
     public void testOptionalObject() {
-        final Jsonb jsonb = (new JsonBindingBuilder()).build();
+        final Jsonb jsonb = new JsonBindingBuilder().build();
         final OptionalWrapper optionalWrapper = new OptionalWrapper();
         Street street = new Street("Xaveriova", 110);
         optionalWrapper.setStreetOptional(Optional.of(street));
@@ -61,7 +92,7 @@ public class OptionalTest {
 
     @Test
     public void testMarshallOptional() {
-        final Jsonb jsonb = (new JsonBindingBuilder()).build();
+        final Jsonb jsonb = new JsonBindingBuilder().build();
         assertEquals("{}", jsonb.toJson(new ScalarValueWrapper<>(OptionalInt.empty())));
         assertEquals("{}", jsonb.toJson(new ScalarValueWrapper<>(OptionalLong.empty())));
         assertEquals("{}", jsonb.toJson(new ScalarValueWrapper<>(OptionalDouble.empty())));
@@ -75,7 +106,7 @@ public class OptionalTest {
 
     @Test
     public void testMarshallOptionalObject() {
-        final Jsonb jsonb = (new JsonBindingBuilder()).build();
+        final Jsonb jsonb = new JsonBindingBuilder().build();
         assertEquals("{}", jsonb.toJson(new ScalarValueWrapper<>(Optional.empty())));
         assertEquals("{\"id\":1,\"name\":\"Cust1\"}", jsonb.toJson(Optional.of(new Customer(1, "Cust1"))));
 
@@ -83,7 +114,7 @@ public class OptionalTest {
 
     @Test
     public void testMarshallOptionalIntArray() {
-        final Jsonb jsonb = (new JsonBindingBuilder()).build();
+        final Jsonb jsonb = new JsonBindingBuilder().build();
 
         final OptionalInt[] array = {OptionalInt.of(1), OptionalInt.of(2), OptionalInt.empty()};
         assertEquals("[1,2,null]", jsonb.toJson(array));
@@ -101,7 +132,7 @@ public class OptionalTest {
 
     @Test
     public void testMarshallOptionalArray() {
-        final Jsonb jsonb = (new JsonBindingBuilder()).build();
+        final Jsonb jsonb = new JsonBindingBuilder().build();
 
         final Optional[] array = {Optional.of(new Customer(1, "Cust1")), Optional.of(new Customer(2, "Cust2")), Optional.empty()};
         assertEquals("[{\"id\":1,\"name\":\"Cust1\"},{\"id\":2,\"name\":\"Cust2\"},null]", jsonb.toJson(array));
@@ -109,7 +140,7 @@ public class OptionalTest {
 
     @Test
     public void testUnmarshallNullAsOptionalEmpty() {
-        final Jsonb jsonb = (new JsonBindingBuilder()).build();
+        final Jsonb jsonb = new JsonBindingBuilder().build();
 
         final ScalarValueWrapper<OptionalInt> result = jsonb.fromJson("{\"value\":null}", new ScalarValueWrapper<OptionalInt>() {
         }.getClass().getGenericSuperclass());
@@ -118,7 +149,7 @@ public class OptionalTest {
 
     @Test
     public void testUnmarshallOptionalArrayNulls() {
-        final Jsonb jsonb = (new JsonBindingBuilder()).build();
+        final Jsonb jsonb = new JsonBindingBuilder().build();
 
         final OptionalLong[] result = jsonb.fromJson("[null, null]", OptionalLong[].class);
 
@@ -131,7 +162,7 @@ public class OptionalTest {
 
     @Test
     public void testUnmarshallOptionalList() {
-        final Jsonb jsonb = (new JsonBindingBuilder()).build();
+        final Jsonb jsonb = new JsonBindingBuilder().build();
 
         final List<Optional<Integer>> result = jsonb.fromJson("[null, null]", new TestTypeToken<List<Optional<Integer>>>() {}.getType());
 
@@ -145,11 +176,11 @@ public class OptionalTest {
     @Test
     public void testMarshallOptionalMap() {
         Map<String, OptionalInt> ints = new HashMap<>();
-        ints.put("first", OptionalInt.empty());
+        ints.put("first", OptionalInt.of(1));
         ints.put("second", OptionalInt.empty());
         final Jsonb jsonb = JsonbBuilder.create();
         String result = jsonb.toJson(ints);
-        Assert.assertEquals("{\"first\":null,\"second\":null}", result);
+        Assert.assertEquals("{\"first\":1,\"second\":null}", result);
     }
 
 

@@ -13,11 +13,14 @@
 
 package org.eclipse.yasson.internal.serializer;
 
+import org.eclipse.yasson.internal.AnnotationIntrospector;
 import org.eclipse.yasson.internal.JsonbContext;
 import org.eclipse.yasson.internal.Marshaller;
 import org.eclipse.yasson.internal.ReflectionUtils;
 import org.eclipse.yasson.internal.model.ClassModel;
 import org.eclipse.yasson.internal.model.JsonBindingModel;
+import org.eclipse.yasson.internal.model.JsonbAnnotatedElement;
+import org.eclipse.yasson.internal.model.customization.Customization;
 
 import javax.json.bind.serializer.JsonbSerializer;
 import javax.json.bind.serializer.SerializationContext;
@@ -120,7 +123,7 @@ public abstract class AbstractContainerSerializer<T> extends AbstractItem<T> imp
         this.valueClass = valueClass;
     }
 
-    protected void serializeItem(Object item, JsonGenerator generator, SerializationContext ctx, JsonBindingModel model) {
+    protected void serializeItem(Object item, JsonGenerator generator, SerializationContext ctx) {
         if (item == null) {
             generator.writeNull();
             return;
@@ -128,7 +131,14 @@ public abstract class AbstractContainerSerializer<T> extends AbstractItem<T> imp
         Class<?> itemClass = item.getClass();
         JsonbSerializer<?> serializer = getValueSerializer(itemClass);
         if (serializer == null) {
-            serializer = new SerializerBuilder(((Marshaller)ctx).getJsonbContext()).withObjectClass(itemClass).withWrapper(this).withModel(model).build();
+            JsonbContext jsonbContext = ((Marshaller) ctx).getJsonbContext();
+
+            AnnotationIntrospector annotationIntrospector = jsonbContext.getAnnotationIntrospector();
+            JsonbAnnotatedElement<Class<?>> runtimeClassJsonbAnnotatedElement = annotationIntrospector.collectAnnotations(itemClass);
+            Customization customization = annotationIntrospector.introspectCustomization(runtimeClassJsonbAnnotatedElement);
+            JsonBindingModel valueModel = new ContainerModel(itemClass, customization);
+
+            serializer = new SerializerBuilder(jsonbContext).withObjectClass(itemClass).withWrapper(this).withModel(valueModel).build();
             addValueSerializer(serializer, itemClass);
         }
         serializerCaptor(serializer, item, generator, ctx);

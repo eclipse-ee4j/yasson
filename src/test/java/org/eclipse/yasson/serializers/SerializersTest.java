@@ -13,26 +13,92 @@
 
 package org.eclipse.yasson.serializers;
 
-import org.eclipse.yasson.serializers.model.*;
+import org.eclipse.yasson.serializers.model.AnnotatedEnum;
+import org.eclipse.yasson.serializers.model.AnnotatedWithSerializerType;
+import org.eclipse.yasson.serializers.model.Author;
+import org.eclipse.yasson.serializers.model.Box;
+import org.eclipse.yasson.serializers.model.BoxWithAnnotations;
+import org.eclipse.yasson.serializers.model.Crate;
+import org.eclipse.yasson.serializers.model.CrateDeserializer;
+import org.eclipse.yasson.serializers.model.CrateDeserializerWithConversion;
+import org.eclipse.yasson.serializers.model.CrateInner;
+import org.eclipse.yasson.serializers.model.CrateJsonObjectDeserializer;
+import org.eclipse.yasson.serializers.model.CrateSerializer;
+import org.eclipse.yasson.serializers.model.CrateSerializerWithConversion;
+import org.eclipse.yasson.serializers.model.RecursiveDeserializer;
+import org.eclipse.yasson.serializers.model.RecursiveSerializer;
+import org.eclipse.yasson.serializers.model.SimpleAnnotatedSerializedArrayContainer;
+import org.eclipse.yasson.serializers.model.SimpleContainer;
+import org.eclipse.yasson.serializers.model.StringWrapper;
 import org.junit.Assert;
 import org.junit.Test;
 
-import javax.json.JsonBuilderFactory;
 import javax.json.bind.Jsonb;
 import javax.json.bind.JsonbBuilder;
 import javax.json.bind.JsonbConfig;
 import java.math.BigDecimal;
 import java.util.ArrayList;
 import java.util.Calendar;
+import java.util.Collection;
 import java.util.Date;
+import java.util.HashMap;
+import java.util.Map;
 import java.util.TimeZone;
 
-import static org.junit.Assert.*;
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNull;
 
 /**
  * @author Roman Grigoriadi
  */
 public class SerializersTest {
+
+    @Test
+    public void testMapWithAnotatedWithSerializerType() {
+        AnnotatedWithSerializerType annotatedWithSerializerType = new AnnotatedWithSerializerType();
+        annotatedWithSerializerType.value = "Sexy money";
+        Map<String, Object> map = new HashMap<>();
+        map.put("yo", annotatedWithSerializerType);
+
+        final Jsonb jsonb = JsonbBuilder.create();
+        String expected = "{\"yo\":{\"valueField\":\"replaced value\"}}";
+
+        assertEquals(expected, jsonb.toJson(map));
+    }
+
+    @Test
+    public void testMapWithEnum() {
+        Map<String, Object> map = new HashMap<>();
+        map.put("yo", AnnotatedEnum.MONEY);
+
+        final Jsonb jsonb = JsonbBuilder.create();
+        String expected = "{\"yo\":{\"valueField\":\"replaced enum value\"}}";
+        String actual = jsonb.toJson(map);
+
+        assertEquals(expected, actual);
+    }
+
+    @Test
+    public void testCollectionWithEnum() {
+        Collection<Object> collection = new ArrayList<>();
+        collection.add(AnnotatedEnum.MONEY);
+
+        final Jsonb jsonb = JsonbBuilder.create();
+        String expected = "[{\"valueField\":\"replaced enum value\"}]";
+
+        assertEquals(expected, jsonb.toJson(collection));
+    }
+
+    @Test
+    public void testArrayWithEnum() {
+        Object[] array = new Object[1];
+        array[0] = AnnotatedEnum.MONEY;
+
+        final Jsonb jsonb = JsonbBuilder.create();
+        String expected = "[{\"valueField\":\"replaced enum value\"}]";
+
+        assertEquals(expected, jsonb.toJson(array));
+    }
 
     @Test
     public void testClassLevelAnnotation() {
@@ -52,7 +118,6 @@ public class SerializersTest {
         Crate result = jsonb.fromJson(expected, Crate.class);
         assertEquals("replaced value", result.annotatedType.value);
         assertEquals("overridden value", result.annotatedTypeOverriddenOnProperty.value);
-
     }
 
     /**
@@ -79,7 +144,6 @@ public class SerializersTest {
         //set by deserializer statically
         assertEquals(new BigDecimal("123"), result.crate.crateBigDec);
         assertEquals("abc", result.crate.crateStr);
-
     }
 
     /**
@@ -228,7 +292,7 @@ public class SerializersTest {
         instance1.setInstance("Test String 1");
         SimpleContainer instance2 = new SimpleContainer();
         instance2.setInstance("Test String 2");
-        container.setArrayInstance(new SimpleContainer[] {instance1, instance2});
+        container.setArrayInstance(new SimpleContainer[]{instance1, instance2});
 
         container.setListInstance(new ArrayList<>());
         container.getListInstance().add(new SimpleContainer("Test List 1"));
@@ -289,7 +353,6 @@ public class SerializersTest {
         box.crate = new Crate();
         box.secondBoxStr = "Second box string";
 
-
         box.crate.crateInner = createCrateInner("Single inner");
 
         box.crate.crateInnerList = new ArrayList<>();
@@ -305,6 +368,4 @@ public class SerializersTest {
         crateInner.crateInnerBigDec = BigDecimal.TEN;
         return crateInner;
     }
-
-
 }

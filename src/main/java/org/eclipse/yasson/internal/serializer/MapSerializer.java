@@ -13,40 +13,30 @@
 
 package org.eclipse.yasson.internal.serializer;
 
-import org.eclipse.yasson.internal.Marshaller;
-import org.eclipse.yasson.internal.ReflectionUtils;
-import org.eclipse.yasson.internal.model.JsonBindingModel;
+import org.eclipse.yasson.internal.JsonbContext;
 
-import javax.json.bind.serializer.JsonbSerializer;
 import javax.json.bind.serializer.SerializationContext;
 import javax.json.stream.JsonGenerator;
-import java.lang.reflect.ParameterizedType;
-import java.lang.reflect.Type;
 import java.util.Map;
 
 /**
  * Serializer for maps.
- * 
+ *
  * @author Roman Grigoriadi
  */
-public class MapSerializer<T extends Map<?,?>> extends AbstractContainerSerializer<T> implements EmbeddedItem {
+public class MapSerializer<T extends Map<?, ?>> extends AbstractContainerSerializer<T> implements EmbeddedItem {
 
-    private final JsonBindingModel containerModel;
+    private final JsonbContext jsonbContext;
 
     protected MapSerializer(SerializerBuilder builder) {
         super(builder);
-        Type mapValueRuntimeType = getRuntimeType() instanceof ParameterizedType ?
-                ReflectionUtils.resolveType(this, ((ParameterizedType) getRuntimeType()).getActualTypeArguments()[1])
-                : Object.class;
-
-        containerModel = new ContainerModel(mapValueRuntimeType,
-                resolveContainerModelCustomization(mapValueRuntimeType, builder.getJsonbContext()));
+        jsonbContext = builder.getJsonbContext();
     }
 
     @SuppressWarnings("unchecked")
     @Override
     protected void serializeInternal(T obj, JsonGenerator generator, SerializationContext ctx) {
-        for (Map.Entry<?,?> entry : obj.entrySet()) {
+        for (Map.Entry<?, ?> entry : obj.entrySet()) {
             final String keysString = String.valueOf(entry.getKey());
             final Object value = entry.getValue();
             if (value == null) {
@@ -54,7 +44,8 @@ public class MapSerializer<T extends Map<?,?>> extends AbstractContainerSerializ
                 return;
             }
             generator.writeKey(keysString);
-            serializeItem(value, generator, ctx, containerModel);
+
+            serializeItem(value, generator, ctx);
         }
     }
 

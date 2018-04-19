@@ -49,7 +49,7 @@ public class CollectionSerializer<T extends Collection> extends AbstractContaine
     @Override
     protected void serializeInternal(T collection, JsonGenerator generator, SerializationContext ctx) {
         for (Object item : collection) {
-            serializeItem(item, generator, ctx, containerModel);
+            serializeItem(item, generator, ctx);
         }
     }
 
