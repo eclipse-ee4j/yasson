@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2015 Oracle and/or its affiliates. All rights reserved.
+ * Copyright (c) 2015, 2018 Oracle and/or its affiliates. All rights reserved.
  * This program and the accompanying materials are made available under the
  * terms of the Eclipse Public License v1.0 and Eclipse Distribution License v. 1.0
  * which accompanies this distribution.
@@ -59,6 +59,17 @@ public class CollectionsTest {
         assertEquals("{\"1\":1,\"2\":2,\"3\":3}", jsonb.toJson(stringIntegerMap));
 
         assertEquals(stringIntegerMap, jsonb.fromJson("{\"1\":1,\"2\":2,\"3\":3}", new LinkedHashMap<String, Integer>(){}.getClass().getGenericSuperclass()));
+    }
+
+    @Test
+    public void testMarshallMapWithNulls() {
+
+        Map<String, String> mapWithNulls = new LinkedHashMap<>();
+        mapWithNulls.put("key1",null);
+        mapWithNulls.put("key2",null);
+        mapWithNulls.put("key3",null);
+
+        assertEquals("{\"key1\":null,\"key2\":null,\"key3\":null}", jsonb.toJson(mapWithNulls));
     }
 
     @Test
