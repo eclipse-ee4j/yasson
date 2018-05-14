@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2016, 2017 Oracle and/or its affiliates. All rights reserved.
+ * Copyright (c) 2016, 2018 Oracle and/or its affiliates. All rights reserved.
  * This program and the accompanying materials are made available under the
  * terms of the Eclipse Public License v1.0 and Eclipse Distribution License v. 1.0
  * which accompanies this distribution.
@@ -35,11 +35,19 @@ public class LongTypeSerializer extends AbstractNumberSerializer<Long> {
 
     @Override
     protected void serializeNonFormatted(Long obj, JsonGenerator generator, String key) {
-        generator.write(key, obj);
+        if (BigNumberUtil.isIEEE754(obj)) {
+            generator.write(key, obj);
+        } else {
+            generator.write(key, obj.toString());
+        }
     }
 
     @Override
     protected void serializeNonFormatted(Long obj, JsonGenerator generator) {
-        generator.write(obj);
+        if (BigNumberUtil.isIEEE754(obj)) {
+            generator.write(obj);
+        } else {
+            generator.write(obj.toString());
+        }
     }
 }

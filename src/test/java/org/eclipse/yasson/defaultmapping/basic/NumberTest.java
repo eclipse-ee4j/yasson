@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2016, 2017 Oracle and/or its affiliates. All rights reserved.
+ * Copyright (c) 2016, 2018 Oracle and/or its affiliates. All rights reserved.
  * This program and the accompanying materials are made available under the
  * terms of the Eclipse Public License v1.0 and Eclipse Distribution License v. 1.0
  * which accompanies this distribution.
@@ -120,4 +120,25 @@ public class NumberTest {
         jsonString = jsonb.toJson(new Object() { public Number number = new BigDecimal("0.1000000000000001"); });
         Assert.assertEquals("{\"number\":0.1000000000000001}", jsonString);
     }
+
+    @Test
+    public void testLongIEEE748() {
+
+        // 9007199254740991L
+        Long maxJsSafeValue = Double.valueOf(Math.pow(2, 53)).longValue() - 1;
+        Long jsUnsafeValue = maxJsSafeValue + 1;
+
+        String json = jsonb.toJson(maxJsSafeValue);
+        Assert.assertEquals("9007199254740991", json);
+        Long deserialized = jsonb.fromJson(json, Long.class);
+        Assert.assertEquals(Long.valueOf("9007199254740991"), deserialized);
+
+        json = jsonb.toJson(jsUnsafeValue);
+        Assert.assertEquals("\"9007199254740992\"", json);
+        deserialized = jsonb.fromJson(json, Long.class);
+        Assert.assertEquals(Long.valueOf("9007199254740992"), deserialized);
+    }
+
+
+
 }
