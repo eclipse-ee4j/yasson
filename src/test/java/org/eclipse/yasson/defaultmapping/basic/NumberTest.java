@@ -126,17 +126,31 @@ public class NumberTest {
 
         // 9007199254740991L
         Long maxJsSafeValue = Double.valueOf(Math.pow(2, 53)).longValue() - 1;
-        Long jsUnsafeValue = maxJsSafeValue + 1;
+        Long upperJsUnsafeValue = maxJsSafeValue + 1;
 
         String json = jsonb.toJson(maxJsSafeValue);
         Assert.assertEquals("9007199254740991", json);
         Long deserialized = jsonb.fromJson(json, Long.class);
         Assert.assertEquals(Long.valueOf("9007199254740991"), deserialized);
 
-        json = jsonb.toJson(jsUnsafeValue);
+        json = jsonb.toJson(upperJsUnsafeValue);
         Assert.assertEquals("\"9007199254740992\"", json);
         deserialized = jsonb.fromJson(json, Long.class);
         Assert.assertEquals(Long.valueOf("9007199254740992"), deserialized);
+
+
+        Long minJsSafeValue = Math.negateExact(maxJsSafeValue);
+        Long lowerJsUnsafeValue = minJsSafeValue - 1;
+
+        json = jsonb.toJson(minJsSafeValue);
+        Assert.assertEquals("-9007199254740991", json);
+        deserialized = jsonb.fromJson(json, Long.class);
+        Assert.assertEquals(Long.valueOf("-9007199254740991"), deserialized);
+
+        json = jsonb.toJson(lowerJsUnsafeValue);
+        Assert.assertEquals("\"-9007199254740992\"", json);
+        deserialized = jsonb.fromJson(json, Long.class);
+        Assert.assertEquals(Long.valueOf("-9007199254740992"), deserialized);
     }
 
 

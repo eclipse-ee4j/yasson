@@ -26,8 +26,11 @@ class BigNumberUtil {
     // 53 means max bit value of number with sign bit included
     private static final int MAX_BIT_SIZE = 53;
 
-    // Max value for Long. Similar to JavaScript Number.MAX_SAFE_INTEGER
-    private static final long MAX_JS_SAFE_VALUE = Double.valueOf(Math.pow(2, 53)).longValue() - 1;
+    // Max value for Long. Similar to JavaScript Number.MAX_SAFE_INTEGER (2**53)-1
+    private static final long MAX_JS_SAFE_VALUE = 9007199254740991L;
+
+    // Min value for Long. Similar to JavaScript Number.MIN_SAFE_INTEGER -(2**53)+1
+    private static final long MIN_JS_SAFE_VALUE = -9007199254740991L;
 
     // -1022 is the lowest range of the exponent
     // more https://en.wikipedia.org/wiki/Exponent_bias
@@ -72,7 +75,7 @@ class BigNumberUtil {
      * @return true if value matches format IEEE-754
      */
     static boolean isIEEE754(Long value) {
-        return value <= MAX_JS_SAFE_VALUE;
+        return value >= MIN_JS_SAFE_VALUE && value <= MAX_JS_SAFE_VALUE;
     }
 
 
