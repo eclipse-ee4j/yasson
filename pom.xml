@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <!--
- Copyright (c) 2016, 2017 Oracle and/or its affiliates. All rights reserved.
+ Copyright (c) 2016, 2018 Oracle and/or its affiliates. All rights reserved.
  This program and the accompanying materials are made available under the
  terms of the Eclipse Public License v1.0 and Eclipse Distribution License v. 1.0
  which accompanies this distribution.
@@ -8,46 +8,16 @@
  and the Eclipse Distribution License is available at
  http://www.eclipse.org/org/documents/edl-v10.php.
 -->
-<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+         xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+
+    <parent>
+        <groupId>org.eclipse.ee4j</groupId>
+        <artifactId>project</artifactId>
+        <version>1.0</version>
+    </parent>
+
     <modelVersion>4.0.0</modelVersion>
-
-    <distributionManagement>
-        <snapshotRepository>
-            <id>repo.eclipse.org</id>
-            <name>Yasson Snapshots</name>
-            <url>https://repo.eclipse.org/content/repositories/yasson-snapshots/</url>
-        </snapshotRepository>
-        <repository>
-            <id>repo.eclipse.org</id>
-            <name>Yasson Releases</name>
-            <url>https://repo.eclipse.org/content/repositories/yasson-releases/</url>
-        </repository>
-    </distributionManagement>
-
-    <repositories>
-        <repository>
-            <id>yasson-releases</id>
-            <name>Yasson Releases</name>
-            <url>https://repo.eclipse.org/content/repositories/yasson-releases/</url>
-            <releases>
-                <enabled>true</enabled>
-            </releases>
-            <snapshots>
-                <enabled>false</enabled>
-            </snapshots>
-        </repository>
-        <repository>
-            <id>java.net-Public</id>
-            <name>Maven Java Net Snapshots and Releases</name>
-            <url>https://maven.java.net/content/groups/public/</url>
-        </repository>
-        <repository>
-            <id>java.net-Staging</id>
-            <name>Maven Java Net Staging</name>
-            <url>https://maven.java.net/content/groups/staging/</url>
-        </repository>
-    </repositories>
-
     <groupId>org.eclipse</groupId>
     <artifactId>yasson</artifactId>
     <version>1.0.2-SNAPSHOT</version>
@@ -64,7 +34,7 @@
 
     <issueManagement>
         <system>github</system>
-        <url>https://github.com/eclipse/yasson/issues</url>
+        <url>https://github.com/eclipse-ee4j/yasson/issues</url>
     </issueManagement>
 
     <mailingLists>
@@ -89,9 +59,9 @@
     </licenses>
 
     <scm>
-        <connection>scm:git:ssh://git@github.com/eclipse/yasson.git</connection>
-        <developerConnection>scm:git:ssh://git@github.com/eclipse/yasson.git</developerConnection>
-        <url>https://github.com/eclipse/yasson.git</url>
+        <connection>scm:git:ssh://git@github.com/eclipse-ee4j/yasson.git</connection>
+        <developerConnection>scm:git:ssh://git@github.com/eclipse-ee4j/yasson.git</developerConnection>
+        <url>https://github.com/eclipse-ee4j/yasson.git</url>
         <tag>HEAD</tag>
     </scm>
 
@@ -116,6 +86,16 @@
             </roles>
             <timezone>CET</timezone>
         </developer>
+        <developer>
+            <email>david.k.kral@oracle.com</email>
+            <id>david.kral</id>
+            <name>David Kral</name>
+            <organization>Oracle</organization>
+            <roles>
+                <role>JSON Binding 1.0 Developer</role>
+            </roles>
+            <timezone>CET</timezone>
+        </developer>
     </developers>
 
     <properties>
@@ -126,120 +106,6 @@
     </properties>
 
     <profiles>
-        <profile>
-            <id>jdk9</id>
-            <activation>
-                <jdk>[1.9,)</jdk>
-            </activation>
-            <build>
-                <plugins>
-                    <plugin>
-                        <artifactId>maven-compiler-plugin</artifactId>
-                        <executions>
-                            <execution>
-                                <id>default-compile</id>
-                                <configuration>
-                                    <excludes>
-                                        <exclude>module-info.java</exclude>
-                                    </excludes>
-                                    <compilerArgs>
-                                        <arg>-Xlint:all</arg>
-                                    </compilerArgs>
-                                </configuration>
-                            </execution>
-                            <execution>
-                                <id>jdk-9</id>
-                                <goals>
-                                    <goal>compile</goal>
-                                </goals>
-                                <configuration>
-                                    <release>9</release>
-                                    <source>9</source>
-                                    <target>9</target>
-                                    <includes>
-                                        <include>module-info.java</include>
-                                    </includes>
-                                </configuration>
-                            </execution>
-                        </executions>
-                    </plugin>
-                    <plugin>
-                        <groupId>org.apache.maven.plugins</groupId>
-                        <artifactId>maven-dependency-plugin</artifactId>
-                        <version>3.0.0</version>
-                        <executions>
-                            <execution>
-                                <id>copy</id>
-                                <phase>package</phase>
-                                <goals>
-                                    <goal>copy</goal>
-                                </goals>
-                                <configuration>
-                                    <artifactItems>
-                                        <artifactItem>
-                                            <groupId>javax.json</groupId>
-                                            <artifactId>javax.json-api</artifactId>
-                                            <version>${javax.json.version}</version>
-                                            <overWrite>true</overWrite>
-                                            <outputDirectory>${project.build.directory}</outputDirectory>
-                                        </artifactItem>
-                                        <artifactItem>
-                                            <groupId>javax.json.bind</groupId>
-                                            <artifactId>javax.json.bind-api</artifactId>
-                                            <version>${javax.json.bind.version}</version>
-                                            <overWrite>true</overWrite>
-                                            <outputDirectory>${project.build.directory}</outputDirectory>
-                                        </artifactItem>
-                                    </artifactItems>
-                                </configuration>
-                            </execution>
-                        </executions>
-                    </plugin>
-                    <plugin>
-                        <artifactId>maven-javadoc-plugin</artifactId>
-                    </plugin>
-                    <plugin>
-                        <groupId>org.apache.maven.plugins</groupId>
-                        <artifactId>maven-surefire-plugin</artifactId>
-                        <version>2.19.1</version>
-                        <configuration>
-                            <!-- TODO remove when fixed in weld/cdi -->
-                            <argLine>
-                                --add-opens java.base/java.lang=ALL-UNNAMED
-                            </argLine>
-                        </configuration>
-                    </plugin>
-                </plugins>
-            </build>
-        </profile>
-        <profile>
-            <id>release-central</id>
-            <activation>
-                <activeByDefault>false</activeByDefault>
-            </activation>
-            <distributionManagement>
-                <snapshotRepository>
-                    <id>ossrh</id>
-                    <url>https://oss.sonatype.org/content/repositories/snapshots</url>
-                </snapshotRepository>
-                <repository>
-                    <id>ossrh</id>
-                    <url>https://oss.sonatype.org/service/local/staging/deploy/maven2/</url>
-                </repository>
-            </distributionManagement>
-            <build>
-                <plugins>
-                    <plugin>
-                        <groupId>org.apache.maven.plugins</groupId>
-                        <artifactId>maven-javadoc-plugin</artifactId>
-                    </plugin>
-                    <plugin>
-                        <groupId>org.apache.maven.plugins</groupId>
-                        <artifactId>maven-gpg-plugin</artifactId>
-                    </plugin>
-                </plugins>
-            </build>
-        </profile>
         <profile>
             <id>re-build</id>
             <activation>
@@ -327,7 +193,35 @@
                 <plugin>
                     <groupId>org.apache.maven.plugins</groupId>
                     <artifactId>maven-compiler-plugin</artifactId>
-                    <version>3.6.1</version>
+                    <version>3.7.0</version>
+                    <executions>
+                        <execution>
+                            <id>default-compile</id>
+                            <configuration>
+                                <!-- compile everything to ensure module-info contains right entries -->
+                                <!-- required when JAVA_HOME is JDK 8 or below -->
+                                <release>9</release>
+                                <compilerArgs>
+                                    <!--Remove when CDI is updated to support modules-->
+                                    <arg>--add-reads</arg>
+                                    <arg>org.eclipse.yasson=ALL-UNNAMED</arg>
+                                </compilerArgs>
+                            </configuration>
+                        </execution>
+                        <execution>
+                            <id>base-compile</id>
+                            <goals>
+                                <goal>compile</goal>
+                            </goals>
+                            <!-- recompile everything for target VM except the module-info.java -->
+                            <configuration>
+                                <excludes>
+                                    <exclude>module-info.java</exclude>
+                                </excludes>
+                            </configuration>
+                        </execution>
+                    </executions>
+                    <!-- defaults for compile and testCompile -->
                     <configuration>
                         <source>1.8</source>
                         <target>1.8</target>
@@ -335,19 +229,6 @@
                             <arg>-Xlint:all</arg>
                         </compilerArgs>
                     </configuration>
-                    <executions>
-                        <execution>
-                            <id>default-compile</id>
-                            <configuration>
-                                <excludes>
-                                    <exclude>module-info.java</exclude>
-                                </excludes>
-                                <compilerArgs>
-                                    <arg>-Xlint:all</arg>
-                                </compilerArgs>
-                            </configuration>
-                        </execution>
-                    </executions>
                 </plugin>
                 <plugin>
                     <groupId>org.apache.maven.plugins</groupId>
@@ -413,7 +294,7 @@
                 <plugin>
                     <groupId>org.apache.felix</groupId>
                     <artifactId>maven-bundle-plugin</artifactId>
-                    <version>3.3.0</version>
+                    <version>3.5.0</version>
                     <executions>
                         <execution>
                             <id>osgi-bundle</id>
