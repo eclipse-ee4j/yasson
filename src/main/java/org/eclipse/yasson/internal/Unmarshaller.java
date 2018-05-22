@@ -14,7 +14,6 @@ package org.eclipse.yasson.internal;
 
 
 import org.eclipse.yasson.internal.model.ClassModel;
-import org.eclipse.yasson.internal.serializer.ContainerModel;
 import org.eclipse.yasson.internal.serializer.CurrentItem;
 import org.eclipse.yasson.internal.serializer.DeserializerBuilder;
 
@@ -57,7 +56,7 @@ public class Unmarshaller extends ProcessingContext implements DeserializationCo
         ClassModel classModel = getMappingContext().getOrCreateClassModel(ReflectionUtils.getRawType(type));
         final JsonbDeserializer<?> item = new DeserializerBuilder(jsonbContext).withWrapper(current)
                 .withType(type).withJsonValueType(getRootEvent(parser))
-                .withModel(new ContainerModel(type, classModel == null ? null : classModel.getCustomization()))
+                .withCustomization(classModel == null ? null : classModel.getCustomization())
                 .build();
         return (T) item.deserialize(parser, this, type);
     }

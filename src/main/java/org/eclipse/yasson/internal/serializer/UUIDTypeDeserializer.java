@@ -14,7 +14,7 @@ package org.eclipse.yasson.internal.serializer;
 
 
 import org.eclipse.yasson.internal.Unmarshaller;
-import org.eclipse.yasson.internal.model.JsonBindingModel;
+import org.eclipse.yasson.internal.model.customization.Customization;
 
 import java.lang.reflect.Type;
 import java.util.UUID;
@@ -27,10 +27,10 @@ public class UUIDTypeDeserializer extends AbstractValueTypeDeserializer<UUID> {
     /**
      * Creates a new instance.
      *
-     * @param model Binding model.
+     * @param customization Model customization.
      */
-    public UUIDTypeDeserializer(JsonBindingModel model) {
-        super(UUID.class, model);
+    public UUIDTypeDeserializer(Customization customization) {
+        super(UUID.class, customization);
     }
 
     @Override

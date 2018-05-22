@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2016, 2017 Oracle and/or its affiliates. All rights reserved.
+ * Copyright (c) 2016, 2018 Oracle and/or its affiliates. All rights reserved.
  * This program and the accompanying materials are made available under the
  * terms of the Eclipse Public License v1.0 and Eclipse Distribution License v. 1.0
  * which accompanies this distribution.
@@ -15,7 +15,7 @@ package org.eclipse.yasson.internal.serializer;
 
 import org.eclipse.yasson.internal.JsonbContext;
 import org.eclipse.yasson.internal.Marshaller;
-import org.eclipse.yasson.internal.model.JsonBindingModel;
+import org.eclipse.yasson.internal.model.ClassModel;
 
 import javax.json.bind.serializer.JsonbSerializer;
 import javax.json.bind.serializer.SerializationContext;
@@ -31,16 +31,16 @@ public class UserSerializerSerializer<T> implements JsonbSerializer<T> {
 
     private final JsonbSerializer<T> userSerializer;
 
-    private JsonBindingModel model;
+    private final ClassModel classModel;
 
     /**
      * Create instance of current item with its builder.
      *
-     * @param model model
+     * @param classModel model
      * @param userSerializer user serializer
      */
-    public UserSerializerSerializer(JsonBindingModel model, JsonbSerializer<T> userSerializer) {
-        this.model = model;
+    public UserSerializerSerializer(ClassModel classModel, JsonbSerializer<T> userSerializer) {
+        this.classModel = classModel;
         this.userSerializer = userSerializer;
     }
 
@@ -48,10 +48,10 @@ public class UserSerializerSerializer<T> implements JsonbSerializer<T> {
     public void serialize(T obj, JsonGenerator generator, SerializationContext ctx) {
         JsonbContext jsonbContext = ((Marshaller) ctx).getJsonbContext();
         try {
-            jsonbContext.addProcessedType(model.getType());
+            jsonbContext.addProcessedType(obj.getClass());
             userSerializer.serialize(obj, generator, ctx);
         } finally {
-            jsonbContext.removeProcessedType(model.getType());
+            jsonbContext.removeProcessedType(obj.getClass());
         }
     }
 }

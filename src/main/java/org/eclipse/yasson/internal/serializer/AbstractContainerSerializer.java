@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2016, 2017 Oracle and/or its affiliates. All rights reserved.
+ * Copyright (c) 2016, 2018 Oracle and/or its affiliates. All rights reserved.
  * This program and the accompanying materials are made available under the
  * terms of the Eclipse Public License v1.0 and Eclipse Distribution License v. 1.0
  * which accompanies this distribution.
@@ -13,15 +13,15 @@
 
 package org.eclipse.yasson.internal.serializer;
 
-import org.eclipse.yasson.internal.JsonbContext;
 import org.eclipse.yasson.internal.Marshaller;
 import org.eclipse.yasson.internal.ReflectionUtils;
 import org.eclipse.yasson.internal.model.ClassModel;
-import org.eclipse.yasson.internal.model.JsonBindingModel;
+import org.eclipse.yasson.internal.model.customization.ContainerCustomization;
 
 import javax.json.bind.serializer.JsonbSerializer;
 import javax.json.bind.serializer.SerializationContext;
 import javax.json.stream.JsonGenerator;
+import java.lang.reflect.ParameterizedType;
 import java.lang.reflect.Type;
 import java.util.Objects;
 import java.util.Optional;
@@ -52,10 +52,9 @@ public abstract class AbstractContainerSerializer<T> extends AbstractItem<T> imp
      * @param wrapper Item to serialize.
      * @param runtimeType Runtime type of the item.
      * @param classModel Class model.
-     * @param wrapperModel Binding model.
      */
-    public AbstractContainerSerializer(CurrentItem<?> wrapper, Type runtimeType, ClassModel classModel, JsonBindingModel wrapperModel) {
-        super(wrapper, runtimeType, classModel, wrapperModel);
+    public AbstractContainerSerializer(CurrentItem<?> wrapper, Type runtimeType, ClassModel classModel) {
+        super(wrapper, runtimeType, classModel);
     }
 
     @Override
@@ -120,7 +119,7 @@ public abstract class AbstractContainerSerializer<T> extends AbstractItem<T> imp
         this.valueClass = valueClass;
     }
 
-    protected void serializeItem(Object item, JsonGenerator generator, SerializationContext ctx, JsonBindingModel model) {
+    protected void serializeItem(Object item, JsonGenerator generator, SerializationContext ctx) {
         if (item == null) {
             generator.writeNull();
             return;
@@ -128,9 +127,25 @@ public abstract class AbstractContainerSerializer<T> extends AbstractItem<T> imp
         Class<?> itemClass = item.getClass();
         JsonbSerializer<?> serializer = getValueSerializer(itemClass);
         if (serializer == null) {
-            serializer = new SerializerBuilder(((Marshaller)ctx).getJsonbContext()).withObjectClass(itemClass).withWrapper(this).withModel(model).build();
+            Type instanceValueType = getValueType(getRuntimeType());
+            instanceValueType = instanceValueType.equals(Object.class) ? itemClass : instanceValueType;
+            ClassModel classModel = ((Marshaller)ctx).getJsonbContext().getMappingContext().getOrCreateClassModel(itemClass);
+            serializer = new SerializerBuilder(((Marshaller)ctx).getJsonbContext())
+                    .withObjectClass(itemClass)
+                    .withCustomization(new ContainerCustomization(classModel.getCustomization()))
+                    .withWrapper(this)
+                    .withType(instanceValueType)
+                    .build();
             addValueSerializer(serializer, itemClass);
         }
         serializerCaptor(serializer, item, generator, ctx);
+    }
+
+    protected Type getValueType(Type valueType) {
+        if (valueType instanceof ParameterizedType) {
+            Optional<Type> runtimeTypeOptional = ReflectionUtils.resolveOptionalType(this, ((ParameterizedType) valueType).getActualTypeArguments()[0]);
+            return runtimeTypeOptional.orElse(Object.class);
+        }
+        return Object.class;
     }
 }

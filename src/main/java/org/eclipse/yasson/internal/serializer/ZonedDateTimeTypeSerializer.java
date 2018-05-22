@@ -13,7 +13,8 @@
 
 package org.eclipse.yasson.internal.serializer;
 
-import org.eclipse.yasson.internal.model.JsonBindingModel;
+
+import org.eclipse.yasson.internal.model.customization.Customization;
 
 import java.time.Instant;
 import java.time.ZonedDateTime;
@@ -28,12 +29,12 @@ import java.util.Locale;
 public class ZonedDateTimeTypeSerializer extends AbstractDateTimeSerializer<ZonedDateTime> {
 
     /**
-     * Creates a serializer.
+     * Creates a new instance.
      *
-     * @param model Meta-data model.
+     * @param customization Model customization.
      */
-    public ZonedDateTimeTypeSerializer(JsonBindingModel model) {
-        super(model);
+    public ZonedDateTimeTypeSerializer(Customization customization) {
+        super(customization);
     }
 
     @Override

@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2016, 2017 Oracle and/or its affiliates. All rights reserved.
+ * Copyright (c) 2016, 2018 Oracle and/or its affiliates. All rights reserved.
  * This program and the accompanying materials are made available under the
  * terms of the Eclipse Public License v1.0 and Eclipse Distribution License v. 1.0
  * which accompanies this distribution.
@@ -13,15 +13,11 @@
 
 package org.eclipse.yasson.internal.serializer;
 
-import org.eclipse.yasson.internal.ReflectionUtils;
-import org.eclipse.yasson.internal.model.JsonBindingModel;
+import org.eclipse.yasson.internal.JsonbContext;
 
 import javax.json.bind.serializer.SerializationContext;
 import javax.json.stream.JsonGenerator;
-import java.lang.reflect.ParameterizedType;
-import java.lang.reflect.Type;
 import java.util.Collection;
-import java.util.Optional;
 
 /**
  * Serializer for collections.
@@ -30,26 +26,17 @@ import java.util.Optional;
  */
 public class CollectionSerializer<T extends Collection> extends AbstractContainerSerializer<T> implements EmbeddedItem {
 
-    private final JsonBindingModel containerModel;
+    protected final JsonbContext jsonbContext;
 
     protected CollectionSerializer(SerializerBuilder builder) {
         super(builder);
-        Type collectionValueType = getValueType();
-        containerModel = new ContainerModel(collectionValueType, resolveContainerModelCustomization(collectionValueType, builder.getJsonbContext()));
-    }
-
-    private Type getValueType() {
-        if (getRuntimeType() instanceof ParameterizedType) {
-            Optional<Type> runtimeTypeOptional = ReflectionUtils.resolveOptionalType(this, ((ParameterizedType) getRuntimeType()).getActualTypeArguments()[0]);
-            return runtimeTypeOptional.orElse(Object.class);
-        }
-        return Object.class;
+        this.jsonbContext = builder.getJsonbContext();
     }
 
     @Override
     protected void serializeInternal(T collection, JsonGenerator generator, SerializationContext ctx) {
         for (Object item : collection) {
-            serializeItem(item, generator, ctx, containerModel);
+            serializeItem(item, generator, ctx);
         }
     }
 

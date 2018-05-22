@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2015, 2017 Oracle and/or its affiliates. All rights reserved.
+ * Copyright (c) 2015, 2018 Oracle and/or its affiliates. All rights reserved.
  * This program and the accompanying materials are made available under the
  * terms of the Eclipse Public License v1.0 and Eclipse Distribution License v. 1.0
  * which accompanies this distribution.
@@ -80,7 +80,6 @@ public class DeserializerBuilder extends AbstractSerializerBuilder<DeserializerB
         Class<?> rawType = ReflectionUtils.getRawType(getRuntimeType());
 
         Optional<AdapterBinding> adapterInfoOptional = Optional.empty();
-        Customization customization = getModel() != null ? getModel().getCustomization() : null;
         if (customization == null
                 || customization instanceof ComponentBoundCustomization) {
             ComponentBoundCustomization componentBoundCustomization = (ComponentBoundCustomization) customization;
@@ -115,7 +114,7 @@ public class DeserializerBuilder extends AbstractSerializerBuilder<DeserializerB
                 case BinaryDataStrategy.BYTE:
                     return new ByteArrayDeserializer(this);
                 default:
-                    return new ByteArrayBase64Deserializer(getModel());
+                    return new ByteArrayBase64Deserializer(customization);
             }
         }
 
@@ -187,7 +186,7 @@ public class DeserializerBuilder extends AbstractSerializerBuilder<DeserializerB
     private Optional<AbstractValueTypeDeserializer<?>> getSupportedTypeDeserializer(Class<?> rawType) {
         final Optional<? extends SerializerProviderWrapper> supportedTypeDeserializerOptional = DefaultSerializers.getInstance().findValueSerializerProvider(rawType);
         if (supportedTypeDeserializerOptional.isPresent()) {
-            return Optional.of(supportedTypeDeserializerOptional.get().getDeserializerProvider().provideDeserializer(getModel()));
+            return Optional.of(supportedTypeDeserializerOptional.get().getDeserializerProvider().provideDeserializer(customization));
         }
         return Optional.empty();
     }
@@ -206,7 +205,7 @@ public class DeserializerBuilder extends AbstractSerializerBuilder<DeserializerB
     }
 
     private Type resolveRuntimeType() {
-        Type result = ReflectionUtils.resolveType(wrapper, genericType != null ? genericType : getModel().getType());
+        Type result = ReflectionUtils.resolveType(wrapper, genericType != null ? genericType : runtimeType);
         //Try to infer best from JSON event.
         if (result == Object.class) {
             switch (jsonEvent) {
@@ -233,8 +232,8 @@ public class DeserializerBuilder extends AbstractSerializerBuilder<DeserializerB
         if (interfaceType.isInterface()) {
             Class implementationClass = null;
             //annotation
-            if (getModel().getCustomization() instanceof PropertyCustomization) {
-                 implementationClass = ((PropertyCustomization) getModel().getCustomization()).getImplementationClass();
+            if (customization instanceof PropertyCustomization) {
+                 implementationClass = ((PropertyCustomization) customization).getImplementationClass();
             }
             //JsonbConfig
             if (implementationClass == null) {

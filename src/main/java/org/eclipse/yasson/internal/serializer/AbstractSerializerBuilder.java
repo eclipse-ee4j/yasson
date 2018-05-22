@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2016, 2017 Oracle and/or its affiliates. All rights reserved.
+ * Copyright (c) 2016, 2018 Oracle and/or its affiliates. All rights reserved.
  * This program and the accompanying materials are made available under the
  * terms of the Eclipse Public License v1.0 and Eclipse Distribution License v. 1.0
  * which accompanies this distribution.
@@ -15,7 +15,7 @@ package org.eclipse.yasson.internal.serializer;
 
 import org.eclipse.yasson.internal.JsonbContext;
 import org.eclipse.yasson.internal.model.ClassModel;
-import org.eclipse.yasson.internal.model.JsonBindingModel;
+import org.eclipse.yasson.internal.model.customization.Customization;
 
 import java.lang.reflect.Type;
 import java.util.Objects;
@@ -33,11 +33,6 @@ public class AbstractSerializerBuilder<T extends AbstractSerializerBuilder> {
     protected CurrentItem<?> wrapper;
 
     /**
-     * Model of jsonb binding.
-     */
-    protected JsonBindingModel model;
-
-    /**
      * In case of unknown object genericType.
      * Null for embedded objects such as collections, or known conversion types.
      */
@@ -53,6 +48,11 @@ public class AbstractSerializerBuilder<T extends AbstractSerializerBuilder> {
      * In case of root, or embedded objects such as collections.
      */
     protected Type genericType;
+
+    /**
+     * Class customization
+     */
+    protected Customization customization;
 
     protected final JsonbContext jsonbContext;
 
@@ -79,14 +79,14 @@ public class AbstractSerializerBuilder<T extends AbstractSerializerBuilder> {
     }
 
     /**
-     * Model of a field for underlying instance. In case model is present, instance type is inferred from it.
+     * Customization of the class
      *
-     * @param model Model of a field, not null.
+     * @param customization Class customization
      * @return Builder instance for call chaining.
      */
     @SuppressWarnings("unchecked")
-    public T withModel(JsonBindingModel model) {
-        this.model = model;
+    public T withCustomization(Customization customization) {
+        this.customization = customization;
         return (T) this;
     }
 
@@ -111,15 +111,6 @@ public class AbstractSerializerBuilder<T extends AbstractSerializerBuilder> {
      */
     public CurrentItem<?> getWrapper() {
         return wrapper;
-    }
-
-    /**
-     * Model of a for underlying instance. In case model is present, instance type is inferred from it.
-     *
-     * @return model of a field.
-     */
-    public JsonBindingModel getModel() {
-        return model;
     }
 
     /**
@@ -162,5 +153,9 @@ public class AbstractSerializerBuilder<T extends AbstractSerializerBuilder> {
      */
     public JsonbContext getJsonbContext() {
         return jsonbContext;
+    }
+
+    public Customization getCustomization() {
+        return customization;
     }
 }

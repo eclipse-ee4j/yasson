@@ -13,7 +13,7 @@
 
 package org.eclipse.yasson.internal.serializer;
 
-import org.eclipse.yasson.internal.model.JsonBindingModel;
+import org.eclipse.yasson.internal.model.customization.Customization;
 
 import java.time.Instant;
 import java.time.format.DateTimeFormatter;
@@ -28,12 +28,12 @@ import java.util.Locale;
 public abstract class AbstractDateTypeSerializer<T extends Date> extends AbstractDateTimeSerializer<T> {
 
     /**
-     * Construct serializer with its class.
+     * Creates a new instance.
      *
-     * @param model Binding model.
+     * @param customization Model customization.
      */
-    public AbstractDateTypeSerializer(JsonBindingModel model) {
-        super(model);
+    public AbstractDateTypeSerializer(Customization customization) {
+        super(customization);
     }
 
     @Override

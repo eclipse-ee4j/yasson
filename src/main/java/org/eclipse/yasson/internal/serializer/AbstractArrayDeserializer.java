@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2016 Oracle and/or its affiliates. All rights reserved.
+ * Copyright (c) 2016, 2018 Oracle and/or its affiliates. All rights reserved.
  * This program and the accompanying materials are made available under the
  * terms of the Eclipse Public License v1.0 and Eclipse Distribution License v. 1.0
  * which accompanies this distribution.
@@ -17,7 +17,7 @@ import org.eclipse.yasson.internal.JsonbParser;
 import org.eclipse.yasson.internal.JsonbRiParser;
 import org.eclipse.yasson.internal.ReflectionUtils;
 import org.eclipse.yasson.internal.Unmarshaller;
-import org.eclipse.yasson.internal.model.JsonBindingModel;
+import org.eclipse.yasson.internal.model.ClassModel;
 
 import javax.json.bind.serializer.JsonbDeserializer;
 import javax.json.stream.JsonParser;
@@ -36,7 +36,7 @@ public abstract class AbstractArrayDeserializer<T> extends AbstractContainerDese
      */
     protected final Class<?> componentClass;
 
-    private final JsonBindingModel model;
+    protected final ClassModel componentClassModel;
 
     protected AbstractArrayDeserializer(DeserializerBuilder builder) {
         super(builder);
@@ -45,22 +45,12 @@ public abstract class AbstractArrayDeserializer<T> extends AbstractContainerDese
         } else {
             componentClass = ReflectionUtils.getRawType(getRuntimeType()).getComponentType();
         }
-        this.model = new ContainerModel(componentClass, resolveContainerModelCustomization(componentClass, builder.getJsonbContext()));
-    }
-
-    /**
-     * Binding model for current deserializer.
-     *
-     * @return model
-     */
-    @Override
-    protected JsonBindingModel getModel() {
-        return model;
+        componentClassModel = builder.getJsonbContext().getMappingContext().getOrCreateClassModel(componentClass);
     }
 
     @Override
     public void appendResult(Object result) {
-        appendCaptor(convertNullToOptionalEmpty(getModel(), result));
+        appendCaptor(convertNullToOptionalEmpty(componentClass, result));
     }
 
     @SuppressWarnings("unchecked")
@@ -71,7 +61,7 @@ public abstract class AbstractArrayDeserializer<T> extends AbstractContainerDese
     @Override
     protected void deserializeNext(JsonParser parser, Unmarshaller context) {
         final JsonbDeserializer<?> deserializer = newUnmarshallerItemBuilder(context.getJsonbContext()).withType(componentClass)
-                .withModel(model).build();
+                .withCustomization(componentClassModel == null ? null : componentClassModel.getCustomization()).build();
         appendResult(deserializer.deserialize(parser, context, componentClass));
     }
 

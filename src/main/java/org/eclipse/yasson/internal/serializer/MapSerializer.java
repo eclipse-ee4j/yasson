@@ -13,16 +13,14 @@
 
 package org.eclipse.yasson.internal.serializer;
 
-import org.eclipse.yasson.internal.Marshaller;
 import org.eclipse.yasson.internal.ReflectionUtils;
-import org.eclipse.yasson.internal.model.JsonBindingModel;
 
-import javax.json.bind.serializer.JsonbSerializer;
 import javax.json.bind.serializer.SerializationContext;
 import javax.json.stream.JsonGenerator;
 import java.lang.reflect.ParameterizedType;
 import java.lang.reflect.Type;
 import java.util.Map;
+import java.util.Optional;
 
 /**
  * Serializer for maps.
@@ -31,16 +29,9 @@ import java.util.Map;
  */
 public class MapSerializer<T extends Map<?,?>> extends AbstractContainerSerializer<T> implements EmbeddedItem {
 
-    private final JsonBindingModel containerModel;
 
     protected MapSerializer(SerializerBuilder builder) {
         super(builder);
-        Type mapValueRuntimeType = getRuntimeType() instanceof ParameterizedType ?
-                ReflectionUtils.resolveType(this, ((ParameterizedType) getRuntimeType()).getActualTypeArguments()[1])
-                : Object.class;
-
-        containerModel = new ContainerModel(mapValueRuntimeType,
-                resolveContainerModelCustomization(mapValueRuntimeType, builder.getJsonbContext()));
     }
 
     @SuppressWarnings("unchecked")
@@ -54,7 +45,7 @@ public class MapSerializer<T extends Map<?,?>> extends AbstractContainerSerializ
                 continue;
             }
             generator.writeKey(keysString);
-            serializeItem(value, generator, ctx, containerModel);
+            serializeItem(value, generator, ctx);
         }
     }
 
@@ -66,5 +57,14 @@ public class MapSerializer<T extends Map<?,?>> extends AbstractContainerSerializ
     @Override
     protected void writeStart(String key, JsonGenerator generator) {
         generator.writeStartObject(key);
+    }
+
+    @Override
+    protected Type getValueType(Type valueType) {
+        if (valueType instanceof ParameterizedType) {
+            Optional<Type> runtimeTypeOptional = ReflectionUtils.resolveOptionalType(this, ((ParameterizedType) valueType).getActualTypeArguments()[1]);
+            return runtimeTypeOptional.orElse(Object.class);
+        }
+        return Object.class;
     }
 }

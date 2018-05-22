@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2016, 2017 Oracle and/or its affiliates. All rights reserved.
+ * Copyright (c) 2016, 2018 Oracle and/or its affiliates. All rights reserved.
  * This program and the accompanying materials are made available under the
  * terms of the Eclipse Public License v1.0 and Eclipse Distribution License v. 1.0
  * which accompanies this distribution.
@@ -16,7 +16,7 @@ package org.eclipse.yasson.internal.serializer;
 import org.eclipse.yasson.internal.JsonbContext;
 import org.eclipse.yasson.internal.ProcessingContext;
 import org.eclipse.yasson.internal.model.ClassModel;
-import org.eclipse.yasson.internal.model.JsonBindingModel;
+import org.eclipse.yasson.internal.model.customization.Customization;
 
 import javax.json.bind.serializer.JsonbSerializer;
 import javax.json.bind.serializer.SerializationContext;
@@ -32,7 +32,7 @@ import java.util.Optional;
  * @param <T> instantiated Optional type
  */
 public class OptionalObjectSerializer<T extends Optional<?>> implements CurrentItem<T>, JsonbSerializer<T> {
-    private final JsonBindingModel wrapperModel;
+    private final Customization customization;
 
     private final CurrentItem<?> wrapper;
 
@@ -45,7 +45,7 @@ public class OptionalObjectSerializer<T extends Optional<?>> implements CurrentI
      */
     public OptionalObjectSerializer(SerializerBuilder builder) {
         this.wrapper = builder.getWrapper();
-        this.wrapperModel = builder.getModel();
+        this.customization = builder.getCustomization();
         this.optionalValueType = resolveOptionalType(builder.getRuntimeType());
     }
 
@@ -71,16 +71,15 @@ public class OptionalObjectSerializer<T extends Optional<?>> implements CurrentI
         return optionalValueType;
     }
 
-    @Override
-    public JsonBindingModel getWrapperModel() {
-        return wrapperModel;
+    public Customization getCustomization() {
+        return customization;
     }
 
     @Override
     public void serialize(T obj, JsonGenerator generator, SerializationContext ctx) {
         JsonbContext jsonbContext = ((ProcessingContext) ctx).getJsonbContext();
         if (obj == null || !obj.isPresent()) {
-            if (!wrapperModel.getCustomization().isNillable()) {
+            if (!customization.isNillable()) {
                 return;
             }
             generator.writeNull();
@@ -88,7 +87,7 @@ public class OptionalObjectSerializer<T extends Optional<?>> implements CurrentI
         }
         Object optionalValue = obj.get();
         final JsonbSerializer<?> serializer = new SerializerBuilder(jsonbContext).withObjectClass(optionalValue.getClass())
-                .withType(optionalValueType).withWrapper(wrapper).withModel(wrapperModel).build();
+                .withType(optionalValueType).withWrapper(wrapper).withCustomization(customization).build();
         serialCaptor(serializer, optionalValue, generator, ctx);
     }
 

@@ -13,7 +13,7 @@
 
 package org.eclipse.yasson.internal.serializer;
 
-import org.eclipse.yasson.internal.model.JsonBindingModel;
+import org.eclipse.yasson.internal.model.customization.Customization;
 
 import java.time.format.DateTimeFormatter;
 import java.util.Date;
@@ -28,12 +28,12 @@ public class DateTypeSerializer<T extends Date> extends AbstractDateTypeSerializ
     private DateTimeFormatter DEFAULT_FORMATTER = DateTimeFormatter.ISO_DATE_TIME.withZone(UTC);
 
     /**
-     * Construct serializer with its class.
+     * Creates a new instance.
      *
-     * @param model Binding model.
+     * @param customization Model customization.
      */
-    public DateTypeSerializer(JsonBindingModel model) {
-        super(model);
+    public DateTypeSerializer(Customization customization) {
+        super(customization);
     }
 
 

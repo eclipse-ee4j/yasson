@@ -16,7 +16,6 @@ import org.eclipse.yasson.internal.JsonbParser;
 import org.eclipse.yasson.internal.JsonbRiParser;
 import org.eclipse.yasson.internal.ReflectionUtils;
 import org.eclipse.yasson.internal.Unmarshaller;
-import org.eclipse.yasson.internal.model.JsonBindingModel;
 
 import javax.json.bind.serializer.JsonbDeserializer;
 import javax.json.stream.JsonParser;
@@ -30,9 +29,6 @@ import java.util.*;
  * @author Roman Grigoriadi
  */
 class CollectionDeserializer<T extends Collection<?>> extends AbstractContainerDeserializer<T> implements EmbeddedItem {
-
-
-    private final ContainerModel containerModel;
 
     /**
      * Generic bound parameter of List.
@@ -51,12 +47,6 @@ class CollectionDeserializer<T extends Collection<?>> extends AbstractContainerD
                 : Object.class;
 
         instance = createInstance();
-        this.containerModel = new ContainerModel(collectionValueType, resolveContainerModelCustomization(collectionValueType, builder.getJsonbContext()));
-    }
-
-    @Override
-    protected JsonBindingModel getModel() {
-        return containerModel;
     }
 
     @SuppressWarnings("unchecked")
@@ -101,7 +91,7 @@ class CollectionDeserializer<T extends Collection<?>> extends AbstractContainerD
 
     @Override
     public void appendResult(Object result) {
-        appendCaptor(convertNullToOptionalEmpty(getModel(), result));
+        appendCaptor(convertNullToOptionalEmpty(collectionValueType, result));
     }
 
     @SuppressWarnings("unchecked")

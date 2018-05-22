@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2016, 2017 Oracle and/or its affiliates. All rights reserved.
+ * Copyright (c) 2016, 2018 Oracle and/or its affiliates. All rights reserved.
  * This program and the accompanying materials are made available under the
  * terms of the Eclipse Public License v1.0 and Eclipse Distribution License v. 1.0
  * which accompanies this distribution.
@@ -13,15 +13,12 @@
 
 package org.eclipse.yasson.internal.serializer;
 
-import org.eclipse.yasson.internal.JsonbContext;
 import org.eclipse.yasson.internal.Marshaller;
-import org.eclipse.yasson.internal.model.JsonBindingModel;
 import org.eclipse.yasson.internal.model.customization.Customization;
 
 import javax.json.stream.JsonGenerator;
 import java.text.DecimalFormat;
 import java.text.NumberFormat;
-import java.util.function.Consumer;
 
 /**
  * Common serializer for numbers, using number format.
@@ -33,14 +30,14 @@ public abstract class AbstractNumberSerializer<T extends Number> extends Abstrac
     private final JsonbNumberFormatter formatter;
 
     /**
-     * Creates an instance.
+     * Creates a new instance.
      *
-     * @param model Binding model.
+     * @param customization Model customization.
      */
-    public AbstractNumberSerializer(JsonBindingModel model) {
-        super(model);
-        formatter = model.getCustomization() != null ?
-                model.getCustomization().getSerializeNumberFormatter() : null;
+    public AbstractNumberSerializer(Customization customization) {
+        super(customization);
+        formatter = customization != null ?
+                customization.getSerializeNumberFormatter() : null;
     }
 
     /**

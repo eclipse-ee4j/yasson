@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2016, 2017 Oracle and/or its affiliates. All rights reserved.
+ * Copyright (c) 2016, 2018 Oracle and/or its affiliates. All rights reserved.
  * This program and the accompanying materials are made available under the
  * terms of the Eclipse Public License v1.0 and Eclipse Distribution License v. 1.0
  * which accompanies this distribution.
@@ -16,7 +16,6 @@ package org.eclipse.yasson.internal.serializer;
 import org.eclipse.yasson.internal.Marshaller;
 import org.eclipse.yasson.internal.ReflectionUtils;
 import org.eclipse.yasson.internal.model.ClassModel;
-import org.eclipse.yasson.internal.model.JsonBindingModel;
 import org.eclipse.yasson.internal.model.PropertyModel;
 
 import javax.json.bind.serializer.JsonbSerializer;
@@ -50,10 +49,9 @@ public class ObjectSerializer<T> extends AbstractContainerSerializer<T> {
      * @param wrapper wrapped item
      * @param runtimeType class type
      * @param classModel model of the class
-     * @param wrapperModel data binding model
      */
-    public ObjectSerializer(CurrentItem<?> wrapper, Type runtimeType, ClassModel classModel, JsonBindingModel wrapperModel) {
-        super(wrapper, runtimeType, classModel, wrapperModel);
+    public ObjectSerializer(CurrentItem<?> wrapper, Type runtimeType, ClassModel classModel) {
+        super(wrapper, runtimeType, classModel);
     }
 
     @Override
@@ -95,11 +93,12 @@ public class ObjectSerializer<T> extends AbstractContainerSerializer<T> {
                 return;
             }
 
-            Optional<Type> runtimeTypeOptional = ReflectionUtils.resolveOptionalType(this, propertyModel.getType());
+            Optional<Type> runtimeTypeOptional = ReflectionUtils.resolveOptionalType(this, propertyModel.getPropertyType());
             Type genericType = runtimeTypeOptional.orElse(null);
             final JsonbSerializer<?> serializer = new SerializerBuilder(marshaller.getJsonbContext())
                     .withWrapper(this)
-                    .withObjectClass(propertyValue.getClass()).withModel(propertyModel)
+                    .withObjectClass(propertyValue.getClass())
+                    .withCustomization(propertyModel.getCustomization())
                     .withType(genericType).build();
             serializerCaptor(serializer, propertyValue, generator, ctx);
         }
