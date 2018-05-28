@@ -13,7 +13,7 @@
 
 package org.eclipse.yasson.internal.serializer;
 
-import org.eclipse.yasson.internal.model.JsonBindingModel;
+import org.eclipse.yasson.internal.model.customization.Customization;
 import org.eclipse.yasson.internal.properties.MessageKeys;
 import org.eclipse.yasson.internal.properties.Messages;
 
@@ -32,12 +32,12 @@ public class ZonedDateTimeTypeDeserializer extends AbstractDateTimeDeserializer<
     private static final Logger log = Logger.getLogger(ZonedDateTimeTypeDeserializer.class.getName());
 
     /**
-     * Creates a new instance.
+     * Creates an instance.
      *
-     * @param model Binding model.
+     * @param customization Model customization.
      */
-    public ZonedDateTimeTypeDeserializer(JsonBindingModel model) {
-        super(ZonedDateTime.class, model);
+    public ZonedDateTimeTypeDeserializer(Customization customization) {
+        super(ZonedDateTime.class, customization);
     }
 
     /**

@@ -15,7 +15,7 @@ package org.eclipse.yasson.internal.serializer;
 
 import org.eclipse.yasson.internal.JsonbParser;
 import org.eclipse.yasson.internal.Unmarshaller;
-import org.eclipse.yasson.internal.model.JsonBindingModel;
+import org.eclipse.yasson.internal.model.customization.Customization;
 
 import javax.json.bind.serializer.DeserializationContext;
 import javax.json.bind.serializer.JsonbDeserializer;
@@ -31,17 +31,17 @@ public abstract class AbstractValueTypeDeserializer<T> implements JsonbDeseriali
 
     private final Class<T> clazz;
 
-    private final JsonBindingModel model;
+    private final Customization customization;
 
     /**
      * Creates a new instance.
      *
      * @param clazz Class to work with.
-     * @param model Binding model.
+     * @param customization Model customization.
      */
-    public AbstractValueTypeDeserializer(Class<T> clazz, JsonBindingModel model) {
+    public AbstractValueTypeDeserializer(Class<T> clazz, Customization customization) {
         this.clazz = clazz;
-        this.model = model;
+        this.customization = customization;
     }
 
     /**
@@ -76,8 +76,13 @@ public abstract class AbstractValueTypeDeserializer<T> implements JsonbDeseriali
         throw new UnsupportedOperationException("Operation not supported in " + getClass());
     }
 
-    protected JsonBindingModel getModel() {
-        return model;
+    /**
+     * Returns customization of object
+     *
+     * @return object customization
+     */
+    public Customization getCustomization() {
+        return customization;
     }
 
     /**

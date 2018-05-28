@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2015, 2017 Oracle and/or its affiliates. All rights reserved.
+ * Copyright (c) 2015, 2018 Oracle and/or its affiliates. All rights reserved.
  * This program and the accompanying materials are made available under the
  * terms of the Eclipse Public License v1.0 and Eclipse Distribution License v. 1.0
  * which accompanies this distribution.
@@ -36,7 +36,7 @@ import java.util.Optional;
  * @author Dmitry Kornilov
  * @author Roman Grigoriadi
  */
-public class PropertyModel implements JsonBindingModel, Comparable<PropertyModel> {
+public class PropertyModel implements Comparable<PropertyModel> {
 
     /**
      * Field propertyName as in class by java bean convention.
@@ -102,16 +102,16 @@ public class PropertyModel implements JsonBindingModel, Comparable<PropertyModel
             return null;
         }
         if (customization.getAdapterBinding() != null) {
-            return new AdaptedObjectSerializer<>(this, customization.getAdapterBinding());
+            return new AdaptedObjectSerializer<>(classModel, customization.getAdapterBinding());
         }
         if (customization.getSerializerBinding() != null) {
-            return new UserSerializerSerializer<>(this, customization.getSerializerBinding().getJsonbSerializer());
+            return new UserSerializerSerializer<>(classModel, customization.getSerializerBinding().getJsonbSerializer());
         }
 
         final Class<?> propertyRawType = ReflectionUtils.getRawType(propertyType);
         final Optional<SerializerProviderWrapper> valueSerializerProvider = DefaultSerializers.getInstance().findValueSerializerProvider(propertyRawType);
         if (valueSerializerProvider.isPresent()) {
-            return valueSerializerProvider.get().getSerializerProvider().provideSerializer(this);
+            return valueSerializerProvider.get().getSerializerProvider().provideSerializer(customization);
         }
 
         return null;
@@ -317,19 +317,8 @@ public class PropertyModel implements JsonBindingModel, Comparable<PropertyModel
      * Introspected customization of a property.
      * @return immutable property customization
      */
-    @Override
     public PropertyCustomization getCustomization() {
         return customization;
-    }
-
-    /**
-     * Class of a property, either bean property type or collection / array component type.
-     *
-     * @return class type
-     */
-    @Override
-    public Type getType() {
-        return getPropertyType();
     }
 
     @Override

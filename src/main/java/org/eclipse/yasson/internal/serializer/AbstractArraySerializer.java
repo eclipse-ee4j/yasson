@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2016, 2017 Oracle and/or its affiliates. All rights reserved.
+ * Copyright (c) 2016, 2018 Oracle and/or its affiliates. All rights reserved.
  * This program and the accompanying materials are made available under the
  * terms of the Eclipse Public License v1.0 and Eclipse Distribution License v. 1.0
  * which accompanies this distribution.
@@ -14,7 +14,6 @@
 package org.eclipse.yasson.internal.serializer;
 
 import org.eclipse.yasson.internal.ReflectionUtils;
-import org.eclipse.yasson.internal.model.JsonBindingModel;
 
 import javax.json.stream.JsonGenerator;
 import java.lang.reflect.GenericArrayType;
@@ -29,14 +28,11 @@ import java.lang.reflect.Type;
  */
 public abstract class AbstractArraySerializer<T> extends AbstractContainerSerializer<T> implements EmbeddedItem {
 
-    protected final JsonBindingModel containerModel;
-
     protected final Type arrayValType;
 
     protected AbstractArraySerializer(SerializerBuilder builder) {
         super(builder);
         arrayValType = resolveArrayType();
-        containerModel = new ContainerModel(arrayValType, resolveContainerModelCustomization(arrayValType, builder.getJsonbContext()));
     }
 
     private Type resolveArrayType() {

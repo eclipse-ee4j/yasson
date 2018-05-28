@@ -18,8 +18,6 @@ import org.eclipse.yasson.internal.properties.Messages;
 import org.eclipse.yasson.internal.serializer.AbstractValueTypeSerializer;
 import org.eclipse.yasson.internal.serializer.ContainerSerializerProvider;
 import org.eclipse.yasson.internal.serializer.SerializerBuilder;
-import org.eclipse.yasson.internal.serializer.ContainerModel;
-import org.eclipse.yasson.internal.model.JsonBindingModel;
 import org.eclipse.yasson.internal.model.JsonbPropertyInfo;
 
 import javax.json.bind.JsonbException;
@@ -73,8 +71,7 @@ public class Marshaller extends ProcessingContext implements SerializationContex
     public void marshall(Object object, JsonGenerator jsonGenerator) {
         try {
             ClassModel classModel = getMappingContext().getOrCreateClassModel(object.getClass());
-            final ContainerModel model = new ContainerModel(runtimeType != null ? runtimeType : object.getClass(), classModel.getClassCustomization());
-            serializeRoot(object, jsonGenerator, model);
+            serializeRoot(object, jsonGenerator, classModel);
         } catch (JsonbException e) {
             logger.severe(e.getMessage());
             throw e;
@@ -91,16 +88,16 @@ public class Marshaller extends ProcessingContext implements SerializationContex
     public <T> void serialize(String key, T object, JsonGenerator generator) {
         Objects.requireNonNull(key);
         Objects.requireNonNull(object);
-        final ContainerModel model = new ContainerModel(object.getClass(), null);
+        final ClassModel classModel = getMappingContext().getOrCreateClassModel(object.getClass());
         generator.writeKey(key);
-        serializeRoot(object, generator, model);
+        serializeRoot(object, generator, classModel);
     }
 
     @Override
     public <T> void serialize(T object, JsonGenerator generator) {
         Objects.requireNonNull(object);
-        final ContainerModel model = new ContainerModel(object.getClass(), null);
-        serializeRoot(object, generator, model);
+        final ClassModel classModel = getMappingContext().getOrCreateClassModel(object.getClass());
+        serializeRoot(object, generator, classModel);
     }
 
     /**
@@ -109,11 +106,11 @@ public class Marshaller extends ProcessingContext implements SerializationContex
      * @param <T> Root type
      * @param root Root.
      * @param generator JSON generator.
-     * @param model Binding model.
+     * @param classModel Class model.
      */
     @SuppressWarnings("unchecked")
-    public <T> void serializeRoot(T root, JsonGenerator generator, JsonBindingModel model) {
-        final JsonbSerializer<T> rootSerializer = (JsonbSerializer<T>) getRootSerializer(root.getClass(), model);
+    public <T> void serializeRoot(T root, JsonGenerator generator, ClassModel classModel) {
+        final JsonbSerializer<T> rootSerializer = (JsonbSerializer<T>) getRootSerializer(root.getClass(), classModel);
         if (jsonbContext.getConfigProperties().isStrictIJson() &&
                 rootSerializer instanceof AbstractValueTypeSerializer) {
             throw new JsonbException(Messages.getMessage(MessageKeys.IJSON_ENABLED_SINGLE_VALUE));
@@ -121,20 +118,18 @@ public class Marshaller extends ProcessingContext implements SerializationContex
         rootSerializer.serialize(root, generator, this);
     }
 
-    private JsonbSerializer<?> getRootSerializer(Class<?> rootClazz, JsonBindingModel model) {
+    private JsonbSerializer<?> getRootSerializer(Class<?> rootClazz, ClassModel classModel) {
         final ContainerSerializerProvider serializerProvider = getMappingContext().getSerializerProvider(rootClazz);
         if (serializerProvider != null) {
             return serializerProvider
                     .provideSerializer(new JsonbPropertyInfo()
                             .withRuntimeType(runtimeType)
-                            .withClassModel(getMappingContext().
-                                    getClassModel(rootClazz))
-                            .withJsonBindingModel(model));
+                            .withClassModel(classModel));
         }
         return new SerializerBuilder(jsonbContext)
                 .withObjectClass(rootClazz)
-                .withType(model.getType())
-                .withModel(model).build();
+                .withType(runtimeType)
+                .withCustomization(classModel.getCustomization()).build();
     }
 
 }

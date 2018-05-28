@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2016, 2017 Oracle and/or its affiliates. All rights reserved.
+ * Copyright (c) 2016, 2018 Oracle and/or its affiliates. All rights reserved.
  * This program and the accompanying materials are made available under the
  * terms of the Eclipse Public License v1.0 and Eclipse Distribution License v. 1.0
  * which accompanies this distribution.
@@ -13,7 +13,7 @@
 
 package org.eclipse.yasson.internal.serializer;
 
-import org.eclipse.yasson.internal.model.JsonBindingModel;
+import org.eclipse.yasson.internal.model.customization.Customization;
 
 import java.time.Instant;
 import java.time.ZonedDateTime;
@@ -31,12 +31,12 @@ public class CalendarTypeSerializer extends AbstractDateTimeSerializer<Calendar>
 
 
     /**
-     * Construct serializer with its class.
+     * Creates a new instance.
      *
-     * @param model Binding model.
+     * @param customization Model customization.
      */
-    public CalendarTypeSerializer(JsonBindingModel model) {
-        super(model);
+    public CalendarTypeSerializer(Customization customization) {
+        super(customization);
     }
 
     @Override

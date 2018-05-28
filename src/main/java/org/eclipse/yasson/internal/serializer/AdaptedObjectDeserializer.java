@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2016, 2017 Oracle and/or its affiliates. All rights reserved.
+ * Copyright (c) 2016, 2018 Oracle and/or its affiliates. All rights reserved.
  * This program and the accompanying materials are made available under the
  * terms of the Eclipse Public License v1.0 and Eclipse Distribution License v. 1.0
  * which accompanies this distribution.
@@ -18,7 +18,6 @@ import org.eclipse.yasson.internal.components.AdapterBinding;
 import org.eclipse.yasson.internal.properties.MessageKeys;
 import org.eclipse.yasson.internal.properties.Messages;
 import org.eclipse.yasson.internal.model.ClassModel;
-import org.eclipse.yasson.internal.model.JsonBindingModel;
 
 import javax.json.bind.JsonbException;
 import javax.json.bind.adapter.JsonbAdapter;
@@ -61,11 +60,6 @@ public class AdaptedObjectDeserializer<A, T> implements CurrentItem<T>, JsonbDes
     @Override
     public CurrentItem<?> getWrapper() {
         return wrapperItem;
-    }
-
-    @Override
-    public JsonBindingModel getWrapperModel() {
-        return ((AbstractContainerDeserializer) adaptedTypeDeserializer).getWrapperModel();
     }
 
     @Override

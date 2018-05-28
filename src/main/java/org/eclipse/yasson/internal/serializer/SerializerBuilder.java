@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2016, 2017 Oracle and/or its affiliates. All rights reserved.
+ * Copyright (c) 2016, 2018 Oracle and/or its affiliates. All rights reserved.
  * This program and the accompanying materials are made available under the
  * terms of the Eclipse Public License v1.0 and Eclipse Distribution License v. 1.0
  * which accompanies this distribution.
@@ -25,7 +25,6 @@ import javax.json.bind.config.BinaryDataStrategy;
 import javax.json.bind.serializer.JsonbSerializer;
 import java.lang.reflect.GenericArrayType;
 import java.lang.reflect.Type;
-import java.lang.reflect.TypeVariable;
 import java.util.Collection;
 import java.util.Map;
 import java.util.Optional;
@@ -67,20 +66,19 @@ public class SerializerBuilder extends AbstractSerializerBuilder<SerializerBuild
     public JsonbSerializer<?> build() {
         runtimeType = resolveRuntimeType();
 
-        if (getModel() != null && (getModel().getCustomization() == null
-                || getModel().getCustomization() instanceof ComponentBoundCustomization)) {
-            ComponentBoundCustomization customization = (ComponentBoundCustomization) getModel().getCustomization();
+        if (customization instanceof ComponentBoundCustomization) {
+            ComponentBoundCustomization customization = (ComponentBoundCustomization) this.customization;
             //First check if user deserializer is registered for such type
             final ComponentMatcher componentMatcher = jsonbContext.getComponentMatcher();
             Optional<SerializerBinding<?>> userSerializer = componentMatcher.getSerializerBinding(getRuntimeType(), customization);
             if (userSerializer.isPresent()  && !jsonbContext.containsProcessedType(userSerializer.get().getBindingType())) {
-                return new UserSerializerSerializer<>(model, userSerializer.get().getJsonbSerializer());
+                return new UserSerializerSerializer<>(classModel, userSerializer.get().getJsonbSerializer());
             }
 
             //Second user components is registered.
             Optional<AdapterBinding> adapterInfoOptional = componentMatcher.getAdapterBinding(getRuntimeType(), customization);
             if (adapterInfoOptional.isPresent() && !jsonbContext.containsProcessedType(adapterInfoOptional.get().getBindingType())) {
-                return new AdaptedObjectSerializer<>(getModel(), adapterInfoOptional.get());
+                return new AdaptedObjectSerializer<>(classModel, adapterInfoOptional.get());
             }
         }
 
@@ -99,7 +97,7 @@ public class SerializerBuilder extends AbstractSerializerBuilder<SerializerBuild
                 case BinaryDataStrategy.BYTE:
                     return new ByteArraySerializer(this);
                 default:
-                    return new ByteArrayBase64Serializer(byte[].class, getModel());
+                    return new ByteArrayBase64Serializer(customization);
             }
         } else if (objectClass.isArray() || getRuntimeType() instanceof GenericArrayType) {
             return createArrayItem(objectClass.getComponentType());
@@ -148,7 +146,7 @@ public class SerializerBuilder extends AbstractSerializerBuilder<SerializerBuild
     private Optional<AbstractValueTypeSerializer<?>> getSupportedTypeSerializer(Class<?> rawType) {
         final Optional<? extends SerializerProviderWrapper> supportedTypeSerializerOptional = DefaultSerializers.getInstance().findValueSerializerProvider(rawType);
         if (supportedTypeSerializerOptional.isPresent()) {
-            return Optional.of(supportedTypeSerializerOptional.get().getSerializerProvider().provideSerializer(getModel()));
+            return Optional.of(supportedTypeSerializerOptional.get().getSerializerProvider().provideSerializer(customization));
         }
         return Optional.empty();
     }
@@ -156,9 +154,6 @@ public class SerializerBuilder extends AbstractSerializerBuilder<SerializerBuild
     private Type resolveRuntimeType() {
         if (genericType != null && genericType != Object.class) {
             return genericType;
-        }
-        if (getModel() != null && ! (getModel().getType() instanceof TypeVariable)) {
-            return getModel().getType();
         }
         return objectClass;
     }

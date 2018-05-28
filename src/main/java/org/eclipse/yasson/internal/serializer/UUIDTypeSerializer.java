@@ -14,7 +14,7 @@ package org.eclipse.yasson.internal.serializer;
 
 
 import org.eclipse.yasson.internal.Marshaller;
-import org.eclipse.yasson.internal.model.JsonBindingModel;
+import org.eclipse.yasson.internal.model.customization.Customization;
 
 import javax.json.stream.JsonGenerator;
 import java.util.UUID;
@@ -27,10 +27,10 @@ public class UUIDTypeSerializer extends AbstractValueTypeSerializer<UUID> {
     /**
      * Creates a new instance.
      *
-     * @param model Binding model.
+     * @param customization Model customization.
      */
-    public UUIDTypeSerializer(JsonBindingModel model) {
-        super(model);
+    public UUIDTypeSerializer(Customization customization) {
+        super(customization);
     }
 
     @Override

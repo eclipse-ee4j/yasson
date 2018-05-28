@@ -13,7 +13,7 @@
 
 package org.eclipse.yasson.internal.serializer;
 
-import org.eclipse.yasson.internal.model.JsonBindingModel;
+import org.eclipse.yasson.internal.model.customization.Customization;
 
 import java.sql.Date;
 import java.time.Instant;
@@ -32,12 +32,12 @@ public class SqlDateTypeDeserializer extends AbstractDateTimeDeserializer<Date> 
     private static final DateTimeFormatter DEFAULT_FORMATTER = DateTimeFormatter.ISO_DATE.withZone(UTC);
 
     /**
-     * Creates a new instance.
+     * Creates an instance.
      *
-     * @param model Binding model.
+     * @param customization Model customization.
      */
-    public SqlDateTypeDeserializer(JsonBindingModel model) {
-        super(Date.class, model);
+    public SqlDateTypeDeserializer(Customization customization) {
+        super(Date.class, customization);
     }
 
     /**

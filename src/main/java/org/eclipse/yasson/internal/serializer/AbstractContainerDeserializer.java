@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2016, 2017 Oracle and/or its affiliates. All rights reserved.
+ * Copyright (c) 2016, 2018 Oracle and/or its affiliates. All rights reserved.
  * This program and the accompanying materials are made available under the
  * terms of the Eclipse Public License v1.0 and Eclipse Distribution License v. 1.0
  * which accompanies this distribution.
@@ -16,7 +16,6 @@ package org.eclipse.yasson.internal.serializer;
 import org.eclipse.yasson.internal.*;
 import org.eclipse.yasson.internal.properties.MessageKeys;
 import org.eclipse.yasson.internal.properties.Messages;
-import org.eclipse.yasson.internal.model.JsonBindingModel;
 
 import javax.json.bind.JsonbException;
 import javax.json.bind.serializer.DeserializationContext;
@@ -115,20 +114,13 @@ public abstract class AbstractContainerDeserializer<T> extends AbstractItem<T> i
      */
     protected abstract JsonbRiParser.LevelContext moveToFirst(JsonbParser parser);
 
-    /**
-     * Binding model for current deserializer.
-     *
-     * @return Binding model.
-     */
-    protected abstract JsonBindingModel getModel();
-
     protected DeserializerBuilder newUnmarshallerItemBuilder(JsonbContext ctx) {
         return new DeserializerBuilder(ctx).withWrapper(this).withJsonValueType(parserContext.getLastEvent());
     }
 
     protected JsonbDeserializer<?> newCollectionOrMapItem(Type valueType, JsonbContext ctx) {
         Type actualValueType = ReflectionUtils.resolveType(this, valueType);
-        return newUnmarshallerItemBuilder(ctx).withType(actualValueType).withModel(getModel()).build();
+        return newUnmarshallerItemBuilder(ctx).withType(actualValueType).build();
     }
 
     /**
@@ -136,16 +128,15 @@ public abstract class AbstractContainerDeserializer<T> extends AbstractItem<T> i
      * {@link OptionalInt}, or {@link OptionalLong}, value of corresponding {@code Optional#empty()}
      * is returned.
      *
-     * @param propertyModel to resolve property type from
+     * @param propertyType property type
      * @param value value to set
      * @return empty optional if applies
      */
-    protected Object convertNullToOptionalEmpty(JsonBindingModel propertyModel, Object value) {
+    protected Object convertNullToOptionalEmpty(Type propertyType, Object value) {
         if (value != null) {
             return value;
         }
 
-        Type propertyType = propertyModel.getType();
         if (!(propertyType instanceof Class)) {
             propertyType = ReflectionUtils.getRawType(ReflectionUtils.resolveType(this, propertyType));
         }

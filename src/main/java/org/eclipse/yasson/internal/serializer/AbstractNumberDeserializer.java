@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2016, 2017 Oracle and/or its affiliates. All rights reserved.
+ * Copyright (c) 2016, 2018 Oracle and/or its affiliates. All rights reserved.
  * This program and the accompanying materials are made available under the
  * terms of the Eclipse Public License v1.0 and Eclipse Distribution License v. 1.0
  * which accompanies this distribution.
@@ -14,9 +14,9 @@
 package org.eclipse.yasson.internal.serializer;
 
 import org.eclipse.yasson.internal.JsonbContext;
+import org.eclipse.yasson.internal.model.customization.Customization;
 import org.eclipse.yasson.internal.properties.MessageKeys;
 import org.eclipse.yasson.internal.properties.Messages;
-import org.eclipse.yasson.internal.model.JsonBindingModel;
 
 import javax.json.bind.JsonbException;
 import java.text.DecimalFormat;
@@ -33,22 +33,21 @@ import java.util.Optional;
 public abstract class AbstractNumberDeserializer<T extends Number> extends AbstractValueTypeDeserializer<T> {
 
     /**
-     * Creates an instance of AbstractNumberDeserializer.
+     * Creates a new instance.
      *
-     * @param clazz Class to create deserializer for.
-     * @param model Binding model.
+     * @param clazz         Class to work with.
+     * @param customization Model customization.
      */
-    public AbstractNumberDeserializer(Class<T> clazz, JsonBindingModel model) {
-        super(clazz, model);
+    public AbstractNumberDeserializer(Class<T> clazz, Customization customization) {
+        super(clazz, customization);
     }
 
     protected final Optional<Number> deserializeFormatted(String jsonValue, boolean integerOnly, JsonbContext jsonbContext) {
-        if (getModel() == null || getModel().getCustomization() == null
-                || getModel().getCustomization().getDeserializeNumberFormatter() == null) {
+        if (getCustomization() == null || getCustomization().getDeserializeNumberFormatter() == null) {
             return Optional.empty();
         }
 
-        final JsonbNumberFormatter numberFormat = getModel().getCustomization().getDeserializeNumberFormatter();
+        final JsonbNumberFormatter numberFormat = getCustomization().getDeserializeNumberFormatter();
         //consider synchronizing on format instance or per thread cache.
         final NumberFormat format = NumberFormat.getInstance(jsonbContext.getConfigProperties().getLocale(numberFormat.getLocale()));
         ((DecimalFormat)format).applyPattern(numberFormat.getFormat());

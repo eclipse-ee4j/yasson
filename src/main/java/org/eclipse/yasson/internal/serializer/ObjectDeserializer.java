@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2015, 2017 Oracle and/or its affiliates. All rights reserved.
+ * Copyright (c) 2015, 2018 Oracle and/or its affiliates. All rights reserved.
  * This program and the accompanying materials are made available under the
  * terms of the Eclipse Public License v1.0 and Eclipse Distribution License v. 1.0
  * which accompanies this distribution.
@@ -136,7 +136,7 @@ class ObjectDeserializer<T> extends AbstractContainerDeserializer<T> {
         if (model == null) {
             return;
         }
-        values.put(model.getPropertyName(), new ValueWrapper(model, convertNullToOptionalEmpty(model, result)));
+        values.put(model.getPropertyName(), new ValueWrapper(model, convertNullToOptionalEmpty(model.getPropertyType(), result)));
     }
 
     @Override
@@ -147,7 +147,10 @@ class ObjectDeserializer<T> extends AbstractContainerDeserializer<T> {
         if (creator != null) {
             final CreatorModel param = creator.findByName(parserContext.getLastKeyName());
             if (param != null) {
-                final JsonbDeserializer<?> deserializer = newUnmarshallerItemBuilder(context.getJsonbContext()).withType(param.getType()).withModel(param).build();
+                final JsonbDeserializer<?> deserializer = newUnmarshallerItemBuilder(context.getJsonbContext())
+                        .withType(param.getType())
+                        .withCustomization(param.getCustomization())
+                        .build();
                 Object result = deserializer.deserialize(parser, context, param.getType());
                 values.put(param.getName(), new ValueWrapper(param, result));
                 return;
@@ -158,8 +161,10 @@ class ObjectDeserializer<T> extends AbstractContainerDeserializer<T> {
         PropertyModel newPropertyModel = getModel();
         if (newPropertyModel != null) {
             //create current item instance of identified object field
-            final JsonbDeserializer<?> deserializer = newUnmarshallerItemBuilder(context.getJsonbContext()).
-                    withModel(newPropertyModel).build();
+            final JsonbDeserializer<?> deserializer = newUnmarshallerItemBuilder(context.getJsonbContext())
+                    .withCustomization(newPropertyModel.getCustomization())
+                    .withType(newPropertyModel.getPropertyType())
+                    .build();
 
             Type resolvedType = ReflectionUtils.resolveType(this, newPropertyModel.getPropertyType());
             Object result = deserializer.deserialize(parser, context, resolvedType);
@@ -185,7 +190,6 @@ class ObjectDeserializer<T> extends AbstractContainerDeserializer<T> {
         return parser.getCurrentLevel();
     }
 
-    @Override
     protected PropertyModel getModel() {
         final String lastKeyName = parserContext.getLastKeyName();
         if (lastPropertyModel != null && lastPropertyModel.getJsonKeyName().equals(lastKeyName)) {
