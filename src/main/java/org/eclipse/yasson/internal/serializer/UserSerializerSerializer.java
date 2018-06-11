@@ -16,7 +16,10 @@ package org.eclipse.yasson.internal.serializer;
 import org.eclipse.yasson.internal.JsonbContext;
 import org.eclipse.yasson.internal.Marshaller;
 import org.eclipse.yasson.internal.model.ClassModel;
+import org.eclipse.yasson.internal.properties.MessageKeys;
+import org.eclipse.yasson.internal.properties.Messages;
 
+import javax.json.bind.JsonbException;
 import javax.json.bind.serializer.JsonbSerializer;
 import javax.json.bind.serializer.SerializationContext;
 import javax.json.stream.JsonGenerator;
@@ -48,10 +51,13 @@ public class UserSerializerSerializer<T> implements JsonbSerializer<T> {
     public void serialize(T obj, JsonGenerator generator, SerializationContext ctx) {
         JsonbContext jsonbContext = ((Marshaller) ctx).getJsonbContext();
         try {
-            jsonbContext.addProcessedType(obj.getClass());
-            userSerializer.serialize(obj, generator, ctx);
+            if (jsonbContext.addProcessedObject(obj)) {
+                userSerializer.serialize(obj, generator, ctx);
+            } else {
+                throw new JsonbException(Messages.getMessage(MessageKeys.RECURSIVE_REFERENCE, obj.getClass()));
+            }
         } finally {
-            jsonbContext.removeProcessedType(obj.getClass());
+            jsonbContext.removeProcessedObject(obj);
         }
     }
 }

@@ -85,15 +85,12 @@ public class AdaptedObjectDeserializer<A, T> implements CurrentItem<T>, JsonbDes
         Unmarshaller unmarshaller = (Unmarshaller) context;
         unmarshaller.setCurrent(this);
         try {
-            unmarshaller.getJsonbContext().addProcessedType(adapterInfo.getBindingType());
             final A result =  adaptedTypeDeserializer.deserialize(parser, context, rtType);
             final T adapted = ((JsonbAdapter<T, A>) adapterInfo.getAdapter()).adaptFromJson(result);
             unmarshaller.setCurrent(wrapperItem);
             return adapted;
         } catch (Exception e) {
             throw new JsonbException(Messages.getMessage(MessageKeys.ADAPTER_EXCEPTION, adapterInfo.getBindingType(), adapterInfo.getToType(), adapterInfo.getAdapter().getClass()), e);
-        } finally {
-            unmarshaller.getJsonbContext().removeProcessedType(adapterInfo.getBindingType());
         }
     }
 }

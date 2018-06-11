@@ -88,13 +88,13 @@ public class DeserializerBuilder extends AbstractSerializerBuilder<DeserializerB
             final ComponentMatcher componentMatcher = jsonbContext.getComponentMatcher();
             Optional<DeserializerBinding<?>> userDeserializer =
                     componentMatcher.getDeserializerBinding(getRuntimeType(), componentBoundCustomization);
-            if (userDeserializer.isPresent() && !jsonbContext.containsProcessedType(userDeserializer.get().getBindingType())) {
+            if (userDeserializer.isPresent()) {
                 return new UserDeserializerDeserializer<>(this, userDeserializer.get());
             }
 
             //Second user components is registered.
             Optional<AdapterBinding> adapterBinding = componentMatcher.getAdapterBinding(getRuntimeType(), componentBoundCustomization);
-            if (adapterBinding.isPresent() && !jsonbContext.containsProcessedType(adapterBinding.get().getBindingType())) {
+            if (adapterBinding.isPresent()) {
                 adapterInfoOptional = adapterBinding;
                 runtimeType = adapterInfoOptional.get().getToType();
                 wrapper = new AdaptedObjectDeserializer<>(adapterInfoOptional.get(), (AbstractContainerDeserializer<?>) wrapper);

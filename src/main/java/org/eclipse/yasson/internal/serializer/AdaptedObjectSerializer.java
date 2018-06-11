@@ -56,15 +56,18 @@ public class AdaptedObjectSerializer<T, A> implements CurrentItem<T>, JsonbSeria
     public void serialize(T obj, JsonGenerator generator, SerializationContext ctx) {
         JsonbContext jsonbContext = ((Marshaller) ctx).getJsonbContext();
         try {
-            jsonbContext.addProcessedType(adapterInfo.getBindingType());
-            final JsonbAdapter<T, A> adapter = (JsonbAdapter<T, A>) adapterInfo.getAdapter();
-            A adapted = adapter.adaptToJson(obj);
-            final JsonbSerializer<A> serializer = resolveSerializer((Marshaller) ctx, adapted);
-            serializer.serialize(adapted, generator, ctx);
+            if (jsonbContext.addProcessedObject(obj)) {
+                final JsonbAdapter<T, A> adapter = (JsonbAdapter<T, A>) adapterInfo.getAdapter();
+                A adapted = adapter.adaptToJson(obj);
+                final JsonbSerializer<A> serializer = resolveSerializer((Marshaller) ctx, adapted);
+                serializer.serialize(adapted, generator, ctx);
+            } else {
+                throw new JsonbException(Messages.getMessage(MessageKeys.RECURSIVE_REFERENCE, obj.getClass()));
+            }
         } catch (Exception e) {
             throw new JsonbException(Messages.getMessage(MessageKeys.ADAPTER_EXCEPTION, adapterInfo.getBindingType(), adapterInfo.getToType(), adapterInfo.getAdapter().getClass()), e);
         } finally {
-            jsonbContext.removeProcessedType(adapterInfo.getBindingType());
+            jsonbContext.removeProcessedObject(obj);
         }
     }
 
