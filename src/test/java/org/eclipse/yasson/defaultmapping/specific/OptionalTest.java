@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2015 Oracle and/or its affiliates. All rights reserved.
+ * Copyright (c) 2015, 2018 Oracle and/or its affiliates. All rights reserved.
  * This program and the accompanying materials are made available under the
  * terms of the Eclipse Public License v1.0 and Eclipse Distribution License v. 1.0
  * which accompanies this distribution.
@@ -15,6 +15,7 @@ package org.eclipse.yasson.defaultmapping.specific;
 import org.eclipse.yasson.TestTypeToken;
 import org.eclipse.yasson.defaultmapping.generics.model.ScalarValueWrapper;
 import org.eclipse.yasson.defaultmapping.specific.model.OptionalWrapper;
+import org.eclipse.yasson.defaultmapping.specific.model.NotMatchingGettersAndSetters;
 import org.eclipse.yasson.defaultmapping.specific.model.Street;
 import org.eclipse.yasson.internal.JsonBindingBuilder;
 import org.junit.Assert;
@@ -26,6 +27,7 @@ import java.util.*;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertTrue;
+import static org.junit.Assert.fail;
 
 /**
  * Default mapping Optional* tests.
@@ -150,6 +152,18 @@ public class OptionalTest {
         final Jsonb jsonb = JsonbBuilder.create();
         String result = jsonb.toJson(ints);
         Assert.assertEquals("{\"first\":null,\"second\":null}", result);
+    }
+
+    @Test
+    public void testCorrectOptionalGetter() {
+        NotMatchingGettersAndSetters personWithCorrectGetter = new NotMatchingGettersAndSetters();
+        final Jsonb jsonb = JsonbBuilder.create();
+        String result = jsonb.toJson(personWithCorrectGetter);
+        assertEquals("{\"firstName\":1,\"lastName\":\"Correct\"}", result);
+
+        NotMatchingGettersAndSetters deserialized = jsonb.fromJson(result, NotMatchingGettersAndSetters.class);
+        personWithCorrectGetter.setFirstName(1);
+        assertEquals(personWithCorrectGetter, deserialized);
     }
 
 

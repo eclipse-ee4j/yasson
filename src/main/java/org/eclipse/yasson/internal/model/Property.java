@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2015 Oracle and/or its affiliates. All rights reserved.
+ * Copyright (c) 2015, 2018 Oracle and/or its affiliates. All rights reserved.
  * This program and the accompanying materials are made available under the
  * terms of the Eclipse Public License v1.0 and Eclipse Distribution License v. 1.0
  * which accompanies this distribution.
@@ -130,15 +130,26 @@ public class Property {
         if (getField() != null) {
             return getField().getGenericType();
         } else if (getGetter() != null) {
-            return getGetter().getGenericReturnType();
+            return getGetterType();
         } else if (getSetter() != null) {
-            Type[] genericParameterTypes = getSetter().getGenericParameterTypes();
-            if (genericParameterTypes.length != 1) {
-                throw new JsonbException("Invalid count of arguments for setter: " + getSetter());
-            }
-            return genericParameterTypes[0];
+            return getSetterType();
         }
         throw new JsonbException("Empty property: " + name);
+    }
+
+    public Type getGetterType() {
+        if (getGetter() != null) {
+            return getGetter().getGenericReturnType();
+        }
+        return null;
+    }
+
+    public Type getSetterType() {
+        Type[] genericParameterTypes = getSetter().getGenericParameterTypes();
+        if (genericParameterTypes.length != 1) {
+            throw new JsonbException("Invalid count of arguments for setter: " + getSetter());
+        }
+        return genericParameterTypes[0];
     }
 
     /**
