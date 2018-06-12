@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2015, 2017 Oracle and/or its affiliates. All rights reserved.
+ * Copyright (c) 2015, 2018 Oracle and/or its affiliates. All rights reserved.
  * This program and the accompanying materials are made available under the
  * terms of the Eclipse Public License v1.0 and Eclipse Distribution License v. 1.0
  * which accompanies this distribution.
@@ -9,6 +9,7 @@
  *
  * Contributors:
  *     Dmitry Kornilov - initial implementation
+ *     Maxence Laurent - parse default methods in interface as properties
  ******************************************************************************/
 package org.eclipse.yasson.internal;
 
@@ -84,25 +85,46 @@ class ClassParser {
         Class<?> concreteClass = classElement.getElement();
         parseMethods(concreteClass, classElement, classProperties);
         for (Class<?> ifc : jsonbContext.getAnnotationIntrospector().collectInterfaces(concreteClass)) {
-            parseIfaceMethodAnnotations(ifc, classProperties);
+            parseIfaceMethodAnnotations(ifc, classElement, classProperties);
         }
     }
 
-    private void parseIfaceMethodAnnotations(Class<?> ifc, Map<String, Property> classProperties) {
+    private void parseIfaceMethodAnnotations(Class<?> ifc, JsonbAnnotatedElement<Class<?>> classElement, Map<String, Property> classProperties) {
         Method[] declaredMethods = AccessController.doPrivileged((PrivilegedAction<Method[]>) ifc::getDeclaredMethods);
-        for(Method method : declaredMethods) {
+        for (Method method : declaredMethods) {
             final String methodName = method.getName();
             if (!isPropertyMethod(method)) {
                 continue;
             }
             String propertyName = toPropertyMethod(methodName);
-            final Property property = classProperties.get(propertyName);
+
+            Property property = classProperties.get(propertyName);
+
+            if (method.isDefault()) {
+                // Interface provides default implementation
+                if (property == null) {
+                    // the property does not yet exists : create it from scratch
+                    property = registerMethod(propertyName, method, classElement, classProperties);
+                } else {
+                    // property already exists, take care not overriding already parsed implementation
+                    if (isSetter(method)) {
+                        if (property.getSetter() == null) {
+                            property.setSetter(method);
+                        }
+                    } else {
+                        if (property.getGetter() == null) {
+                            property.setGetter(method);
+                        }
+                    }
+                }
+            }
+
             if (property == null) {
                 //May happen for classes which both extend a class with some method and implement interface with same method.
                 continue;
             }
-            JsonbAnnotatedElement<Method> methodElement = isGetter(method) ?
-                    property.getGetterElement() : property.getSetterElement();
+            JsonbAnnotatedElement<Method> methodElement = isGetter(method)
+                    ? property.getGetterElement() : property.getSetterElement();
             //Only push iface annotations if not overridden on impl classes
             for (Annotation ann : method.getDeclaredAnnotations()) {
                 if (methodElement.getAnnotation(ann.annotationType()) == null) {
@@ -110,6 +132,17 @@ class ClassParser {
                 }
             }
         }
+    }
+
+    private Property registerMethod(String propertyName, Method method, JsonbAnnotatedElement<Class<?>> classElement, Map<String, Property> classProperties) {
+        Property property = classProperties.computeIfAbsent(propertyName, n -> new Property(n, classElement));
+        if (isSetter(method)) {
+            property.setSetter(method);
+        } else {
+            property.setGetter(method);
+        }
+
+        return property;
     }
 
     private void parseMethods(Class<?> clazz, JsonbAnnotatedElement<Class<?>> classElement, Map<String, Property> classProperties) {
@@ -121,13 +154,7 @@ class ClassParser {
             }
             final String propertyName = toPropertyMethod(name);
 
-            Property property = classProperties.computeIfAbsent(propertyName, n -> new Property(n, classElement));
-
-            if (isSetter(method)) {
-                property.setSetter(method);
-            } else {
-                property.setGetter(method);
-            }
+            Property property = registerMethod(propertyName, method, classElement, classProperties);
         }
     }
 
@@ -144,7 +171,7 @@ class ClassParser {
     }
 
     private boolean isPropertyMethod(Method m) {
-    	return isGetter(m) || isSetter(m);
+        return isGetter(m) || isSetter(m);
     }
 
     private void parseFields(JsonbAnnotatedElement<Class<?>> classElement, Map<String, Property> classProperties) {
@@ -215,13 +242,40 @@ class ClassParser {
         return sortedProperties;
     }
 
+    /**
+     * Select the correct method to use. The correct method is the most specific
+     * method which is not a default one:
+     * <ul>
+     * <li> if current is not defined, returns parent;</li>
+     * <li> if parent is not defined, returns current;</li>
+     * <li> if current is a default method and parent is not, returns parent;</li>
+     * <ul>
+     * <li><i>By definition, it is not possible to make a choice betweentwo default
+     * methods. <br/>Here, the most specific is selected, but a concrete
+     * implementation MUST eventually be provided as the source code won't even
+     * compile if such a method does not exist</i></li>
+     * </ul>
+     * <li> returns current otherwise</li>
+     * </ul>
+     *
+     *
+     * @param current current 'child' implementation
+     * @param parent  parent implementation
+     *
+     * @return effective method to register as getter or setter
+     */
+    private Method selectMostSpecificNonDefaultMethod(Method current, Method parent) {
+        return (current != null ? (parent != null && current.isDefault()
+                && !parent.isDefault() ? parent : current) : parent);
+    }
+
     private Property mergeProperty(Property current, PropertyModel parentProp, JsonbAnnotatedElement<Class<?>> classElement) {
         Field field = current.getField() != null
                 ? current.getField() : parentProp.getPropagation().getField();
-        Method getter = current.getGetter() != null
-                ? current.getGetter() : parentProp.getPropagation().getGetter();
-        Method setter = current.getSetter() != null
-                ? current.getSetter() : parentProp.getPropagation().getSetter();
+        Method getter = selectMostSpecificNonDefaultMethod(current.getGetter(),
+                parentProp.getPropagation().getGetter());
+        Method setter = selectMostSpecificNonDefaultMethod(current.getSetter(),
+                parentProp.getPropagation().getSetter());
 
         Property merged = new Property(parentProp.getPropertyName(), classElement);
         if (field != null) {
