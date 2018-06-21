@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2016, 2017 Oracle and/or its affiliates. All rights reserved.
+ * Copyright (c) 2016, 2018 Oracle and/or its affiliates. All rights reserved.
  * This program and the accompanying materials are made available under the
  * terms of the Eclipse Public License v1.0 and Eclipse Distribution License v. 1.0
  * which accompanies this distribution.
@@ -17,10 +17,10 @@ import org.eclipse.yasson.serializers.model.*;
 import org.junit.Assert;
 import org.junit.Test;
 
-import javax.json.JsonBuilderFactory;
 import javax.json.bind.Jsonb;
 import javax.json.bind.JsonbBuilder;
 import javax.json.bind.JsonbConfig;
+import javax.json.bind.JsonbException;
 import java.math.BigDecimal;
 import java.util.ArrayList;
 import java.util.Calendar;
@@ -255,10 +255,17 @@ public class SerializersTest {
 
         Box box = new Box();
         box.boxStr = "Box to serialize";
-        Assert.assertEquals("{\"boxFieldName\":{\"boxStr\":\"Box to serialize\"}}", jsonb.toJson(box));
+        try {
+            jsonb.toJson(box);
+            fail();
+        } catch (JsonbException ex) {
+        }
 
-        Box result = jsonb.fromJson("{\"boxStr\":\"Box to deserialize\"}", Box.class);
-        Assert.assertEquals("Box to deserialize", result.boxStr);
+        try {
+            jsonb.fromJson("{\"boxStr\":\"Box to deserialize\"}", Box.class);
+            fail();
+        } catch (StackOverflowError error){
+        }
     }
 
     @Test

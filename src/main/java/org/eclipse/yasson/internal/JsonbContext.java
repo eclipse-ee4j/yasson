@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2016, 2017 Oracle and/or its affiliates. All rights reserved.
+ * Copyright (c) 2016, 2018 Oracle and/or its affiliates. All rights reserved.
  * This program and the accompanying materials are made available under the
  * terms of the Eclipse Public License v1.0 and Eclipse Distribution License v. 1.0
  * which accompanies this distribution.
@@ -48,14 +48,10 @@ public class JsonbContext {
     private JsonbConfigProperties configProperties;
 
     /**
-     * Types which are being processed by {@linkplain javax.json.bind.serializer.JsonbSerializer},
-     * {@link javax.json.bind.serializer.JsonbDeserializer} or
-     * {@link javax.json.bind.adapter.JsonbAdapter}.
-     *
      * Used to avoid StackOverflowError, when adapted / serialized object
-     * contains contains instance of its type inside it.
+     * contains contains instance of its type inside it or when object has recursive reference.
      */
-    private Set<Type> bindingTypes;
+    private Set<Object> currentlyProcessedObjects;
 
     /**
      * Creates and initialize context.
@@ -72,7 +68,7 @@ public class JsonbContext {
         this.annotationIntrospector = new AnnotationIntrospector(this);
         this.jsonProvider = jsonProvider;
         this.configProperties = new JsonbConfigProperties(jsonbConfig);
-        this.bindingTypes = new HashSet<>();
+        this.currentlyProcessedObjects = new HashSet<>();
     }
 
     /**
@@ -151,24 +147,11 @@ public class JsonbContext {
         return configProperties;
     }
 
-    public boolean addProcessedType(Type bindingTypes) {
-        return this.bindingTypes.add(bindingTypes);
+    public boolean addProcessedObject(Object object) {
+        return this.currentlyProcessedObjects.add(object);
     }
 
-    public boolean removeProcessedType(Type bindingType) {
-        return bindingTypes.remove(bindingType);
-    }
-
-    /**
-     * Check if type is already being processed lower in call stack.
-     *
-     * This may happen when {@link javax.json.bind.adapter.JsonbAdapter}
-     * or {@link javax.json.bind.serializer.JsonbSerializer} are called recursively for same binding type.
-     *
-     * @param bindingType type to check
-     * @return true if type is processed
-     */
-    public boolean containsProcessedType(Type bindingType) {
-        return bindingTypes.contains(bindingType);
+    public boolean removeProcessedObject(Object object) {
+        return currentlyProcessedObjects.remove(object);
     }
 }
