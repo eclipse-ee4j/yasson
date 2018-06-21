@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2015, 2017 Oracle and/or its affiliates. All rights reserved.
+ * Copyright (c) 2015, 2018 Oracle and/or its affiliates. All rights reserved.
  * This program and the accompanying materials are made available under the
  * terms of the Eclipse Public License v1.0 and Eclipse Distribution License v. 1.0
  * which accompanies this distribution.
@@ -55,6 +55,10 @@ public abstract class PropertyValuePropagation {
      */
     protected boolean readable;
 
+    private final boolean getterVisible;
+
+    private final boolean setterVisible;
+
     /**
      * Construct a property propagation.
      *
@@ -65,6 +69,8 @@ public abstract class PropertyValuePropagation {
         this.field = property.getField();
         this.getter = property.getGetter();
         this.setter = property.getSetter();
+        this.getterVisible = isMethodVisible(field, getter, ctx);
+        this.setterVisible = isMethodVisible(field, setter, ctx);
 
         initReadable(field, getter, ctx);
         initWritable(field, setter, ctx);
@@ -88,7 +94,7 @@ public abstract class PropertyValuePropagation {
             readable = false;
             return;
         }
-        if (getter != null && isMethodVisible(field, getter, ctx)) {
+        if (getter != null && getterVisible) {
             acceptMethod(getter, OperationMode.GET);
             readable = true;
         } else if (isFieldVisible(field, getter, ctx)) {
@@ -104,7 +110,7 @@ public abstract class PropertyValuePropagation {
             writable = false;
             return;
         }
-        if (setter != null && isMethodVisible(field, setter, ctx) && !setter.getDeclaringClass().isAnonymousClass()) {
+        if (setter != null && setterVisible && !setter.getDeclaringClass().isAnonymousClass()) {
             acceptMethod(setter, OperationMode.SET);
             writable = true;
         } else if (isFieldVisible(field, setter, ctx) && !field.getDeclaringClass().isAnonymousClass()) {
@@ -234,6 +240,14 @@ public abstract class PropertyValuePropagation {
      */
     public Method getSetter() {
         return setter;
+    }
+
+    public boolean isGetterVisible() {
+        return getterVisible;
+    }
+
+    public boolean isSetterVisible() {
+        return setterVisible;
     }
 
     private static final class DefaultVisibilityStrategy implements PropertyVisibilityStrategy {
