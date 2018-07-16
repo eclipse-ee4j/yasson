@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2015 Oracle and/or its affiliates. All rights reserved.
+ * Copyright (c) 2015, 2018 Oracle and/or its affiliates. All rights reserved.
  * This program and the accompanying materials are made available under the
  * terms of the Eclipse Public License v1.0 and Eclipse Distribution License v. 1.0
  * which accompanies this distribution.
@@ -52,6 +52,13 @@ public class BasicTest {
             jsonb.toJson(new Long[]{5L}, baos);
             assertEquals("[5]", baos.toString("UTF-8"));
         }
+    }
+
+    @Test
+    public void testObjectSerialization() {
+        Jsonb jsonb = (new JsonBindingBuilder()).build();
+        final String val =  jsonb.toJson(new Object());
+        assertEquals("{}", val);
     }
 
 }
