@@ -79,6 +79,7 @@ public enum MessageKeys {
     PROPERTY_NAME_CLASH("propertyNameClash"),
     SQL_DATE_IJSON_ERROR("sqlDateIJsonError"),
     RECURSIVE_REFERENCE("recursiveReference"),
+    DATATYPE_FACTORY_CREATION_FAILED("datatypeFactoryCreationFailed"),
     ;
 
     /** Message bundle key. */
