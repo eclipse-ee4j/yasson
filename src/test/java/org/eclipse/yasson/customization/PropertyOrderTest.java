@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2016 Oracle and/or its affiliates. All rights reserved.
+ * Copyright (c) 2016, 2018 Oracle and/or its affiliates. All rights reserved.
  * This program and the accompanying materials are made available under the
  * terms of the Eclipse Public License v1.0 and Eclipse Distribution License v. 1.0
  * which accompanies this distribution.
@@ -57,7 +57,10 @@ public class PropertyOrderTest {
     public void testPropertySetCustomOrder() {
         Jsonb jsonb = JsonbBuilder.create();
         FieldSpecificOrder fieldSpecificOrder = new FieldSpecificOrder();
-        String expectedSpecific = "{\"aField\":\"aValue\",\"dField\":\"dValue\",\"cField\":\"cValue\",\"bField\":\"bValue\"}";
+        String expectedSpecific = "{\"aField\":\"aValue\",\"dField\":\"dValue\",\"bField\":\"bValue\",\"cField\":\"cValue\"}";
+        assertEquals(expectedSpecific, jsonb.toJson(fieldSpecificOrder));
+        jsonb = JsonbBuilder.create(new JsonbConfig().withPropertyOrderStrategy(PropertyOrderStrategy.REVERSE));
+        expectedSpecific = "{\"aField\":\"aValue\",\"dField\":\"dValue\",\"cField\":\"cValue\",\"bField\":\"bValue\"}";
         assertEquals(expectedSpecific, jsonb.toJson(fieldSpecificOrder));
     }
 

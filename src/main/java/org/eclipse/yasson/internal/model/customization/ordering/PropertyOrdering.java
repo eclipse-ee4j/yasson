@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2016, 2017 Oracle and/or its affiliates. All rights reserved.
+ * Copyright (c) 2016, 2018 Oracle and/or its affiliates. All rights reserved.
  * This program and the accompanying materials are made available under the
  * terms of the Eclipse Public License v1.0 and Eclipse Distribution License v. 1.0
  * which accompanies this distribution.
@@ -19,11 +19,9 @@ import org.eclipse.yasson.internal.model.PropertyModel;
 
 import javax.json.bind.JsonbConfig;
 import javax.json.bind.config.PropertyOrderStrategy;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Map;
-import java.util.Objects;
+import java.util.*;
 import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
 /**
  * Order properties in bean object. {@link javax.json.bind.annotation.JsonbPropertyOrder} have always precedence.
@@ -56,28 +54,25 @@ public class PropertyOrdering {
      */
     public List<PropertyModel> orderProperties(Map<String, Property> properties, ClassModel classModel, JsonbContext jsonbContext) {
         String[] order = classModel.getClassCustomization().getPropertyOrder();
+        List<PropertyModel> sortedProperties = new ArrayList<>();
         if (order != null) {
             //if @JsonbPropertyOrder annotation is defined on a class
-            List<PropertyModel> sortedProperties = new ArrayList<>();
             for (String propName : order) {
                 final Property remove = properties.remove(propName);
                 if (remove != null) {
                     sortedProperties.add(new PropertyModel(classModel, remove, jsonbContext));
                 }
             }
-
-            for (Map.Entry<String, Property> entry : properties.entrySet()) {
-                sortedProperties.add(new PropertyModel(classModel, entry.getValue(), jsonbContext));
-            }
-
-
-            return sortedProperties;
         }
 
-        //No annotation, check JsonbConfig for ordering strategy use LEXICOGRAPHICAL as default
-        return propertyOrderStrategy.sortProperties(properties.values().stream()
-                .map((prop)->new PropertyModel(classModel, prop, jsonbContext))
-                .collect(Collectors.toList()));
+        //No annotation or not ordered properties remains, check JsonbConfig for ordering strategy use LEXICOGRAPHICAL as default
+        return Stream.of(sortedProperties,
+                propertyOrderStrategy.sortProperties(
+                        properties.values().stream()
+                                .map((prop) -> new PropertyModel(classModel, prop, jsonbContext))
+                                .collect(Collectors.toList())))
+                .flatMap(Collection::stream)
+                .collect(Collectors.toList());
     }
 
     /**
