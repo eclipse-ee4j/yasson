@@ -108,7 +108,7 @@ public class ClassModel {
         if (propertyNamingStrategy instanceof CaseInsensitiveStrategy) {
             return jsonName.equalsIgnoreCase(propertyReadName);
         }
-        return jsonName.equalsIgnoreCase(propertyReadName);
+        return jsonName.equals(propertyReadName);
     }
 
     /**
