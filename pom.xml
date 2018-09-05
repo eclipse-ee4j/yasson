@@ -25,7 +25,7 @@
     <name>org.eclipse.yasson</name>
 
     <description>Eclipse Yasson. Reference implementation of JSR-367 (JSON-B).</description>
-    <url>https://projects.eclipse.org/projects/rt.yasson</url>
+    <url>https://projects.eclipse.org/projects/ee4j.yasson</url>
 
     <organization>
         <name>Oracle Corporation</name>
