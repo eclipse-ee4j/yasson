@@ -14,6 +14,7 @@
 package org.eclipse.yasson.internal.serializer;
 
 import org.eclipse.yasson.internal.*;
+import org.eclipse.yasson.internal.model.ClassModel;
 import org.eclipse.yasson.internal.properties.MessageKeys;
 import org.eclipse.yasson.internal.properties.Messages;
 
@@ -120,7 +121,10 @@ public abstract class AbstractContainerDeserializer<T> extends AbstractItem<T> i
 
     protected JsonbDeserializer<?> newCollectionOrMapItem(Type valueType, JsonbContext ctx) {
         Type actualValueType = ReflectionUtils.resolveType(this, valueType);
-        return newUnmarshallerItemBuilder(ctx).withType(actualValueType).build();
+        ClassModel classModel = ctx.getMappingContext().getOrCreateClassModel(ReflectionUtils.getRawType(actualValueType));
+        return newUnmarshallerItemBuilder(ctx).withType(actualValueType)
+        		.withCustomization(classModel == null ? null : classModel.getCustomization())
+        		.build();
     }
 
     /**
