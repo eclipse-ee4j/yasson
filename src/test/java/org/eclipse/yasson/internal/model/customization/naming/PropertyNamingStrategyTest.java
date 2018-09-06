@@ -21,6 +21,7 @@ import javax.json.bind.JsonbConfig;
 import javax.json.bind.config.PropertyNamingStrategy;
 
 import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNull;
 
 /**
  * Tests naming strategies.
@@ -99,6 +100,15 @@ public class PropertyNamingStrategyTest {
         NamingPojo result = jsonb.fromJson("{\"caPS_unDERscore_prOPERty\":\"ghi\",\"_startingwithUndERSCorePrOPERTy\":\"def\",\"upPERCASedProPerty\":\"abc\"}", NamingPojo.class);
         assertResult(result);
     }
+    
+    @Test
+    public void testIdentityCaseSensitive() {
+        Jsonb jsonb = JsonbBuilder.create(new JsonbConfig().withPropertyNamingStrategy(PropertyNamingStrategy.IDENTITY));
+        NamingPojo result = jsonb.fromJson("{\"CAPS_UNDERSCORE_PROPERTY\":\"ghi\",\"_startingWithUnderscoreProperty\":\"def\",\"UPPERCASEDPROPERTY\":\"abc\"}", NamingPojo.class);
+        assertEquals("ghi", result.CAPS_UNDERSCORE_PROPERTY);
+        assertEquals("def", result._startingWithUnderscoreProperty);
+        assertNull(result.upperCasedProperty);
+    }
 
     @Test
     public void testCustom() {
@@ -109,7 +119,7 @@ public class PropertyNamingStrategyTest {
         NamingPojo result = jsonb.fromJson(custom, NamingPojo.class);
         assertResult(result);
     }
-
+    
     private void assertResult(NamingPojo result) {
         assertEquals("abc", result.upperCasedProperty);
         assertEquals("def", result._startingWithUnderscoreProperty);
