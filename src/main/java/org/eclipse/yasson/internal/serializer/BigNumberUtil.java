@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2017 Oracle and/or its affiliates. All rights reserved.
+ * Copyright (c) 2017, 2018 Oracle and/or its affiliates. All rights reserved.
  * This program and the accompanying materials are made available under the
  * terms of the Eclipse Public License v1.0 and Eclipse Distribution License v. 1.0
  * which accompanies this distribution.
@@ -25,6 +25,12 @@ class BigNumberUtil {
 
     // 53 means max bit value of number with sign bit included
     private static final int MAX_BIT_SIZE = 53;
+
+    // Max value for Long. Similar to JavaScript Number.MAX_SAFE_INTEGER (2**53)-1
+    private static final long MAX_JS_SAFE_VALUE = 9007199254740991L;
+
+    // Min value for Long. Similar to JavaScript Number.MIN_SAFE_INTEGER -(2**53)+1
+    private static final long MIN_JS_SAFE_VALUE = -9007199254740991L;
 
     // -1022 is the lowest range of the exponent
     // more https://en.wikipedia.org/wiki/Exponent_bias
@@ -61,5 +67,17 @@ class BigNumberUtil {
         // Number whose bit length is than 53 is considered as non IEEE 754-2008 binary64 compliant
         return value.abs().bitLength() <= MAX_BIT_SIZE;
     }
+
+    /**
+     * Checks whether the value of {@link Long} matches format IEEE-754
+     *
+     * @param value value which is going to be checked
+     * @return true if value matches format IEEE-754
+     */
+    static boolean isIEEE754(Long value) {
+        return value >= MIN_JS_SAFE_VALUE && value <= MAX_JS_SAFE_VALUE;
+    }
+
+
 
 }

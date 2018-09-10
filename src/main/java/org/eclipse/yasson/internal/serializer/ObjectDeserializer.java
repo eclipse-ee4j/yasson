@@ -136,7 +136,7 @@ class ObjectDeserializer<T> extends AbstractContainerDeserializer<T> {
         if (model == null) {
             return;
         }
-        values.put(model.getPropertyName(), new ValueWrapper(model, convertNullToOptionalEmpty(model.getPropertyType(), result)));
+        values.put(model.getReadName(), new ValueWrapper(model, convertNullToOptionalEmpty(model.getPropertyType(), result)));
     }
 
     @Override
@@ -163,10 +163,10 @@ class ObjectDeserializer<T> extends AbstractContainerDeserializer<T> {
             //create current item instance of identified object field
             final JsonbDeserializer<?> deserializer = newUnmarshallerItemBuilder(context.getJsonbContext())
                     .withCustomization(newPropertyModel.getCustomization())
-                    .withType(newPropertyModel.getPropertyType())
+                    .withType(newPropertyModel.getPropertyDeserializationType())
                     .build();
 
-            Type resolvedType = ReflectionUtils.resolveType(this, newPropertyModel.getPropertyType());
+            Type resolvedType = ReflectionUtils.resolveType(this, newPropertyModel.getPropertyDeserializationType());
             Object result = deserializer.deserialize(parser, context, resolvedType);
             values.put(newPropertyModel.getPropertyName(), new ValueWrapper(newPropertyModel, result));
             return;

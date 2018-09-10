@@ -35,6 +35,9 @@ import javax.json.bind.JsonbConfig;
 import javax.json.bind.annotation.JsonbDateFormat;
 import javax.json.bind.annotation.JsonbTypeDeserializer;
 import javax.json.bind.config.PropertyVisibilityStrategy;
+import javax.xml.datatype.DatatypeConfigurationException;
+import javax.xml.datatype.DatatypeFactory;
+import javax.xml.datatype.XMLGregorianCalendar;
 import java.io.Serializable;
 import java.lang.reflect.Field;
 import java.lang.reflect.Method;
@@ -512,6 +515,23 @@ public class DatesTest {
         DateInMapPojo result = jsonb.fromJson("{\"dateMap\":{\"first\":\"01.01.2017\"},\"localDate\":\"01.01.2017\"}", DateInMapPojo.class);
         Assert.assertEquals(LocalDate.of(2017,1,1), result.localDate);
         Assert.assertEquals(LocalDate.of(2017,1,1), result.dateMap.get("first"));
+    }
+
+    @Test
+    public void testXMLGregorianCalendar() throws DatatypeConfigurationException {
+        final Calendar calendar = new Calendar.Builder()
+                .setDate(2015, Calendar.APRIL, 3)
+                .setTimeOfDay(11, 11, 10)
+                .setTimeZone(TimeZone.getTimeZone("Europe/Prague"))
+                .build();
+
+        final XMLGregorianCalendar xmlGregorianCalendar = DatatypeFactory.newInstance()
+                .newXMLGregorianCalendar((GregorianCalendar) calendar);
+
+        String serialized = jsonb.toJson(xmlGregorianCalendar);
+
+        assertEquals("\"2015-04-03T11:11:10+02:00[GMT+02:00]\"", serialized);
+        assertEquals(xmlGregorianCalendar, jsonb.fromJson(serialized, XMLGregorianCalendar.class));
     }
 
 

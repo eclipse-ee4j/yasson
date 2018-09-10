@@ -72,6 +72,10 @@ public class PropertyModel implements Comparable<PropertyModel> {
 
     private final JsonbSerializer<?> propertySerializer;
 
+    private final AccessMethodType getterMethodType;
+
+    private final AccessMethodType setterMethodType;
+
     /**
      * Creates an instance.
      *
@@ -84,6 +88,8 @@ public class PropertyModel implements Comparable<PropertyModel> {
         this.propertyName = property.getName();
         this.propertyType = property.getPropertyType();
         this.propagation = PropertyValuePropagation.createInstance(property, jsonbContext);
+        this.getterMethodType = propagation.isGetterVisible() ? new AccessMethodType(property.getGetterType()) : null;
+        this.setterMethodType = propagation.isSetterVisible() ? new AccessMethodType(property.getSetterType()) : null;
         this.customization = introspectCustomization(property, jsonbContext);
         this.readName = calculateReadWriteName(customization.getJsonReadName(), jsonbContext.getConfigProperties().getPropertyNamingStrategy());
         this.writeName = calculateReadWriteName(customization.getJsonWriteName(), jsonbContext.getConfigProperties().getPropertyNamingStrategy());
@@ -98,7 +104,8 @@ public class PropertyModel implements Comparable<PropertyModel> {
      */
     @SuppressWarnings("unchecked")
     private JsonbSerializer<?> resolveCachedSerializer() {
-        if (!ReflectionUtils.isResolvedType(propertyType)) {
+        Type serializationType = getPropertySerializationType();
+        if (!ReflectionUtils.isResolvedType(serializationType)) {
             return null;
         }
         if (customization.getAdapterBinding() != null) {
@@ -108,13 +115,31 @@ public class PropertyModel implements Comparable<PropertyModel> {
             return new UserSerializerSerializer<>(classModel, customization.getSerializerBinding().getJsonbSerializer());
         }
 
-        final Class<?> propertyRawType = ReflectionUtils.getRawType(propertyType);
+        final Class<?> propertyRawType = ReflectionUtils.getRawType(serializationType);
         final Optional<SerializerProviderWrapper> valueSerializerProvider = DefaultSerializers.getInstance().findValueSerializerProvider(propertyRawType);
         if (valueSerializerProvider.isPresent()) {
             return valueSerializerProvider.get().getSerializerProvider().provideSerializer(customization);
         }
 
         return null;
+    }
+
+    /**
+     * Returns which type should be used to deserialization
+     *
+     * @return deserialization type
+     */
+    public Type getPropertyDeserializationType() {
+        return setterMethodType == null ? propertyType : setterMethodType.getMethodType();
+    }
+
+    /**
+     * Returns which type should be used to serialization
+     *
+     * @return serialization type
+     */
+    public Type getPropertySerializationType() {
+        return getterMethodType == null ? propertyType : getterMethodType.getMethodType();
     }
 
     private AdapterBinding getUserAdapterBinding(Property property, JsonbContext jsonbContext) {
@@ -130,7 +155,7 @@ public class PropertyModel implements Comparable<PropertyModel> {
         if (serializerBinding != null) {
             return serializerBinding;
         }
-        return jsonbContext.getComponentMatcher().getSerializerBinding(propertyType, null).orElse(null);
+        return jsonbContext.getComponentMatcher().getSerializerBinding(getPropertySerializationType(), null).orElse(null);
     }
 
     private PropertyCustomization introspectCustomization(Property property, JsonbContext jsonbContext) {

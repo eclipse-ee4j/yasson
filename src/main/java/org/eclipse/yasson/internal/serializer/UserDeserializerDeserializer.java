@@ -62,12 +62,7 @@ public class UserDeserializerDeserializer<T> extends AbstractContainerDeserializ
         parserContext = moveToFirst(parser);
         JsonParser.Event lastEvent = parserContext.getLastEvent();
         final UserDeserializerParser userDeserializerParser = new UserDeserializerParser(parser);
-        try {
-            context.getJsonbContext().addProcessedType(deserializerBinding.getBindingType());
-            deserializerResult = (T) deserializerBinding.getJsonbDeserializer().deserialize(userDeserializerParser, context, getRuntimeType());
-        } finally {
-            context.getJsonbContext().removeProcessedType(deserializerBinding.getBindingType());
-        }
+        deserializerResult = (T) deserializerBinding.getJsonbDeserializer().deserialize(userDeserializerParser, context, getRuntimeType());
         //Avoid moving parser to the end of the object, if deserializer was for one value only.
         if (lastEvent == JsonParser.Event.START_ARRAY || lastEvent == JsonParser.Event.START_OBJECT) {
             userDeserializerParser.advanceParserToEnd();

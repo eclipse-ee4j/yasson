@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2016, 2017 Oracle and/or its affiliates. All rights reserved.
+ * Copyright (c) 2016, 2018 Oracle and/or its affiliates. All rights reserved.
  * This program and the accompanying materials are made available under the
  * terms of the Eclipse Public License v1.0 and Eclipse Distribution License v. 1.0
  * which accompanies this distribution.
@@ -20,8 +20,14 @@ import org.eclipse.yasson.defaultmapping.generics.model.ScalarValueWrapper;
 import org.junit.Assert;
 import org.junit.Test;
 
+import javax.json.Json;
+import javax.json.JsonObject;
+import javax.json.JsonObjectBuilder;
+import javax.json.JsonWriter;
 import javax.json.bind.Jsonb;
 import javax.json.bind.JsonbBuilder;
+import javax.json.stream.JsonGenerator;
+import java.io.StringWriter;
 import java.math.BigDecimal;
 import java.math.BigInteger;
 
@@ -120,4 +126,86 @@ public class NumberTest {
         jsonString = jsonb.toJson(new Object() { public Number number = new BigDecimal("0.1000000000000001"); });
         Assert.assertEquals("{\"number\":0.1000000000000001}", jsonString);
     }
+
+    @Test
+    public void testLongIEEE748() {
+
+        // 9007199254740991L
+        Long maxJsSafeValue = Double.valueOf(Math.pow(2, 53)).longValue() - 1;
+        Long upperJsUnsafeValue = maxJsSafeValue + 1;
+
+        String json = jsonb.toJson(maxJsSafeValue);
+        Assert.assertEquals("9007199254740991", json);
+        Long deserialized = jsonb.fromJson(json, Long.class);
+        Assert.assertEquals(Long.valueOf("9007199254740991"), deserialized);
+
+        json = jsonb.toJson(upperJsUnsafeValue);
+        Assert.assertEquals("\"9007199254740992\"", json);
+        deserialized = jsonb.fromJson(json, Long.class);
+        Assert.assertEquals(Long.valueOf("9007199254740992"), deserialized);
+
+
+        Long minJsSafeValue = Math.negateExact(maxJsSafeValue);
+        Long lowerJsUnsafeValue = minJsSafeValue - 1;
+
+        json = jsonb.toJson(minJsSafeValue);
+        Assert.assertEquals("-9007199254740991", json);
+        deserialized = jsonb.fromJson(json, Long.class);
+        Assert.assertEquals(Long.valueOf("-9007199254740991"), deserialized);
+
+        json = jsonb.toJson(lowerJsUnsafeValue);
+        Assert.assertEquals("\"-9007199254740992\"", json);
+        deserialized = jsonb.fromJson(json, Long.class);
+        Assert.assertEquals(Long.valueOf("-9007199254740992"), deserialized);
+    }
+
+    /**
+     * Tests that JSON-P RI itself does no big number (out of IEEE 754 quotation).
+     * This is why it is now must be done in Yasson to match the JSONB spec.
+     */
+    @Test
+    public void testJsonpBigNumber() {
+        StringWriter w = new StringWriter();
+        JsonGenerator generator = Json.createGenerator(w);
+
+        Long maxJsSafeValue = Double.valueOf(Math.pow(2, 53)).longValue() - 1;
+        Long upperJsUnsafeValue = Long.MAX_VALUE;
+
+        generator.writeStartObject();
+        generator.write("safeLongValue", maxJsSafeValue);
+        generator.write("unsafeLongValue", upperJsUnsafeValue);
+        generator.write("safeBigDecimalValue", BigDecimal.TEN);
+        generator.write("unsafeBigDecimalValue", BigDecimal.valueOf(upperJsUnsafeValue));
+        generator.writeEnd();
+        generator.close();
+
+        Assert.assertEquals("{" +
+                        "\"safeLongValue\":9007199254740991," +
+                        "\"unsafeLongValue\":9223372036854775807," +
+                        "\"safeBigDecimalValue\":10," +
+                        "\"unsafeBigDecimalValue\":9223372036854775807}",
+                w.toString());
+
+
+        w = new StringWriter();
+        JsonWriter writer = Json.createWriter(w);
+
+
+        JsonObjectBuilder objectBuilder = Json.createObjectBuilder();
+        objectBuilder.add("safeLongValue", maxJsSafeValue);
+        objectBuilder.add("unsafeLongValue", upperJsUnsafeValue);
+        objectBuilder.add("safeBigDecimalValue", BigDecimal.valueOf(maxJsSafeValue));
+        objectBuilder.add("unsafeBigDecimalValue", BigDecimal.valueOf(upperJsUnsafeValue));
+        JsonObject build = objectBuilder.build();
+        writer.write(build);
+        writer.close();
+
+        Assert.assertEquals("{" +
+                "\"safeLongValue\":9007199254740991," +
+                "\"unsafeLongValue\":9223372036854775807," +
+                "\"safeBigDecimalValue\":9007199254740991," +
+                "\"unsafeBigDecimalValue\":9223372036854775807}", w.toString());
+
+    }
+
 }
