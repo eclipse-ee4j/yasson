@@ -18,7 +18,7 @@ import org.eclipse.yasson.internal.components.JsonbComponentInstanceCreator;
 
 import javax.json.bind.JsonbConfig;
 import javax.json.spi.JsonProvider;
-import java.lang.reflect.Type;
+import java.util.Collections;
 import java.util.HashSet;
 import java.util.Objects;
 import java.util.Set;
@@ -68,7 +68,7 @@ public class JsonbContext {
         this.annotationIntrospector = new AnnotationIntrospector(this);
         this.jsonProvider = jsonProvider;
         this.configProperties = new JsonbConfigProperties(jsonbConfig);
-        this.currentlyProcessedObjects = new HashSet<>();
+        this.currentlyProcessedObjects = Collections.synchronizedSet(new HashSet<>());
     }
 
     /**
@@ -125,7 +125,6 @@ public class JsonbContext {
     public AnnotationIntrospector getAnnotationIntrospector() {
         return annotationIntrospector;
     }
-
 
     /**
      * Flag for searching for generic serializers and adapters in runtime.
