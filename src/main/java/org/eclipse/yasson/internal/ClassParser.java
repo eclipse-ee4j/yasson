@@ -149,7 +149,8 @@ class ClassParser {
         Method[] declaredMethods = AccessController.doPrivileged((PrivilegedAction<Method[]>) clazz::getDeclaredMethods);
         for (Method method : declaredMethods) {
             String name = method.getName();
-            if (!isPropertyMethod(method)) {
+            //isBridge method filters out methods inherited from interfaces
+            if (!isPropertyMethod(method) || method.isBridge()) {
                 continue;
             }
             final String propertyName = toPropertyMethod(name);
