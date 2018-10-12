@@ -19,7 +19,7 @@
     <modelVersion>4.0.0</modelVersion>
     <groupId>org.eclipse</groupId>
     <artifactId>yasson</artifactId>
-    <version>1.0.2</version>
+    <version>1.0.3-SNAPSHOT</version>
     <packaging>jar</packaging>
     <name>org.eclipse.yasson</name>
 
@@ -61,7 +61,7 @@
         <connection>scm:git:ssh://git@github.com/eclipse-ee4j/yasson.git</connection>
         <developerConnection>scm:git:ssh://git@github.com/eclipse-ee4j/yasson.git</developerConnection>
         <url>https://github.com/eclipse-ee4j/yasson.git</url>
-        <tag>1.0.2-RELEASE</tag>
+        <tag>HEAD</tag>
     </scm>
 
     <developers>
