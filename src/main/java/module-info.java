@@ -13,7 +13,7 @@
 module org.eclipse.yasson {
     requires java.json;
     requires java.json.bind;
-    requires java.naming;
+    requires static java.naming;
     requires java.desktop;
     requires java.logging;
     requires java.sql;
