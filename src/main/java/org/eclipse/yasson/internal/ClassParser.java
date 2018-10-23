@@ -13,13 +13,18 @@
  ******************************************************************************/
 package org.eclipse.yasson.internal;
 
-import org.eclipse.yasson.internal.model.*;
+import org.eclipse.yasson.internal.model.ClassModel;
+import org.eclipse.yasson.internal.model.CreatorModel;
+import org.eclipse.yasson.internal.model.JsonbAnnotatedElement;
+import org.eclipse.yasson.internal.model.JsonbCreator;
+import org.eclipse.yasson.internal.model.Property;
+import org.eclipse.yasson.internal.model.PropertyModel;
+import org.eclipse.yasson.internal.model.ReflectionPropagation;
+import org.eclipse.yasson.internal.model.customization.CreatorCustomization;
 import org.eclipse.yasson.internal.properties.MessageKeys;
 import org.eclipse.yasson.internal.properties.Messages;
-import org.eclipse.yasson.internal.model.customization.CreatorCustomization;
 
 import javax.json.bind.JsonbException;
-import java.beans.Introspector;
 import java.lang.annotation.Annotation;
 import java.lang.reflect.Field;
 import java.lang.reflect.Method;
@@ -29,6 +34,7 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Objects;
 
 /**
  * Created a class internal model.
@@ -168,7 +174,22 @@ class ClassParser {
     }
 
     private String toPropertyMethod(String name) {
-        return Introspector.decapitalize(name.substring(name.startsWith(IS_PREFIX) ? 2 : 3, name.length()));
+        return lowerFirstLetter(name.substring(name.startsWith(IS_PREFIX) ? 2 : 3, name.length()));
+    }
+
+    private String lowerFirstLetter(String name) {
+        Objects.requireNonNull(name);
+        if (name.length() == 0) {
+            //methods named get() or set()
+            return name;
+        }
+        if (name.length() > 1 && Character.isUpperCase(name.charAt(1)) &&
+                Character.isUpperCase(name.charAt(0))){
+            return name;
+        }
+        char chars[] = name.toCharArray();
+        chars[0] = Character.toLowerCase(chars[0]);
+        return new String(chars);
     }
 
     private boolean isPropertyMethod(Method m) {
