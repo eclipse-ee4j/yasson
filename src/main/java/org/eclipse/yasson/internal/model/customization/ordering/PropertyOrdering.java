@@ -12,16 +12,16 @@
  ******************************************************************************/
 package org.eclipse.yasson.internal.model.customization.ordering;
 
-import org.eclipse.yasson.internal.JsonbContext;
 import org.eclipse.yasson.internal.model.ClassModel;
-import org.eclipse.yasson.internal.model.Property;
 import org.eclipse.yasson.internal.model.PropertyModel;
 
 import javax.json.bind.JsonbConfig;
 import javax.json.bind.config.PropertyOrderStrategy;
-import java.util.*;
-import java.util.stream.Collectors;
-import java.util.stream.Stream;
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+import java.util.Objects;
 
 /**
  * Order properties in bean object. {@link javax.json.bind.annotation.JsonbPropertyOrder} have always precedence.
@@ -49,30 +49,27 @@ public class PropertyOrdering {
      *
      * @param properties Properties to sort.
      * @param classModel Class model.
-     * @param jsonbContext jsonb context.
      * @return Sorted list of properties.
      */
-    public List<PropertyModel> orderProperties(Map<String, Property> properties, ClassModel classModel, JsonbContext jsonbContext) {
+    public List<PropertyModel> orderProperties(List<PropertyModel> properties, ClassModel classModel) {
+        Map<String, PropertyModel> byReadName = new HashMap<>();
+        properties.stream().forEach(propertyModel -> byReadName.put(propertyModel.getReadName(), propertyModel));
+
         String[] order = classModel.getClassCustomization().getPropertyOrder();
         List<PropertyModel> sortedProperties = new ArrayList<>();
         if (order != null) {
             //if @JsonbPropertyOrder annotation is defined on a class
             for (String propName : order) {
-                final Property remove = properties.remove(propName);
+                final PropertyModel remove = byReadName.remove(propName);
                 if (remove != null) {
-                    sortedProperties.add(new PropertyModel(classModel, remove, jsonbContext));
+                    sortedProperties.add(remove);
                 }
             }
         }
 
-        //No annotation or not ordered properties remains, check JsonbConfig for ordering strategy use LEXICOGRAPHICAL as default
-        return Stream.of(sortedProperties,
-                propertyOrderStrategy.sortProperties(
-                        properties.values().stream()
-                                .map((prop) -> new PropertyModel(classModel, prop, jsonbContext))
-                                .collect(Collectors.toList())))
-                .flatMap(Collection::stream)
-                .collect(Collectors.toList());
+        sortedProperties.addAll(propertyOrderStrategy.sortProperties(byReadName.values()));
+        return sortedProperties;
+
     }
 
     /**
