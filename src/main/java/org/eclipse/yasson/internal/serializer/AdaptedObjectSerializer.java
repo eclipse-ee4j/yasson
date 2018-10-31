@@ -13,13 +13,13 @@
 
 package org.eclipse.yasson.internal.serializer;
 
-import org.eclipse.yasson.internal.JsonbContext;
 import org.eclipse.yasson.internal.Marshaller;
+import org.eclipse.yasson.internal.ProcessingContext;
 import org.eclipse.yasson.internal.components.AdapterBinding;
-import org.eclipse.yasson.internal.properties.MessageKeys;
-import org.eclipse.yasson.internal.properties.Messages;
 import org.eclipse.yasson.internal.model.ClassModel;
 import org.eclipse.yasson.internal.model.JsonbPropertyInfo;
+import org.eclipse.yasson.internal.properties.MessageKeys;
+import org.eclipse.yasson.internal.properties.Messages;
 
 import javax.json.bind.JsonbException;
 import javax.json.bind.adapter.JsonbAdapter;
@@ -54,9 +54,9 @@ public class AdaptedObjectSerializer<T, A> implements CurrentItem<T>, JsonbSeria
     @Override
     @SuppressWarnings("unchecked")
     public void serialize(T obj, JsonGenerator generator, SerializationContext ctx) {
-        JsonbContext jsonbContext = ((Marshaller) ctx).getJsonbContext();
+        ProcessingContext context = (ProcessingContext) ctx;
         try {
-            if (jsonbContext.addProcessedObject(obj)) {
+            if (context.addProcessedObject(obj)) {
                 final JsonbAdapter<T, A> adapter = (JsonbAdapter<T, A>) adapterInfo.getAdapter();
                 A adapted = adapter.adaptToJson(obj);
                 final JsonbSerializer<A> serializer = resolveSerializer((Marshaller) ctx, adapted);
@@ -67,7 +67,7 @@ public class AdaptedObjectSerializer<T, A> implements CurrentItem<T>, JsonbSeria
         } catch (Exception e) {
             throw new JsonbException(Messages.getMessage(MessageKeys.ADAPTER_EXCEPTION, adapterInfo.getBindingType(), adapterInfo.getToType(), adapterInfo.getAdapter().getClass()), e);
         } finally {
-            jsonbContext.removeProcessedObject(obj);
+            context.removeProcessedObject(obj);
         }
     }
 
