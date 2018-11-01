@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2016, 2017 Oracle and/or its affiliates. All rights reserved.
+ * Copyright (c) 2016, 2018 Oracle and/or its affiliates. All rights reserved.
  * This program and the accompanying materials are made available under the
  * terms of the Eclipse Public License v1.0 and Eclipse Distribution License v. 1.0
  * which accompanies this distribution.
@@ -13,7 +13,11 @@
 
 package org.eclipse.yasson.customization;
 
-import org.eclipse.yasson.customization.model.*;
+import org.eclipse.yasson.customization.model.JsonbNillableClassSecondLevel;
+import org.eclipse.yasson.customization.model.JsonbNillableOverriddenWithJsonbProperty;
+import org.eclipse.yasson.customization.model.JsonbNillableOverridesClass;
+import org.eclipse.yasson.customization.model.JsonbNillableOverridesInterface;
+import org.eclipse.yasson.customization.model.JsonbNillableValue;
 import org.eclipse.yasson.customization.model.packagelevelannotations.JsonbNillablePackageLevel;
 import org.eclipse.yasson.customization.model.packagelevelannotations.PackageLevelOverriddenWithClassLevel;
 import org.eclipse.yasson.defaultmapping.generics.model.ScalarValueWrapper;

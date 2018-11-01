@@ -59,6 +59,10 @@ public class AdaptedObjectSerializer<T, A> implements CurrentItem<T>, JsonbSeria
             if (context.addProcessedObject(obj)) {
                 final JsonbAdapter<T, A> adapter = (JsonbAdapter<T, A>) adapterInfo.getAdapter();
                 A adapted = adapter.adaptToJson(obj);
+                if (adapted == null) {
+                    generator.writeNull();
+                    return;
+                }
                 final JsonbSerializer<A> serializer = resolveSerializer((Marshaller) ctx, adapted);
                 serializer.serialize(adapted, generator, ctx);
             } else {

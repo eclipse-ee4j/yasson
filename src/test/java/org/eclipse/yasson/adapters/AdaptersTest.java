@@ -24,8 +24,10 @@ import org.eclipse.yasson.adapters.model.Crate;
 import org.eclipse.yasson.adapters.model.GenericBox;
 import org.eclipse.yasson.adapters.model.IntegerListToStringAdapter;
 import org.eclipse.yasson.adapters.model.JsonObjectPojo;
+import org.eclipse.yasson.adapters.model.ReturnNullAdapter;
 import org.eclipse.yasson.adapters.model.SupertypeAdapterPojo;
 import org.eclipse.yasson.adapters.model.UUIDContainer;
+import org.eclipse.yasson.defaultmapping.generics.model.ScalarValueWrapper;
 import org.junit.Assert;
 import org.junit.Test;
 
@@ -33,6 +35,7 @@ import javax.json.bind.Jsonb;
 import javax.json.bind.JsonbBuilder;
 import javax.json.bind.JsonbConfig;
 import javax.json.bind.adapter.JsonbAdapter;
+import java.lang.reflect.Type;
 import java.math.BigDecimal;
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -434,6 +437,22 @@ public class AdaptersTest {
         Author result = jsonb.fromJson("{\"firstName\":\"J\",\"lastName\":\"Connor\"}", Author.class);
         Assert.assertEquals("\"J\"", result.getFirstName());
         Assert.assertEquals("Connor", result.getLastName());
+    }
+
+    @Test
+    public void testAdapterReturningNull() {
+        Jsonb jsonb = JsonbBuilder.create(new JsonbConfig().withAdapters(new ReturnNullAdapter()).withNullValues(true));
+
+        ScalarValueWrapper<Number> wrapper = new ScalarValueWrapper<>();
+        wrapper.setValue(10);
+        Type type = new TestTypeToken<ScalarValueWrapper<Number>>() {
+        }.getType();
+        String json = jsonb.toJson(wrapper, type);
+
+        Assert.assertEquals("{\"value\":null}", json);
+
+        ScalarValueWrapper<Number> result = jsonb.fromJson("{\"value\":null}", type);
+        Assert.assertNull(result.getValue());
     }
 
     @Test
