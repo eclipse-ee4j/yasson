@@ -14,6 +14,7 @@
 package org.eclipse.yasson.defaultmapping.generics;
 
 import org.eclipse.yasson.TestTypeToken;
+import org.eclipse.yasson.adapters.model.GenericBox;
 import org.eclipse.yasson.defaultmapping.generics.model.AnotherGenericTestClass;
 import org.eclipse.yasson.defaultmapping.generics.model.BoundedGenericClass;
 import org.eclipse.yasson.defaultmapping.generics.model.Circle;
@@ -254,6 +255,28 @@ public class GenericsTest {
         assertEquals("first", result.genericTestClass.field2);
 
     }
+
+    @Test
+    public void testMarshallPropagatedGenericsRaw() {
+
+        List<Integer> integerList = new ArrayList<>();
+        integerList.add(1);
+        integerList.add(2);
+
+        GenericBox<List<Integer>> box = new GenericBox<>();
+        box.setX(integerList);
+        box.setStrField("IntegerListBox");
+
+        GenericTestClass<GenericBox<List<Integer>>, String> pojo = new GenericTestClass<>();
+        pojo.field1 = box;
+        pojo.field2 = "GenericTestClass";
+
+        Assert.assertEquals(
+                "{\"field1\":{\"strField\":\"IntegerListBox\",\"x\":[1,2]},\"field2\":\"GenericTestClass\"}",
+                jsonb.toJson(pojo));
+    }
+
+
 
     @Test
     public void testFunctional() {
