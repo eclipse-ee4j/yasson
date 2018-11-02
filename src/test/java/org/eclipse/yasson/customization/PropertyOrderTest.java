@@ -13,13 +13,21 @@
 
 package org.eclipse.yasson.customization;
 
-import org.eclipse.yasson.customization.model.*;
+import org.eclipse.yasson.customization.model.FieldCustomOrder;
+import org.eclipse.yasson.customization.model.FieldCustomOrderWrapper;
+import org.eclipse.yasson.customization.model.FieldOrder;
+import org.eclipse.yasson.customization.model.FieldOrderNameAnnotation;
+import org.eclipse.yasson.customization.model.FieldSpecificOrder;
+import org.eclipse.yasson.customization.model.RenamedPropertiesContainer;
 import org.junit.Assert;
 import org.junit.Test;
 
 import javax.json.bind.Jsonb;
 import javax.json.bind.JsonbBuilder;
 import javax.json.bind.JsonbConfig;
+import javax.json.bind.annotation.JsonbCreator;
+import javax.json.bind.annotation.JsonbProperty;
+import javax.json.bind.annotation.JsonbPropertyOrder;
 import javax.json.bind.config.PropertyOrderStrategy;
 
 import static org.junit.Assert.assertEquals;
@@ -87,5 +95,35 @@ public class PropertyOrderTest {
 
         RenamedPropertiesContainer unmarshalledObject = jsonb.fromJson("{ \"first\" : 1, \"second\" : \"Test String\", \"third\" : 1 }", RenamedPropertiesContainer.class);
         Assert.assertEquals(3, unmarshalledObject.getIntInstance());
+    }
+
+    @Test
+    public void testJsonbPropertyOrderOnRenamedProperties() {
+        Jsonb jsonb = JsonbBuilder.create();
+        Assert.assertEquals("{\"from\":10,\"count\":11}", jsonb.toJson(new Range(10, 11)));
+    }
+
+    @JsonbPropertyOrder(
+            {
+                    "from",
+                    "count"
+            }
+    )
+    public class Range {
+
+        @JsonbProperty("from")
+        public final int fromIndex;
+
+        @JsonbProperty("count")
+        public final int numberOfItems;
+
+        @JsonbCreator
+        public Range(
+                @JsonbProperty("from") int fromIndex,
+                @JsonbProperty("count") int numberOfItems
+        ) {
+            this.fromIndex = fromIndex;
+            this. numberOfItems = numberOfItems;
+        }
     }
 }
