@@ -421,7 +421,6 @@ public class GenericsTest {
         collectionWrapper.setWrappedCollection(new ArrayList<>());
         collectionWrapper.setWrappedMap(new HashMap<>());
         String s = jsonb.toJson(collectionWrapper);
-        System.out.println("s = " + s);
     }
 
     public interface FunctionalInterface<T> {

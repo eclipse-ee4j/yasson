@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2015, 2017 Oracle and/or its affiliates. All rights reserved.
+ * Copyright (c) 2015, 2018 Oracle and/or its affiliates. All rights reserved.
  * This program and the accompanying materials are made available under the
  * terms of the Eclipse Public License v1.0 and Eclipse Distribution License v. 1.0
  * which accompanies this distribution.
@@ -13,6 +13,9 @@
  ******************************************************************************/
 package org.eclipse.yasson.internal;
 
+import java.util.HashSet;
+import java.util.Set;
+
 /**
  * Jsonb processing (serializing/deserializing) context.
  * Instance is thread bound (in contrast to {@link JsonbContext}.
@@ -24,6 +27,12 @@ public abstract class ProcessingContext {
     protected static final String NULL = "null";
 
     protected final JsonbContext jsonbContext;
+
+    /**
+     * Used to avoid StackOverflowError, when adapted / serialized object
+     * contains contains instance of its type inside it or when object has recursive reference.
+     */
+    private Set<Object> currentlyProcessedObjects = new HashSet<>();
 
     /**
      * Parent instance for marshaller and unmarshaller.
@@ -50,6 +59,15 @@ public abstract class ProcessingContext {
      */
     public MappingContext getMappingContext() {
         return getJsonbContext().getMappingContext();
+    }
+
+
+    public boolean addProcessedObject(Object object) {
+        return this.currentlyProcessedObjects.add(object);
+    }
+
+    public boolean removeProcessedObject(Object object) {
+        return currentlyProcessedObjects.remove(object);
     }
 
 }

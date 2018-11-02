@@ -432,7 +432,8 @@ public class AdaptersTest {
         Assert.assertEquals("{\"firstName\":\"J\",\"lastName\":\"Connor\"}", json);
 
         Author result = jsonb.fromJson("{\"firstName\":\"J\",\"lastName\":\"Connor\"}", Author.class);
-        System.out.println(result);
+        Assert.assertEquals("\"J\"", result.getFirstName());
+        Assert.assertEquals("Connor", result.getLastName());
     }
 
     @Test

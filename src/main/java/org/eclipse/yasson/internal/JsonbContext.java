@@ -20,7 +20,6 @@ import javax.json.bind.JsonbConfig;
 import javax.json.spi.JsonProvider;
 import java.util.HashSet;
 import java.util.Objects;
-import java.util.Set;
 
 /**
  * Jsonb context holding central components and configuration of jsonb runtime. Scoped to instance of Jsonb runtime.
@@ -47,12 +46,6 @@ public class JsonbContext {
     private JsonbConfigProperties configProperties;
 
     /**
-     * Used to avoid StackOverflowError, when adapted / serialized object
-     * contains contains instance of its type inside it or when object has recursive reference.
-     */
-    private Set<Object> currentlyProcessedObjects;
-
-    /**
      * Creates and initialize context.
      *
      * @param jsonbConfig jsonb jsonbConfig not null
@@ -67,7 +60,6 @@ public class JsonbContext {
         this.annotationIntrospector = new AnnotationIntrospector(this);
         this.jsonProvider = jsonProvider;
         this.configProperties = new JsonbConfigProperties(jsonbConfig);
-        this.currentlyProcessedObjects = new HashSet<>();
     }
 
     /**
@@ -146,11 +138,4 @@ public class JsonbContext {
         return configProperties;
     }
 
-    public boolean addProcessedObject(Object object) {
-        return this.currentlyProcessedObjects.add(object);
-    }
-
-    public boolean removeProcessedObject(Object object) {
-        return currentlyProcessedObjects.remove(object);
-    }
 }
