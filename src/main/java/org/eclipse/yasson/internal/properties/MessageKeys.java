@@ -47,9 +47,11 @@ public enum MessageKeys {
     PROPERTY_ORDER("propertyOrder"),
     UNSUPPORTED_JSONP_SERIALIZER_VALUE("unsupportedJsonpSerializerValue"),
     JSONB_CONFIG_FORMATTING_ILLEGAL_VALUE("Only Boolean type values are supported for JsonbConfig.FORMATTING property."),
-    BEAN_MANAGER_NOT_FOUND_JNDI("beanManagerNotFoundJndi"),
-    BEAN_MANAGER_NOT_FOUND_NO_PROVIDER("beanManagerNotFoundNoProvider"),
+    NO_JNDI_ENVIRONMENT("noJndiEnvironment"),
+    NO_CDI_API_PROVIDER("noCdiApiProvider"),
+    ILLEGAL_ACCESS("illegalAccess"),
     BEAN_MANAGER_NOT_FOUND_USING_DEFAULT("usingDefaultConstructorInstantiator"),
+    NO_CDI_ENVIRONMENT("noCdiEnvironment"),
     IJSON_ENABLED_SINGLE_VALUE("iJsonEnabledSingleValue"),
     PROPERTY_NOT_FOUND_DESERIALIZER("propertyNotFoundDeserializer"),
     SETTING_PROPERTY_DESERIALIZER("settingPropertyDeserializer"),
@@ -80,6 +82,7 @@ public enum MessageKeys {
     SQL_DATE_IJSON_ERROR("sqlDateIJsonError"),
     RECURSIVE_REFERENCE("recursiveReference"),
     DATATYPE_FACTORY_CREATION_FAILED("datatypeFactoryCreationFailed"),
+    BEAN_MANAGER_PROVIDER_NOT_FOUND("beanManagerProviderNotFound"),
     ;
 
     /** Message bundle key. */

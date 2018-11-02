@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2016, 2017 Oracle and/or its affiliates. All rights reserved.
+ * Copyright (c) 2016, 2018 Oracle and/or its affiliates. All rights reserved.
  * This program and the accompanying materials are made available under the
  * terms of the Eclipse Public License v1.0 and Eclipse Distribution License v. 1.0
  * which accompanies this distribution.
@@ -14,11 +14,14 @@
 package org.eclipse.yasson.internal.components;
 
 import org.eclipse.yasson.internal.JsonBinding;
+import org.eclipse.yasson.internal.properties.MessageKeys;
+import org.eclipse.yasson.internal.properties.Messages;
 
 import javax.enterprise.context.spi.CreationalContext;
 import javax.enterprise.inject.spi.AnnotatedType;
 import javax.enterprise.inject.spi.BeanManager;
 import javax.enterprise.inject.spi.InjectionTarget;
+import javax.json.bind.JsonbException;
 import java.io.IOException;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ConcurrentMap;
@@ -27,6 +30,8 @@ import java.util.concurrent.ConcurrentMap;
  * CDI instance manager.
  * Instances are created and stored per instance of {@link JsonBinding}.
  * Calling close on JsonBinding, cleans up Jsonb CDI instances and in case of "dependant" scope its dependencies.
+ *
+ * CDI API dependency is optional, this class is never referenced / loaded if CDI API is not resolvable.
  *
  * @author Roman Grigoriadi
  */
@@ -41,8 +46,12 @@ public class BeanManagerInstanceCreator implements JsonbComponentInstanceCreator
      *
      * @param beanManager Bean manager.
      */
-    public BeanManagerInstanceCreator(BeanManager beanManager) {
-        this.beanManager = beanManager;
+    public BeanManagerInstanceCreator(Object beanManager) {
+        if (!(beanManager instanceof BeanManager)) {
+            throw new JsonbException(Messages.getMessage(MessageKeys.INTERNAL_ERROR,
+                    "beanManager instance should be of type '" + BeanManager.class + "'"));
+        }
+        this.beanManager = (BeanManager) beanManager;
     }
 
     /**

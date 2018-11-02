@@ -13,7 +13,25 @@
 
 package org.eclipse.yasson.serializers;
 
-import org.eclipse.yasson.serializers.model.*;
+import org.eclipse.yasson.serializers.model.AnnotatedWithSerializerType;
+import org.eclipse.yasson.serializers.model.Author;
+import org.eclipse.yasson.serializers.model.Box;
+import org.eclipse.yasson.serializers.model.BoxWithAnnotations;
+import org.eclipse.yasson.serializers.model.Crate;
+import org.eclipse.yasson.serializers.model.CrateDeserializer;
+import org.eclipse.yasson.serializers.model.CrateDeserializerWithConversion;
+import org.eclipse.yasson.serializers.model.CrateInner;
+import org.eclipse.yasson.serializers.model.CrateJsonObjectDeserializer;
+import org.eclipse.yasson.serializers.model.CrateSerializer;
+import org.eclipse.yasson.serializers.model.CrateSerializerWithConversion;
+import org.eclipse.yasson.serializers.model.NumberDeserializer;
+import org.eclipse.yasson.serializers.model.NumberSerializer;
+import org.eclipse.yasson.serializers.model.RecursiveDeserializer;
+import org.eclipse.yasson.serializers.model.RecursiveSerializer;
+import org.eclipse.yasson.serializers.model.SimpleAnnotatedSerializedArrayContainer;
+import org.eclipse.yasson.serializers.model.SimpleContainer;
+import org.eclipse.yasson.serializers.model.StringWrapper;
+import org.eclipse.yasson.serializers.model.SupertypeSerializerPojo;
 import org.junit.Assert;
 import org.junit.Test;
 
@@ -280,6 +298,21 @@ public class SerializersTest {
         Author result = jsonb.fromJson(expected, Author.class);
         Assert.assertEquals("John", result.getFirstName());
         Assert.assertEquals("Connor", result.getLastName());
+    }
+
+    @Test
+    public void testSupertypeSerializer() {
+        Jsonb jsonb = JsonbBuilder.create(
+                new JsonbConfig().withSerializers(new NumberSerializer())
+                        .withDeserializers(new NumberDeserializer()));
+        SupertypeSerializerPojo pojo = new SupertypeSerializerPojo();
+        pojo.setNumberInteger(10);
+        pojo.setAnotherNumberInteger(11);
+        Assert.assertEquals("{\"anotherNumberInteger\":\"12\",\"numberInteger\":\"11\"}", jsonb.toJson(pojo));
+
+        pojo = jsonb.fromJson("{\"anotherNumberInteger\":\"12\",\"numberInteger\":\"11\"}", SupertypeSerializerPojo.class);
+        Assert.assertEquals(Integer.valueOf(10), pojo.getNumberInteger());
+        Assert.assertEquals(Integer.valueOf(11), pojo.getAnotherNumberInteger());
     }
 
     private Box createPojoWithDates() {

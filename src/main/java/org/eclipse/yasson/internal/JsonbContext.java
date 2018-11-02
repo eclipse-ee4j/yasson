@@ -13,11 +13,12 @@
 
 package org.eclipse.yasson.internal;
 
-import org.eclipse.yasson.internal.components.InstanceCreatorFactoryHelper;
 import org.eclipse.yasson.internal.components.JsonbComponentInstanceCreator;
+import org.eclipse.yasson.internal.components.JsonbComponentInstanceCreatorFactory;
 
 import javax.json.bind.JsonbConfig;
 import javax.json.spi.JsonProvider;
+import java.util.HashSet;
 import java.util.Objects;
 
 /**
@@ -54,7 +55,7 @@ public class JsonbContext {
         Objects.requireNonNull(jsonbConfig);
         this.jsonbConfig = jsonbConfig;
         this.mappingContext = new MappingContext(this);
-        this.componentInstanceCreator = InstanceCreatorFactoryHelper.getComponentInstanceCreator();
+        this.componentInstanceCreator = JsonbComponentInstanceCreatorFactory.getComponentInstanceCreator();
         this.componentMatcher = new ComponentMatcher(this);
         this.annotationIntrospector = new AnnotationIntrospector(this);
         this.jsonProvider = jsonProvider;

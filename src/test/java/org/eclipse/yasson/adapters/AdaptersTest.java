@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2016 Oracle and/or its affiliates. All rights reserved.
+ * Copyright (c) 2016, 2018 Oracle and/or its affiliates. All rights reserved.
  * This program and the accompanying materials are made available under the
  * terms of the Eclipse Public License v1.0 and Eclipse Distribution License v. 1.0
  * which accompanies this distribution.
@@ -24,6 +24,7 @@ import org.eclipse.yasson.adapters.model.Crate;
 import org.eclipse.yasson.adapters.model.GenericBox;
 import org.eclipse.yasson.adapters.model.IntegerListToStringAdapter;
 import org.eclipse.yasson.adapters.model.JsonObjectPojo;
+import org.eclipse.yasson.adapters.model.SupertypeAdapterPojo;
 import org.eclipse.yasson.adapters.model.UUIDContainer;
 import org.junit.Assert;
 import org.junit.Test;
@@ -449,5 +450,17 @@ public class AdaptersTest {
         UUIDContainer uuidContainer = jsonb.fromJson(result, UUIDContainer.class);
         Assert.assertEquals(uuid, uuidContainer.getUuidClsBased());
         Assert.assertEquals(uuid, uuidContainer.getUuidIfcBased());
+    }
+
+    @Test
+    public void testSupertypeAdapter() {
+        jsonb = JsonbBuilder.create();
+        SupertypeAdapterPojo pojo = new SupertypeAdapterPojo();
+        pojo.setNumberInteger(10);
+        pojo.setSerializableInteger(11);
+        Assert.assertEquals("{\"numberInteger\":\"11\",\"serializableInteger\":12}", jsonb.toJson(pojo));
+        pojo = jsonb.fromJson("{\"numberInteger\":\"11\",\"serializableInteger\":12}", SupertypeAdapterPojo.class);
+        Assert.assertEquals(Integer.valueOf(10), pojo.getNumberInteger());
+        Assert.assertEquals(Integer.valueOf(11), pojo.getSerializableInteger());
     }
 }

@@ -13,13 +13,18 @@
  ******************************************************************************/
 package org.eclipse.yasson.internal;
 
-import org.eclipse.yasson.internal.model.*;
+import org.eclipse.yasson.internal.model.ClassModel;
+import org.eclipse.yasson.internal.model.CreatorModel;
+import org.eclipse.yasson.internal.model.JsonbAnnotatedElement;
+import org.eclipse.yasson.internal.model.JsonbCreator;
+import org.eclipse.yasson.internal.model.Property;
+import org.eclipse.yasson.internal.model.PropertyModel;
+import org.eclipse.yasson.internal.model.ReflectionPropagation;
+import org.eclipse.yasson.internal.model.customization.CreatorCustomization;
 import org.eclipse.yasson.internal.properties.MessageKeys;
 import org.eclipse.yasson.internal.properties.Messages;
-import org.eclipse.yasson.internal.model.customization.CreatorCustomization;
 
 import javax.json.bind.JsonbException;
-import java.beans.Introspector;
 import java.lang.annotation.Annotation;
 import java.lang.reflect.Field;
 import java.lang.reflect.Method;
@@ -29,6 +34,9 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.stream.Collectors;
+import java.util.Objects;
+
 
 /**
  * Created a class internal model.
@@ -59,16 +67,29 @@ class ClassParser {
         parseClassAndInterfaceMethods(classElement, classProperties);
 
         //add sorted properties from parent, if they are not overridden in current class
-        final List<PropertyModel> sortedProperties = getSortedParentProperties(classModel, classElement, classProperties);
-        //sort and add properties from current class
-        sortedProperties.addAll(jsonbContext.getConfigProperties().getPropertyOrdering().orderProperties(classProperties, classModel, jsonbContext));
+        //parent properties are by default first by alphabet, than properties from a subclass
+        final List<PropertyModel> sortedParentProperties = getSortedParentProperties(classModel, classElement, classProperties);
 
-        checkPropertyNameClash(sortedProperties, classModel.getType());
+        List<PropertyModel> classPropertyModels = classProperties.values().stream()
+                .map(property -> new PropertyModel(classModel, property, jsonbContext))
+                .collect(Collectors.toList());
+
+        //check for collision on same property read name
+        List<PropertyModel> unsortedMerged = new ArrayList<>();
+        unsortedMerged.addAll(sortedParentProperties);
+        unsortedMerged.addAll(classPropertyModels);
+        checkPropertyNameClash(unsortedMerged, classModel.getType());
+
+
+        List<PropertyModel> sortedPropertyModels = new ArrayList<>();
+        sortedPropertyModels.addAll(sortedParentProperties);
+        sortedPropertyModels.addAll(jsonbContext.getConfigProperties().getPropertyOrdering()
+                .orderProperties(classPropertyModels, classModel));
 
         //reference property to creator parameter by name to merge configuration in runtime
         JsonbCreator creator = classModel.getClassCustomization().getCreator();
         if (creator != null) {
-            sortedProperties.forEach((propertyModel -> {
+            sortedPropertyModels.forEach((propertyModel -> {
                 for (CreatorModel creatorModel : creator.getParams()) {
                     if (creatorModel.getName().equals(propertyModel.getPropertyName())) {
                         CreatorCustomization customization = (CreatorCustomization) creatorModel.getCustomization();
@@ -77,7 +98,8 @@ class ClassParser {
                 }
             }));
         }
-        classModel.setProperties(sortedProperties);
+
+        classModel.setProperties(sortedPropertyModels);
 
     }
 
@@ -168,7 +190,22 @@ class ClassParser {
     }
 
     private String toPropertyMethod(String name) {
-        return Introspector.decapitalize(name.substring(name.startsWith(IS_PREFIX) ? 2 : 3, name.length()));
+        return lowerFirstLetter(name.substring(name.startsWith(IS_PREFIX) ? 2 : 3, name.length()));
+    }
+
+    private String lowerFirstLetter(String name) {
+        Objects.requireNonNull(name);
+        if (name.length() == 0) {
+            //methods named get() or set()
+            return name;
+        }
+        if (name.length() > 1 && Character.isUpperCase(name.charAt(1)) &&
+                Character.isUpperCase(name.charAt(0))){
+            return name;
+        }
+        char chars[] = name.toCharArray();
+        chars[0] = Character.toLowerCase(chars[0]);
+        return new String(chars);
     }
 
     private boolean isPropertyMethod(Method m) {
@@ -195,9 +232,9 @@ class ClassParser {
             for (PropertyModel checkedPropertyModel : checkedProperties) {
 
                 if ((checkedPropertyModel.getReadName().equals(collectedPropertyModel.getReadName())
-                && checkedPropertyModel.isReadable() && collectedPropertyModel.isReadable()) ||
+                        && checkedPropertyModel.isReadable() && collectedPropertyModel.isReadable()) ||
                         (checkedPropertyModel.getWriteName().equals(collectedPropertyModel.getWriteName()))
-                        && checkedPropertyModel.isWritable() && collectedPropertyModel.isWritable()) {
+                                && checkedPropertyModel.isWritable() && collectedPropertyModel.isWritable()) {
                     throw new JsonbException(Messages.getMessage(MessageKeys.PROPERTY_NAME_CLASH,
                             checkedPropertyModel.getPropertyName(), collectedPropertyModel.getPropertyName(),
                             cls.getName()));
@@ -211,13 +248,13 @@ class ClassParser {
      * Merges current class properties with parent class properties.
      * If javabean property is declared in more than one inheritance levels,
      * merge field, getters and setters of that property.
-     *
+     * <p>
      * For example BaseClass contains field foo and getter getFoo. In BaseExtensions there is a setter setFoo.
      * All three will be merged for BaseExtension.
-     *
+     * <p>
      * Such property is sorted based on where its getter or field is located.
      */
-    private  List<PropertyModel> getSortedParentProperties(ClassModel classModel, JsonbAnnotatedElement<Class<?>> classElement, Map<String, Property> classProperties) {
+    private List<PropertyModel> getSortedParentProperties(ClassModel classModel, JsonbAnnotatedElement<Class<?>> classElement, Map<String, Property> classProperties) {
         List<PropertyModel> sortedProperties = new ArrayList<>();
         //Pull properties from parent
         if (classModel.getParentClassModel() != null) {
@@ -259,10 +296,8 @@ class ClassParser {
      * <li> returns current otherwise</li>
      * </ul>
      *
-     *
      * @param current current 'child' implementation
      * @param parent  parent implementation
-     *
      * @return effective method to register as getter or setter
      */
     private Method selectMostSpecificNonDefaultMethod(Method current, Method parent) {
