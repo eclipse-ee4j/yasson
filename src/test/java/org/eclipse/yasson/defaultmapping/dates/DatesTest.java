@@ -150,11 +150,22 @@ public class DatesTest {
     }
 
     @Test
-    public void testDateWithZone() throws ParseException {
+    public void testDateWithZoneOffset() throws ParseException {
         final SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ssXXX");
         final Date parsedDate = sdf.parse("2018-11-02T00:00:00+01:00");
     	
     	String jsonDateWithZone = "{\"dateWithZone\":\"2018-11-02T00:00:00+01:00\"}";
+    	final DateWithZonePojo result = jsonb.fromJson(jsonDateWithZone, DateWithZonePojo.class);
+    	
+    	assertEquals(parsedDate, result.dateWithZone);
+    }
+    
+    @Test
+    public void testDateWithZoneId() throws ParseException {
+        final SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ssXXX");
+        final Date parsedDate = sdf.parse("2018-11-02T00:00:00+01:00");
+    	
+    	String jsonDateWithZone = "{\"dateWithZone\":\"2018-11-02T00:00:00+01:00[Europe/Berlin]\"}";
     	final DateWithZonePojo result = jsonb.fromJson(jsonDateWithZone, DateWithZonePojo.class);
     	
     	assertEquals(parsedDate, result.dateWithZone);
