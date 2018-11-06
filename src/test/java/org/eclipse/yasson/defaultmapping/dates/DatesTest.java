@@ -151,6 +151,7 @@ public class DatesTest {
 
     @Test
     public void testDateWithZoneOffset() throws ParseException {
+        // Test for Yasson-172
         final SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ssXXX");
         final Date parsedDate = sdf.parse("2018-11-02T00:00:00+01:00");
     	
@@ -162,6 +163,7 @@ public class DatesTest {
     
     @Test
     public void testDateWithZoneId() throws ParseException {
+        // Test for Yasson-172
         final SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ssXXX");
         final Date parsedDate = sdf.parse("2018-11-02T00:00:00+01:00");
     	

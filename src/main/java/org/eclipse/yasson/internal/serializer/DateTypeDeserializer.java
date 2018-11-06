@@ -29,6 +29,7 @@ import org.eclipse.yasson.internal.model.customization.Customization;
  * Deserializer for {@link Date} type.
  *
  * @author David Kral
+ * @author Dennis Kriechel
  */
 public class DateTypeDeserializer extends AbstractDateTimeDeserializer<Date> {
 
