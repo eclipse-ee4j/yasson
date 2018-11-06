@@ -63,21 +63,22 @@ public class DateTypeDeserializer extends AbstractDateTimeDeserializer<Date> {
 	}
 
 	/**
-	 * Parses the jsonValue as an Date.<br>
-	 * At first the Date is parsed with an Offset/ZoneId.<br>
-	 * If no Offset/ZoneId is present and the parsing fails, it will be parsed again with the fixed ZoneId that was passed as defaultZone.
+	 * Parses the jsonValue as a java.time.ZonedDateTime that can later be use to be converted into a java.util.Date.<br>
+	 * At first the Json-Date is parsed with an Offset/Zone.<br>
+	 * If no Offset/Zone is present and the parsing fails, it will be parsed again with the fixed Zone that was passed as defaultZone.
 	 * 
-	 * @param jsonValue Value from json
-	 * @param formatter DateFormat-Options
+	 * @param jsonValue String value from json
+	 * @param formatter DateTimeFormat options
 	 * @param defaultZone This Zone will be used if no other Zone was found in the jsonValue
-	 * @return Parsed Date
+	 * @return Parsed date on base of a java.time.ZonedDateTime
 	 */
 	private TemporalAccessor parseWithOrWithoutZone(String jsonValue, DateTimeFormatter formatter, ZoneId defaultZone) {
 		try {
+			// Try parsing with a Zone
 			return ZonedDateTime.parse(jsonValue, formatter);
 		} catch (DateTimeParseException e) {
-			e.printStackTrace();
-			// Exception occures possibly because no Offset/ZoneId was found
+			// Possibly exception occures because no Offset/ZoneId was found
+			// Therefore parse with defaultZone again
 			return ZonedDateTime.parse(jsonValue, formatter.withZone(defaultZone));
 		}
 	}
