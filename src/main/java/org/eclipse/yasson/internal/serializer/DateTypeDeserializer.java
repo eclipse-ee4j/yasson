@@ -15,6 +15,8 @@ package org.eclipse.yasson.internal.serializer;
 
 import java.time.Instant;
 import java.time.OffsetDateTime;
+import java.time.ZoneId;
+import java.time.ZonedDateTime;
 import java.time.format.DateTimeFormatter;
 import java.time.format.DateTimeParseException;
 import java.time.temporal.TemporalAccessor;
@@ -48,43 +50,35 @@ public class DateTypeDeserializer extends AbstractDateTimeDeserializer<Date> {
 
 	@Override
     protected Date parseDefault(String jsonValue, Locale locale) {
-		TemporalAccessor parsed;
+		TemporalAccessor parsed = parseWithOrWithoutZone(jsonValue, DEFAULT_DATE_TIME_FORMATTER.withLocale(locale), UTC);
 		
-		if (hasOffset(jsonValue)) {
-			parsed = DEFAULT_DATE_TIME_FORMATTER.withLocale(locale).parse(jsonValue);
-		} else {
-			parsed = DEFAULT_DATE_TIME_FORMATTER.withZone(UTC).withLocale(locale).parse(jsonValue);
-		}
-    	
         return new Date(Instant.from(parsed).toEpochMilli());
     }
 
 	@Override
 	protected Date parseWithFormatter(String jsonValue, DateTimeFormatter formatter) {
-		TemporalAccessor parsed;
-		
-		if (hasOffset(jsonValue)) {
-			parsed = formatter.parse(jsonValue);
-		} else {
-			parsed = formatter.withZone(UTC).parse(jsonValue);
-		}
+		TemporalAccessor parsed = parseWithOrWithoutZone(jsonValue, formatter, UTC);
 		
 		return new Date(Instant.from(parsed).toEpochMilli());
 	}
 
 	/**
-	 * Checks if a json date value contains an offset in terms of
-	 * java.time.OffsetDateTime
+	 * Parses the jsonValue as an Date.<br>
+	 * At first the Date is parsed with an Offset/ZoneId.<br>
+	 * If no Offset/ZoneId is present and the parsing fails, it will be parsed again with the fixed ZoneId that was passed as defaultZone.
 	 * 
 	 * @param jsonValue Value from json
-	 * @return true if the value could be interpreted as an date with an offset
+	 * @param formatter DateFormat-Options
+	 * @param defaultZone This Zone will be used if no other Zone was found in the jsonValue
+	 * @return Parsed Date
 	 */
-	private boolean hasOffset(String jsonValue) {
+	private TemporalAccessor parseWithOrWithoutZone(String jsonValue, DateTimeFormatter formatter, ZoneId defaultZone) {
 		try {
-			OffsetDateTime.parse(jsonValue);
-			return true;
-		} catch (DateTimeParseException e1) {
-			return false;
+			return ZonedDateTime.parse(jsonValue, formatter);
+		} catch (DateTimeParseException e) {
+			e.printStackTrace();
+			// Exception occures possibly because no Offset/ZoneId was found
+			return ZonedDateTime.parse(jsonValue, formatter.withZone(defaultZone));
 		}
 	}
 }
