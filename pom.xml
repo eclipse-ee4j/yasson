@@ -467,7 +467,8 @@
                 <artifactId>jakarta.json</artifactId>
                 <version>${jakarta.json.version}</version>
                 <classifier>module</classifier>
-                <scope>test</scope>
+                <scope>compile</scope>
+                <optional>true</optional>
             </dependency>
             <dependency>
                 <groupId>org.jboss.weld.se</groupId>
