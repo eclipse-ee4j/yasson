@@ -1,7 +1,7 @@
 language: java
 
 jdk:
-  - oraclejdk9
+  - oraclejdk11
 
 cache:
   directories:
@@ -11,4 +11,4 @@ cache:
 install: true
 
 script:
-- mvn -U -C clean verify
+- mvn -U -C -Pstaging clean verify
