@@ -12,22 +12,6 @@
  ******************************************************************************/
 package org.eclipse.yasson.internal.serializer;
 
-import org.eclipse.yasson.internal.ComponentMatcher;
-import org.eclipse.yasson.internal.JsonbContext;
-import org.eclipse.yasson.internal.ReflectionUtils;
-import org.eclipse.yasson.internal.components.AdapterBinding;
-import org.eclipse.yasson.internal.components.DeserializerBinding;
-import org.eclipse.yasson.internal.model.customization.ComponentBoundCustomization;
-import org.eclipse.yasson.internal.model.customization.Customization;
-import org.eclipse.yasson.internal.model.customization.PropertyCustomization;
-import org.eclipse.yasson.internal.properties.MessageKeys;
-import org.eclipse.yasson.internal.properties.Messages;
-
-import javax.json.JsonValue;
-import javax.json.bind.JsonbException;
-import javax.json.bind.config.BinaryDataStrategy;
-import javax.json.bind.serializer.JsonbDeserializer;
-import javax.json.stream.JsonParser;
 import java.lang.reflect.GenericArrayType;
 import java.lang.reflect.Type;
 import java.math.BigDecimal;
@@ -36,11 +20,30 @@ import java.util.Collection;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Optional;
+import java.util.TreeMap;
+
+import javax.json.JsonValue;
+import javax.json.bind.JsonbConfig;
+import javax.json.bind.JsonbException;
+import javax.json.bind.config.BinaryDataStrategy;
+import javax.json.bind.serializer.JsonbDeserializer;
+import javax.json.stream.JsonParser;
+
+import org.eclipse.yasson.internal.ComponentMatcher;
+import org.eclipse.yasson.internal.JsonbContext;
+import org.eclipse.yasson.internal.ReflectionUtils;
+import org.eclipse.yasson.internal.components.AdapterBinding;
+import org.eclipse.yasson.internal.components.DeserializerBinding;
+import org.eclipse.yasson.internal.model.customization.ComponentBoundCustomization;
+import org.eclipse.yasson.internal.model.customization.PropertyCustomization;
+import org.eclipse.yasson.internal.properties.MessageKeys;
+import org.eclipse.yasson.internal.properties.Messages;
 
 /**
  * Builder for currently processed items by unmarshaller.
  *
  * @author Roman Grigoriadi
+ * @author Sebastien Rius
  */
 public class DeserializerBuilder extends AbstractSerializerBuilder<DeserializerBuilder> {
 
@@ -50,12 +53,18 @@ public class DeserializerBuilder extends AbstractSerializerBuilder<DeserializerB
     private JsonParser.Event jsonEvent;
 
     /**
+     * true if ordering strategy is set in associated JSONB configuration, false otherwise
+     */
+    private boolean orderStrategySet;
+    
+    /**
      * Creates a new builder.
      *
      * @param jsonbContext Context.
      */
     public DeserializerBuilder(JsonbContext jsonbContext) {
         super(jsonbContext);
+        this.orderStrategySet = jsonbContext.getConfig().getProperty(JsonbConfig.PROPERTY_ORDER_STRATEGY).isPresent();
     }
 
     /**
@@ -219,7 +228,11 @@ public class DeserializerBuilder extends AbstractSerializerBuilder<DeserializerB
                 case START_ARRAY:
                 return ArrayList.class;
                 case START_OBJECT:
-                return HashMap.class;
+                if (orderStrategySet) {
+                    return TreeMap.class;
+                } else {
+                    return HashMap.class;
+                }
                 default:
                 throw new IllegalStateException("Can't infer deserialization type type: " + jsonEvent);
 
