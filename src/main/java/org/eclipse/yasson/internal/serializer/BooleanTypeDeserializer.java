@@ -18,10 +18,12 @@ import org.eclipse.yasson.internal.model.customization.Customization;
 import org.eclipse.yasson.internal.properties.MessageKeys;
 import org.eclipse.yasson.internal.properties.Messages;
 
+import javax.json.JsonValue;
 import javax.json.bind.JsonbException;
 import javax.json.bind.serializer.DeserializationContext;
 import javax.json.stream.JsonParser;
 import java.lang.reflect.Type;
+import java.util.NoSuchElementException;
 
 /**
  * Deserializer for {@link Boolean} type.
@@ -41,7 +43,13 @@ public class BooleanTypeDeserializer extends AbstractValueTypeDeserializer<Boole
 
     @Override
     public Boolean deserialize(JsonParser parser, DeserializationContext ctx, Type rtType) {
-        final JsonParser.Event event = ((JsonbParser) parser).moveToValue();
+        JsonValue current = parser.getValue();
+        if (current == JsonValue.TRUE)
+            return Boolean.TRUE;
+        else if (current == JsonValue.FALSE)
+            return Boolean.FALSE;
+
+        JsonParser.Event event = ((JsonbParser) parser).moveToValue();
         switch (event) {
             case VALUE_TRUE:
                 return Boolean.TRUE;
