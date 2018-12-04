@@ -14,7 +14,10 @@
 package org.eclipse.yasson.defaultmapping.basic;
 
 import org.eclipse.yasson.defaultmapping.basic.model.BooleanModel;
+import org.junit.Before;
+import org.junit.Rule;
 import org.junit.Test;
+import org.junit.rules.TestName;
 
 import javax.json.bind.Jsonb;
 import javax.json.bind.JsonbBuilder;
@@ -40,14 +43,26 @@ public class BooleanTest {
     @Test
     public void testBooleanDeserializationFromBooleanAsStringValue() throws Exception {
         BooleanModel booleanModel = jsonb.fromJson("{\"field1\":\"true\",\"field2\":\"true\"}", BooleanModel.class);
-        assertEquals(booleanModel.field1, true);
-        assertEquals(booleanModel.field2, true);
+        assertEquals(true, booleanModel.field1);
+        assertEquals(true, booleanModel.field2);
     }
 
     @Test
     public void testBooleanDeserializationFromBooleanRawValue() throws Exception {
         BooleanModel booleanModel = jsonb.fromJson("{\"field1\":false,\"field2\":false}", BooleanModel.class);
-        assertEquals(booleanModel.field1, false);
-        assertEquals(booleanModel.field2, false);
+        assertEquals(false, booleanModel.field1);
+        assertEquals(false, booleanModel.field2);
     }
+
+    @Test
+    public void testNakedBooleans() {
+        assertEquals(true, jsonb.fromJson("true", boolean.class));
+        assertEquals(true, jsonb.fromJson("true", Boolean.class));
+        assertEquals(false, jsonb.fromJson("false", boolean.class));
+        assertEquals(false, jsonb.fromJson("false", Boolean.class));
+        
+        assertEquals("true", jsonb.toJson(true, boolean.class));
+        assertEquals("false", jsonb.toJson(Boolean.FALSE, Boolean.class));
+    }
+
 }
