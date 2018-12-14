@@ -105,6 +105,14 @@
         <netbeans.hint.jdkPlatform>JDK_9</netbeans.hint.jdkPlatform>
     </properties>
 
+    <!-- TODO: Remove this once JakartaEE 8 artifacts are officially released -->
+    <repositories>
+        <repository>
+            <id>staging</id>
+            <url>https://oss.sonatype.org/content/repositories/staging/</url>
+        </repository>
+    </repositories>
+
     <profiles>
         <profile>
             <id>re-build</id>
