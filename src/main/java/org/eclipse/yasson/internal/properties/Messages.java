@@ -55,9 +55,20 @@ public class Messages {
      * @return Formatted message in string.
      */
     public static String getMessage(MessageKeys key, Locale locale, Object... objects) {
-        ResourceBundle messages = ResourceBundle.getBundle(MESSAGE_BUNDLE, locale, new UTF8Control());
+        ResourceBundle messages = getResourceBundle(locale);
         MessageFormat formatter = new MessageFormat(messages.getString(key.key));
         return formatter.format(objects);
+    }
+
+    /**
+     * ResourceBundle.Control is not supported when loaded from JPMS native module.
+     */
+    private static ResourceBundle getResourceBundle(Locale locale) {
+        try {
+            return ResourceBundle.getBundle(MESSAGE_BUNDLE, locale, new UTF8Control());
+        } catch (UnsupportedOperationException e) {
+            return ResourceBundle.getBundle(MESSAGE_BUNDLE, locale);
+        }
     }
 
     static class UTF8Control extends ResourceBundle.Control {
