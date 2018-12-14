@@ -137,8 +137,8 @@ public abstract class PropertyValuePropagation {
         }
 
         Boolean accessible = isVisible(strategy -> strategy.isVisible(method), method.getDeclaringClass(), field, method, ctx);
-        //overridden by strategy, or anonymous class
-        if (accessible && (!Modifier.isPublic(method.getModifiers()) || method.getDeclaringClass().isAnonymousClass())) {
+        //overridden by strategy, anonymous class, or lambda
+        if (accessible && (!Modifier.isPublic(method.getModifiers()) || method.getDeclaringClass().isAnonymousClass() || method.getDeclaringClass().isSynthetic())) {
             overrideAccessible(method);
         }
         return accessible;
