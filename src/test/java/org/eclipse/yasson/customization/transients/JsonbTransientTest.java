@@ -170,4 +170,10 @@ public class JsonbTransientTest {
         String result = jsonb.toJson(pojo);
         Assert.assertEquals("{\"instance\":\"INSTANCE\"}", result);
     }
+
+    @Test
+    public void testTransientGetterNoField() {
+        TransientGetterNoField pojo = new TransientGetterNoField();
+        assertEquals("{}", jsonb.toJson(pojo));
+    }
 }
