@@ -159,7 +159,7 @@ class ObjectDeserializer<T> extends AbstractContainerDeserializer<T> {
 
         //identify field model of currently processed class model
         PropertyModel newPropertyModel = getModel();
-        if (newPropertyModel != null) {
+        if (newPropertyModel != null && newPropertyModel.isWritable()) {
             //create current item instance of identified object field
             final JsonbDeserializer<?> deserializer = newUnmarshallerItemBuilder(context.getJsonbContext())
                     .withCustomization(newPropertyModel.getCustomization())
