@@ -43,7 +43,7 @@ public class CreatorModel {
      */
     public CreatorModel(String name, Parameter parameter, JsonbContext context) {
         this.name = name;
-        this.type = parameter.getType();
+        this.type = parameter.getParameterizedType();
 
         AnnotationIntrospector annotationIntrospector = context.getAnnotationIntrospector();
 

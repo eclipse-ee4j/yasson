@@ -26,6 +26,7 @@ import javax.json.bind.annotation.JsonbNumberFormat;
 import javax.json.bind.annotation.JsonbProperty;
 import java.math.BigDecimal;
 import java.time.LocalDate;
+import java.util.Set;
 
 import static org.junit.Assert.*;
 
@@ -141,6 +142,45 @@ public class JsonbCreatorTest {
         ParameterNameTester result = JsonbBuilder.create().fromJson(json, ParameterNameTester.class);
         Assert.assertEquals("someText", result.name);
         Assert.assertNull(result.secondParam);
+    }
+
+    @Test
+    public void testGenericCreatorParameter() throws Exception {
+        final String json = "{\"persons\": [{\"name\": \"name1\"}]}";
+        Jsonb jsonb = JsonbBuilder.create();
+        Persons persons = jsonb.fromJson(json, Persons.class);
+        Assert.assertEquals(1, persons.hiddenPersons.size());
+        Assert.assertEquals("name1", persons.hiddenPersons.iterator().next().getName());
+    }
+
+    public static final class Persons {
+
+        Set<Person> hiddenPersons;
+
+        private Persons(Set<Person> persons) {
+            this.hiddenPersons = persons;
+        }
+
+        @JsonbCreator
+        public static Persons wrap(@JsonbProperty("persons") Set<Person> persons) {
+            return new Persons(persons);
+        }
+
+        public Set<Person> getPersons() {
+            return null;
+        }
+    }
+
+    public static final class Person {
+        private String name;
+
+        public String getName() {
+            return name;
+        }
+
+        public void setName(String name) {
+            this.name = name;
+        }
     }
 
 
