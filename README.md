@@ -32,7 +32,7 @@ String result = jsonb.toJson(someObject);
 - [Eclipse Public License 1.0](https://projects.eclipse.org/content/eclipse-public-license-1.0)
 
 ## Links
-- Yasson home page: https://projects.eclipse.org/projects/rt.yasson
+- Yasson home page: https://projects.eclipse.org/projects/ee4j.yasson
 - JSON-B official web site: http://json-b.net
-- JSON-B API & spec project: https://github.com/javaee/jsonb-spec
+- JSON-B API & spec project: https://github.com/eclipse-ee4j/jsonb-api
 - JSR-367 page on JCP site: https://jcp.org/en/jsr/detail?id=367
