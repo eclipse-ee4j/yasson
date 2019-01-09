@@ -9,6 +9,7 @@
  *
  * Contributors:
  * Roman Grigoriadi
+ * Sebastien Rius
  ******************************************************************************/
 package org.eclipse.yasson.internal.serializer;
 
@@ -26,6 +27,7 @@ import javax.json.JsonValue;
 import javax.json.bind.JsonbConfig;
 import javax.json.bind.JsonbException;
 import javax.json.bind.config.BinaryDataStrategy;
+import javax.json.bind.config.PropertyOrderStrategy;
 import javax.json.bind.serializer.JsonbDeserializer;
 import javax.json.stream.JsonParser;
 
@@ -34,6 +36,7 @@ import org.eclipse.yasson.internal.JsonbContext;
 import org.eclipse.yasson.internal.ReflectionUtils;
 import org.eclipse.yasson.internal.components.AdapterBinding;
 import org.eclipse.yasson.internal.components.DeserializerBinding;
+import org.eclipse.yasson.internal.model.ReverseTreeMap;
 import org.eclipse.yasson.internal.model.customization.ComponentBoundCustomization;
 import org.eclipse.yasson.internal.model.customization.PropertyCustomization;
 import org.eclipse.yasson.internal.properties.MessageKeys;
@@ -53,9 +56,10 @@ public class DeserializerBuilder extends AbstractSerializerBuilder<DeserializerB
     private JsonParser.Event jsonEvent;
 
     /**
-     * true if ordering strategy is set in associated JSONB configuration, false otherwise
+     * Map runtime type to use according to ordering strategy set in associated JSONB configuration, HashMap if none was set
      */
-    private boolean orderStrategySet;
+    @SuppressWarnings("rawtypes")
+    private final Class<? extends Map> mapImplType;
     
     /**
      * Creates a new builder.
@@ -64,7 +68,27 @@ public class DeserializerBuilder extends AbstractSerializerBuilder<DeserializerB
      */
     public DeserializerBuilder(JsonbContext jsonbContext) {
         super(jsonbContext);
-        this.orderStrategySet = jsonbContext.getConfig().getProperty(JsonbConfig.PROPERTY_ORDER_STRATEGY).isPresent();
+        String os = (String) jsonbContext.getConfig().getProperty(JsonbConfig.PROPERTY_ORDER_STRATEGY).orElse(PropertyOrderStrategy.ANY);
+        switch (os) {
+            case PropertyOrderStrategy.LEXICOGRAPHICAL:
+                mapImplType = TreeMap.class;
+                break;
+            case PropertyOrderStrategy.REVERSE:
+                mapImplType = ReverseTreeMap.class;
+                break;
+            case PropertyOrderStrategy.ANY:
+            default:
+                mapImplType = HashMap.class;
+                break;
+        }
+    }
+
+    /**
+     * @return the mapImplType
+     */
+    @SuppressWarnings("rawtypes")
+    public Class<? extends Map> getMapImplType() {
+        return mapImplType;
     }
 
     /**
@@ -228,11 +252,7 @@ public class DeserializerBuilder extends AbstractSerializerBuilder<DeserializerB
                 case START_ARRAY:
                 return ArrayList.class;
                 case START_OBJECT:
-                if (orderStrategySet) {
-                    return TreeMap.class;
-                } else {
-                    return HashMap.class;
-                }
+                    return mapImplType;
                 default:
                 throw new IllegalStateException("Can't infer deserialization type type: " + jsonEvent);
 

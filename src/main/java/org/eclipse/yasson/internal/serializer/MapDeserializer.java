@@ -9,22 +9,24 @@
  *
  * Contributors:
  * Roman Grigoriadi
+ * Sebastien Rius
  ******************************************************************************/
 package org.eclipse.yasson.internal.serializer;
 
-import org.eclipse.yasson.internal.JsonbParser;
-import org.eclipse.yasson.internal.JsonbRiParser;
-import org.eclipse.yasson.internal.ReflectionUtils;
-import org.eclipse.yasson.internal.Unmarshaller;
-
-import javax.json.bind.serializer.JsonbDeserializer;
-import javax.json.stream.JsonParser;
 import java.lang.reflect.ParameterizedType;
 import java.lang.reflect.Type;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.SortedMap;
 import java.util.TreeMap;
+
+import javax.json.bind.serializer.JsonbDeserializer;
+import javax.json.stream.JsonParser;
+
+import org.eclipse.yasson.internal.JsonbParser;
+import org.eclipse.yasson.internal.JsonbRiParser;
+import org.eclipse.yasson.internal.ReflectionUtils;
+import org.eclipse.yasson.internal.Unmarshaller;
 
 /**
  * Item implementation for {@link java.util.Map} fields.
@@ -36,8 +38,13 @@ import java.util.TreeMap;
 public class MapDeserializer<T extends Map<?,?>> extends AbstractContainerDeserializer<T> implements EmbeddedItem {
 
     /**
-     * Type of value in the map.
-     * (Keys must always be Strings, because of JSON spec)
+     * Sorted map runtime type to use according to ordering strategy set in associated JSONB configuration
+     */
+    @SuppressWarnings("rawtypes")
+    private final Class<? extends SortedMap> sortedMapImplType;
+
+    /**
+     * Type of value in the map. (Keys must always be Strings, because of JSON spec)
      */
     private final Type mapValueRuntimeType;
 
@@ -48,8 +55,19 @@ public class MapDeserializer<T extends Map<?,?>> extends AbstractContainerDeseri
      *
      * @param builder {@link DeserializerBuilder} used to build this instance
      */
+    @SuppressWarnings({ "unchecked", "rawtypes" })
     protected MapDeserializer(DeserializerBuilder builder) {
         super(builder);
+
+        Class<? extends Map> mapImplType = builder.getMapImplType();
+        if (SortedMap.class.isAssignableFrom(mapImplType)) {
+            // if deser. builder decided to deal with sorted maps by default : using its choice for lex or reverse order
+            sortedMapImplType = (Class<SortedMap>) mapImplType;
+        } else {
+            // if deser. builder decided not to deal with sorted maps by default : defaulting sorted maps to lex order
+            sortedMapImplType = TreeMap.class;
+        }
+
         mapValueRuntimeType = getRuntimeType() instanceof ParameterizedType ?
                 ReflectionUtils.resolveType(this, ((ParameterizedType) getRuntimeType()).getActualTypeArguments()[1])
                 : Object.class;
@@ -63,10 +81,10 @@ public class MapDeserializer<T extends Map<?,?>> extends AbstractContainerDeseri
         return rawType.isInterface() ? (T) getMapImpl(rawType) : ReflectionUtils.createNoArgConstructorInstance(rawType);
     }
 
-    private Map<Object, Object> getMapImpl(Class ifcType) {
-        //SortedMap, NavigableMap
+    private Map<?, ?> getMapImpl(Class ifcType) {
+        // SortedMap, NavigableMap
         if (SortedMap.class.isAssignableFrom(ifcType)) {
-            return new TreeMap<>();
+            return ReflectionUtils.createNoArgConstructorInstance(sortedMapImplType);
         }
         return new HashMap<>();
     }
