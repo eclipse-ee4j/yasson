@@ -9,25 +9,10 @@
  *
  * Contributors:
  * Roman Grigoriadi
+ * Sebastien Rius
  ******************************************************************************/
 package org.eclipse.yasson.internal.serializer;
 
-import org.eclipse.yasson.internal.ComponentMatcher;
-import org.eclipse.yasson.internal.JsonbContext;
-import org.eclipse.yasson.internal.ReflectionUtils;
-import org.eclipse.yasson.internal.components.AdapterBinding;
-import org.eclipse.yasson.internal.components.DeserializerBinding;
-import org.eclipse.yasson.internal.model.customization.ComponentBoundCustomization;
-import org.eclipse.yasson.internal.model.customization.Customization;
-import org.eclipse.yasson.internal.model.customization.PropertyCustomization;
-import org.eclipse.yasson.internal.properties.MessageKeys;
-import org.eclipse.yasson.internal.properties.Messages;
-
-import javax.json.JsonValue;
-import javax.json.bind.JsonbException;
-import javax.json.bind.config.BinaryDataStrategy;
-import javax.json.bind.serializer.JsonbDeserializer;
-import javax.json.stream.JsonParser;
 import java.lang.reflect.GenericArrayType;
 import java.lang.reflect.Type;
 import java.math.BigDecimal;
@@ -36,11 +21,32 @@ import java.util.Collection;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Optional;
+import java.util.TreeMap;
+
+import javax.json.JsonValue;
+import javax.json.bind.JsonbConfig;
+import javax.json.bind.JsonbException;
+import javax.json.bind.config.BinaryDataStrategy;
+import javax.json.bind.config.PropertyOrderStrategy;
+import javax.json.bind.serializer.JsonbDeserializer;
+import javax.json.stream.JsonParser;
+
+import org.eclipse.yasson.internal.ComponentMatcher;
+import org.eclipse.yasson.internal.JsonbContext;
+import org.eclipse.yasson.internal.ReflectionUtils;
+import org.eclipse.yasson.internal.components.AdapterBinding;
+import org.eclipse.yasson.internal.components.DeserializerBinding;
+import org.eclipse.yasson.internal.model.ReverseTreeMap;
+import org.eclipse.yasson.internal.model.customization.ComponentBoundCustomization;
+import org.eclipse.yasson.internal.model.customization.PropertyCustomization;
+import org.eclipse.yasson.internal.properties.MessageKeys;
+import org.eclipse.yasson.internal.properties.Messages;
 
 /**
  * Builder for currently processed items by unmarshaller.
  *
  * @author Roman Grigoriadi
+ * @author Sebastien Rius
  */
 public class DeserializerBuilder extends AbstractSerializerBuilder<DeserializerBuilder> {
 
@@ -50,12 +56,39 @@ public class DeserializerBuilder extends AbstractSerializerBuilder<DeserializerB
     private JsonParser.Event jsonEvent;
 
     /**
+     * Map runtime type to use according to ordering strategy set in associated JSONB configuration, HashMap if none was set
+     */
+    @SuppressWarnings("rawtypes")
+    private final Class<? extends Map> mapImplType;
+    
+    /**
      * Creates a new builder.
      *
      * @param jsonbContext Context.
      */
     public DeserializerBuilder(JsonbContext jsonbContext) {
         super(jsonbContext);
+        String os = (String) jsonbContext.getConfig().getProperty(JsonbConfig.PROPERTY_ORDER_STRATEGY).orElse(PropertyOrderStrategy.ANY);
+        switch (os) {
+            case PropertyOrderStrategy.LEXICOGRAPHICAL:
+                mapImplType = TreeMap.class;
+                break;
+            case PropertyOrderStrategy.REVERSE:
+                mapImplType = ReverseTreeMap.class;
+                break;
+            case PropertyOrderStrategy.ANY:
+            default:
+                mapImplType = HashMap.class;
+                break;
+        }
+    }
+
+    /**
+     * @return the mapImplType
+     */
+    @SuppressWarnings("rawtypes")
+    public Class<? extends Map> getMapImplType() {
+        return mapImplType;
     }
 
     /**
@@ -219,7 +252,7 @@ public class DeserializerBuilder extends AbstractSerializerBuilder<DeserializerB
                 case START_ARRAY:
                 return ArrayList.class;
                 case START_OBJECT:
-                return HashMap.class;
+                    return mapImplType;
                 default:
                 throw new IllegalStateException("Can't infer deserialization type type: " + jsonEvent);
 

@@ -9,10 +9,31 @@
  *
  * Contributors:
  * Roman Grigoriadi
+ * Sebastien Rius
  ******************************************************************************/
 
 package org.eclipse.yasson.serializers;
 
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNull;
+import static org.junit.Assert.fail;
+
+import java.math.BigDecimal;
+import java.util.ArrayList;
+import java.util.Calendar;
+import java.util.Date;
+import java.util.HashMap;
+import java.util.SortedMap;
+import java.util.TimeZone;
+import java.util.TreeMap;
+
+import javax.json.bind.Jsonb;
+import javax.json.bind.JsonbBuilder;
+import javax.json.bind.JsonbConfig;
+import javax.json.bind.JsonbException;
+import javax.json.bind.config.PropertyOrderStrategy;
+
+import org.eclipse.yasson.internal.model.ReverseTreeMap;
 import org.eclipse.yasson.serializers.model.AnnotatedWithSerializerType;
 import org.eclipse.yasson.serializers.model.Author;
 import org.eclipse.yasson.serializers.model.Box;
@@ -34,18 +55,6 @@ import org.eclipse.yasson.serializers.model.StringWrapper;
 import org.eclipse.yasson.serializers.model.SupertypeSerializerPojo;
 import org.junit.Assert;
 import org.junit.Test;
-
-import javax.json.bind.Jsonb;
-import javax.json.bind.JsonbBuilder;
-import javax.json.bind.JsonbConfig;
-import javax.json.bind.JsonbException;
-import java.math.BigDecimal;
-import java.util.ArrayList;
-import java.util.Calendar;
-import java.util.Date;
-import java.util.TimeZone;
-
-import static org.junit.Assert.*;
 
 /**
  * @author Roman Grigoriadi
@@ -313,6 +322,65 @@ public class SerializersTest {
         pojo = jsonb.fromJson("{\"anotherNumberInteger\":\"12\",\"numberInteger\":\"11\"}", SupertypeSerializerPojo.class);
         Assert.assertEquals(Integer.valueOf(10), pojo.getNumberInteger());
         Assert.assertEquals(Integer.valueOf(11), pojo.getAnotherNumberInteger());
+    }
+    
+    @Test
+    public void testObjectDerializerWithLexOrderStrategy() {
+        Jsonb jsonb = JsonbBuilder.create(new JsonbConfig().withPropertyOrderStrategy(PropertyOrderStrategy.LEXICOGRAPHICAL));
+        Object pojo = jsonb.fromJson("{\"first\":{},\"third\":{},\"second\":{\"second\":2,\"first\":1}}", Object.class);
+        Assert.assertTrue("Pojo is not of type TreeMap", pojo instanceof TreeMap);
+        @SuppressWarnings("unchecked")
+        SortedMap<String, Object> pojoAsMap = (SortedMap<String, Object>) pojo;
+        Assert.assertTrue("Pojo inner object is not of type TreeMap", pojoAsMap.get("second") instanceof TreeMap);
+        Assert.assertEquals("{\"first\":{},\"second\":{\"first\":1,\"second\":2},\"third\":{}}", jsonb.toJson(pojo));
+    }
+    
+    @Test
+    public void testObjectDerializerWithReverseOrderStrategy() {
+        Jsonb jsonb = JsonbBuilder.create(new JsonbConfig().withPropertyOrderStrategy(PropertyOrderStrategy.REVERSE));
+        Object pojo = jsonb.fromJson("{\"first\":{},\"second\":{\"first\":1,\"second\":2},\"third\":{}}", Object.class);
+        Assert.assertTrue("Pojo is not of type ReverseTreeMap", pojo instanceof ReverseTreeMap);
+        @SuppressWarnings("unchecked")
+        SortedMap<String, Object> pojoAsMap = (SortedMap<String, Object>) pojo;
+        Assert.assertTrue("Pojo inner object is not of type TreeMap", pojoAsMap.get("second") instanceof TreeMap);
+        Assert.assertEquals("{\"third\":{},\"second\":{\"second\":2,\"first\":1},\"first\":{}}", jsonb.toJson(pojo));
+    }
+
+    @Test
+    public void testObjectDerializerWithAnyOrNoneOrderStrategy() {
+        String json = "{\"first\":{},\"second\":{\"first\":1,\"second\":2},\"third\":{}}";
+        // ANY
+        Jsonb jsonb = JsonbBuilder.create(new JsonbConfig().withPropertyOrderStrategy(PropertyOrderStrategy.ANY));
+        Object pojo = jsonb.fromJson(json, Object.class);
+        Assert.assertTrue("Pojo is not of type HashMap with \"ANY\" strategy", pojo instanceof HashMap);
+        // none
+        jsonb = JsonbBuilder.create(new JsonbConfig());
+        pojo = jsonb.fromJson(json, Object.class);
+        Assert.assertTrue("Pojo is not of type HashMap with no strategy", pojo instanceof HashMap);
+    }
+
+    @Test
+    public void testSortedMapDerializer() {
+        String json = "{\"first\":1,\"third\":3,\"second\":2}";
+
+        Jsonb jsonb = JsonbBuilder.create(new JsonbConfig().withPropertyOrderStrategy(PropertyOrderStrategy.ANY));
+        SortedMap<?, ?> pojo = jsonb.fromJson(json, SortedMap.class);
+        Assert.assertTrue("Pojo is not of type TreeMap with \"ANY\" strategy", pojo instanceof TreeMap);
+
+        jsonb = JsonbBuilder.create(new JsonbConfig().withPropertyOrderStrategy(PropertyOrderStrategy.LEXICOGRAPHICAL));
+        pojo = jsonb.fromJson(json, SortedMap.class);
+        Assert.assertTrue("Pojo is not of type TreeMap with no strategy", pojo instanceof TreeMap);
+        Assert.assertEquals("{\"first\":1,\"second\":2,\"third\":3}", jsonb.toJson(pojo));
+
+        jsonb = JsonbBuilder.create(new JsonbConfig().withPropertyOrderStrategy(PropertyOrderStrategy.REVERSE));
+        pojo = jsonb.fromJson(json, SortedMap.class);
+        Assert.assertTrue("Pojo is not of type ReverseTreeMap with no strategy", pojo instanceof ReverseTreeMap);
+        Assert.assertEquals("{\"third\":3,\"second\":2,\"first\":1}", jsonb.toJson(pojo));
+
+        jsonb = JsonbBuilder.create(new JsonbConfig());
+        pojo = jsonb.fromJson(json, SortedMap.class);
+        Assert.assertTrue("Pojo is not of type TreeMap with no strategy", pojo instanceof TreeMap);
+        Assert.assertEquals("{\"first\":1,\"second\":2,\"third\":3}", jsonb.toJson(pojo));
     }
 
     private Box createPojoWithDates() {
