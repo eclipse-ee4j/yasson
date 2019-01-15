@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2016, 2018 Oracle and/or its affiliates. All rights reserved.
+ * Copyright (c) 2016, 2019 Oracle and/or its affiliates. All rights reserved.
  * This program and the accompanying materials are made available under the
  * terms of the Eclipse Public License v1.0 and Eclipse Distribution License v. 1.0
  * which accompanies this distribution.
@@ -43,12 +43,6 @@ public class BooleanTypeDeserializer extends AbstractValueTypeDeserializer<Boole
 
     @Override
     public Boolean deserialize(JsonParser parser, DeserializationContext ctx, Type rtType) {
-        JsonValue current = parser.getValue();
-        if (current == JsonValue.TRUE)
-            return Boolean.TRUE;
-        else if (current == JsonValue.FALSE)
-            return Boolean.FALSE;
-
         JsonParser.Event event = ((JsonbParser) parser).moveToValue();
         switch (event) {
             case VALUE_TRUE:

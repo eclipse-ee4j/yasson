@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2016, 2017 Oracle and/or its affiliates. All rights reserved.
+ * Copyright (c) 2016, 2019 Oracle and/or its affiliates. All rights reserved.
  * This program and the accompanying materials are made available under the
  * terms of the Eclipse Public License v1.0 and Eclipse Distribution License v. 1.0
  * which accompanies this distribution.
@@ -109,8 +109,6 @@ public class JsonbRiParser implements JsonParser, JsonbParser {
 
     private final Stack<LevelContext> level = new Stack<>();
 
-    private final LevelContext root = new LevelContext(null);
-
     /**
      * Creates a parser.
      *
@@ -118,6 +116,8 @@ public class JsonbRiParser implements JsonParser, JsonbParser {
      */
     public JsonbRiParser(JsonParser jsonParser) {
         this.jsonParser = jsonParser;
+        //root level
+        this.level.push(new LevelContext(null));
     }
 
     @Override
@@ -138,16 +138,11 @@ public class JsonbRiParser implements JsonParser, JsonbParser {
     @Override
     public JsonParser.Event next() {
         final JsonParser.Event next = jsonParser.next();
-        final boolean rootLevel = level.empty();
-        if (rootLevel) {
-            root.setLastEvent(next);
-        } else {
-            level.peek().setLastEvent(next);
-        }
+        level.peek().setLastEvent(next);
         switch (next) {
             case START_ARRAY:
             case START_OBJECT:
-                final LevelContext newLevel = new LevelContext(rootLevel ? root : level.peek());
+                final LevelContext newLevel = new LevelContext(level.peek());
                 newLevel.setLastEvent(next);
                 level.push(newLevel);
                 break;
@@ -245,9 +240,6 @@ public class JsonbRiParser implements JsonParser, JsonbParser {
 
     @Override
     public LevelContext getCurrentLevel() {
-        if (level.empty()) {
-            return root;
-        }
         return level.peek();
     }
 
