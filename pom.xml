@@ -271,10 +271,14 @@
                 <plugin>
                     <groupId>org.apache.maven.plugins</groupId>
                     <artifactId>maven-javadoc-plugin</artifactId>
-                    <version>3.0.0-M1</version>
+                    <version>3.0.1</version>
                     <configuration>
                         <doctitle>Yasson</doctitle>
                         <sourcepath>${basedir}/src/main/java/org/eclipse/yasson</sourcepath>
+                        <additionalJOptions>
+                            <additionalJOption>--add-modules</additionalJOption>
+                            <additionalJOption>java.json.bind,java.json</additionalJOption>
+                        </additionalJOptions>
                     </configuration>
                     <executions>
                         <execution>
@@ -331,6 +335,7 @@
                 </plugin>
                 <plugin>
                     <artifactId>maven-surefire-plugin</artifactId>
+                    <version>3.0.0-M3</version>
                     <executions>
                         <execution>
                             <id>default-test</id>
@@ -342,6 +347,14 @@
                                 <excludes>
                                     <exclude>**/JavaxNamingExcludedTest.class</exclude>
                                 </excludes>
+                                <argLine>
+                                    <!--Remove when CDI is updated to support modules
+                                    (Yasson does read CDI which is on CP, CDI access yasson's classes with reflection)
+                                    -->
+                                    --add-reads org.eclipse.yasson=ALL-UNNAMED --add-opens org.eclipse.yasson/org.eclipse.yasson.internal.cdi=ALL-UNNAMED
+
+                                    --add-exports org.eclipse.yasson/org.eclipse.yasson.internal.cdi=java.naming
+                                </argLine>
                             </configuration>
                         </execution>
                         <execution>
@@ -351,7 +364,10 @@
                                 <goal>test</goal>
                             </goals>
                             <configuration>
-                                <argLine>--limit-modules java.base,java.logging,java.sql</argLine>
+                                <argLine>
+                                    <!--java.management is required by Maven's ForkedBooter-->
+                                    --limit-modules java.base,java.logging,java.sql,java.json.bind,java.json,java.management
+                                </argLine>
                                 <includes>
                                     <include>**/JavaxNamingExcludedTest.class</include>
                                 </includes>

@@ -17,6 +17,7 @@ import org.eclipse.yasson.internal.properties.MessageKeys;
 import org.eclipse.yasson.internal.properties.Messages;
 import org.eclipse.yasson.internal.serializer.AbstractValueTypeSerializer;
 import org.eclipse.yasson.internal.serializer.ContainerSerializerProvider;
+import org.eclipse.yasson.internal.serializer.DefaultSerializers;
 import org.eclipse.yasson.internal.serializer.SerializerBuilder;
 import org.eclipse.yasson.internal.model.JsonbPropertyInfo;
 
@@ -70,8 +71,7 @@ public class Marshaller extends ProcessingContext implements SerializationContex
      */
     public void marshall(Object object, JsonGenerator jsonGenerator) {
         try {
-            ClassModel classModel = getMappingContext().getOrCreateClassModel(object.getClass());
-            serializeRoot(object, jsonGenerator, classModel);
+            serializeRoot(object, jsonGenerator);
         } catch (JsonbException e) {
             logger.severe(e.getMessage());
             throw e;
@@ -88,16 +88,14 @@ public class Marshaller extends ProcessingContext implements SerializationContex
     public <T> void serialize(String key, T object, JsonGenerator generator) {
         Objects.requireNonNull(key);
         Objects.requireNonNull(object);
-        final ClassModel classModel = getMappingContext().getOrCreateClassModel(object.getClass());
         generator.writeKey(key);
-        serializeRoot(object, generator, classModel);
+        serializeRoot(object, generator);
     }
 
     @Override
     public <T> void serialize(T object, JsonGenerator generator) {
         Objects.requireNonNull(object);
-        final ClassModel classModel = getMappingContext().getOrCreateClassModel(object.getClass());
-        serializeRoot(object, generator, classModel);
+        serializeRoot(object, generator);
     }
 
     /**
@@ -106,11 +104,10 @@ public class Marshaller extends ProcessingContext implements SerializationContex
      * @param <T> Root type
      * @param root Root.
      * @param generator JSON generator.
-     * @param classModel Class model.
      */
     @SuppressWarnings("unchecked")
-    public <T> void serializeRoot(T root, JsonGenerator generator, ClassModel classModel) {
-        final JsonbSerializer<T> rootSerializer = (JsonbSerializer<T>) getRootSerializer(root.getClass(), classModel);
+    public <T> void serializeRoot(T root, JsonGenerator generator) {
+        final JsonbSerializer<T> rootSerializer = (JsonbSerializer<T>) getRootSerializer(root.getClass());
         if (jsonbContext.getConfigProperties().isStrictIJson() &&
                 rootSerializer instanceof AbstractValueTypeSerializer) {
             throw new JsonbException(Messages.getMessage(MessageKeys.IJSON_ENABLED_SINGLE_VALUE));
@@ -118,18 +115,22 @@ public class Marshaller extends ProcessingContext implements SerializationContex
         rootSerializer.serialize(root, generator, this);
     }
 
-    private JsonbSerializer<?> getRootSerializer(Class<?> rootClazz, ClassModel classModel) {
+    private JsonbSerializer<?> getRootSerializer(Class<?> rootClazz) {
         final ContainerSerializerProvider serializerProvider = getMappingContext().getSerializerProvider(rootClazz);
         if (serializerProvider != null) {
             return serializerProvider
                     .provideSerializer(new JsonbPropertyInfo()
-                            .withRuntimeType(runtimeType)
-                            .withClassModel(classModel));
+                            .withRuntimeType(runtimeType));
         }
-        return new SerializerBuilder(jsonbContext)
+        SerializerBuilder serializerBuilder = new SerializerBuilder(jsonbContext)
                 .withObjectClass(rootClazz)
-                .withType(runtimeType)
-                .withCustomization(classModel.getCustomization()).build();
+                .withType(runtimeType);
+
+        if (!DefaultSerializers.getInstance().isKnownType(rootClazz)) {
+            ClassModel classModel = getMappingContext().getOrCreateClassModel(rootClazz);
+            serializerBuilder.withCustomization(classModel.getCustomization());
+        }
+        return serializerBuilder.build();
     }
 
 }

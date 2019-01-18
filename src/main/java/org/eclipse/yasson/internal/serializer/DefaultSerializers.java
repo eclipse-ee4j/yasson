@@ -34,18 +34,7 @@ import java.time.Period;
 import java.time.ZoneId;
 import java.time.ZoneOffset;
 import java.time.ZonedDateTime;
-import java.util.Calendar;
-import java.util.Collections;
-import java.util.Date;
-import java.util.GregorianCalendar;
-import java.util.HashMap;
-import java.util.Map;
-import java.util.Optional;
-import java.util.OptionalDouble;
-import java.util.OptionalInt;
-import java.util.OptionalLong;
-import java.util.TimeZone;
-import java.util.UUID;
+import java.util.*;
 
 /**
  * @author Roman Grigoriadi
@@ -148,6 +137,23 @@ public class DefaultSerializers {
             return Optional.of(serializers.get(JsonValue.class));
         }
         return Optional.empty();
+    }
+
+    /**
+     * Checks a class if it is supported by Yasson builtin serializers/deserializers in order to decide if it
+     * should be introspected with reflection.
+     *
+     * @param clazz class to check
+     * @return true if supported
+     */
+    public boolean isKnownType(Class<?> clazz) {
+        boolean knownContainerValueType = Collection.class.isAssignableFrom(clazz)
+                || Map.class.isAssignableFrom(clazz)
+                || JsonValue.class.isAssignableFrom(clazz)
+                || Optional.class.isAssignableFrom(clazz)
+                || clazz.isArray();
+
+        return knownContainerValueType || findValueSerializerProvider(clazz).isPresent();
     }
 
 
