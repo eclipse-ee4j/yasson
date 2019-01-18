@@ -16,6 +16,7 @@ package org.eclipse.yasson.internal.serializer;
 import org.eclipse.yasson.internal.Marshaller;
 import org.eclipse.yasson.internal.ReflectionUtils;
 import org.eclipse.yasson.internal.model.ClassModel;
+import org.eclipse.yasson.internal.model.customization.ClassCustomizationBuilder;
 import org.eclipse.yasson.internal.model.customization.ContainerCustomization;
 
 import javax.json.bind.serializer.JsonbSerializer;
@@ -125,17 +126,32 @@ public abstract class AbstractContainerSerializer<T> extends AbstractItem<T> imp
             return;
         }
         Class<?> itemClass = item.getClass();
+        //Not null when generic type is present or previous item is of same type
         JsonbSerializer<?> serializer = getValueSerializer(itemClass);
+
+        //Raw collections + lost generic information
         if (serializer == null) {
             Type instanceValueType = getValueType(getRuntimeType());
             instanceValueType = instanceValueType.equals(Object.class) ? itemClass : instanceValueType;
-            ClassModel classModel = ((Marshaller)ctx).getJsonbContext().getMappingContext().getOrCreateClassModel(itemClass);
-            serializer = new SerializerBuilder(((Marshaller)ctx).getJsonbContext())
-                    .withObjectClass(itemClass)
-                    .withCustomization(new ContainerCustomization(classModel.getCustomization()))
-                    .withWrapper(this)
-                    .withType(instanceValueType)
-                    .build();
+
+            SerializerBuilder builder = new SerializerBuilder(((Marshaller) ctx).getJsonbContext());
+            builder.withObjectClass(itemClass);
+            builder.withWrapper(this);
+            builder.withType(instanceValueType);
+
+
+            if (!DefaultSerializers.getInstance().isKnownType(itemClass)) {
+                //Need for class level annotations + user adapters/serializers bound to type
+                ClassModel classModel = ((Marshaller)ctx).getJsonbContext().getMappingContext().getOrCreateClassModel(itemClass);
+                builder.withCustomization(new ContainerCustomization(classModel.getCustomization()));
+            } else {
+                //Still need to override isNillable to true with ContainerCustomization for all serializers
+                //to preserve collections and array null elements
+                builder.withCustomization(new ContainerCustomization(new ClassCustomizationBuilder()));
+            }
+            serializer = builder.build();
+
+            //Cache last used value serializer in case of next item is the same type.
             addValueSerializer(serializer, itemClass);
         }
         serializerCaptor(serializer, item, generator, ctx);

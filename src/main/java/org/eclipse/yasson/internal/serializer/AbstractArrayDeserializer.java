@@ -45,7 +45,11 @@ public abstract class AbstractArrayDeserializer<T> extends AbstractContainerDese
         } else {
             componentClass = ReflectionUtils.getRawType(getRuntimeType()).getComponentType();
         }
-        componentClassModel = builder.getJsonbContext().getMappingContext().getOrCreateClassModel(componentClass);
+        if (!DefaultSerializers.getInstance().isKnownType(componentClass)) {
+            componentClassModel = builder.getJsonbContext().getMappingContext().getOrCreateClassModel(componentClass);
+        } else {
+            componentClassModel = null;
+        }
     }
 
     @Override

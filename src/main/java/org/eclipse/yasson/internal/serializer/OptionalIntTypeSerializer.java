@@ -39,7 +39,7 @@ public class OptionalIntTypeSerializer extends AbstractValueTypeSerializer<Optio
     protected void serialize(OptionalInt obj, JsonGenerator generator, Marshaller marshaller) {
         if (obj.isPresent()) {
             generator.write(obj.getAsInt());
-        } else if (customization.isNillable()) {
+        } else if (customization != null && customization.isNillable()) {
             generator.writeNull();
         }
     }

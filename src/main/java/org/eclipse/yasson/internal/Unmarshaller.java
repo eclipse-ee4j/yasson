@@ -15,6 +15,7 @@ package org.eclipse.yasson.internal;
 
 import org.eclipse.yasson.internal.model.ClassModel;
 import org.eclipse.yasson.internal.serializer.CurrentItem;
+import org.eclipse.yasson.internal.serializer.DefaultSerializers;
 import org.eclipse.yasson.internal.serializer.DeserializerBuilder;
 
 import javax.json.bind.serializer.DeserializationContext;
@@ -53,12 +54,15 @@ public class Unmarshaller extends ProcessingContext implements DeserializationCo
 
     @SuppressWarnings("unchecked")
     private <T> T deserializeItem(Type type, JsonParser parser) {
-        ClassModel classModel = getMappingContext().getOrCreateClassModel(ReflectionUtils.getRawType(type));
-        final JsonbDeserializer<?> item = new DeserializerBuilder(jsonbContext).withWrapper(current)
-                .withType(type).withJsonValueType(getRootEvent(parser))
-                .withCustomization(classModel == null ? null : classModel.getCustomization())
-                .build();
-        return (T) item.deserialize(parser, this, type);
+        DeserializerBuilder deserializerBuilder = new DeserializerBuilder(jsonbContext).withWrapper(current)
+                .withType(type).withJsonValueType(getRootEvent(parser));
+        Class<?> rawType = ReflectionUtils.getRawType(type);
+        if (!DefaultSerializers.getInstance().isKnownType(rawType)) {
+            ClassModel classModel = getMappingContext().getOrCreateClassModel(rawType);
+            deserializerBuilder.withCustomization(classModel.getCustomization());
+        }
+
+        return (T) deserializerBuilder.build().deserialize(parser, this, type);
     }
 
     /**
