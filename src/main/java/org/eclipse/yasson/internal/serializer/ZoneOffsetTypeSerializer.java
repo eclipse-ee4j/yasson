@@ -29,7 +29,7 @@ public class ZoneOffsetTypeSerializer extends AbstractValueTypeSerializer<ZoneOf
     /**
      * Creates a new instance.
      *
-     * @param customization
+     * @param customization customization
      */
     public ZoneOffsetTypeSerializer(Customization customization) {
         super(customization);
