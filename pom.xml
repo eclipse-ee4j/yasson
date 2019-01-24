@@ -221,18 +221,23 @@
                             <goals>
                                 <goal>compile</goal>
                             </goals>
-                            <!-- recompile everything for target VM except the module-info.java -->
+                            <!-- recompile everything for 1.8 except the module-info.java -->
                             <configuration>
+                                <release>8</release>
                                 <excludes>
                                     <exclude>module-info.java</exclude>
                                 </excludes>
                             </configuration>
                         </execution>
+                        <execution>
+                            <id>default-testCompile</id>
+                            <configuration>
+                                <release>11</release>
+                            </configuration>
+                        </execution>
                     </executions>
                     <!-- defaults for compile and testCompile -->
                     <configuration>
-                        <source>1.8</source>
-                        <target>1.8</target>
                         <compilerArgs>
                             <arg>-Xlint:all</arg>
                         </compilerArgs>
@@ -279,6 +284,7 @@
                             <additionalJOption>--add-modules</additionalJOption>
                             <additionalJOption>java.json.bind,java.json</additionalJOption>
                         </additionalJOptions>
+                        <source>11</source>
                     </configuration>
                     <executions>
                         <execution>
