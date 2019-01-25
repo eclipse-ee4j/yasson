@@ -144,11 +144,11 @@ public class ArrayTest {
     public void testArrayOfNulls() {
         String[] nulls = new String[2];
         String expected = "[null,null]";
-        /*assertEquals(expected, jsonb.toJson(nulls));
+        assertEquals(expected, jsonb.toJson(nulls));
         String[] result = jsonb.fromJson(expected, nulls.getClass());
         assertTrue(result.length == 2);
         assertNull(result[0]);
-        assertNull(result[1]);*/
+        assertNull(result[1]);
 
         Integer ints[] = new Integer[2];
         Assert.assertEquals(expected, jsonb.toJson(ints));
