@@ -1,0 +1,12 @@
+remote_theme: jakartaee/jekyll-theme-jakarta-ee
+
+title: [Yasson]
+description: [Yasson is a Java framework which provides a standard binding layer between Java classes and JSON documents]
+
+links:
+  source: https://github.com/eclipse-ee4j/yasson
+  #docs: documentation
+  javadocs: docs/api/
+  download: https://github.com/eclipse-ee4j/yasson/releases
+  mailinglist: https://accounts.eclipse.org/mailing-list/yasson-dev
+#faq: FAQ
