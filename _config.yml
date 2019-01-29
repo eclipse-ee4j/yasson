@@ -10,3 +10,5 @@ links:
   download: https://github.com/eclipse-ee4j/yasson/releases
   mailinglist: https://accounts.eclipse.org/mailing-list/yasson-dev
   #faq: FAQ
+
+theme: jekyll-theme-cayman
