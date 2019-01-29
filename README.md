@@ -12,7 +12,6 @@ Binding ([JSR-367](https://jcp.org/en/jsr/detail?id=367)).
 The 1.0.3 release is the latest release of the Eclipse Yasson project.
 
 # <a name="Links"></a>Links #
-- Yasson home page: https://projects.eclipse.org/projects/ee4j.yasson
-- JSON-B official web site: http://json-b.net
-- JSON-B API & spec project: https://github.com/eclipse-ee4j/jsonb-api
-- JSR-367 page on JCP site: https://jcp.org/en/jsr/detail?id=367
+- [Yasson home page](https://projects.eclipse.org/projects/ee4j.yasson)
+- [JSON-B API & spec project](https://github.com/eclipse-ee4j/jsonb-api)
+- [JSR-367 page on JCP site](https://jcp.org/en/jsr/detail?id=367)
