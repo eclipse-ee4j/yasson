@@ -166,6 +166,9 @@ public class AnnotationIntrospector {
                 jsonbCreator = createJsonbCreator(method, jsonbCreator, clazz);
             }
         }
+    	if (jsonbCreator == null) {
+    	    jsonbCreator = ConstructorPropertiesAnnotationIntrospector.forContext(jsonbContext).getCreator(clazz);
+    	}
         return jsonbCreator;
     }
 
