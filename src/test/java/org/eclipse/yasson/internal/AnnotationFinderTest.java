@@ -59,5 +59,4 @@ public class AnnotationFinderTest {
     public void testResultShouldBeNullWhenThereAreOnlyOtherAnnotations() {
 	assertNull(findAnnotation.in(getMethodAnnotationsOf(ObjectWithIgnoredMethod.class)));
     }
-
 }
