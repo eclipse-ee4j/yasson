@@ -23,7 +23,6 @@ import java.util.Objects;
 
 /**
  * Jsonb context holding central components and configuration of jsonb runtime. Scoped to instance of Jsonb runtime.
- * Thread bound.
  *
  * @author Roman Grigoriadi
  */
@@ -41,9 +40,7 @@ public class JsonbContext {
 
     private final AnnotationIntrospector annotationIntrospector;
 
-    private boolean genericComponents;
-
-    private JsonbConfigProperties configProperties;
+    private final JsonbConfigProperties configProperties;
 
     /**
      * Creates and initialize context.
@@ -117,22 +114,6 @@ public class JsonbContext {
         return annotationIntrospector;
     }
 
-
-    /**
-     * Flag for searching for generic serializers and adapters in runtime.
-     *
-     * @return True if generic components are present.
-     */
-    public boolean genericComponentsPresent() {
-        return genericComponents;
-    }
-
-    /**
-     * Set flag for searching for generic serializers and adapters in runtime.
-     */
-    public void registerGenericComponentFlag() {
-        this.genericComponents = true;
-    }
 
     public JsonbConfigProperties getConfigProperties() {
         return configProperties;

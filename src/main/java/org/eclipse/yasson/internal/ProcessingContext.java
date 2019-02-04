@@ -24,15 +24,13 @@ import java.util.Set;
  */
 public abstract class ProcessingContext {
 
-    protected static final String NULL = "null";
-
     protected final JsonbContext jsonbContext;
 
     /**
      * Used to avoid StackOverflowError, when adapted / serialized object
      * contains contains instance of its type inside it or when object has recursive reference.
      */
-    private Set<Object> currentlyProcessedObjects = new HashSet<>();
+    private final Set<Object> currentlyProcessedObjects = new HashSet<>();
 
     /**
      * Parent instance for marshaller and unmarshaller.
