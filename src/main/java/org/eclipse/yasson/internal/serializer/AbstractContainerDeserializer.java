@@ -57,9 +57,7 @@ public abstract class AbstractContainerDeserializer<T> extends AbstractItem<T> i
     @Override
     public final T deserialize(JsonParser parser, DeserializationContext context, Type rtType) {
         Unmarshaller ctx = (Unmarshaller) context;
-        ctx.setCurrent(this);
         deserializeInternal((JsonbParser) parser, ctx);
-        ctx.setCurrent(getWrapper());
         return getInstance((Unmarshaller) context);
     }
 
