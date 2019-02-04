@@ -40,8 +40,6 @@ public class Unmarshaller extends ProcessingContext implements DeserializationCo
         super(jsonbContext);
     }
 
-    private CurrentItem<?> current;
-
     @Override
     public <T> T deserialize(Class<T> clazz, JsonParser parser) {
         return deserializeItem(clazz, parser);
@@ -54,7 +52,7 @@ public class Unmarshaller extends ProcessingContext implements DeserializationCo
 
     @SuppressWarnings("unchecked")
     private <T> T deserializeItem(Type type, JsonParser parser) {
-        DeserializerBuilder deserializerBuilder = new DeserializerBuilder(jsonbContext).withWrapper(current)
+        DeserializerBuilder deserializerBuilder = new DeserializerBuilder(jsonbContext)
                 .withType(type).withJsonValueType(getRootEvent(parser));
         Class<?> rawType = ReflectionUtils.getRawType(type);
         if (!DefaultSerializers.getInstance().isKnownType(rawType)) {
@@ -75,24 +73,6 @@ public class Unmarshaller extends ProcessingContext implements DeserializationCo
         }
         final JsonParser.Event lastEvent = ((JsonbParser) parser).getCurrentLevel().getLastEvent();
         return lastEvent == JsonParser.Event.KEY_NAME ? parser.next() : lastEvent;
-    }
-
-    /**
-     * Get currently processed json item.
-     *
-     * @return current item
-     */
-    public CurrentItem<?> getCurrent() {
-        return current;
-    }
-
-    /**
-     * Set currently processed item.
-     *
-     * @param current current item
-     */
-    public void setCurrent(CurrentItem<?> current) {
-        this.current = current;
     }
 
 }

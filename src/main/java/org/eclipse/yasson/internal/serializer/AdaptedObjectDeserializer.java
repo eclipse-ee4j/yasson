@@ -13,7 +13,6 @@
 
 package org.eclipse.yasson.internal.serializer;
 
-import org.eclipse.yasson.internal.Unmarshaller;
 import org.eclipse.yasson.internal.components.AdapterBinding;
 import org.eclipse.yasson.internal.properties.MessageKeys;
 import org.eclipse.yasson.internal.properties.Messages;
@@ -82,12 +81,9 @@ public class AdaptedObjectDeserializer<A, T> implements CurrentItem<T>, JsonbDes
     @Override
     @SuppressWarnings("unchecked")
     public T deserialize(JsonParser parser, DeserializationContext context, Type rtType) {
-        Unmarshaller unmarshaller = (Unmarshaller) context;
-        unmarshaller.setCurrent(this);
         try {
             final A result =  adaptedTypeDeserializer.deserialize(parser, context, rtType);
             final T adapted = ((JsonbAdapter<T, A>) adapterInfo.getAdapter()).adaptFromJson(result);
-            unmarshaller.setCurrent(wrapperItem);
             return adapted;
         } catch (Exception e) {
             throw new JsonbException(Messages.getMessage(MessageKeys.ADAPTER_EXCEPTION, adapterInfo.getBindingType(), adapterInfo.getToType(), adapterInfo.getAdapter().getClass()), e);
