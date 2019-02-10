@@ -40,7 +40,7 @@ public class Marshaller extends ProcessingContext implements SerializationContex
 
     private static final Logger logger = Logger.getLogger(Marshaller.class.getName());
 
-    private final Type runtimeType;
+    private Type runtimeType;
 
     /**
      * Creates Marshaller for generation to String.

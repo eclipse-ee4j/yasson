@@ -42,11 +42,6 @@ public class ComponentMatcher {
     private final JsonbContext jsonbContext;
 
     /**
-     * Flag for searching for generic serializers and adapters in runtime.
-     */
-    private volatile boolean genericComponents;
-
-    /**
      * Supplier for component binging.
      * @param <T> component binding class
      */
@@ -130,8 +125,8 @@ public class ComponentMatcher {
      * @param bindingType component binding type
      */
     private void registerGeneric(Type bindingType) {
-        if (bindingType instanceof ParameterizedType && !genericComponents) {
-            genericComponents = true;
+        if (bindingType instanceof ParameterizedType && !jsonbContext.genericComponentsPresent()) {
+            jsonbContext.registerGenericComponentFlag();
         }
     }
 
@@ -208,7 +203,7 @@ public class ComponentMatcher {
         }
 
         //don't try to runtime generic scan if not needed
-        if (!genericComponents) {
+        if (!jsonbContext.genericComponentsPresent()) {
             return false;
         }
 
