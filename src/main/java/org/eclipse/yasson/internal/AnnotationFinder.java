@@ -1,20 +1,29 @@
 package org.eclipse.yasson.internal;
 
+import org.eclipse.yasson.internal.properties.MessageKeys;
+import org.eclipse.yasson.internal.properties.Messages;
+
 import java.lang.annotation.Annotation;
+import java.lang.reflect.InvocationTargetException;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
+import java.util.logging.Logger;
 
 /**
  * Finds an annotation including inherited annotations (e.g. meta-annotations).
  * 
  * @author JohT
  */
-class AnnotationFinder<T extends Annotation> {
+class AnnotationFinder {
 
-    private final Class<T> annotationClass;
+    private static final String CONSTRUCTOR_PROPERTIES_ANNOTATION = "java.beans.ConstructorProperties";
+    private static final Logger LOGGER = Logger.getLogger(AnnotationFinder.class.getName());
+
+    private final String annotationClassName;
+    private final Class<? extends Annotation> annotationClass; // may be null
 
     /**
      * Gets the {@link AnnotationFinder} for the given Annotation-Type.
@@ -22,30 +31,83 @@ class AnnotationFinder<T extends Annotation> {
      * @param annotation {@link Class}, that is a sub-type of {@link Annotation}
      * @return {@link AnnotationFinder}
      */
-    public static final <S extends Annotation> AnnotationFinder<S> findAnnotation(Class<S> annotation) {
-	return new AnnotationFinder<>(annotation);
+    public static final AnnotationFinder findAnnotation(Class<?> annotation) {
+        return findAnnotationByName(annotation.getName());
     }
 
     /**
-     * Only for testing purposes. <br>
-     * Please use a static factory method e.g. {@link #findAnnotation(Class)}.
+     * Gets the {@link AnnotationFinder} for the given Annotation-Type Name.
      * 
-     * @param annotation {@link Class}
+     * @param annotationClassName {@link String}, that is a sub-type of {@link Annotation}
+     * @return {@link AnnotationFinder}
      */
-    protected AnnotationFinder(Class<T> annotation) {
-	this.annotationClass = annotation;
+    public static final AnnotationFinder findAnnotationByName(String annotationClassName) {
+        return new AnnotationFinder(annotationClassName, getOptionalAnnotationClass(annotationClassName));
     }
 
-    public T in(Annotation[] annotations) {
-	return findAnnotation(annotations, annotationClass, new HashSet<>());
+    /**
+     * Gets the {@link AnnotationFinder} for @ConstructorProperties-Annotation.
+     * 
+     * @return {@link AnnotationFinder}
+     */
+    public static final AnnotationFinder findConstructorProperties() {
+        return findAnnotationByName(CONSTRUCTOR_PROPERTIES_ANNOTATION);
+    }
+
+    private AnnotationFinder(String annotationClassName, Class<? extends Annotation> annotationClass) {
+        this.annotationClassName = annotationClassName;
+        this.annotationClass = annotationClass;
+    }
+
+    @SuppressWarnings("unchecked")
+    public <T extends Annotation> T in(Annotation[] annotations) {
+        if (annotationClass == null) {
+            return null;
+        }
+        return (T) findAnnotation(annotations, annotationClass, new HashSet<>());
+    }
+
+    /**
+     * Looks for the annotation {@link #in(Annotation[])} <br>
+     * and executes the "value" Method of it dynamically.
+     * 
+     * @param annotations - Array of {@link Annotation}n.
+     * @return {@link Object}
+     */
+    public Object valueIn(Annotation[] annotations) {
+        return invocateValueMethod(in(annotations));
+    }
+
+    private Object invocateValueMethod(Annotation annotation) {
+        if (annotation == null) {
+            return null;
+        }
+        try {
+            return annotation.annotationType().getMethod("value").invoke(annotation);
+        } catch (NoSuchMethodException | SecurityException | IllegalAccessException | IllegalArgumentException | InvocationTargetException e) {
+            String message = Messages.getMessage(MessageKeys.MISSING_VALUE_PROPERTY_IN_ANNOTATION, annotation.annotationType().getName());
+            LOGGER.finest(message);
+            return null;
+        }
+    }
+
+    @SuppressWarnings("unchecked")
+    private static <T extends Annotation> Class<T> getOptionalAnnotationClass(String classname) {
+        try {
+            return (Class<T>) Class.forName(classname);
+        } catch (ClassNotFoundException e) {
+            String message = Messages.getMessage(MessageKeys.ANNOTATION_NOT_AVAILABLE, classname);
+            LOGGER.finest(message);
+            return null;
+        }
     }
 
     /**
      * Searches for annotation, collects processed, to avoid StackOverflow.
      */
-    // This method is a copy of "AnnotationIntrospector.findAnnotation"
+    // "static" to use it in a hybrid procedural and object oriented manner.
     @SuppressWarnings("unchecked")
-    private T findAnnotation(Annotation[] declaredAnnotations, Class<T> annotationClass, Set<Annotation> processed) {
+    public static <T extends Annotation> T findAnnotation(Annotation[] declaredAnnotations, Class<T> annotationClass, Set<Annotation> processed) {
         for (Annotation candidate : declaredAnnotations) {
             final Class<? extends Annotation> annType = candidate.annotationType();
             if (annType.equals(annotationClass)) {
@@ -66,6 +128,6 @@ class AnnotationFinder<T extends Annotation> {
 
     @Override
     public String toString() {
-	return "AnnotationFinder [annotationClass=" + annotationClass + "]";
+        return "AnnotationFinder [annotationClassName=" + annotationClassName + ", annotationClass=" + annotationClass + "]";
     }
 }
