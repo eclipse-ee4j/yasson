@@ -42,7 +42,9 @@ public class CollectionsWithJavaBaseTypesTest {
         properties.setInnerArrayInts(innerArrayInts);
 
         //Making all fields accessible. When used on JPMS will fail if java.base classes are parsed into class model.
-        Jsonb jsonb = new JsonBindingBuilder().withConfig(new JsonbConfig().withPropertyVisibilityStrategy(new PropertyVisibilityStrategy() {
+        Jsonb jsonb =
+                new JsonBindingBuilder().withConfig(new JsonbConfig().withNullValues(Boolean.TRUE)
+                        .withPropertyVisibilityStrategy(new PropertyVisibilityStrategy() {
             @Override
             public boolean isVisible(Field field) {
                 return true;

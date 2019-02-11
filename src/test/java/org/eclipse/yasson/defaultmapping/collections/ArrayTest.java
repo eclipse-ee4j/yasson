@@ -20,6 +20,7 @@ import org.junit.Test;
 
 import javax.json.bind.Jsonb;
 import javax.json.bind.JsonbBuilder;
+import javax.json.bind.JsonbConfig;
 import java.math.BigDecimal;
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -37,7 +38,7 @@ public class ArrayTest {
 
     @Before
     public void before() {
-        jsonb = JsonbBuilder.create();
+        jsonb = JsonbBuilder.create(new JsonbConfig().withNullValues(Boolean.TRUE));
     }
 
     @Test
