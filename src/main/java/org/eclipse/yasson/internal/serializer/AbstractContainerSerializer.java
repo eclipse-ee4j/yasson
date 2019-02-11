@@ -13,19 +13,20 @@
 
 package org.eclipse.yasson.internal.serializer;
 
+import java.lang.reflect.ParameterizedType;
+import java.lang.reflect.Type;
+import java.util.Objects;
+import java.util.Optional;
+
+import javax.json.bind.serializer.JsonbSerializer;
+import javax.json.bind.serializer.SerializationContext;
+import javax.json.stream.JsonGenerator;
+
 import org.eclipse.yasson.internal.Marshaller;
 import org.eclipse.yasson.internal.ReflectionUtils;
 import org.eclipse.yasson.internal.model.ClassModel;
 import org.eclipse.yasson.internal.model.customization.ClassCustomizationBuilder;
 import org.eclipse.yasson.internal.model.customization.ContainerCustomization;
-
-import javax.json.bind.serializer.JsonbSerializer;
-import javax.json.bind.serializer.SerializationContext;
-import javax.json.stream.JsonGenerator;
-import java.lang.reflect.ParameterizedType;
-import java.lang.reflect.Type;
-import java.util.Objects;
-import java.util.Optional;
 
 /**
  * Base class for container serializers (list, array, etc.).
@@ -38,6 +39,8 @@ public abstract class AbstractContainerSerializer<T> extends AbstractItem<T> imp
 
     private Class<?> valueClass;
 
+    private boolean nullable;
+
     /**
      * Create instance of current item with its builder.
      *
@@ -45,6 +48,7 @@ public abstract class AbstractContainerSerializer<T> extends AbstractItem<T> imp
      */
     protected AbstractContainerSerializer(SerializerBuilder builder) {
         super(builder);
+        nullable = builder.getJsonbContext().getConfigProperties().getConfigNullable();
     }
 
     /**
@@ -63,6 +67,16 @@ public abstract class AbstractContainerSerializer<T> extends AbstractItem<T> imp
         writeStart(generator);
         serializeInternal(obj, generator, ctx);
         writeEnd(generator);
+    }
+
+
+    /**
+     * Checks if {@code null} value should be serialized or not.
+     * 
+     * @return {@code true} if {@code null} values should be serialized, {@code false} otherwise.
+     */
+    protected final boolean isNullable() {
+        return nullable;
     }
 
     protected abstract void serializeInternal(T obj, JsonGenerator generator, SerializationContext ctx);
@@ -122,7 +136,9 @@ public abstract class AbstractContainerSerializer<T> extends AbstractItem<T> imp
 
     protected void serializeItem(Object item, JsonGenerator generator, SerializationContext ctx) {
         if (item == null) {
-            generator.writeNull();
+            if (isNullable()) {
+                generator.writeNull();
+            }
             return;
         }
         Class<?> itemClass = item.getClass();
