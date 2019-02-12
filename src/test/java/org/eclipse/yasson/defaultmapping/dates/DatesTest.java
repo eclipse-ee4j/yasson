@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2015, 2018 Oracle and/or its affiliates. All rights reserved.
+ * Copyright (c) 2015, 2019 Oracle and/or its affiliates. All rights reserved.
  * This program and the accompanying materials are made available under the
  * terms of the Eclipse Public License v1.0 and Eclipse Distribution License v. 1.0
  * which accompanies this distribution.
@@ -41,6 +41,7 @@ import javax.xml.datatype.XMLGregorianCalendar;
 import java.io.Serializable;
 import java.lang.reflect.Field;
 import java.lang.reflect.Method;
+import java.sql.Timestamp;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.time.Duration;
@@ -78,16 +79,29 @@ public class DatesTest {
 
     private static LocalDate localDate = LocalDate.of(2018, 1, 31);
 
-    public static class LocalDateObj implements Serializable {
+    @SuppressWarnings("serial")
+	public static class LocalDateObj implements Serializable {
         public LocalDate date = localDate;
     }
 
-    public static class SqlDateObj implements Serializable {
+    @SuppressWarnings("serial")
+	public static class SqlDateObj implements Serializable {
         public java.sql.Date sqlDate = new java.sql.Date(localDate.atStartOfDay(ZoneId.of("UTC")).toInstant().toEpochMilli());
         //no way for runtime to choose java.sql.Date deserializer here without a hint
         @JsonbTypeDeserializer(SqlDateTypeDeserializer.class)
         public java.util.Date utilDate = new java.sql.Date(localDate.atStartOfDay(ZoneId.of("UTC")).toInstant().toEpochMilli());
 
+    }
+
+    @Test
+    public void testSqlTimestamp() {
+        Timestamp expectedTimestamp = Timestamp.from(Instant.now());
+
+        Jsonb jsonb = new JsonBindingBuilder().build();
+        String json = jsonb.toJson(expectedTimestamp);
+
+        Timestamp timestamp = jsonb.fromJson(json, Timestamp.class);
+        assertEquals(expectedTimestamp, timestamp);
     }
 
     @Test
