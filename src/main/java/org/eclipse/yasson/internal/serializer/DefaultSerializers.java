@@ -65,6 +65,7 @@ public class DefaultSerializers {
         serializers.put(Character.TYPE, new SerializerProviderWrapper(CharacterTypeSerializer::new, CharacterTypeDeserializer::new));
         serializers.put(Date.class, new SerializerProviderWrapper(DateTypeSerializer::new, DateTypeDeserializer::new));
         serializers.put(java.sql.Date.class, new SerializerProviderWrapper(SqlDateTypeSerializer::new, SqlDateTypeDeserializer::new));
+        serializers.put(java.sql.Timestamp.class, new SerializerProviderWrapper(SqlTimestampTypeSerializer::new, SqlTimestampTypeDeserializer::new));
         serializers.put(Double.class, new SerializerProviderWrapper(DoubleTypeSerializer::new, DoubleTypeDeserializer::new));
         serializers.put(Double.TYPE, new SerializerProviderWrapper(DoubleTypeSerializer::new, DoubleTypeDeserializer::new));
         serializers.put(Float.class, new SerializerProviderWrapper(FloatTypeSerializer::new, FloatTypeDeserializer::new));
@@ -112,7 +113,6 @@ public class DefaultSerializers {
      * @param <T> Type of serializer
      * @return serializer if found
      */
-    @SuppressWarnings("unchecked")
     public <T> Optional<SerializerProviderWrapper> findValueSerializerProvider(Class<T> clazz) {
         Class<?> candidate = clazz;
         do {
