@@ -14,8 +14,6 @@
 
 package org.eclipse.yasson.serializers;
 
-import static java.util.Collections.singleton;
-import static java.util.Collections.singletonList;
 import static java.util.Collections.singletonMap;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNull;
@@ -393,13 +391,6 @@ public class SerializersTest {
         assertEquals("{\"null\":null}", jsonb.toJson(singletonMap(null, null)));
         assertEquals("{\"key\":null}", jsonb.toJson(singletonMap("key", null)));
         assertEquals("{\"null\":\"value\"}", jsonb.toJson(singletonMap(null, "value")));
-    }
-
-    @Test
-    public void testSerializeCollectionWithoutNulls() {
-        Jsonb jsonb = JsonbBuilder.create(new JsonbConfig().withNullValues(Boolean.FALSE));
-        assertEquals("[]", jsonb.toJson(singleton(null)));
-        assertEquals("[]", jsonb.toJson(singletonList(null)));
     }
 
     private Box createPojoWithDates() {

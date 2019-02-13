@@ -31,8 +31,11 @@ import org.eclipse.yasson.internal.ReflectionUtils;
 public class MapSerializer<T extends Map<?,?>> extends AbstractContainerSerializer<T> implements EmbeddedItem {
 
 
+    private final boolean nullable;
+
     protected MapSerializer(SerializerBuilder builder) {
         super(builder);
+        nullable = builder.getJsonbContext().getConfigProperties().getConfigNullable();
     }
 
     @Override
@@ -40,14 +43,14 @@ public class MapSerializer<T extends Map<?,?>> extends AbstractContainerSerializ
         for (Map.Entry<?,?> entry : obj.entrySet()) {
             final Object key = entry.getKey();
             if (key == null) {
-                if (!isNullable()) {
+                if (!nullable) {
                     continue;
                 }
             }
             final String keysString = String.valueOf(key);
             final Object value = entry.getValue();
             if (value == null) {
-                if (isNullable()) {
+                if (nullable) {
                     generator.writeNull(keysString);
                 }
                 continue;
