@@ -39,7 +39,7 @@ public abstract class AbstractContainerSerializer<T> extends AbstractItem<T> imp
 
     private Class<?> valueClass;
 
-    private boolean nullable;
+    private final boolean nullable;
 
     /**
      * Create instance of current item with its builder.
@@ -56,10 +56,14 @@ public abstract class AbstractContainerSerializer<T> extends AbstractItem<T> imp
      *
      * @param wrapper Item to serialize.
      * @param runtimeType Runtime type of the item.
+     * @param nullable {@code true} if {@code null} values should be serialized, {@code false}
+     *        otherwise.
      * @param classModel Class model.
      */
-    public AbstractContainerSerializer(CurrentItem<?> wrapper, Type runtimeType, ClassModel classModel) {
+    public AbstractContainerSerializer(CurrentItem<?> wrapper, Type runtimeType,
+            ClassModel classModel, boolean nullable) {
         super(wrapper, runtimeType, classModel);
+        this.nullable = nullable;
     }
 
     @Override

@@ -14,6 +14,9 @@
 
 package org.eclipse.yasson.serializers;
 
+import static java.util.Collections.singleton;
+import static java.util.Collections.singletonList;
+import static java.util.Collections.singletonMap;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNull;
 import static org.junit.Assert.fail;
@@ -21,7 +24,6 @@ import static org.junit.Assert.fail;
 import java.math.BigDecimal;
 import java.util.ArrayList;
 import java.util.Calendar;
-import java.util.Collections;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.SortedMap;
@@ -388,31 +390,16 @@ public class SerializersTest {
     @Test
     public void testSerializeMapWithNulls() {
         Jsonb jsonb = JsonbBuilder.create(new JsonbConfig().withNullValues(Boolean.TRUE));
-        assertEquals("{\"null\":null}", jsonb.toJson(Collections.singletonMap(null, null)));
-        assertEquals("{\"key\":null}", jsonb.toJson(Collections.singletonMap("key", null)));
-        assertEquals("{\"null\":\"value\"}", jsonb.toJson(Collections.singletonMap(null, "value")));
-    }
-
-    @Test
-    public void testSerializeMapWithoutNulls() {
-        Jsonb jsonb = JsonbBuilder.create(new JsonbConfig().withNullValues(Boolean.FALSE));
-        assertEquals("{}", jsonb.toJson(Collections.singletonMap(null, null)));
-        assertEquals("{}", jsonb.toJson(Collections.singletonMap("key", null)));
-        assertEquals("{}", jsonb.toJson(Collections.singletonMap(null, "value")));
-    }
-
-    @Test
-    public void testSerializeCollectionWithNulls() {
-        Jsonb jsonb = JsonbBuilder.create(new JsonbConfig().withNullValues(Boolean.TRUE));
-        assertEquals("[null]", jsonb.toJson(Collections.singleton(null)));
-        assertEquals("[null]", jsonb.toJson(Collections.singletonList(null)));
+        assertEquals("{\"null\":null}", jsonb.toJson(singletonMap(null, null)));
+        assertEquals("{\"key\":null}", jsonb.toJson(singletonMap("key", null)));
+        assertEquals("{\"null\":\"value\"}", jsonb.toJson(singletonMap(null, "value")));
     }
 
     @Test
     public void testSerializeCollectionWithoutNulls() {
         Jsonb jsonb = JsonbBuilder.create(new JsonbConfig().withNullValues(Boolean.FALSE));
-        assertEquals("[]", jsonb.toJson(Collections.singleton(null)));
-        assertEquals("[]", jsonb.toJson(Collections.singletonList(null)));
+        assertEquals("[]", jsonb.toJson(singleton(null)));
+        assertEquals("[]", jsonb.toJson(singletonList(null)));
     }
 
     private Box createPojoWithDates() {

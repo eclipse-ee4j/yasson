@@ -49,9 +49,12 @@ public class ObjectSerializer<T> extends AbstractContainerSerializer<T> {
      * @param wrapper wrapped item
      * @param runtimeType class type
      * @param classModel model of the class
+     * @param nullable {@code true} if {@code null} values should be serialized, {@code false}
+     *        otherwise.
      */
-    public ObjectSerializer(CurrentItem<?> wrapper, Type runtimeType, ClassModel classModel) {
-        super(wrapper, runtimeType, classModel);
+    public ObjectSerializer(CurrentItem<?> wrapper, Type runtimeType, ClassModel classModel,
+            boolean nullable) {
+        super(wrapper, runtimeType, classModel, nullable);
     }
 
     @Override

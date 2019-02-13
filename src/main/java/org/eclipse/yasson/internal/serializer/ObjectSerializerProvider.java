@@ -12,6 +12,7 @@
  ******************************************************************************/
 package org.eclipse.yasson.internal.serializer;
 
+import org.eclipse.yasson.internal.JsonbContext;
 import org.eclipse.yasson.internal.model.JsonbPropertyInfo;
 
 import javax.json.bind.serializer.JsonbSerializer;
@@ -23,6 +24,9 @@ public class ObjectSerializerProvider implements ContainerSerializerProvider {
 
     @Override
     public JsonbSerializer<?> provideSerializer(JsonbPropertyInfo propertyInfo) {
-        return new ObjectSerializer<>(propertyInfo.getWrapper(), propertyInfo.getRuntimeType(), propertyInfo.getClassModel());
+        JsonbContext context = propertyInfo.getContext();
+        return new ObjectSerializer<>(propertyInfo.getWrapper(), propertyInfo.getRuntimeType(),
+                propertyInfo.getClassModel(),
+                context != null && context.getConfigProperties().getConfigNullable());
     }
 }
