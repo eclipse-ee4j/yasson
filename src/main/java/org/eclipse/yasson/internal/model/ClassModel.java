@@ -12,10 +12,12 @@
  ******************************************************************************/
 package org.eclipse.yasson.internal.model;
 
+import org.eclipse.yasson.internal.ReflectionUtils;
 import org.eclipse.yasson.internal.model.customization.naming.CaseInsensitiveStrategy;
 import org.eclipse.yasson.internal.model.customization.ClassCustomization;
 
 import javax.json.bind.config.PropertyNamingStrategy;
+import java.lang.reflect.Constructor;
 import java.util.*;
 import java.util.stream.Collectors;
 
@@ -31,6 +33,8 @@ public class ClassModel {
     private final ClassCustomization classCustomization;
 
     private final ClassModel parentClassModel;
+
+    private final Constructor<?> defaultConstructor;
 
     /**
      * A map of all class properties, including properties from superclasses. Used to access by name.
@@ -67,6 +71,7 @@ public class ClassModel {
         this.classCustomization = customization;
         this.parentClassModel = parentClassModel;
         this.propertyNamingStrategy = propertyNamingStrategy;
+        this.defaultConstructor = ReflectionUtils.getDefaultConstructor(clazz, false);
         setProperties(new ArrayList<>());
     }
 
@@ -170,5 +175,13 @@ public class ClassModel {
      */
     public Map<String, PropertyModel> getProperties() {
         return Collections.unmodifiableMap(properties);
+    }
+
+    /**
+     * Default no argument constructor of the class used for deserialization.
+     * @return default constructor
+     */
+    public Constructor<?> getDefaultConstructor() {
+        return defaultConstructor;
     }
 }
