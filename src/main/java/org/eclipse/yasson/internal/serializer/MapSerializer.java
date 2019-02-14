@@ -13,15 +13,14 @@
 
 package org.eclipse.yasson.internal.serializer;
 
+import org.eclipse.yasson.internal.ReflectionUtils;
+
+import javax.json.bind.serializer.SerializationContext;
+import javax.json.stream.JsonGenerator;
 import java.lang.reflect.ParameterizedType;
 import java.lang.reflect.Type;
 import java.util.Map;
 import java.util.Optional;
-
-import javax.json.bind.serializer.SerializationContext;
-import javax.json.stream.JsonGenerator;
-
-import org.eclipse.yasson.internal.ReflectionUtils;
 
 /**
  * Serializer for maps.
@@ -41,13 +40,7 @@ public class MapSerializer<T extends Map<?,?>> extends AbstractContainerSerializ
     @Override
     protected void serializeInternal(T obj, JsonGenerator generator, SerializationContext ctx) {
         for (Map.Entry<?,?> entry : obj.entrySet()) {
-            final Object key = entry.getKey();
-            if (key == null) {
-                if (!nullable) {
-                    continue;
-                }
-            }
-            final String keysString = String.valueOf(key);
+            final String keysString = String.valueOf(entry.getKey());
             final Object value = entry.getValue();
             if (value == null) {
                 if (nullable) {
