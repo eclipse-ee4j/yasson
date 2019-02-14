@@ -99,13 +99,6 @@ public class UnmarshallingUnsupportedTypesTest {
     }
 
     @Test
-    public void testSupportedTypeAsObjectInJson() {
-        //wrong, instant is wrapped with {}, unmarshalls to object.
-        String json  = "{\"instant\":{\"instantWrongKey\":\"2015-12-28T14:57:00Z\"},\"optionalLong\":11}";
-        assertFail(json, SupportedTypes.class, "Can't create instance of a class: class java.time.Instant, No default constructor found.");
-    }
-
-    @Test
     public void testPojoAsScalarValue() {
         //wrong, nestedPojo is a value.
         String json  = "{\"nestedPojo\":\"10\",\"optionalLong\":11}";
