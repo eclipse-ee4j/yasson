@@ -353,7 +353,7 @@
                             <configuration>
                                 <excludes>
                                     <exclude>**/JavaxNamingExcludedTest.class</exclude>
-                                    <exclude>**/AnnotationIntrospectorWithoutJavaDektopModuleTest.class</exclude>
+                                    <exclude>**/AnnotationIntrospectorWithoutOptionalModulesTest.class</exclude>
                                 </excludes>
                                 <argLine>
                                     <!--Remove when CDI is updated to support modules
@@ -378,7 +378,7 @@
                                 </argLine>
                                 <includes>
                                     <include>**/JavaxNamingExcludedTest.class</include>
-                                    <include>**/AnnotationIntrospectorWithoutJavaDektopModuleTest.class</include>
+                                    <include>**/AnnotationIntrospectorWithoutOptionalModulesTest.class</include>
                                 </includes>
                             </configuration>
                         </execution>
