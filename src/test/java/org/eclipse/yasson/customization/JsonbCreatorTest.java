@@ -35,6 +35,8 @@ import static org.junit.Assert.*;
  */
 public class JsonbCreatorTest {
 
+    private static byte DEFAULT_BYTE;
+
     @Test
     public void testRootConstructor() {
         String json = "{\"str1\":\"abc\",\"str2\":\"def\",\"bigDec\":25}";
@@ -42,6 +44,7 @@ public class JsonbCreatorTest {
         CreatorConstructorPojo pojo = jsonb.fromJson(json, CreatorConstructorPojo.class);
         assertEquals("abc", pojo.str1);
         assertEquals("def", pojo.str2);
+        assertNull(pojo.missing);
         assertEquals(new BigDecimal("25"), pojo.bigDec);
     }
 
@@ -52,6 +55,7 @@ public class JsonbCreatorTest {
         CreatorFactoryMethodPojo pojo = jsonb.fromJson(json, CreatorFactoryMethodPojo.class);
         assertEquals("abc", pojo.str1);
         assertEquals("def", pojo.str2);
+        assertNull(pojo.missing);
         assertEquals(new BigDecimal("25"), pojo.bigDec);
     }
 
@@ -62,10 +66,12 @@ public class JsonbCreatorTest {
         CreatorConstructorPojo pojo = jsonb.fromJson(json, CreatorConstructorPojo.class);
         assertEquals("abc", pojo.str1);
         assertEquals("def", pojo.str2);
+        assertNull(pojo.missing);
         assertEquals(new BigDecimal("25"), pojo.bigDec);
 
         assertEquals("inn1", pojo.innerFactoryCreator.str1);
         assertEquals("inn2", pojo.innerFactoryCreator.str2);
+        assertNull(pojo.innerFactoryCreator.missing);
         assertEquals(new BigDecimal("11"), pojo.innerFactoryCreator.bigDec);
     }
 
@@ -89,10 +95,13 @@ public class JsonbCreatorTest {
         }
     }
 
-    @Test(expected = JsonbException.class)
+    @Test
     public void testCreatorWithoutJsonbParameters1() {
         //arg2 is missing in json document
-        JsonbBuilder.create().fromJson("{\"arg0\":\"abc\", \"s2\":\"def\"}", CreatorWithoutJsonbProperty1.class);
+        final CreatorWithoutJsonbProperty1 result = JsonbBuilder.create().fromJson("{\"arg0\":\"abc\", \"s2\":\"def\"}", CreatorWithoutJsonbProperty1.class);
+        assertEquals("abc", result.getPar1());
+        assertEquals("def", result.getPar2());
+        assertEquals(DEFAULT_BYTE, result.getPar3());
     }
 
     @Test

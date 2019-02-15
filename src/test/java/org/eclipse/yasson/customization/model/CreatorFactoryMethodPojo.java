@@ -26,14 +26,17 @@ public class CreatorFactoryMethodPojo {
 
     public final String str2;
 
+    public final String missing;
+
     public BigDecimal bigDec;
 
-    private CreatorFactoryMethodPojo(String str1, String str2) {
+    private CreatorFactoryMethodPojo(String str1, String str2, String missing) {
         this.str1 = str1;
         this.str2 = str2;
+        this.missing = missing;
     }
     @JsonbCreator
-    public static CreatorFactoryMethodPojo getInstance(@JsonbProperty("par1") String str1, @JsonbProperty("par2")String str2) {
-        return new CreatorFactoryMethodPojo(str1, str2);
+    public static CreatorFactoryMethodPojo getInstance(@JsonbProperty("par1") String str1, @JsonbProperty("par2")String str2, @JsonbProperty("missing") String missing) {
+        return new CreatorFactoryMethodPojo(str1, str2, missing);
     }
 }
