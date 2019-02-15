@@ -22,6 +22,7 @@ import javax.json.bind.JsonbException;
 import javax.json.bind.serializer.DeserializationContext;
 import javax.json.bind.serializer.JsonbDeserializer;
 import javax.json.stream.JsonParser;
+import java.lang.reflect.Array;
 import java.lang.reflect.Type;
 import java.util.Optional;
 import java.util.OptionalDouble;
@@ -157,6 +158,8 @@ public abstract class AbstractContainerDeserializer<T> extends AbstractItem<T> i
             return OptionalLong.empty();
         } else if (propertyType == OptionalDouble.class) {
             return OptionalDouble.empty();
+        } else if (((Class<?>) propertyType).isPrimitive()){
+            return Array.get(Array.newInstance((Class<?>) propertyType, 1), 0);
         } else {
             return null;
         }
