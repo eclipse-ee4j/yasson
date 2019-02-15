@@ -331,6 +331,7 @@
                                         javax.enterprise.context.spi;version=!;resolution:="optional",
                                         javax.enterprise.inject.spi;version=!;resolution:="optional",
                                         javax.naming;resolution:="optional",
+                                        java.beans;resolution:="optional",
                                         *
                                     </Import-Package>
                                     <Require-Capability>osgi.ee;filter:="(&amp;(osgi.ee=JavaSE)(version=1.8))"</Require-Capability>
@@ -352,6 +353,7 @@
                             <configuration>
                                 <excludes>
                                     <exclude>**/JavaxNamingExcludedTest.class</exclude>
+                                    <exclude>**/AnnotationIntrospectorWithoutOptionalModulesTest.class</exclude>
                                 </excludes>
                                 <argLine>
                                     <!--Remove when CDI is updated to support modules
@@ -364,7 +366,7 @@
                             </configuration>
                         </execution>
                         <execution>
-                            <id>java.naming-excluded</id>
+                            <id>optional-modules-excluded</id>
                             <phase>test</phase>
                             <goals>
                                 <goal>test</goal>
@@ -376,6 +378,7 @@
                                 </argLine>
                                 <includes>
                                     <include>**/JavaxNamingExcludedTest.class</include>
+                                    <include>**/AnnotationIntrospectorWithoutOptionalModulesTest.class</include>
                                 </includes>
                             </configuration>
                         </execution>

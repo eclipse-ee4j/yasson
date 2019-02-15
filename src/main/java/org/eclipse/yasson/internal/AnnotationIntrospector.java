@@ -44,6 +44,7 @@ import javax.json.bind.annotation.JsonbVisibility;
 import javax.json.bind.config.PropertyVisibilityStrategy;
 import javax.json.bind.serializer.JsonbDeserializer;
 import javax.json.bind.serializer.JsonbSerializer;
+
 import java.lang.annotation.Annotation;
 import java.lang.reflect.Constructor;
 import java.lang.reflect.Executable;
@@ -57,7 +58,6 @@ import java.time.format.DateTimeFormatter;
 import java.time.format.DateTimeFormatterBuilder;
 import java.time.temporal.ChronoField;
 import java.time.temporal.TemporalAccessor;
-import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Calendar;
 import java.util.Date;
@@ -82,6 +82,7 @@ import java.util.Set;
 public class AnnotationIntrospector {
 
     private final JsonbContext jsonbContext;
+    private final ConstructorPropertiesAnnotationIntrospector constructorPropertiesIntrospector;
 
     /**
      * Annotations to report exception when used in combination with {@link JsonbTransient}
@@ -98,6 +99,7 @@ public class AnnotationIntrospector {
     public AnnotationIntrospector(JsonbContext jsonbContext) {
         Objects.requireNonNull(jsonbContext);
         this.jsonbContext = jsonbContext;
+        this.constructorPropertiesIntrospector = ConstructorPropertiesAnnotationIntrospector.forContext(jsonbContext);
     }
 
     /**
@@ -165,6 +167,9 @@ public class AnnotationIntrospector {
                 }
                 jsonbCreator = createJsonbCreator(method, jsonbCreator, clazz);
             }
+        }
+        if (jsonbCreator == null) {
+            jsonbCreator = constructorPropertiesIntrospector.getCreator(declaredConstructors);
         }
         return jsonbCreator;
     }
@@ -596,7 +601,7 @@ public class AnnotationIntrospector {
     }
 
     private <T extends Annotation> T findAnnotation(Annotation[] declaredAnnotations, Class<T> annotationClass) {
-        return findAnnotation(declaredAnnotations, annotationClass, new HashSet<>());
+        return AnnotationFinder.findAnnotation(declaredAnnotations, annotationClass, new HashSet<>());
     }
 
     /**
@@ -616,29 +621,6 @@ public class AnnotationIntrospector {
                 throw new JsonbException(Messages.getMessage(MessageKeys.JSONB_TRANSIENT_WITH_OTHER_ANNOTATIONS));
             }
         }
-    }
-
-    /**
-     * Searches for annotation, collects processed, to avoid StackOverflow.
-     */
-    @SuppressWarnings("unchecked")
-    private <T extends Annotation> T findAnnotation(Annotation[] declaredAnnotations, Class<T> annotationClass, Set<Annotation> processed) {
-        for (Annotation candidate : declaredAnnotations) {
-            final Class<? extends Annotation> annType = candidate.annotationType();
-            if (annType.equals(annotationClass)) {
-                return (T) candidate;
-            }
-            processed.add(candidate);
-            final List<Annotation> inheritedAnnotations = new ArrayList<>(Arrays.asList(annType.getDeclaredAnnotations()));
-            inheritedAnnotations.removeAll(processed);
-            if (inheritedAnnotations.size() > 0) {
-                final T inherited = findAnnotation(inheritedAnnotations.toArray(new Annotation[inheritedAnnotations.size()]), annotationClass, processed);
-                if (inherited != null) {
-                    return inherited;
-                }
-            }
-        }
-        return null;
     }
 
     private <T extends Annotation> T getMethodAnnotation(Class<T> annotationClass, JsonbAnnotatedElement<Method> methodElement) {
