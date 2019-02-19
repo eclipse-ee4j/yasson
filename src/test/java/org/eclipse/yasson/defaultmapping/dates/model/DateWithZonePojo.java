@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2017, 2018 Oracle and/or its affiliates. All rights reserved.
+ * Copyright (c) 2016 Oracle and/or its affiliates. All rights reserved.
  * This program and the accompanying materials are made available under the
  * terms of the Eclipse Public License v1.0 and Eclipse Distribution License v. 1.0
  * which accompanies this distribution.
@@ -10,14 +10,23 @@
  * Contributors:
  * Roman Grigoriadi
  ******************************************************************************/
-module org.eclipse.yasson {
-    requires java.json;
-    requires java.json.bind;
-    requires static java.naming;
-    requires java.logging;
-    requires java.sql;
-    requires static java.desktop;
-    
-    exports org.eclipse.yasson;
-    provides javax.json.bind.spi.JsonbProvider with org.eclipse.yasson.JsonBindingProvider;
+
+package org.eclipse.yasson.defaultmapping.dates.model;
+
+import java.util.Date;
+
+/**
+ * @author Dennis Kriechel
+ */
+public class DateWithZonePojo extends AbstractDateTimePojo<Date> {
+
+    public DateWithZonePojo() {
+    }
+
+    public DateWithZonePojo(Date dateObj) {
+        super(dateObj);
+        this.dateWithZone = dateObj;
+    }
+
+    public Date dateWithZone;
 }

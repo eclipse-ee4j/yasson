@@ -13,47 +13,74 @@
 
 package org.eclipse.yasson.internal.serializer;
 
-import org.eclipse.yasson.internal.model.customization.Customization;
-
 import java.time.Instant;
+import java.time.OffsetDateTime;
+import java.time.ZoneId;
+import java.time.ZonedDateTime;
 import java.time.format.DateTimeFormatter;
+import java.time.format.DateTimeParseException;
 import java.time.temporal.TemporalAccessor;
 import java.util.Date;
 import java.util.Locale;
+
+import org.eclipse.yasson.internal.model.customization.Customization;
 
 /**
  * Deserializer for {@link Date} type.
  *
  * @author David Kral
+ * @author Dennis Kriechel
  */
 public class DateTypeDeserializer extends AbstractDateTimeDeserializer<Date> {
 
-    private static final DateTimeFormatter DEFAULT_DATE_TIME_FORMATTER = DateTimeFormatter.ISO_DATE_TIME.withZone(UTC);
+	private static final DateTimeFormatter DEFAULT_DATE_TIME_FORMATTER = DateTimeFormatter.ISO_DATE_TIME;
 
-    /**
-     * Creates an instance.
-     *
-     * @param customization Model customization.
-     */
-    public DateTypeDeserializer(Customization customization) {
-        super(Date.class, customization);
-    }
+	/**
+	 * Creates an instance.
+	 *
+	 * @param customization Model customization.
+	 */
+	public DateTypeDeserializer(Customization customization) {
+		super(Date.class, customization);
+	}
 
+	@Override
+	protected Date fromInstant(Instant instant) {
+		return new Date(instant.toEpochMilli());
+	}
 
-    @Override
-    protected Date fromInstant(Instant instant) {
-        return new Date(instant.toEpochMilli());
-    }
-
-    @Override
+	@Override
     protected Date parseDefault(String jsonValue, Locale locale) {
-        final TemporalAccessor parsed = DEFAULT_DATE_TIME_FORMATTER.withLocale(locale).parse(jsonValue);
+		TemporalAccessor parsed = parseWithOrWithoutZone(jsonValue, DEFAULT_DATE_TIME_FORMATTER.withLocale(locale), UTC);
+		
         return new Date(Instant.from(parsed).toEpochMilli());
     }
 
-    @Override
-    protected Date parseWithFormatter(String jsonValue, DateTimeFormatter formatter) {
-        final TemporalAccessor parsed = getZonedFormatter(formatter).parse(jsonValue);
-        return new Date(Instant.from(parsed).toEpochMilli());
-    }
+	@Override
+	protected Date parseWithFormatter(String jsonValue, DateTimeFormatter formatter) {
+		TemporalAccessor parsed = parseWithOrWithoutZone(jsonValue, formatter, UTC);
+		
+		return new Date(Instant.from(parsed).toEpochMilli());
+	}
+
+	/**
+	 * Parses the jsonValue as a java.time.ZonedDateTime that can later be use to be converted into a java.util.Date.<br>
+	 * At first the Json-Date is parsed with an Offset/Zone.<br>
+	 * If no Offset/Zone is present and the parsing fails, it will be parsed again with the fixed Zone that was passed as defaultZone.
+	 * 
+	 * @param jsonValue String value from json
+	 * @param formatter DateTimeFormat options
+	 * @param defaultZone This Zone will be used if no other Zone was found in the jsonValue
+	 * @return Parsed date on base of a java.time.ZonedDateTime
+	 */
+	private TemporalAccessor parseWithOrWithoutZone(String jsonValue, DateTimeFormatter formatter, ZoneId defaultZone) {
+		try {
+			// Try parsing with a Zone
+			return ZonedDateTime.parse(jsonValue, formatter);
+		} catch (DateTimeParseException e) {
+			// Possibly exception occures because no Offset/ZoneId was found
+			// Therefore parse with defaultZone again
+			return ZonedDateTime.parse(jsonValue, formatter.withZone(defaultZone));
+		}
+	}
 }

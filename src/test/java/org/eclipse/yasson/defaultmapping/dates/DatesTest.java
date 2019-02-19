@@ -16,6 +16,7 @@ import org.eclipse.yasson.TestTypeToken;
 import org.eclipse.yasson.defaultmapping.dates.model.CalendarPojo;
 import org.eclipse.yasson.defaultmapping.dates.model.ClassLevelDateAnnotation;
 import org.eclipse.yasson.defaultmapping.dates.model.DatePojo;
+import org.eclipse.yasson.defaultmapping.dates.model.DateWithZonePojo;
 import org.eclipse.yasson.defaultmapping.dates.model.InstantPojo;
 import org.eclipse.yasson.defaultmapping.dates.model.LocalDatePojo;
 import org.eclipse.yasson.defaultmapping.dates.model.LocalDateTimePojo;
@@ -162,6 +163,30 @@ public class DatesTest {
         assertEquals(parsedDate, result.millisFormatted);
     }
 
+    @Test
+    public void testDateWithZoneOffset() throws ParseException {
+        // Test for Yasson-172
+        final SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ssXXX");
+        final Date parsedDate = sdf.parse("2018-11-02T00:00:00+01:00");
+    	
+    	String jsonDateWithZone = "{\"dateWithZone\":\"2018-11-02T00:00:00+01:00\"}";
+    	final DateWithZonePojo result = jsonb.fromJson(jsonDateWithZone, DateWithZonePojo.class);
+    	
+    	assertEquals(parsedDate, result.dateWithZone);
+    }
+    
+    @Test
+    public void testDateWithZoneId() throws ParseException {
+        // Test for Yasson-172
+        final SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ssXXX");
+        final Date parsedDate = sdf.parse("2018-11-02T00:00:00+01:00");
+    	
+    	String jsonDateWithZone = "{\"dateWithZone\":\"2018-11-02T00:00:00+01:00[Europe/Berlin]\"}";
+    	final DateWithZonePojo result = jsonb.fromJson(jsonDateWithZone, DateWithZonePojo.class);
+    	
+    	assertEquals(parsedDate, result.dateWithZone);
+    }
+    
     @Test
     public void testCalendar() {
         final Calendar timeCalendar = new Calendar.Builder()

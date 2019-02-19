@@ -83,6 +83,9 @@ public enum MessageKeys {
     RECURSIVE_REFERENCE("recursiveReference"),
     DATATYPE_FACTORY_CREATION_FAILED("datatypeFactoryCreationFailed"),
     BEAN_MANAGER_PROVIDER_NOT_FOUND("beanManagerProviderNotFound"),
+    MULTIPLE_CONSTRUCTOR_PROPERTIES_CREATORS("multipleConstructorPropertiesCreators"),
+    ANNOTATION_NOT_AVAILABLE("annotationNotAvailable"),
+    MISSING_VALUE_PROPERTY_IN_ANNOTATION("missingValuePropertyInAnnotation"),
     ;
 
     /** Message bundle key. */
