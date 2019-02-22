@@ -207,22 +207,6 @@ public class ReflectionUtils {
     }
 
     /**
-     * Create instance with default constructor in provided class.
-     *
-     * @param clazz class not null
-     * @param <T> type of instance
-     * @return instance
-     */
-    public static <T> T createNoArgConstructorInstance(Class<T> clazz) {
-        Objects.requireNonNull(clazz);
-        try {
-            return getDefaultConstructor(clazz, true).newInstance();
-        } catch (InstantiationException | IllegalAccessException | InvocationTargetException e) {
-            throw new JsonbException("Can't create instance", e);
-        }
-    }
-
-    /**
      * Get default no argument constructor of the class.
      * @param clazz Class to get constructor from
      * @param <T> Class generic type

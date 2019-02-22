@@ -17,6 +17,8 @@ import org.eclipse.yasson.internal.serializer.JsonbDateFormatter;
 import org.eclipse.yasson.internal.serializer.JsonbNumberFormatter;
 import org.eclipse.yasson.internal.model.JsonbCreator;
 
+import javax.json.bind.config.PropertyVisibilityStrategy;
+
 /**
  * Customization, which could be applied on a class or package level.
  *
@@ -32,6 +34,8 @@ public class ClassCustomization extends CustomizationBase {
 
     private final JsonbDateFormatter dateTimeFormatter;
 
+    private final PropertyVisibilityStrategy propertyVisibilityStrategy;
+
     /**
      * Copies properties from builder an creates immutable instance.
      *
@@ -43,6 +47,7 @@ public class ClassCustomization extends CustomizationBase {
         this.propertyOrder = builder.getPropertyOrder();
         this.numberFormatter = builder.getNumberFormatter();
         this.dateTimeFormatter = builder.getDateFormatter();
+        this.propertyVisibilityStrategy = builder.getPropertyVisibilityStrategy();
     }
 
     /**
@@ -56,6 +61,7 @@ public class ClassCustomization extends CustomizationBase {
         this.propertyOrder = other.getPropertyOrder();
         this.numberFormatter = other.getSerializeNumberFormatter();
         this.dateTimeFormatter = other.getSerializeDateFormatter();
+        this.propertyVisibilityStrategy = other.getPropertyVisibilityStrategy();
     }
 
     /**
@@ -83,6 +89,14 @@ public class ClassCustomization extends CustomizationBase {
      */
     public void setPropertyOrder(String[] propertyOrder) {
         this.propertyOrder = propertyOrder;
+    }
+
+    /**
+     * Property visibility strategy for this class model.
+     * @return visibility strategy
+     */
+    public PropertyVisibilityStrategy getPropertyVisibilityStrategy() {
+        return propertyVisibilityStrategy;
     }
 
     @Override

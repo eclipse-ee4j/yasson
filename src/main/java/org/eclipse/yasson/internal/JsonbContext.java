@@ -42,6 +42,8 @@ public class JsonbContext {
 
     private final JsonbConfigProperties configProperties;
 
+    private final InstanceCreator instanceCreator;
+
     /**
      * Creates and initialize context.
      *
@@ -52,7 +54,8 @@ public class JsonbContext {
         Objects.requireNonNull(jsonbConfig);
         this.jsonbConfig = jsonbConfig;
         this.mappingContext = new MappingContext(this);
-        this.componentInstanceCreator = JsonbComponentInstanceCreatorFactory.getComponentInstanceCreator();
+        this.instanceCreator = new InstanceCreator();
+        this.componentInstanceCreator = JsonbComponentInstanceCreatorFactory.getComponentInstanceCreator(this.instanceCreator);
         this.componentMatcher = new ComponentMatcher(this);
         this.annotationIntrospector = new AnnotationIntrospector(this);
         this.jsonProvider = jsonProvider;
@@ -119,4 +122,12 @@ public class JsonbContext {
         return configProperties;
     }
 
+
+    /**
+     * Returns component for creating instances of non-parsed types.
+     * @return InstanceCreator
+     */
+    public InstanceCreator getInstanceCreator() {
+        return instanceCreator;
+    }
 }

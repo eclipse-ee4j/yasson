@@ -92,7 +92,7 @@ public class PropertyModel implements Comparable<PropertyModel> {
         this.classModel = classModel;
         this.propertyName = property.getName();
         this.propertyType = property.getPropertyType();
-        this.propagation = PropertyValuePropagation.createInstance(property, jsonbContext);
+        this.propagation = new ReflectionPropagation(property, classModel.getClassCustomization().getPropertyVisibilityStrategy());
         this.getterMethodType = propagation.isGetterVisible() ? new AccessMethodType(property.getGetterType()) : null;
         this.setterMethodType = propagation.isSetterVisible() ? new AccessMethodType(property.getSetterType()) : null;
         this.customization = introspectCustomization(property, jsonbContext);
