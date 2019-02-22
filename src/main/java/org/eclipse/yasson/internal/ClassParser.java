@@ -25,6 +25,7 @@ import org.eclipse.yasson.internal.properties.MessageKeys;
 import org.eclipse.yasson.internal.properties.Messages;
 
 import javax.json.bind.JsonbException;
+import javax.json.bind.config.PropertyVisibilityStrategy;
 import java.lang.annotation.Annotation;
 import java.lang.reflect.Field;
 import java.lang.reflect.Method;
@@ -266,7 +267,7 @@ class ClassParser {
                 } else {
                     //merge
                     final Property merged = mergeProperty(current, parentProp, classElement);
-                    ReflectionPropagation propagation = new ReflectionPropagation(current, jsonbContext);
+                    ReflectionPropagation propagation = new ReflectionPropagation(current, classModel.getClassCustomization().getPropertyVisibilityStrategy());
                     if (propagation.isReadable()) {
                         classProperties.replace(current.getName(), merged);
                     } else {

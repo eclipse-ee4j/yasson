@@ -17,6 +17,7 @@ import org.eclipse.yasson.internal.properties.MessageKeys;
 import org.eclipse.yasson.internal.properties.Messages;
 
 import javax.json.bind.JsonbException;
+import javax.json.bind.config.PropertyVisibilityStrategy;
 import java.lang.invoke.MethodHandle;
 import java.lang.invoke.MethodHandles;
 import java.lang.reflect.Field;
@@ -39,8 +40,8 @@ class MethodHandleValuePropagation extends PropertyValuePropagation {
     private MethodHandle setHandle;
 
 
-    MethodHandleValuePropagation(Property property, JsonbContext ctx) {
-        super(property, ctx);
+    MethodHandleValuePropagation(Property property, PropertyVisibilityStrategy propertyVisibilityStrategy) {
+        super(property, propertyVisibilityStrategy);
     }
 
     @Override

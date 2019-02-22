@@ -13,6 +13,7 @@
 package org.eclipse.yasson.internal;
 
 import org.eclipse.yasson.YassonProperties;
+import org.eclipse.yasson.internal.model.ReverseTreeMap;
 import org.eclipse.yasson.internal.model.customization.naming.DefaultNamingStrategies;
 import org.eclipse.yasson.internal.model.customization.naming.IdentityStrategy;
 import org.eclipse.yasson.internal.model.customization.ordering.AnyOrderStrategy;
@@ -35,9 +36,11 @@ import java.time.format.DateTimeFormatter;
 import java.time.format.DateTimeFormatterBuilder;
 import java.time.temporal.ChronoField;
 import java.util.Collections;
+import java.util.HashMap;
 import java.util.Locale;
 import java.util.Map;
 import java.util.Optional;
+import java.util.TreeMap;
 
 /**
  * Resolved properties from JSONB config.
@@ -70,6 +73,8 @@ public class JsonbConfigProperties {
 
     private final Map<Class<?>, Class<?>> userTypeMapping;
 
+    private final Class<?> defaultMapImplType;
+
     public JsonbConfigProperties(JsonbConfig jsonbConfig) {
         this.jsonbConfig = jsonbConfig;
         this.binaryDataStrategy = initBinaryDataStrategy();
@@ -83,6 +88,22 @@ public class JsonbConfigProperties {
         this.strictIJson = initStrictJson();
         this.userTypeMapping = initUserTypeMapping();
         this.zeroTimeDefaulting = initZeroTimeDefaultingForJavaTime();
+        this.defaultMapImplType = initDefaultMapImplType();
+    }
+
+    private Class<?> initDefaultMapImplType() {
+        Optional<String> os = getPropertyOrderStrategy();
+        if (os.isPresent()) {
+            switch (os.get()) {
+                case PropertyOrderStrategy.LEXICOGRAPHICAL:
+                    return TreeMap.class;
+                case PropertyOrderStrategy.REVERSE:
+                    return ReverseTreeMap.class;
+                default:
+                    return HashMap.class;
+            }
+        }
+        return HashMap.class;
     }
 
     private boolean initZeroTimeDefaultingForJavaTime() {
@@ -129,13 +150,9 @@ public class JsonbConfigProperties {
     }
 
     private PropOrderStrategy initOrderStrategy() {
-        final Optional<Object> property = jsonbConfig.getProperty(JsonbConfig.PROPERTY_ORDER_STRATEGY);
-        if (property.isPresent()) {
-            final Object strategy = property.get();
-            if (!(strategy instanceof String)) {
-                throw new JsonbException(Messages.getMessage(MessageKeys.PROPERTY_ORDER, strategy));
-            }
-            switch ((String) strategy) {
+        Optional<String> strategy = getPropertyOrderStrategy();
+        if (strategy.isPresent()) {
+            switch (strategy.get()) {
                 case PropertyOrderStrategy.LEXICOGRAPHICAL:
                     return new LexicographicalOrderStrategy();
                 case PropertyOrderStrategy.REVERSE:
@@ -148,6 +165,25 @@ public class JsonbConfigProperties {
         }
         //default by spec
         return new LexicographicalOrderStrategy();
+    }
+
+    private Optional<String> getPropertyOrderStrategy() {
+        final Optional<Object> property = jsonbConfig.getProperty(JsonbConfig.PROPERTY_ORDER_STRATEGY);
+        if (property.isPresent()) {
+            final Object strategy = property.get();
+            if (!(strategy instanceof String)) {
+                throw new JsonbException(Messages.getMessage(MessageKeys.PROPERTY_ORDER, strategy));
+            }
+            switch ((String)strategy) {
+                case PropertyOrderStrategy.LEXICOGRAPHICAL:
+                case PropertyOrderStrategy.REVERSE:
+                case PropertyOrderStrategy.ANY:
+                    return Optional.of((String)strategy);
+                default:
+                    throw new JsonbException(Messages.getMessage(MessageKeys.PROPERTY_ORDER, strategy));
+            }
+        }
+        return Optional.empty();
     }
 
     private PropertyNamingStrategy initPropertyNamingStrategy() {
@@ -342,5 +378,13 @@ public class JsonbConfigProperties {
      */
     public boolean isZeroTimeDefaulting() {
         return zeroTimeDefaulting;
+    }
+
+    /**
+     * Default {@link java.util.Map} implementation to use, based on order strategy.
+     * @return map impl type
+     */
+    public Class<?> getDefaultMapImplType() {
+        return defaultMapImplType;
     }
 }

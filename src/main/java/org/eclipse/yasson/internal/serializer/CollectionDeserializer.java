@@ -46,19 +46,18 @@ class CollectionDeserializer<T extends Collection<?>> extends AbstractContainerD
                 ReflectionUtils.resolveType(this, ((ParameterizedType) getRuntimeType()).getActualTypeArguments()[0])
                 : Object.class;
 
-        instance = createInstance();
+        instance = createInstance(builder);
     }
 
     @SuppressWarnings("unchecked")
-    private T createInstance() {
+    private T createInstance(DeserializerBuilder builder) {
         Class<T> rawType = (Class<T>) ReflectionUtils.getRawType(getRuntimeType());
-        assert Collection.class.isAssignableFrom(rawType);
 
         if (rawType.isInterface()) {
             final T x = createInterfaceInstance(rawType);
             if (x != null) return x;
         }
-        return ReflectionUtils.createNoArgConstructorInstance(rawType);
+        return builder.getJsonbContext().getInstanceCreator().createInstance(rawType);
     }
 
     @SuppressWarnings("unchecked")

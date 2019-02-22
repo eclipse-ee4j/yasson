@@ -13,6 +13,7 @@
 
 package org.eclipse.yasson.internal.components;
 
+import org.eclipse.yasson.internal.InstanceCreator;
 import org.eclipse.yasson.internal.properties.MessageKeys;
 import org.eclipse.yasson.internal.properties.Messages;
 
@@ -45,16 +46,17 @@ public class JsonbComponentInstanceCreatorFactory {
      * Try to lookup in a JNDI if no provider is registered.
      * If one of the above is found {@link BeanManagerInstanceCreator} is returned,
      * or {@link DefaultConstructorCreator} otherwise.
+     * @param creator Instance creator
      * @return Component instance creator, either CDI or default constructor.
      */
-    public static JsonbComponentInstanceCreator getComponentInstanceCreator() {
+    public static JsonbComponentInstanceCreator getComponentInstanceCreator(InstanceCreator creator) {
         Object beanManager = getCdiBeanManager();
         if (beanManager == null) {
             beanManager = getJndiBeanManager();
         }
         if (beanManager == null) {
             log.finest(Messages.getMessage(MessageKeys.BEAN_MANAGER_NOT_FOUND_USING_DEFAULT));
-            return new DefaultConstructorCreator();
+            return new DefaultConstructorCreator(creator);
         }
         return new BeanManagerInstanceCreator(beanManager);
     }

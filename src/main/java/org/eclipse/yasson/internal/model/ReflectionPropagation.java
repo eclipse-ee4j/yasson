@@ -14,6 +14,7 @@ package org.eclipse.yasson.internal.model;
 
 import org.eclipse.yasson.internal.JsonbContext;
 
+import javax.json.bind.config.PropertyVisibilityStrategy;
 import java.lang.reflect.Field;
 import java.lang.reflect.Method;
 
@@ -26,8 +27,8 @@ public class ReflectionPropagation extends PropertyValuePropagation {
 
     private SetValueCommand setValueCommand;
 
-    public ReflectionPropagation(Property property, JsonbContext ctx) {
-        super(property, ctx);
+    public ReflectionPropagation(Property property, PropertyVisibilityStrategy strategy) {
+        super(property, strategy);
     }
 
     /**
