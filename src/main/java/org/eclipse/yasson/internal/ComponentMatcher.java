@@ -209,6 +209,12 @@ public class ComponentMatcher {
 
         //don't try to runtime generic scan if not needed
         if (!genericComponents) {
+        	//quick check in case we have a raw root class (due to type erasure) and a matching bound type
+            if (componentBindingType instanceof ParameterizedType && runtimeType instanceof Class &&
+                    ReflectionUtils.getRawType(componentBindingType).isAssignableFrom((Class<?>) runtimeType)) {
+                return true;
+            }
+
             return false;
         }
 
