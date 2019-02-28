@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2016 Oracle and/or its affiliates. All rights reserved.
+ * Copyright (c) 2016, 2019 Oracle and/or its affiliates. All rights reserved.
  * This program and the accompanying materials are made available under the
  * terms of the Eclipse Public License v1.0 and Eclipse Distribution License v. 1.0
  * which accompanies this distribution.
@@ -15,7 +15,7 @@ package org.eclipse.yasson.internal;
 import org.eclipse.yasson.internal.properties.MessageKeys;
 import org.eclipse.yasson.internal.properties.Messages;
 
-import javax.json.bind.Jsonb;
+import org.eclipse.yasson.Jsonb;
 import javax.json.bind.JsonbConfig;
 import javax.json.bind.JsonbException;
 import javax.json.spi.JsonProvider;
@@ -137,6 +137,24 @@ public class JsonBinding implements Jsonb {
     public void toJson(Object object, Type type, OutputStream stream) throws JsonbException {
         final Marshaller marshaller = new Marshaller(jsonbContext, type);
         marshaller.marshall(object, streamGenerator(stream));
+    }
+
+    @Override
+    public <T> T fromJson(JsonParser jsonParser, Class<T> type) throws JsonbException {
+        Unmarshaller unmarshaller = new Unmarshaller(jsonbContext);
+        return unmarshaller.deserialize(type, new JsonbRiParser(jsonParser));
+    }
+
+    @Override
+    public void toJson(Object object, JsonGenerator jsonGenerator) throws JsonbException {
+        final Marshaller marshaller = new Marshaller(jsonbContext);
+        marshaller.marshall(object, jsonGenerator);
+    }
+
+    @Override
+    public void toJson(Object object, Type runtimeType, JsonGenerator jsonGenerator) throws JsonbException {
+        final Marshaller marshaller = new Marshaller(jsonbContext, runtimeType);
+        marshaller.marshall(object, jsonGenerator);
     }
 
     private JsonGenerator streamGenerator(OutputStream stream) {

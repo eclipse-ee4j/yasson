@@ -1,0 +1,82 @@
+/*******************************************************************************
+ * Copyright (c) 2019 Oracle and/or its affiliates. All rights reserved.
+ * This program and the accompanying materials are made available under the
+ * terms of the Eclipse Public License v1.0 and Eclipse Distribution License v. 1.0
+ * which accompanies this distribution.
+ * The Eclipse Public License is available at http://www.eclipse.org/legal/epl-v10.html
+ * and the Eclipse Distribution License is available at
+ * http://www.eclipse.org/org/documents/edl-v10.php.
+ ******************************************************************************/
+package org.eclipse.yasson.jsonpsubstitution;
+
+import org.eclipse.yasson.JsonBindingProvider;
+import org.eclipse.yasson.Jsonb;
+import org.junit.Before;
+import org.junit.Test;
+
+import javax.json.bind.JsonbBuilder;
+import javax.json.stream.JsonGenerator;
+import javax.json.stream.JsonParser;
+import java.io.ByteArrayInputStream;
+import java.io.ByteArrayOutputStream;
+
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertTrue;
+
+public class PreinstantiatedJsonpTest {
+
+    public static class Dog {
+        public String name;
+        public int age;
+        public boolean goodDog = true;
+
+        public Dog() {
+        }
+
+        public Dog(String name, int age) {
+            this.name = name;
+            this.age = age;
+        }
+
+        @Override
+        public String toString() {
+            return "Dog:\nname: " + name + "\nage: " + age + "\ngoodDog: " + goodDog;
+        }
+    }
+
+    private Dog dog = new Dog("Falco", 4);
+
+    private Jsonb jsonb;
+
+    @Before
+    public void setUp() {
+        // Create Jsonb and serialize
+        JsonBindingProvider provider = new JsonBindingProvider();
+        JsonbBuilder builder = provider.create();
+        jsonb = (Jsonb) builder.build();
+    }
+
+    @Test
+    public void testToJsonGeneratorFromJsonParserSimple() throws Exception {
+        ByteArrayOutputStream out = new ByteArrayOutputStream();
+        JsonGenerator generator = new SuffixJsonGenerator("Best dog ever!", out);
+        jsonb.toJson(dog, generator);
+
+        assertEquals("{\"age\":4,\"goodDog\":true,\"name\":\"Falco\",\"suffix\":\"Best dog ever!\"}", new String(out.toByteArray()));
+
+        ByteArrayInputStream in = new ByteArrayInputStream(out.toByteArray());
+        JsonParser parser = new AdaptedJsonParser((value) -> {
+            if ("Falco".equals(value)) {
+                return value + ", a best dog ever!";
+            }
+            return value;
+        }, in);
+        Dog result = jsonb.fromJson(parser, Dog.class);
+
+        assertEquals("Falco, a best dog ever!", result.name);
+        assertEquals(4, result.age);
+        assertTrue(result.goodDog);
+    }
+
+
+}
