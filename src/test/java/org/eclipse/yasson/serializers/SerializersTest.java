@@ -14,6 +14,7 @@
 
 package org.eclipse.yasson.serializers;
 
+import static java.util.Collections.singletonMap;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNull;
 import static org.junit.Assert.fail;
@@ -244,6 +245,7 @@ public class SerializersTest {
         StringWrapper pojo = new StringWrapper();
         pojo.strField = "abc";
         final String result = jsonb.toJson(pojo);
+        assertEquals("{\"strField\":\"   abc\"}", result);
     }
 
     @Test
@@ -381,6 +383,14 @@ public class SerializersTest {
         pojo = jsonb.fromJson(json, SortedMap.class);
         Assert.assertTrue("Pojo is not of type TreeMap with no strategy", pojo instanceof TreeMap);
         Assert.assertEquals("{\"first\":1,\"second\":2,\"third\":3}", jsonb.toJson(pojo));
+    }
+
+    @Test
+    public void testSerializeMapWithNulls() {
+        Jsonb jsonb = JsonbBuilder.create(new JsonbConfig().withNullValues(Boolean.TRUE));
+        assertEquals("{\"null\":null}", jsonb.toJson(singletonMap(null, null)));
+        assertEquals("{\"key\":null}", jsonb.toJson(singletonMap("key", null)));
+        assertEquals("{\"null\":\"value\"}", jsonb.toJson(singletonMap(null, "value")));
     }
 
     private Box createPojoWithDates() {

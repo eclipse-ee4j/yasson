@@ -20,6 +20,7 @@ import org.junit.Before;
 import org.junit.Test;
 
 import javax.json.bind.Jsonb;
+import javax.json.bind.JsonbConfig;
 import javax.json.bind.JsonbBuilder;
 import java.math.BigDecimal;
 import java.util.*;
@@ -38,7 +39,7 @@ public class CollectionsTest {
 
     @Before
     public void before() {
-        jsonb = JsonbBuilder.create();
+        jsonb = JsonbBuilder.create(new JsonbConfig().withNullValues(Boolean.TRUE));
     }
 
     @Test
