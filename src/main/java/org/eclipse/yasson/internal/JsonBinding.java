@@ -148,13 +148,13 @@ public class JsonBinding implements Jsonb {
     @Override
     public void toJson(Object object, JsonGenerator jsonGenerator) throws JsonbException {
         final Marshaller marshaller = new Marshaller(jsonbContext);
-        marshaller.marshall(object, jsonGenerator);
+        marshaller.marshallWithoutClose(object, jsonGenerator);
     }
 
     @Override
     public void toJson(Object object, Type runtimeType, JsonGenerator jsonGenerator) throws JsonbException {
         final Marshaller marshaller = new Marshaller(jsonbContext, runtimeType);
-        marshaller.marshall(object, jsonGenerator);
+        marshaller.marshallWithoutClose(object, jsonGenerator);
     }
 
     private JsonGenerator streamGenerator(OutputStream stream) {

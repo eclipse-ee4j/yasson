@@ -28,6 +28,8 @@ public class SuffixJsonGenerator implements JsonGenerator {
      */
     private final String objSuffix;
 
+    private boolean written;
+
     public SuffixJsonGenerator(String objSuffix, OutputStream out) {
         this.objSuffix = objSuffix;
         this.generator = Json.createGenerator(out);
@@ -105,7 +107,10 @@ public class SuffixJsonGenerator implements JsonGenerator {
 
     @Override
     public JsonGenerator writeEnd() {
-        generator.write("suffix", objSuffix);
+        if (!written) {
+            generator.write("suffix", objSuffix);
+            written = true;
+        }
         return generator.writeEnd();
     }
 

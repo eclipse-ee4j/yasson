@@ -56,8 +56,8 @@ public interface Jsonb extends javax.json.bind.Jsonb {
      * @param object
      *      The object content tree to be serialized.
      * @param jsonGenerator
-     *      The json generator to write JSON data. Upon a successful completion,
-     *      the generator will be closed by this method.
+     *      The json generator to write JSON data. The generator is not closed
+     *      on a completion for further interaction.
      *
      * @throws JsonbException If any unexpected problem occurs during the
      * serialization.
@@ -79,8 +79,8 @@ public interface Jsonb extends javax.json.bind.Jsonb {
      *      Runtime type of the content tree's root object.
      *
      * @param jsonGenerator
-     *      The json generator to write JSON data. Upon a successful completion,
-     *      the generator will be closed by this method.
+     *      The json generator to write JSON data. The generator is not closed
+     *      on a completion for further interaction.
      *
      * @throws JsonbException If any unexpected problem occurs during the
      * serialization.
