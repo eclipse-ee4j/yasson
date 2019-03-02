@@ -147,7 +147,7 @@ public class ComponentMatcher {
         if (customization == null || customization.getSerializerBinding() == null) {
             return searchComponentBinding(propertyRuntimeType, ComponentBindings::getSerializer);
         }
-        return getComponentBinding(propertyRuntimeType, customization.getSerializerBinding());
+        return Optional.of(customization.getSerializerBinding());
     }
 
     /**
