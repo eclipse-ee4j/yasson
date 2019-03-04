@@ -33,6 +33,7 @@ import javax.json.bind.JsonbConfig;
 import javax.json.bind.JsonbException;
 import javax.json.bind.config.PropertyOrderStrategy;
 
+import org.eclipse.yasson.TestTypeToken;
 import org.eclipse.yasson.internal.model.ReverseTreeMap;
 import org.eclipse.yasson.serializers.model.AnnotatedGenericWithSerializerType;
 import org.eclipse.yasson.serializers.model.AnnotatedWithSerializerType;
@@ -46,6 +47,7 @@ import org.eclipse.yasson.serializers.model.CrateInner;
 import org.eclipse.yasson.serializers.model.CrateJsonObjectDeserializer;
 import org.eclipse.yasson.serializers.model.CrateSerializer;
 import org.eclipse.yasson.serializers.model.CrateSerializerWithConversion;
+import org.eclipse.yasson.serializers.model.GenericPropertyPojo;
 import org.eclipse.yasson.serializers.model.NumberDeserializer;
 import org.eclipse.yasson.serializers.model.NumberSerializer;
 import org.eclipse.yasson.serializers.model.RecursiveDeserializer;
@@ -415,6 +417,21 @@ public class SerializersTest {
         pojo = jsonb.fromJson(json, SortedMap.class);
         Assert.assertTrue("Pojo is not of type TreeMap with no strategy", pojo instanceof TreeMap);
         Assert.assertEquals("{\"first\":1,\"second\":2,\"third\":3}", jsonb.toJson(pojo));
+    }
+
+    @Test
+    public void testGenericPropertyPojoSerializer() {
+        GenericPropertyPojo<Number> numberPojo = new GenericPropertyPojo<>();
+        numberPojo.setProperty(10L);
+        GenericPropertyPojo<String> stringPojo = new GenericPropertyPojo<>();
+        stringPojo.setProperty("String property");
+
+        Jsonb jsonb = JsonbBuilder.create();
+        String numResult = jsonb.toJson(numberPojo, new TestTypeToken<GenericPropertyPojo<Number>>(){}.getType());
+        Assert.assertEquals("{\"propertyByUserSerializer\":\"Number value [10]\"}", numResult);
+
+        String strResult = jsonb.toJson(stringPojo, new TestTypeToken<GenericPropertyPojo<String>>(){}.getType());
+        Assert.assertEquals("{\"property\":\"String property\"}", strResult);
     }
 
     private Box createPojoWithDates() {
