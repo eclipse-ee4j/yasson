@@ -49,6 +49,7 @@ import org.eclipse.yasson.serializers.model.CrateJsonObjectDeserializer;
 import org.eclipse.yasson.serializers.model.CrateSerializer;
 import org.eclipse.yasson.serializers.model.CrateSerializerWithConversion;
 import org.eclipse.yasson.serializers.model.GenericPropertyPojo;
+import org.eclipse.yasson.serializers.model.GenericPropertyPojoSerializer;
 import org.eclipse.yasson.serializers.model.NumberDeserializer;
 import org.eclipse.yasson.serializers.model.NumberSerializer;
 import org.eclipse.yasson.serializers.model.RecursiveDeserializer;
@@ -428,7 +429,8 @@ public class SerializersTest {
         GenericPropertyPojo<String> stringPojo = new GenericPropertyPojo<>();
         stringPojo.setProperty("String property");
 
-        Jsonb jsonb = JsonbBuilder.create();
+        JsonbConfig config = new JsonbConfig().withSerializers(new GenericPropertyPojoSerializer());
+        Jsonb jsonb = JsonbBuilder.newBuilder().withConfig(config).build();
         String numResult = jsonb.toJson(numberPojo, new TestTypeToken<GenericPropertyPojo<Number>>(){}.getType());
         Assert.assertEquals("{\"propertyByUserSerializer\":\"Number value [10]\"}", numResult);
 

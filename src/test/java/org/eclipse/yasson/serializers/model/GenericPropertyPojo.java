@@ -9,9 +9,6 @@
  ******************************************************************************/
 package org.eclipse.yasson.serializers.model;
 
-import javax.json.bind.annotation.JsonbTypeSerializer;
-
-@JsonbTypeSerializer(GenericPropertyPojoSerializer.class)
 public class GenericPropertyPojo<T> {
     private T property;
 
