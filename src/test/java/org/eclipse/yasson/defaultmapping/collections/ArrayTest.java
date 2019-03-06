@@ -163,6 +163,13 @@ public class ArrayTest {
     }
 
     @Test
+    public void testCharArray() {
+        char[] charArr = {'a', 'b', 'c'};
+        assertEquals("[\"a\",\"b\",\"c\"]", jsonb.toJson(charArr));
+        assertArrayEquals(charArr, jsonb.fromJson("[\"a\",\"b\",\"c\"]", char[].class));
+    }
+
+    @Test
     public void testShortArray() {
         short[] shortArr = {-128, 127};
         assertEquals("[-128,127]", jsonb.toJson(shortArr));

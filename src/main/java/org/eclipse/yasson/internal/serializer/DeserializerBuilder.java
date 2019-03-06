@@ -151,6 +151,10 @@ public class DeserializerBuilder extends AbstractSerializerBuilder<DeserializerB
             }
         }
 
+        if (isCharArray(rawType)) {
+            return new CharArrayDeserializer(this);
+        }
+
         //Third deserializer is a supported value type to deserialize to JSON_VALUE
         if (isJsonValueEvent()) {
             final Optional<AbstractValueTypeDeserializer<?>> supportedTypeDeserializer = getSupportedTypeDeserializer(rawType);
@@ -306,5 +310,9 @@ public class DeserializerBuilder extends AbstractSerializerBuilder<DeserializerB
 
     private boolean isByteArray(Class<?> rawType) {
         return rawType.isArray() && rawType.getComponentType() == Byte.TYPE;
+    }
+
+    private boolean isCharArray(Class<?> rawType) {
+        return rawType.isArray() && rawType.getComponentType() == Character.TYPE;
     }
 }
