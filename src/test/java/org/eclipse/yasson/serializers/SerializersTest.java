@@ -431,7 +431,9 @@ public class SerializersTest {
         Assert.assertEquals("{\"propertyByUserSerializer\":\"Number value [10]\"}", numResult);
 
         String strResult = jsonb.toJson(stringPojo, new TestTypeToken<GenericPropertyPojo<String>>(){}.getType());
-        Assert.assertEquals("{\"property\":\"String property\"}", strResult);
+        // because GenericPropertyPojo is annotated to use GenericPropertyPojoSerializer, it will always be
+        // used, despite the fact that the runtime type supplied does not match the serializer type
+        Assert.assertEquals("{\"propertyByUserSerializer\":\"Number value [String property]\"}", strResult);
     }
 
     private Box createPojoWithDates() {
