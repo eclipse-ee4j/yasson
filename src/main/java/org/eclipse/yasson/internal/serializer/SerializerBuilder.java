@@ -130,6 +130,8 @@ public class SerializerBuilder extends AbstractSerializerBuilder<SerializerBuild
             return new ByteArraySerializer(this);
         } else if (componentType == short.class) {
             return new ShortArraySerializer(this);
+        } else if (componentType == char.class) {
+            return new CharArraySerializer(this);
         } else if (componentType == int.class) {
             return new IntArraySerializer(this);
         } else if (componentType == long.class) {
