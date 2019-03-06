@@ -14,6 +14,7 @@
 
 package org.eclipse.yasson.serializers;
 
+import static java.util.Collections.singletonMap;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNull;
 import static org.junit.Assert.fail;
@@ -280,6 +281,7 @@ public class SerializersTest {
         StringWrapper pojo = new StringWrapper();
         pojo.strField = "abc";
         final String result = jsonb.toJson(pojo);
+        assertEquals("{\"strField\":\"   abc\"}", result);
     }
 
     @Test
@@ -434,6 +436,14 @@ public class SerializersTest {
         // because GenericPropertyPojo is annotated to use GenericPropertyPojoSerializer, it will always be
         // used, despite the fact that the runtime type supplied does not match the serializer type
         Assert.assertEquals("{\"propertyByUserSerializer\":\"Number value [String property]\"}", strResult);
+    }
+
+    @Test
+    public void testSerializeMapWithNulls() {
+        Jsonb jsonb = JsonbBuilder.create(new JsonbConfig().withNullValues(Boolean.TRUE));
+        assertEquals("{\"null\":null}", jsonb.toJson(singletonMap(null, null)));
+        assertEquals("{\"key\":null}", jsonb.toJson(singletonMap("key", null)));
+        assertEquals("{\"null\":\"value\"}", jsonb.toJson(singletonMap(null, "value")));
     }
 
     private Box createPojoWithDates() {

@@ -30,18 +30,22 @@ import java.util.Optional;
 public class MapSerializer<T extends Map<?,?>> extends AbstractContainerSerializer<T> implements EmbeddedItem {
 
 
+    private final boolean nullable;
+
     protected MapSerializer(SerializerBuilder builder) {
         super(builder);
+        nullable = builder.getJsonbContext().getConfigProperties().getConfigNullable();
     }
 
-    @SuppressWarnings("unchecked")
     @Override
     protected void serializeInternal(T obj, JsonGenerator generator, SerializationContext ctx) {
         for (Map.Entry<?,?> entry : obj.entrySet()) {
             final String keysString = String.valueOf(entry.getKey());
             final Object value = entry.getValue();
             if (value == null) {
-                generator.writeNull(keysString);
+                if (nullable) {
+                    generator.writeNull(keysString);
+                }
                 continue;
             }
             generator.writeKey(keysString);
