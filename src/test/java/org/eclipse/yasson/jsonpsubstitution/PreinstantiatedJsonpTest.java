@@ -10,7 +10,7 @@
 package org.eclipse.yasson.jsonpsubstitution;
 
 import org.eclipse.yasson.JsonBindingProvider;
-import org.eclipse.yasson.Jsonb;
+import org.eclipse.yasson.YassonJsonb;
 import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
@@ -53,14 +53,14 @@ public class PreinstantiatedJsonpTest {
 
     private Dog dog = new Dog("Falco", 4);
 
-    private Jsonb jsonb;
+    private YassonJsonb jsonb;
 
     @Before
     public void setUp() {
         // Create Jsonb and serialize
         JsonBindingProvider provider = new JsonBindingProvider();
         JsonbBuilder builder = provider.create();
-        jsonb = (Jsonb) builder.build();
+        jsonb = (YassonJsonb) builder.build();
     }
 
     @Test

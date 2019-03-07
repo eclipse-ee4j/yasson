@@ -12,10 +12,10 @@
  ******************************************************************************/
 package org.eclipse.yasson.internal;
 
+import org.eclipse.yasson.YassonJsonb;
 import org.eclipse.yasson.internal.properties.MessageKeys;
 import org.eclipse.yasson.internal.properties.Messages;
 
-import org.eclipse.yasson.Jsonb;
 import javax.json.bind.JsonbConfig;
 import javax.json.bind.JsonbException;
 import javax.json.spi.JsonProvider;
@@ -33,7 +33,7 @@ import java.util.Optional;
  *
  * @author Dmitry Kornilov
  */
-public class JsonBinding implements Jsonb {
+public class JsonBinding implements YassonJsonb {
 
     private final JsonbContext jsonbContext;
 

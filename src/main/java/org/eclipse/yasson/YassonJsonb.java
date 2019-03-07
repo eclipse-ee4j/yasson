@@ -25,7 +25,7 @@ import java.lang.reflect.Type;
  * This interface accepts instantiated generators and parsers with different input / output sources.
  * </p>
  */
-public interface Jsonb extends javax.json.bind.Jsonb {
+public interface YassonJsonb extends javax.json.bind.Jsonb {
 
 
     /**
