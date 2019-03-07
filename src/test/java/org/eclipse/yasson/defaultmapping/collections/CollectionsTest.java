@@ -181,6 +181,9 @@ public class CollectionsTest {
         final String[] stringArray = {"first", "second", "third"};
         assertEquals("[\"first\",\"second\",\"third\"]", jsonb.toJson(stringArray));
 
+        Character[] charArr = {'a', 'b', 'c'};
+        assertEquals("[\"a\",\"b\",\"c\"]", jsonb.toJson(charArr));
+
         final byte[] bytePrimitivesArray = {1, 2, 3};
         assertEquals("[1,2,3]", jsonb.toJson(bytePrimitivesArray));
 
