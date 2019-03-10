@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2015, 2018 Oracle and/or its affiliates. All rights reserved.
+ * Copyright (c) 2015, 2019 Oracle and/or its affiliates. All rights reserved.
  * This program and the accompanying materials are made available under the
  * terms of the Eclipse Public License v1.0 and Eclipse Distribution License v. 1.0
  * which accompanies this distribution.
@@ -68,20 +68,48 @@ public class Marshaller extends ProcessingContext implements SerializationContex
      *
      * @param object object to marshall
      * @param jsonGenerator generator to use
+     * @param close if generator should be closed
      */
-    public void marshall(Object object, JsonGenerator jsonGenerator) {
+    public void marshall(Object object, JsonGenerator jsonGenerator, boolean close) {
         try {
             serializeRoot(object, jsonGenerator);
         } catch (JsonbException e) {
             logger.severe(e.getMessage());
             throw e;
+        } catch (Exception e) {
+            logger.severe(e.getMessage());
+            throw new JsonbException(Messages.getMessage(MessageKeys.INTERNAL_ERROR, e.getMessage()), e);
         } finally {
             try {
-                jsonGenerator.close();
+                if (close) {
+                    jsonGenerator.close();
+                }
             } catch (JsonGenerationException jge) {
                 logger.severe(jge.getMessage());
             }
         }
+    }
+
+    /**
+     * Marshals given object to provided Writer or OutputStream.
+     * Closes the generator on completion.
+     *
+     * @param object object to marshall
+     * @param jsonGenerator generator to use
+     */
+    public void marshall(Object object, JsonGenerator jsonGenerator) {
+        marshall(object,jsonGenerator,true);
+    }
+
+    /**
+     * Marshals given object to provided Writer or OutputStream.
+     * Leaves generator open for further interaction after completion.
+     *
+     * @param object object to marshall
+     * @param jsonGenerator generator to use
+     */
+    public void marshallWithoutClose(Object object, JsonGenerator jsonGenerator) {
+        marshall(object,jsonGenerator,false);
     }
 
     @Override
