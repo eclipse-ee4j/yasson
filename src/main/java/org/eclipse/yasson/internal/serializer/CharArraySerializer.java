@@ -30,7 +30,7 @@ public class CharArraySerializer extends AbstractArraySerializer<char[]> {
     @Override
     protected void serializeInternal(char[] obj, JsonGenerator generator, SerializationContext ctx) {
         for (char c : obj) {
-            generator.write("" + c); // write as string since org.glassfish.json.api.JsonGeneratorImpl does not support writing a char
+            generator.write(Character.valueOf(c).toString());
         }
     }
 
