@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2016, 2018 Oracle and/or its affiliates. All rights reserved.
+ * Copyright (c) 2016, 2019 Oracle and/or its affiliates. All rights reserved.
  * This program and the accompanying materials are made available under the
  * terms of the Eclipse Public License v1.0 and Eclipse Distribution License v. 1.0
  * which accompanies this distribution.
@@ -85,18 +85,15 @@ public class JsonbTypeAdapterTest {
     }
 
     @Test
-    public void testGenericFieldsMatch() throws Exception {
+    public void testGenericFieldsMatch() {
         AnnotatedPojo<Integer, String> annotatedPojo = new AnnotatedPojo<>();
         annotatedPojo.tBox = new GenericBox<>("T_BOX", 110);
-        annotatedPojo.xBox = new GenericBox<>("X_BOX", "STR");
         String marshalledJson = jsonb.toJson(annotatedPojo, new TestTypeToken<AnnotatedPojo<Integer, String>>(){}.getType());
-        assertEquals("{\"tBox\":{\"adaptedT\":{\"x\":[\"110\"]},\"crateStrField\":\"T_BOX\"},\"xBox\":{\"strField\":\"X_BOX\",\"x\":\"STR\"}}", marshalledJson);
+        assertEquals("{\"tBox\":{\"adaptedT\":{\"x\":[\"110\"]},\"crateStrField\":\"T_BOX\"}}", marshalledJson);
 
-        AnnotatedPojo<Integer,String> result = jsonb.fromJson("{\"tBox\":{\"crateStrField\":\"T_BOX\",\"adaptedT\":{\"x\":[\"110\"]}},\"xBox\":{\"strField\":\"X_BOX\",\"x\":\"STR\"}}", new TestTypeToken<AnnotatedPojo<Integer,String>>(){}.getType());
+        AnnotatedPojo<Integer,String> result = jsonb.fromJson("{\"tBox\":{\"crateStrField\":\"T_BOX\",\"adaptedT\":{\"x\":[\"110\"]}}}", new TestTypeToken<AnnotatedPojo<Integer,String>>(){}.getType());
         assertEquals("T_BOX", result.tBox.getStrField());
         assertEquals(Integer.valueOf(110), result.tBox.getX());
-        assertEquals("X_BOX", result.xBox.getStrField());
-        assertEquals("STR", result.xBox.getX());
     }
 
     @Test
