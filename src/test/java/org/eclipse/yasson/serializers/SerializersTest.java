@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2016, 2018 Oracle and/or its affiliates. All rights reserved.
+ * Copyright (c) 2016, 2019 Oracle and/or its affiliates. All rights reserved.
  * This program and the accompanying materials are made available under the
  * terms of the Eclipse Public License v1.0 and Eclipse Distribution License v. 1.0
  * which accompanies this distribution.
@@ -34,7 +34,9 @@ import javax.json.bind.JsonbConfig;
 import javax.json.bind.JsonbException;
 import javax.json.bind.config.PropertyOrderStrategy;
 
+import org.eclipse.yasson.TestTypeToken;
 import org.eclipse.yasson.internal.model.ReverseTreeMap;
+import org.eclipse.yasson.serializers.model.AnnotatedGenericWithSerializerType;
 import org.eclipse.yasson.serializers.model.AnnotatedWithSerializerType;
 import org.eclipse.yasson.serializers.model.Author;
 import org.eclipse.yasson.serializers.model.Box;
@@ -46,6 +48,8 @@ import org.eclipse.yasson.serializers.model.CrateInner;
 import org.eclipse.yasson.serializers.model.CrateJsonObjectDeserializer;
 import org.eclipse.yasson.serializers.model.CrateSerializer;
 import org.eclipse.yasson.serializers.model.CrateSerializerWithConversion;
+import org.eclipse.yasson.serializers.model.GenericPropertyPojo;
+import org.eclipse.yasson.serializers.model.GenericPropertyPojoSerializer;
 import org.eclipse.yasson.serializers.model.NumberDeserializer;
 import org.eclipse.yasson.serializers.model.NumberSerializer;
 import org.eclipse.yasson.serializers.model.RecursiveDeserializer;
@@ -70,16 +74,49 @@ public class SerializersTest {
 
         crate.annotatedType = new AnnotatedWithSerializerType();
         crate.annotatedType.value = "abc";
+        crate.annotatedGenericType = new AnnotatedGenericWithSerializerType<>();
+        crate.annotatedGenericType.value = new Crate();
+        crate.annotatedGenericType.value.crateStr = "inside generic";
         crate.annotatedTypeOverriddenOnProperty = new AnnotatedWithSerializerType();
         crate.annotatedTypeOverriddenOnProperty.value = "def";
         final Jsonb jsonb = JsonbBuilder.create();
-        String expected = "{\"annotatedType\":{\"valueField\":\"replaced value\"},\"annotatedTypeOverriddenOnProperty\":{\"valueField\":\"overridden value\"},\"crateBigDec\":10,\"crate_str\":\"crateStr\"}";
+        String expected = "{\"annotatedGenericType\":{\"generic\":{\"crate_str\":\"inside generic\"}},\"annotatedType\":{\"valueField\":\"replaced value\"},\"annotatedTypeOverriddenOnProperty\":{\"valueField\":\"overridden value\"},\"crateBigDec\":10,\"crate_str\":\"crateStr\"}";
 
         assertEquals(expected, jsonb.toJson(crate));
 
         Crate result = jsonb.fromJson(expected, Crate.class);
         assertEquals("replaced value", result.annotatedType.value);
         assertEquals("overridden value", result.annotatedTypeOverriddenOnProperty.value);
+        assertEquals("inside generic", result.annotatedGenericType.value.crateStr);
+
+    }
+
+    @Test
+    public void testClassLevelAnnotationOnRoot() {
+        AnnotatedWithSerializerType annotatedType = new AnnotatedWithSerializerType();
+        annotatedType.value = "abc";
+        final Jsonb jsonb = JsonbBuilder.create();
+        String expected = "{\"valueField\":\"replaced value\"}";
+
+        assertEquals(expected, jsonb.toJson(annotatedType));
+
+        AnnotatedWithSerializerType result = jsonb.fromJson(expected, AnnotatedWithSerializerType.class);
+        assertEquals("replaced value", result.value);
+
+    }
+
+    @Test
+    public void testClassLevelAnnotationOnGenericRoot() {
+        AnnotatedGenericWithSerializerType<Crate> annotatedType = new AnnotatedGenericWithSerializerType<>();
+        annotatedType.value = new Crate();
+        annotatedType.value.crateStr = "inside generic";
+        final Jsonb jsonb = JsonbBuilder.create();
+        String expected = "{\"generic\":{\"crate_str\":\"inside generic\"}}";
+
+        assertEquals(expected, jsonb.toJson(annotatedType));
+
+        AnnotatedGenericWithSerializerType<Crate> result = jsonb.fromJson(expected, new AnnotatedGenericWithSerializerType<Crate>(){}.getClass().getGenericSuperclass());
+        assertEquals("inside generic", result.value.crateStr);
 
     }
 
@@ -383,6 +420,23 @@ public class SerializersTest {
         pojo = jsonb.fromJson(json, SortedMap.class);
         Assert.assertTrue("Pojo is not of type TreeMap with no strategy", pojo instanceof TreeMap);
         Assert.assertEquals("{\"first\":1,\"second\":2,\"third\":3}", jsonb.toJson(pojo));
+    }
+
+    @Test
+    public void testGenericPropertyPojoSerializer() {
+        GenericPropertyPojo<Number> numberPojo = new GenericPropertyPojo<>();
+        numberPojo.setProperty(10L);
+        GenericPropertyPojo<String> stringPojo = new GenericPropertyPojo<>();
+        stringPojo.setProperty("String property");
+
+        Jsonb jsonb = JsonbBuilder.create();
+        String numResult = jsonb.toJson(numberPojo, new TestTypeToken<GenericPropertyPojo<Number>>(){}.getType());
+        Assert.assertEquals("{\"propertyByUserSerializer\":\"Number value [10]\"}", numResult);
+
+        String strResult = jsonb.toJson(stringPojo, new TestTypeToken<GenericPropertyPojo<String>>(){}.getType());
+        // because GenericPropertyPojo is annotated to use GenericPropertyPojoSerializer, it will always be
+        // used, despite the fact that the runtime type supplied does not match the serializer type
+        Assert.assertEquals("{\"propertyByUserSerializer\":\"Number value [String property]\"}", strResult);
     }
 
     @Test

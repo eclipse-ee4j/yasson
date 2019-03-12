@@ -13,34 +13,12 @@
 
 package org.eclipse.yasson.serializers.model;
 
-import javax.json.bind.annotation.JsonbDateFormat;
-import javax.json.bind.annotation.JsonbProperty;
+import javax.json.bind.annotation.JsonbTypeDeserializer;
 import javax.json.bind.annotation.JsonbTypeSerializer;
-import java.math.BigDecimal;
-import java.util.Date;
-import java.util.List;
 
-/**
- * @author Roman Grigoriadi
- */
-public class Crate {
+@JsonbTypeSerializer(AnnotatedGenericWithSerializerTypeSerializer.class)
+@JsonbTypeDeserializer(AnnotatedGenericWithSerializerTypeDeserializer.class)
+public class AnnotatedGenericWithSerializerType<T> {
 
-    @JsonbProperty("crate_str")
-    public String crateStr;
-
-    public CrateInner crateInner;
-
-    public List<CrateInner> crateInnerList;
-
-    public BigDecimal crateBigDec;
-
-    @JsonbDateFormat("dd.MM.yyy ^ HH:mm:ss")
-    public Date date;
-
-    public AnnotatedWithSerializerType annotatedType;
-
-    public AnnotatedGenericWithSerializerType<Crate> annotatedGenericType;
-
-    @JsonbTypeSerializer(AnnotatedWithSerializerTypeSerializerOverride.class)
-    public AnnotatedWithSerializerType annotatedTypeOverriddenOnProperty;
+    public T value;
 }
