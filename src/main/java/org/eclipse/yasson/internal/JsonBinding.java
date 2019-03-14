@@ -146,6 +146,12 @@ public class JsonBinding implements YassonJsonb {
     }
 
     @Override
+    public <T> T fromJson(JsonParser jsonParser, Type runtimeType) throws JsonbException {
+        Unmarshaller unmarshaller = new Unmarshaller(jsonbContext);
+        return unmarshaller.deserialize(runtimeType, new JsonbRiParser(jsonParser));
+    }
+
+    @Override
     public void toJson(Object object, JsonGenerator jsonGenerator) throws JsonbException {
         final Marshaller marshaller = new Marshaller(jsonbContext);
         marshaller.marshallWithoutClose(object, jsonGenerator);

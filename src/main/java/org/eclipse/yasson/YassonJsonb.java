@@ -50,6 +50,27 @@ public interface YassonJsonb extends javax.json.bind.Jsonb {
     <T> T fromJson(JsonParser jsonParser, Class<T> type) throws JsonbException;
 
     /**
+     * Reads in a JSON data with a specified {@link JsonParser} and return the
+     * resulting content tree. Provided json parser must be fully initialized,
+     * no further configurations will be applied.
+     *
+     * @param jsonParser
+     *      The json parser instance to be used to read JSON data.
+     * @param runtimeType
+     *      Runtime type of the content tree's root object.
+     * @param <T>
+     *      Type of the content tree's root object.
+     *
+     * @return the newly created root object of the java content tree
+     *
+     * @throws JsonbException
+     *     If any unexpected error(s) occur(s) during deserialization.
+     * @throws NullPointerException
+     *      If any of the parameters is {@code null}.
+     */
+    <T> T fromJson(JsonParser jsonParser, Type runtimeType) throws JsonbException;
+
+    /**
      * Writes the object content tree with a specified {@link JsonGenerator}.
      * Provided json generator must be fully initialized, no further configurations are applied.
      *

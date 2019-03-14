@@ -10,6 +10,7 @@
 package org.eclipse.yasson.jsonpsubstitution;
 
 import org.eclipse.yasson.JsonBindingProvider;
+import org.eclipse.yasson.TestTypeToken;
 import org.eclipse.yasson.YassonJsonb;
 import org.junit.Assert;
 import org.junit.Before;
@@ -21,6 +22,7 @@ import javax.json.stream.JsonGenerator;
 import javax.json.stream.JsonParser;
 import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
+import java.util.List;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertTrue;
@@ -44,6 +46,18 @@ public class PreinstantiatedJsonpTest {
         @Override
         public String toString() {
             return "Dog:\nname: " + name + "\nage: " + age + "\ngoodDog: " + goodDog;
+        }
+    }
+
+    public static class Wrapper<T> {
+        private T value;
+
+        public T getValue() {
+            return value;
+        }
+
+        public void setValue(T value) {
+            this.value = value;
         }
     }
 
@@ -157,6 +171,32 @@ public class PreinstantiatedJsonpTest {
         } catch (JsonbException e) {
             //OK
         }
+    }
+
+    @Test
+    public void testRuntimeTypeParser() {
+        Wrapper<String> stringWrapper = new Wrapper<>();
+        stringWrapper.setValue("String value");
+        ByteArrayInputStream in = new ByteArrayInputStream("{\"value\":\"String value\"}".getBytes());
+        JsonParser parser = new AdaptedJsonParser((value) -> {
+            if (value.equals("String value")) {
+                return "Adapted string";
+            }
+            return value;
+        }, in);
+        Wrapper<String> result = jsonb.fromJson(parser, new TestTypeToken<Wrapper<String>>() {}.getType());
+        Assert.assertEquals("Adapted string", result.getValue());
+    }
+
+    @Test
+    public void testRuntimeTypeGenerator() {
+        Wrapper<String> stringWrapper = new Wrapper<>();
+        stringWrapper.setValue("String value");
+        ByteArrayOutputStream out = new ByteArrayOutputStream();
+        JsonGenerator generator = new SuffixJsonGenerator("Appended value.", out);
+        jsonb.toJson(stringWrapper, new TestTypeToken<List<String>>(){}.getType(), generator);
+        generator.close();
+        Assert.assertEquals("{\"value\":\"String value\",\"suffix\":\"Appended value.\"}", out.toString());
     }
 
 }
