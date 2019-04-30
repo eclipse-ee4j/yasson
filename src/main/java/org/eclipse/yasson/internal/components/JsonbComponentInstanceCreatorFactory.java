@@ -26,7 +26,7 @@ import java.security.PrivilegedAction;
 import java.util.logging.Logger;
 
 /**
- * Factory method for Jsonb component instance creator.
+ * Factory method for default Jsonb component instance creators.
  *
  * @author Roman Grigoriadi
  */

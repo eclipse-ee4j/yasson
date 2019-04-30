@@ -86,6 +86,7 @@ public enum MessageKeys {
     MULTIPLE_CONSTRUCTOR_PROPERTIES_CREATORS("multipleConstructorPropertiesCreators"),
     ANNOTATION_NOT_AVAILABLE("annotationNotAvailable"),
     MISSING_VALUE_PROPERTY_IN_ANNOTATION("missingValuePropertyInAnnotation"),
+    SERVICE_PROVIDER_COMPONENT_INSTANCE_CREATOR("usingServiceProviderComponentInstanceCreator"),
     ;
 
     /** Message bundle key. */
