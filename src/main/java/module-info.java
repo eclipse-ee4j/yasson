@@ -19,6 +19,7 @@ module org.eclipse.yasson {
     requires static java.desktop;
     
     exports org.eclipse.yasson;
+    exports org.eclipse.yasson.spi;
     provides javax.json.bind.spi.JsonbProvider with org.eclipse.yasson.JsonBindingProvider;
     uses org.eclipse.yasson.internal.components.JsonbComponentInstanceCreator;
 }

@@ -13,10 +13,8 @@
 
 package org.eclipse.yasson.internal;
 
-import org.eclipse.yasson.internal.components.JsonbComponentInstanceCreator;
 import org.eclipse.yasson.internal.components.JsonbComponentInstanceCreatorFactory;
-import org.eclipse.yasson.internal.properties.MessageKeys;
-import org.eclipse.yasson.internal.properties.Messages;
+import org.eclipse.yasson.spi.JsonbComponentInstanceCreator;
 
 import javax.json.bind.JsonbConfig;
 import javax.json.spi.JsonProvider;
@@ -156,7 +154,7 @@ public class JsonbContext {
         }
         creators.sort(Comparator.comparingInt(JsonbComponentInstanceCreator::getPriority).reversed());
         JsonbComponentInstanceCreator creator = creators.get(0);
-        log.finest(Messages.getMessage(MessageKeys.SERVICE_PROVIDER_COMPONENT_INSTANCE_CREATOR, creator.getClass()));
+        log.finest("Component instance creator:" + creator.getClass());
         return creator;
     }
 

@@ -11,18 +11,17 @@
  * Roman Grigoriadi
  ******************************************************************************/
 
-package org.eclipse.yasson.internal.components;
+package org.eclipse.yasson.spi;
 
 import java.io.Closeable;
-
 
 /**
  * Creates instances of JsonbComponents such as JsonbAdapter.
  * 
  * <p>
  * Yasson attempts to load the implementations using {@link java.util.ServiceLoader} first. If there are multiple
- * implementations found the service provider with the highest priority is used. If there are no implementations found the
- * {@link JsonbComponentInstanceCreatorFactory} is used to instantiate the default implementation.
+ * implementations found the service provider with the highest priority is used. If there are no service providers found the
+ * default implementation is used.
  * </p>
  * 
  * @author Roman Grigoriadi

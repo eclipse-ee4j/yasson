@@ -16,6 +16,7 @@ package org.eclipse.yasson.internal.components;
 import org.eclipse.yasson.internal.JsonBinding;
 import org.eclipse.yasson.internal.properties.MessageKeys;
 import org.eclipse.yasson.internal.properties.Messages;
+import org.eclipse.yasson.spi.JsonbComponentInstanceCreator;
 
 import javax.enterprise.context.spi.CreationalContext;
 import javax.enterprise.inject.spi.AnnotatedType;

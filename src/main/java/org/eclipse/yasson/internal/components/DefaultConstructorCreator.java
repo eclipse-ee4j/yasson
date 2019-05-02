@@ -14,6 +14,7 @@
 package org.eclipse.yasson.internal.components;
 
 import org.eclipse.yasson.internal.InstanceCreator;
+import org.eclipse.yasson.spi.JsonbComponentInstanceCreator;
 
 import java.io.IOException;
 

@@ -16,6 +16,7 @@ package org.eclipse.yasson.internal.components;
 import org.eclipse.yasson.internal.InstanceCreator;
 import org.eclipse.yasson.internal.properties.MessageKeys;
 import org.eclipse.yasson.internal.properties.Messages;
+import org.eclipse.yasson.spi.JsonbComponentInstanceCreator;
 
 import javax.json.bind.JsonbException;
 import java.lang.reflect.Constructor;
