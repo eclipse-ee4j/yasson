@@ -16,6 +16,7 @@ package org.eclipse.yasson.internal.components;
 import org.eclipse.yasson.internal.InstanceCreator;
 import org.eclipse.yasson.internal.properties.MessageKeys;
 import org.eclipse.yasson.internal.properties.Messages;
+import org.eclipse.yasson.spi.JsonbComponentInstanceCreator;
 
 import javax.json.bind.JsonbException;
 import java.lang.reflect.Constructor;
@@ -26,7 +27,7 @@ import java.security.PrivilegedAction;
 import java.util.logging.Logger;
 
 /**
- * Factory method for Jsonb component instance creator.
+ * Factory method for default Jsonb component instance creators.
  *
  * @author Roman Grigoriadi
  */
