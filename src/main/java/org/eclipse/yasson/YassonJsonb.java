@@ -9,6 +9,7 @@
  ******************************************************************************/
 package org.eclipse.yasson;
 
+import javax.json.JsonStructure;
 import javax.json.bind.JsonbException;
 import javax.json.stream.JsonGenerator;
 import javax.json.stream.JsonParser;
@@ -71,6 +72,47 @@ public interface YassonJsonb extends javax.json.bind.Jsonb {
     <T> T fromJson(JsonParser jsonParser, Type runtimeType) throws JsonbException;
 
     /**
+     * Reads a {@link JsonStructure} and and converts it into
+     * resulting java content tree.
+     *
+     * @param jsonStructure
+     *      {@link JsonStructure} to be used as a source for conversion.
+     * @param type
+     *      Type of the content tree's root object.
+     * @param <T>
+     *      Type of the content tree's root object.
+     *
+     * @return the newly created root object of the java content tree
+     *
+     * @throws JsonbException
+     *     If any unexpected error(s) occur(s) during conversion.
+     * @throws NullPointerException
+     *      If any of the parameters is {@code null}.
+     */
+    <T> T fromJsonStructure(JsonStructure jsonStructure, Class<T> type) throws JsonbException;
+
+    /**
+     * Reads a {@link JsonStructure} and and converts it into
+     * resulting java content tree.
+     *
+     * @param jsonStructure
+     *      {@link JsonStructure} to be used as a source for conversion.
+     * @param runtimeType
+     *      Runtime type of the content tree's root object.
+     * @param <T>
+     *      Type of the content tree's root object.
+     *
+     * @return the newly created root object of the java content tree
+     *
+     * @throws JsonbException
+     *     If any unexpected error(s) occur(s) during deserialization.
+     * @throws NullPointerException
+     *      If any of the parameters is {@code null}.
+     */
+    <T> T fromJsonStructure(JsonStructure jsonStructure, Type runtimeType) throws JsonbException;
+
+
+    /**
      * Writes the object content tree with a specified {@link JsonGenerator}.
      * Provided json generator must be fully initialized, no further configurations are applied.
      *
@@ -111,4 +153,41 @@ public interface YassonJsonb extends javax.json.bind.Jsonb {
      * @since JSON Binding 1.0
      */
     void toJson(Object object, Type runtimeType, JsonGenerator jsonGenerator) throws JsonbException;
+
+    /**
+     * Serializes the object content tree to a {@link javax.json.JsonStructure}.
+     *
+     * @param object
+     *      The object content tree to be serialized.
+     *
+     * @return The {@link JsonStructure} serialized from java content tree.
+     *
+     * @throws JsonbException If any unexpected problem occurs during the
+     * serialization.
+     * @throws NullPointerException
+     *      If any of the parameters is {@code null}.
+     *
+     * @since JSON Binding 1.0
+     */
+    JsonStructure toJsonStructure(Object object) throws JsonbException;
+
+    /**
+     * Serializes the object content tree to a {@link javax.json.JsonStructure}.
+     *
+     * @param object
+     *      The object content tree to be serialized.
+     *
+     * @param runtimeType
+     *      Runtime type of the content tree's root object.
+     *
+     * @return The {@link JsonStructure} serialized from java content tree.
+     *
+     * @throws JsonbException If any unexpected problem occurs during the
+     * serialization.
+     * @throws NullPointerException
+     *      If any of the parameters is {@code null}.
+     *
+     * @since JSON Binding 1.0
+     */
+    JsonStructure toJsonStructure (Object object, Type runtimeType) throws JsonbException;
 }

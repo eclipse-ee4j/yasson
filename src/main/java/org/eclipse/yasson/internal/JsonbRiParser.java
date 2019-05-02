@@ -25,6 +25,7 @@ import javax.json.stream.JsonParser;
 import java.math.BigDecimal;
 import java.util.Arrays;
 import java.util.Map;
+import java.util.Objects;
 import java.util.Stack;
 import java.util.stream.Stream;
 
@@ -76,6 +77,7 @@ public class JsonbRiParser implements JsonParser, JsonbParser {
         }
 
         private void setLastKeyName(String lastKeyName) {
+            Objects.requireNonNull(lastKeyName);
             this.lastKeyName = lastKeyName;
         }
 
