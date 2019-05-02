@@ -21,5 +21,5 @@ module org.eclipse.yasson {
     exports org.eclipse.yasson;
     exports org.eclipse.yasson.spi;
     provides javax.json.bind.spi.JsonbProvider with org.eclipse.yasson.JsonBindingProvider;
-    uses org.eclipse.yasson.internal.components.JsonbComponentInstanceCreator;
+    uses org.eclipse.yasson.spi.JsonbComponentInstanceCreator;
 }
