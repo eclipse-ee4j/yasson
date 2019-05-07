@@ -1,5 +1,6 @@
 /*******************************************************************************
  * Copyright (c) 2016, 2018 Oracle and/or its affiliates. All rights reserved.
+ * Copyright (c) 2019 Payara Foundation and/or its affiliates. All rights reserved.
  * This program and the accompanying materials are made available under the
  * terms of the Eclipse Public License v1.0 and Eclipse Distribution License v. 1.0
  * which accompanies this distribution.
@@ -19,6 +20,8 @@ import org.eclipse.yasson.internal.model.customization.Customization;
 import javax.json.stream.JsonGenerator;
 import java.util.OptionalDouble;
 
+import static org.eclipse.yasson.internal.serializer.OptionalObjectSerializer.handleEmpty;
+
 /**
  * Serializer for {@link OptionalDouble} type.
  * 
@@ -37,10 +40,8 @@ public class OptionalDoubleTypeSerializer extends AbstractValueTypeSerializer<Op
 
     @Override
     protected void serialize(OptionalDouble obj, JsonGenerator generator, Marshaller marshaller) {
-        if (obj.isPresent()) {
+        if (!handleEmpty(obj, OptionalDouble::isPresent, customization, generator, marshaller)) {
             generator.write(obj.getAsDouble());
-        } else if (customization.isNillable()) {
-            generator.writeNull();
         }
     }
 }

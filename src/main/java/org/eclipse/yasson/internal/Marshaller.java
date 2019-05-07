@@ -135,6 +135,10 @@ public class Marshaller extends ProcessingContext implements SerializationContex
      */
     @SuppressWarnings("unchecked")
     public <T> void serializeRoot(T root, JsonGenerator generator) {
+        if (root == null) {
+            getJsonbContext().getConfigProperties().getNullSerializer().serialize(null, generator, this);
+            return;
+        }
         final JsonbSerializer<T> rootSerializer = (JsonbSerializer<T>) getRootSerializer(root.getClass());
         if (jsonbContext.getConfigProperties().isStrictIJson() &&
                 rootSerializer instanceof AbstractValueTypeSerializer) {

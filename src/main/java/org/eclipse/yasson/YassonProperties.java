@@ -35,4 +35,11 @@ public class YassonProperties {
      * to instant {@link java.time.Instant} or {@link java.time.ZonedDateTime}.
      */
     public static final String ZERO_TIME_PARSE_DEFAULTING = "jsonb.zero-time-defaulting";
+
+    /**
+     * Serializer to use when object provided to {@link javax.json.bind.Jsonb#toJson(Object)} is {@code null} or an empty
+     * Optional. Much be instance of {@link javax.json.bind.serializer.JsonbSerializer}{@code <Object>}. Its obj value
+     * will be respective parameter.
+     */
+    public static final String NULL_ROOT_SERIALIZER = "yasson.null-root-serializer";
 }

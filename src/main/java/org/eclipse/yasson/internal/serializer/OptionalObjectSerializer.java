@@ -14,6 +14,7 @@
 package org.eclipse.yasson.internal.serializer;
 
 import org.eclipse.yasson.internal.JsonbContext;
+import org.eclipse.yasson.internal.Marshaller;
 import org.eclipse.yasson.internal.ProcessingContext;
 import org.eclipse.yasson.internal.model.ClassModel;
 import org.eclipse.yasson.internal.model.customization.Customization;
@@ -24,6 +25,7 @@ import javax.json.stream.JsonGenerator;
 import java.lang.reflect.ParameterizedType;
 import java.lang.reflect.Type;
 import java.util.Optional;
+import java.util.function.Predicate;
 
 /**
  * Common serializer logic for java Optionals.
@@ -78,17 +80,29 @@ public class OptionalObjectSerializer<T extends Optional<?>> implements CurrentI
     @Override
     public void serialize(T obj, JsonGenerator generator, SerializationContext ctx) {
         JsonbContext jsonbContext = ((ProcessingContext) ctx).getJsonbContext();
-        if (obj == null || !obj.isPresent()) {
-            if (!customization.isNillable()) {
-                return;
-            }
-            generator.writeNull();
+        if (handleEmpty(obj, Optional::isPresent, customization, generator, (Marshaller)ctx)) {
             return;
         }
         Object optionalValue = obj.get();
         final JsonbSerializer<?> serializer = new SerializerBuilder(jsonbContext).withObjectClass(optionalValue.getClass())
                 .withType(optionalValueType).withWrapper(wrapper).withCustomization(customization).build();
         serialCaptor(serializer, optionalValue, generator, ctx);
+    }
+
+    static <T> boolean handleEmpty(T value, Predicate<T> presentCheck,  Customization customization, JsonGenerator generator, Marshaller marshaller) {
+        if (value == null || !presentCheck.test(value)) {
+            if (customization != null) {
+                if (customization.isNillable()) {
+                    generator.writeNull();
+                    return true;
+                }
+            } else {
+                marshaller.getJsonbContext().getConfigProperties().getNullSerializer().serialize(value, generator, marshaller);
+            }
+            return true;
+        } else {
+            return false;
+        }
     }
 
     @SuppressWarnings("unchecked")
