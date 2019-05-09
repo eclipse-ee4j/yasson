@@ -1,5 +1,6 @@
 /*******************************************************************************
  * Copyright (c) 2015 Oracle and/or its affiliates. All rights reserved.
+ * Copyright (c) 2019 Payara Foundation and/or its affiliates. All rights reserved.
  * This program and the accompanying materials are made available under the
  * terms of the Eclipse Public License v1.0 and Eclipse Distribution License v. 1.0
  * which accompanies this distribution.
@@ -13,12 +14,17 @@
 
 package org.eclipse.yasson.defaultmapping.specific;
 
+import org.eclipse.yasson.TestTypeToken;
 import org.eclipse.yasson.defaultmapping.specific.model.Street;
+import org.eclipse.yasson.internal.JsonBindingBuilder;
 import org.junit.Before;
 import org.junit.Test;
 
 import javax.json.bind.Jsonb;
 import javax.json.bind.JsonbBuilder;
+
+import java.util.List;
+import java.util.Map;
 
 import static org.junit.Assert.assertNull;
 
@@ -43,4 +49,25 @@ public class NullTest {
         assertNull(result.getName());
         assertNull(result.getNumber());
     }
+
+    @Test
+    public void testDeserializeNull() {
+        assertNull(jsonb.fromJson("null", Object.class));
+    }
+
+    @Test
+    public void testDeserializeNullPojo() {
+        assertNull(jsonb.fromJson("null", Street.class));
+    }
+
+    @Test
+    public void testDeserializeNullList() {
+        assertNull(jsonb.fromJson("null", new TestTypeToken<List<Integer>>() {}.getType()));
+    }
+
+    @Test
+    public void testDeserializeNullMap() {
+        assertNull(jsonb.fromJson("null", new TestTypeToken<Map<String, Street>>() {}.getType()));
+    }
+
 }

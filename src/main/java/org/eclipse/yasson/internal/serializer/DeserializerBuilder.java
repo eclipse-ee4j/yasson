@@ -1,5 +1,6 @@
 /*******************************************************************************
  * Copyright (c) 2015, 2018 Oracle and/or its affiliates. All rights reserved.
+ * Copyright (c) 2019 Payara Foundation and/or its affiliates. All rights reserved.
  * This program and the accompanying materials are made available under the
  * terms of the Eclipse Public License v1.0 and Eclipse Distribution License v. 1.0
  * which accompanies this distribution.
@@ -127,6 +128,9 @@ public class DeserializerBuilder extends AbstractSerializerBuilder<DeserializerB
         if (isJsonValueEvent()) {
             final Optional<AbstractValueTypeDeserializer<?>> supportedTypeDeserializer = getSupportedTypeDeserializer(rawType);
             if (!supportedTypeDeserializer.isPresent()) {
+                if (jsonEvent == JsonParser.Event.VALUE_NULL) {
+                    return NullDeserializer.INSTANCE;
+                }
                 throw new JsonbException(Messages.getMessage(MessageKeys.DESERIALIZE_VALUE_ERROR, getRuntimeType()));
             }
             return wrapAdapted(adapterInfoOptional, supportedTypeDeserializer.get());
@@ -225,6 +229,8 @@ public class DeserializerBuilder extends AbstractSerializerBuilder<DeserializerB
                 return ArrayList.class;
                 case START_OBJECT:
                     return jsonbContext.getConfigProperties().getDefaultMapImplType();
+                case VALUE_NULL:
+                    return Object.class;
                 default:
                 throw new IllegalStateException("Can't infer deserialization type type: " + jsonEvent);
 
