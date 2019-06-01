@@ -80,7 +80,15 @@ public abstract class AbstractContainerDeserializer<T> extends AbstractItem<T> i
                 case VALUE_NUMBER:
                 case VALUE_FALSE:
                 case VALUE_TRUE:
-                    deserializeNext(parser, context);
+                	try {
+                		deserializeNext(parser, context);
+                	} catch (JsonbException e) {
+                		if (parserContext == null || parserContext.getLastKeyName() == null)
+                			throw e;
+                		else
+                            throw new JsonbException("Unable to deserialize property '" + parserContext.getLastKeyName() + 
+                					"' because of: " + e.getMessage(), e);
+                	}
                     break;
                 case KEY_NAME:
                     break;
