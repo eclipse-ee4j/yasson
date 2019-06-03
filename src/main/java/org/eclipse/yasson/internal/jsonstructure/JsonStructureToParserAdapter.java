@@ -19,7 +19,8 @@ import javax.json.bind.JsonbException;
 import javax.json.stream.JsonLocation;
 import javax.json.stream.JsonParser;
 import java.math.BigDecimal;
-import java.util.Stack;
+import java.util.ArrayDeque;
+import java.util.Deque;
 
 /**
  * Adapter for {@link JsonParser}, that reads a {@link JsonStructure} content tree instead of JSON text.
@@ -30,7 +31,7 @@ import java.util.Stack;
  */
 public class JsonStructureToParserAdapter implements JsonParser {
 
-    private Stack<JsonStructureIterator> iterators = new Stack<>();
+    private Deque<JsonStructureIterator> iterators = new ArrayDeque<>();
 
     private final JsonStructure rootStructure;
 

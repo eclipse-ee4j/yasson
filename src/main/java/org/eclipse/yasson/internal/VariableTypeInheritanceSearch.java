@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2015 Oracle and/or its affiliates. All rights reserved.
+ * Copyright (c) 2015, 2019 Oracle and/or its affiliates. All rights reserved.
  * This program and the accompanying materials are made available under the
  * terms of the Eclipse Public License v1.0 and Eclipse Distribution License v. 1.0
  * which accompanies this distribution.
@@ -20,7 +20,8 @@ import javax.json.bind.JsonbException;
 import java.lang.reflect.ParameterizedType;
 import java.lang.reflect.Type;
 import java.lang.reflect.TypeVariable;
-import java.util.Stack;
+import java.util.ArrayDeque;
+import java.util.Deque;
 
 /**
  * Search for type variable in inheritance hierarchy and resolve if possible.
@@ -29,7 +30,7 @@ import java.util.Stack;
  */
 public class VariableTypeInheritanceSearch {
 
-    private final Stack<ParameterizedType> parameterizedSubclasses = new Stack<>();
+    private final Deque<ParameterizedType> parameterizedSubclasses = new ArrayDeque<>();
 
     /**
      * Searches the hierarchy of classes to resolve a type variable. If typevar resolved value is another typevar redirection (propagated from wrapping class),

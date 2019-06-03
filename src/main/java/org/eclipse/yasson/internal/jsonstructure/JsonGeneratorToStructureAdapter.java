@@ -20,7 +20,8 @@ import javax.json.spi.JsonProvider;
 import javax.json.stream.JsonGenerator;
 import java.math.BigDecimal;
 import java.math.BigInteger;
-import java.util.Stack;
+import java.util.ArrayDeque;
+import java.util.Deque;
 
 /**
  * Adapter for {@link JsonGenerator}, that builds a {@link JsonStructure} content tree instead of JSON text.
@@ -31,7 +32,7 @@ import java.util.Stack;
  */
 public class JsonGeneratorToStructureAdapter implements JsonGenerator {
 
-    private final Stack<JsonStructureBuilder> builders;
+    private final Deque<JsonStructureBuilder> builders;
 
     private JsonStructure root;
 
@@ -43,7 +44,7 @@ public class JsonGeneratorToStructureAdapter implements JsonGenerator {
      * @param provider Cached json provider to create builders on.
      */
     public JsonGeneratorToStructureAdapter(JsonProvider provider) {
-        this.builders = new Stack<>();
+        this.builders = new ArrayDeque<>();
         this.provider = provider;
     }
 
@@ -131,7 +132,8 @@ public class JsonGeneratorToStructureAdapter implements JsonGenerator {
         JsonStructureBuilder current = builders.peek();
         if (!(current instanceof JsonObjectBuilder)) {
             throw new JsonbException(Messages.getMessage(
-                    MessageKeys.INTERNAL_ERROR, "Can't write key [" + keyName + "] into " + current.getClass()));
+                    MessageKeys.INTERNAL_ERROR, "Can't write key [" + keyName + "] into " + current.getClass()
+            + "because "+current.getClass() + " is not an instance of "+ JsonObjectBuilder.class));
         }
         return (JsonObjectBuilder) current;
     }
