@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2016, 2018 Oracle and/or its affiliates. All rights reserved.
+ * Copyright (c) 2016, 2019 Oracle and/or its affiliates. All rights reserved.
  * This program and the accompanying materials are made available under the
  * terms of the Eclipse Public License v1.0 and Eclipse Distribution License v. 1.0
  * which accompanies this distribution.
@@ -36,19 +36,11 @@ public class BigDecimalTypeSerializer extends AbstractNumberSerializer<BigDecima
 
     @Override
     protected void serializeNonFormatted(BigDecimal obj, JsonGenerator generator, String key) {
-        if (BigNumberUtil.isIEEE754(obj)) {
-            generator.write(key, obj);
-        } else {
-            generator.write(key, obj.toString());
-        }
+        generator.write(key, obj);
     }
 
     @Override
     protected void serializeNonFormatted(BigDecimal obj, JsonGenerator generator) {
-        if (BigNumberUtil.isIEEE754(obj)) {
-            generator.write(obj);
-        } else {
-            generator.write(obj.toString());
-        }
+        generator.write(obj);
     }
 }
