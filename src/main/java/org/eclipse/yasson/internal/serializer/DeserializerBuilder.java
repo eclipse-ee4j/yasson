@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2015, 2018 Oracle and/or its affiliates. All rights reserved.
+ * Copyright (c) 2015, 2019 Oracle and/or its affiliates. All rights reserved.
  * Copyright (c) 2019 Payara Foundation and/or its affiliates. All rights reserved.
  * This program and the accompanying materials are made available under the
  * terms of the Eclipse Public License v1.0 and Eclipse Distribution License v. 1.0
@@ -125,7 +125,7 @@ public class DeserializerBuilder extends AbstractSerializerBuilder<DeserializerB
         }
 
         //Third deserializer is a supported value type to deserialize to JSON_VALUE
-        if (isJsonValueEvent()) {
+        if (isJsonValueEvent(jsonEvent)) {
             final Optional<AbstractValueTypeDeserializer<?>> supportedTypeDeserializer = getSupportedTypeDeserializer(rawType);
             if (!supportedTypeDeserializer.isPresent()) {
                 if (jsonEvent == JsonParser.Event.VALUE_NULL) {
@@ -178,8 +178,14 @@ public class DeserializerBuilder extends AbstractSerializerBuilder<DeserializerB
         throw new JsonbException("unresolved type for deserialization: " + getRuntimeType());
     }
 
-    private boolean isJsonValueEvent() {
-        switch (jsonEvent) {
+    /**
+     * Checks if event is a value event.
+     *
+     * @param event JSON event to check.
+     * @return True if one of value events.
+     */
+    public static boolean isJsonValueEvent(JsonParser.Event event) {
+        switch (event) {
             case VALUE_NULL:
             case VALUE_FALSE:
             case VALUE_TRUE:
