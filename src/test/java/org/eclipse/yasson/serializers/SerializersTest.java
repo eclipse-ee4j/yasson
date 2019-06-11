@@ -19,6 +19,7 @@ import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNull;
 import static org.junit.Assert.fail;
 
+import java.lang.reflect.Type;
 import java.math.BigDecimal;
 import java.util.ArrayList;
 import java.util.Calendar;
@@ -28,11 +29,15 @@ import java.util.SortedMap;
 import java.util.TimeZone;
 import java.util.TreeMap;
 
+import javax.json.JsonObject;
 import javax.json.bind.Jsonb;
 import javax.json.bind.JsonbBuilder;
 import javax.json.bind.JsonbConfig;
 import javax.json.bind.JsonbException;
 import javax.json.bind.config.PropertyOrderStrategy;
+import javax.json.bind.serializer.DeserializationContext;
+import javax.json.bind.serializer.JsonbDeserializer;
+import javax.json.stream.JsonParser;
 
 import org.eclipse.yasson.TestTypeToken;
 import org.eclipse.yasson.internal.model.ReverseTreeMap;
@@ -445,6 +450,37 @@ public class SerializersTest {
         assertEquals("{\"null\":null}", jsonb.toJson(singletonMap(null, null)));
         assertEquals("{\"key\":null}", jsonb.toJson(singletonMap("key", null)));
         assertEquals("{\"null\":\"value\"}", jsonb.toJson(singletonMap(null, "value")));
+    }
+
+    @Test
+    public void testDeserializeArrayWithAdvancingParserAfterObjectEnd() {
+        String json = "[{\"stringProperty\":\"Property 1 value\"},{\"stringProperty\":\"Property 2 value\"}]";
+        Jsonb jsonb = JsonbBuilder.create(new JsonbConfig().withDeserializers(new SimplePojoDeserializer()));
+        SimplePojo[] result = jsonb.fromJson(json, SimplePojo[].class);
+        Assert.assertEquals(2, result.length);
+    }
+
+    public class SimplePojoDeserializer implements JsonbDeserializer<SimplePojo> {
+        @Override
+        public SimplePojo deserialize(JsonParser parser, DeserializationContext ctx, Type rtType) {
+            //parser.getObject advances the parser to END_OBJECT.
+            JsonObject json = parser.getObject();
+            SimplePojo simplePojo = new SimplePojo();
+            simplePojo.setStringProperty(json.getString("stringProperty"));
+            return simplePojo;
+        }
+    }
+
+    public class SimplePojo {
+        private String stringProperty;
+
+        public String getStringProperty() {
+            return stringProperty;
+        }
+
+        public void setStringProperty(String stringProperty) {
+            this.stringProperty = stringProperty;
+        }
     }
 
     private Box createPojoWithDates() {
