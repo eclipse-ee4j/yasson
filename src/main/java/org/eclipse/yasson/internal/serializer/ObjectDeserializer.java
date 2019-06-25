@@ -115,13 +115,14 @@ class ObjectDeserializer<T> extends AbstractContainerDeserializer<T> {
         final List<Object> paramValues = new ArrayList<>();
         for(CreatorModel param : creator.getParams()) {
             final ValueWrapper valueWrapper = values.get(param.getName());
-            if (ReflectionUtils.getRawType(param.getType()).isAssignableFrom( Optional.class )) {
-                paramValues.add( Optional.empty() );
-            } else {
-                //required by spec
-                if ( valueWrapper == null ) {
+            if ( valueWrapper == null ) {
+                if (ReflectionUtils.getRawType(param.getType()).isAssignableFrom( Optional.class )) {
+                    paramValues.add( Optional.empty() );
+                } else {
+                    //required by spec
                     throw new JsonbException( Messages.getMessage( MessageKeys.JSONB_CREATOR_MISSING_PROPERTY, param.getName() ) );
                 }
+            } else {
                 paramValues.add( valueWrapper.getValue() );
             }
         }
