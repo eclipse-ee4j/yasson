@@ -31,7 +31,7 @@ class AnnotationIntrospectorTestFixtures {
         return AccessController.doPrivileged((PrivilegedAction<Constructor<?>[]>) clazz::getDeclaredConstructors);
     }
 
-    public static class ObjectWithoutAnnotatedConstructor implements ProvidesParameterRepresentation {
+    public static class MissingAnnotationConstructor implements ProvidesParameterRepresentation {
         private final String string;
         private final long primitive;
 
@@ -40,11 +40,39 @@ class AnnotationIntrospectorTestFixtures {
         }
 
         public static final ProvidesParameterRepresentation example() {
-            return new ObjectWithoutAnnotatedConstructor("a string", Long.MAX_VALUE);
+            return new MissingAnnotationConstructor("a string", Long.MAX_VALUE);
+        }
+
+        public MissingAnnotationConstructor(String aString, long aPrimitive) {
+            this.string = aString;
+            this.primitive = aPrimitive;
+        }
+
+        @Override
+        public Object[] asParameters() {
+            return new Object[] { string, primitive };
+        }
+
+        @Override
+        public String toString() {
+            return "NoAnnotatedConstructor [string=" + string + ", primitive=" + primitive + "]";
+        }
+    }
+
+    public static class JsonbCreatorAnnotatedConstructor implements ProvidesParameterRepresentation {
+        private final String string;
+        private final long primitive;
+
+        public static final Map<String, Type> parameters() {
+            return twoParameters("string", String.class, "primitive", long.class);
+        }
+
+        public static final ProvidesParameterRepresentation example() {
+            return new JsonbCreatorAnnotatedConstructor("a string", Long.MAX_VALUE);
         }
 
         @JsonbCreator
-        public ObjectWithoutAnnotatedConstructor( //
+        public JsonbCreatorAnnotatedConstructor( //
                 @JsonbProperty("string") String aString, //
                 @JsonbProperty("primitive") long aPrimitive) {
             this.string = aString;
@@ -58,11 +86,11 @@ class AnnotationIntrospectorTestFixtures {
 
         @Override
         public String toString() {
-            return "ObjectWithNotAnnotatedConstructor [string=" + string + ", primitive=" + primitive + "]";
+            return "JsonbCreatorAnnotatedConstructor [string=" + string + ", primitive=" + primitive + "]";
         }
     }
 
-    public static class ObjectWithJsonbCreatorAnnotatedConstructor implements ProvidesParameterRepresentation {
+    public static class JsonbCreatorAnnotatedProtectedConstructor implements ProvidesParameterRepresentation {
         private final String string;
         private final long primitive;
 
@@ -71,11 +99,11 @@ class AnnotationIntrospectorTestFixtures {
         }
 
         public static final ProvidesParameterRepresentation example() {
-            return new ObjectWithJsonbCreatorAnnotatedConstructor("a string", Long.MAX_VALUE);
+            return new JsonbCreatorAnnotatedProtectedConstructor("a string", Long.MAX_VALUE);
         }
 
         @JsonbCreator
-        public ObjectWithJsonbCreatorAnnotatedConstructor( //
+        protected JsonbCreatorAnnotatedProtectedConstructor( //
                 @JsonbProperty("string") String aString, //
                 @JsonbProperty("primitive") long aPrimitive) {
             this.string = aString;
@@ -89,11 +117,11 @@ class AnnotationIntrospectorTestFixtures {
 
         @Override
         public String toString() {
-            return "ObjectWithJsonbCreatorAnnotatedConstructor [string=" + string + ", primitive=" + primitive + "]";
+            return "JsonbCreatorAnnotatedProtectedConstructor [string=" + string + ", primitive=" + primitive + "]";
         }
     }
 
-    public static class ObjectWithJsonbCreatorAnnotatedFactoryMethod implements ProvidesParameterRepresentation {
+    public static class JsonbCreatorAnnotatedFactoryMethod implements ProvidesParameterRepresentation {
         private final String string;
         private final long primitive;
 
@@ -102,17 +130,17 @@ class AnnotationIntrospectorTestFixtures {
         }
 
         public static final ProvidesParameterRepresentation example() {
-            return new ObjectWithJsonbCreatorAnnotatedFactoryMethod("text", Long.MIN_VALUE);
+            return new JsonbCreatorAnnotatedFactoryMethod("text", Long.MIN_VALUE);
         }
 
         @JsonbCreator
-        public static final ObjectWithJsonbCreatorAnnotatedFactoryMethod create( //
+        public static final JsonbCreatorAnnotatedFactoryMethod create( //
                 @JsonbProperty("string") String aString, //
                 @JsonbProperty("primitive") long aPrimitive) {
-            return new ObjectWithJsonbCreatorAnnotatedFactoryMethod(aString, aPrimitive);
+            return new JsonbCreatorAnnotatedFactoryMethod(aString, aPrimitive);
         }
 
-        private ObjectWithJsonbCreatorAnnotatedFactoryMethod(String string, long primitiv) {
+        private JsonbCreatorAnnotatedFactoryMethod(String string, long primitiv) {
             this.string = string;
             this.primitive = primitiv;
         }
@@ -124,11 +152,11 @@ class AnnotationIntrospectorTestFixtures {
 
         @Override
         public String toString() {
-            return "ObjectWithJsonbCreatorAnnotatedFactoryMethod [string=" + string + ", primitive=" + primitive + "]";
+            return "JsonbCreatorAnnotatedFactoryMethod [string=" + string + ", primitive=" + primitive + "]";
         }
     }
 
-    public static class ObjectWithTwoJsonbCreatorAnnotatedSpots implements ProvidesParameterRepresentation {
+    public static class TwoJsonbCreatorAnnotatedSpots implements ProvidesParameterRepresentation {
         private final String string;
         private final long primitive;
 
@@ -137,18 +165,18 @@ class AnnotationIntrospectorTestFixtures {
         }
 
         public static final ProvidesParameterRepresentation example() {
-            return new ObjectWithJsonbCreatorAnnotatedConstructor("", Long.valueOf(0));
+            return new JsonbCreatorAnnotatedConstructor("", Long.valueOf(0));
         }
 
         @JsonbCreator
-        public static final ObjectWithTwoJsonbCreatorAnnotatedSpots create( //
+        public static final TwoJsonbCreatorAnnotatedSpots create( //
                 @JsonbProperty("string") String aString, //
                 @JsonbProperty("primitive") long aPrimitive) {
-            return new ObjectWithTwoJsonbCreatorAnnotatedSpots(aString, aPrimitive);
+            return new TwoJsonbCreatorAnnotatedSpots(aString, aPrimitive);
         }
 
         @JsonbCreator
-        public ObjectWithTwoJsonbCreatorAnnotatedSpots( //
+        public TwoJsonbCreatorAnnotatedSpots( //
                 @JsonbProperty("string") String aString, //
                 @JsonbProperty("primitive") long aPrimitive) {
             this.string = aString;
@@ -162,11 +190,11 @@ class AnnotationIntrospectorTestFixtures {
 
         @Override
         public String toString() {
-            return "ObjectWithTwoJsonbCreatorAnnotatedSpots [string=" + string + ", primitive=" + primitive + "]";
+            return "TwoJsonbCreatorAnnotatedSpots [string=" + string + ", primitive=" + primitive + "]";
         }
     }
 
-    public static class ObjectWithConstructorPropertiesAnnotation implements ProvidesParameterRepresentation {
+    public static class ConstructorPropertiesAnnotation implements ProvidesParameterRepresentation {
         private final String string;
         private final long primitive;
 
@@ -175,11 +203,11 @@ class AnnotationIntrospectorTestFixtures {
         }
 
         public static final ProvidesParameterRepresentation example() {
-            return new ObjectWithConstructorPropertiesAnnotation("  ", Long.valueOf(-12));
+            return new ConstructorPropertiesAnnotation("  ", Long.valueOf(-12));
         }
 
         @ConstructorProperties({ "string", "primitive" })
-        public ObjectWithConstructorPropertiesAnnotation(String aString, long aPrimitive) {
+        public ConstructorPropertiesAnnotation(String aString, long aPrimitive) {
             this.string = aString;
             this.primitive = aPrimitive;
         }
@@ -191,11 +219,11 @@ class AnnotationIntrospectorTestFixtures {
 
         @Override
         public String toString() {
-            return "ObjectWithConstructorPropertiesAnnotatedConstructor [string=" + string + ", primitive=" + primitive + "]";
+            return "ConstructorPropertiesAnnotatedConstructor [string=" + string + ", primitive=" + primitive + "]";
         }
     }
 
-    public static class ObjectWithTwoConstructorPropertiesAnnotation implements ProvidesParameterRepresentation {
+    public static class TwoConstructorPropertiesAnnotation implements ProvidesParameterRepresentation {
         private final String string;
         private final long primitive;
 
@@ -204,16 +232,16 @@ class AnnotationIntrospectorTestFixtures {
         }
 
         public static final ProvidesParameterRepresentation example() {
-            return new ObjectWithTwoConstructorPropertiesAnnotation("  ", Long.valueOf(-12));
+            return new TwoConstructorPropertiesAnnotation("  ", Long.valueOf(-12));
         }
 
         @ConstructorProperties({ "string" })
-        public ObjectWithTwoConstructorPropertiesAnnotation(String aString) {
+        public TwoConstructorPropertiesAnnotation(String aString) {
             this(aString, 0L);
         }
 
         @ConstructorProperties({ "string", "primitive" })
-        public ObjectWithTwoConstructorPropertiesAnnotation(String aString, long aPrimitive) {
+        public TwoConstructorPropertiesAnnotation(String aString, long aPrimitive) {
             this.string = aString;
             this.primitive = aPrimitive;
         }
@@ -225,11 +253,11 @@ class AnnotationIntrospectorTestFixtures {
 
         @Override
         public String toString() {
-            return "ObjectWithTwoConstructorPropertiesAnnotation [string=" + string + ", primitive=" + primitive + "]";
+            return "TwoConstructorPropertiesAnnotation [string=" + string + ", primitive=" + primitive + "]";
         }
     }
 
-    public static class ObjectWithJsonbCreatorAndConstructorPropertiesAnnotation implements ProvidesParameterRepresentation {
+    public static class JsonbCreatorAndConstructorPropertiesAnnotation implements ProvidesParameterRepresentation {
         private final String string;
         private final long primitive;
 
@@ -238,18 +266,18 @@ class AnnotationIntrospectorTestFixtures {
         }
 
         public static final ProvidesParameterRepresentation example() {
-            return new ObjectWithJsonbCreatorAndConstructorPropertiesAnnotation("", Long.valueOf(0));
+            return new JsonbCreatorAndConstructorPropertiesAnnotation("", Long.valueOf(0));
         }
 
         @JsonbCreator
-        public static final ObjectWithJsonbCreatorAndConstructorPropertiesAnnotation create( //
+        public static final JsonbCreatorAndConstructorPropertiesAnnotation create( //
                 @JsonbProperty("string") String aString, //
                 @JsonbProperty("primitive") long aPrimitive) {
-            return new ObjectWithJsonbCreatorAndConstructorPropertiesAnnotation(aString, aPrimitive);
+            return new JsonbCreatorAndConstructorPropertiesAnnotation(aString, aPrimitive);
         }
 
         @ConstructorProperties({ "string", "primitive" })
-        public ObjectWithJsonbCreatorAndConstructorPropertiesAnnotation(String aString, long aPrimitive) {
+        public JsonbCreatorAndConstructorPropertiesAnnotation(String aString, long aPrimitive) {
             this.string = aString;
             this.primitive = aPrimitive;
         }
@@ -261,11 +289,166 @@ class AnnotationIntrospectorTestFixtures {
 
         @Override
         public String toString() {
-            return "ObjectWithJsonbCreatorAndConstructorPropertiesAnnotation [string=" + string + ", primitive=" + primitive + "]";
+            return "JsonbCreatorAndConstructorPropertiesAnnotation [string=" + string + ", primitive=" + primitive + "]";
         }
     }
 
-    public static class ObjectWithMissingConstructorAnnotation implements ProvidesParameterRepresentation {
+    public static class PublicNoArgAndAnnotatedPrivateConstructor implements ProvidesParameterRepresentation {
+        private String string;
+        private Long primitive;
+
+        public static final Map<String, Type> parameters() {
+            return twoParameters("string", String.class, "primitive", long.class);
+        }
+
+        public static final ProvidesParameterRepresentation example() {
+            return new PublicNoArgAndAnnotatedPrivateConstructor("  ", Long.valueOf(-12));
+        }
+
+        public PublicNoArgAndAnnotatedPrivateConstructor() {
+            super();
+        }
+
+        @ConstructorProperties({ "string", "primitive" })
+        private PublicNoArgAndAnnotatedPrivateConstructor(String aString, long aPrimitive) {
+            this.string = aString;
+            this.primitive = aPrimitive;
+        }
+
+        public Long getPrimitive() {
+            return primitive;
+        }
+
+        public void setPrimitive(Long primitive) {
+            this.primitive = primitive;
+        }
+
+        public String getString() {
+            return string;
+        }
+
+        public void setString(String string) {
+            this.string = string;
+        }
+
+        @Override
+        public Object[] asParameters() {
+            return new Object[] { string, primitive };
+        }
+
+        @Override
+        public String toString() {
+            return "PublicNoArgAndAnnotatedPrivateConstructor [string=" + string + ", primitive=" + primitive + "]";
+        }
+    }
+
+    public static class PublicNoArgAndAnnotatedPackageProtectedConstructor implements ProvidesParameterRepresentation {
+        private String string;
+        private Long primitive;
+
+        public static final Map<String, Type> parameters() {
+            return twoParameters("string", String.class, "primitive", long.class);
+        }
+
+        public static final ProvidesParameterRepresentation example() {
+            return new PublicNoArgAndAnnotatedPackageProtectedConstructor("  ", Long.valueOf(-12));
+        }
+
+        public static final PublicNoArgAndAnnotatedPackageProtectedConstructor create(String aString, long aPrimitive) {
+            return new PublicNoArgAndAnnotatedPackageProtectedConstructor(aString, aPrimitive);
+        }
+
+        public PublicNoArgAndAnnotatedPackageProtectedConstructor() {
+            super();
+        }
+
+        @ConstructorProperties({ "string", "primitive" })
+        PublicNoArgAndAnnotatedPackageProtectedConstructor(String aString, long aPrimitive) {
+            this.string = aString;
+            this.primitive = aPrimitive;
+        }
+
+        public Long getPrimitive() {
+            return primitive;
+        }
+
+        public void setPrimitive(Long primitive) {
+            this.primitive = primitive;
+        }
+
+        public String getString() {
+            return string;
+        }
+
+        public void setString(String string) {
+            this.string = string;
+        }
+
+        @Override
+        public Object[] asParameters() {
+            return new Object[] { string, primitive };
+        }
+
+        @Override
+        public String toString() {
+            return "PublicNoArgAndAnnotatedPackageProtectedConstructor [string=" + string + ", primitive=" + primitive + "]";
+        }
+    }
+
+    public static class PublicNoArgAndAnnotatedProtectedConstructor implements ProvidesParameterRepresentation {
+        private String string;
+        private Long primitive;
+
+        public static final Map<String, Type> parameters() {
+            return twoParameters("string", String.class, "primitive", long.class);
+        }
+
+        public static final ProvidesParameterRepresentation example() {
+            return new PublicNoArgAndAnnotatedPackageProtectedConstructor("  ", Long.valueOf(-12));
+        }
+
+        public static final PublicNoArgAndAnnotatedProtectedConstructor create(String aString, long aPrimitive) {
+            return new PublicNoArgAndAnnotatedProtectedConstructor(aString, aPrimitive);
+        }
+
+        @ConstructorProperties({ "string", "primitive" })
+        protected PublicNoArgAndAnnotatedProtectedConstructor(String aString, long aPrimitive) {
+            this.string = aString;
+            this.primitive = aPrimitive;
+        }
+
+        public PublicNoArgAndAnnotatedProtectedConstructor() {
+            super();
+        }
+
+        public Long getPrimitive() {
+            return primitive;
+        }
+
+        public void setPrimitive(Long primitive) {
+            this.primitive = primitive;
+        }
+
+        public String getString() {
+            return string;
+        }
+
+        public void setString(String string) {
+            this.string = string;
+        }
+
+        @Override
+        public Object[] asParameters() {
+            return new Object[] { string, primitive };
+        }
+
+        @Override
+        public String toString() {
+            return "PublicNoArgAndAnnotatedProtectedConstructor [string=" + string + ", primitive=" + primitive + "]";
+        }
+    }
+
+    public static class MissingConstructorAnnotation implements ProvidesParameterRepresentation {
         private final String string;
         private final long primitive;
 
@@ -274,10 +457,10 @@ class AnnotationIntrospectorTestFixtures {
         }
 
         public static final ProvidesParameterRepresentation example() {
-            return new ObjectWithMissingConstructorAnnotation("a string", Long.MAX_VALUE);
+            return new MissingConstructorAnnotation("a string", Long.MAX_VALUE);
         }
 
-        public ObjectWithMissingConstructorAnnotation(String aString, long aPrimitive) {
+        public MissingConstructorAnnotation(String aString, long aPrimitive) {
             this.string = aString;
             this.primitive = aPrimitive;
         }
@@ -289,7 +472,7 @@ class AnnotationIntrospectorTestFixtures {
 
         @Override
         public String toString() {
-            return "ObjectWithMissingConstructorAnnotation [string=" + string + ", primitive=" + primitive + "]";
+            return "MissingConstructorAnnotation [string=" + string + ", primitive=" + primitive + "]";
         }
     }
 }

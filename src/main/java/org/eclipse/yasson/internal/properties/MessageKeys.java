@@ -88,6 +88,7 @@ public enum MessageKeys {
     MISSING_VALUE_PROPERTY_IN_ANNOTATION("missingValuePropertyInAnnotation"),
     NUMBER_INCOMPATIBLE_VALUE_TYPE_ARRAY("numberIncompatibleValueTypeArray"),
     NUMBER_INCOMPATIBLE_VALUE_TYPE_OBJECT("numberIncompatibleValueTypeObject"),
+    INACCESSIBLE_CONSTRUCTOR_PROPERTIES_CREATOR("inaccessibleConstructorPropertiesCreator"),
     ;
 
     /** Message bundle key. */
