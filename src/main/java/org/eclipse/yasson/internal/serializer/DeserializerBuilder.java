@@ -1,5 +1,6 @@
 /*******************************************************************************
- * Copyright (c) 2015, 2018 Oracle and/or its affiliates. All rights reserved.
+ * Copyright (c) 2015, 2019 Oracle and/or its affiliates. All rights reserved.
+ * Copyright (c) 2019 Payara Foundation and/or its affiliates. All rights reserved.
  * This program and the accompanying materials are made available under the
  * terms of the Eclipse Public License v1.0 and Eclipse Distribution License v. 1.0
  * which accompanies this distribution.
@@ -18,16 +19,12 @@ import java.lang.reflect.Type;
 import java.math.BigDecimal;
 import java.util.ArrayList;
 import java.util.Collection;
-import java.util.HashMap;
 import java.util.Map;
 import java.util.Optional;
-import java.util.TreeMap;
 
 import javax.json.JsonValue;
-import javax.json.bind.JsonbConfig;
 import javax.json.bind.JsonbException;
 import javax.json.bind.config.BinaryDataStrategy;
-import javax.json.bind.config.PropertyOrderStrategy;
 import javax.json.bind.serializer.JsonbDeserializer;
 import javax.json.stream.JsonParser;
 
@@ -36,7 +33,6 @@ import org.eclipse.yasson.internal.JsonbContext;
 import org.eclipse.yasson.internal.ReflectionUtils;
 import org.eclipse.yasson.internal.components.AdapterBinding;
 import org.eclipse.yasson.internal.components.DeserializerBinding;
-import org.eclipse.yasson.internal.model.ReverseTreeMap;
 import org.eclipse.yasson.internal.model.customization.ComponentBoundCustomization;
 import org.eclipse.yasson.internal.model.customization.PropertyCustomization;
 import org.eclipse.yasson.internal.properties.MessageKeys;
@@ -56,39 +52,12 @@ public class DeserializerBuilder extends AbstractSerializerBuilder<DeserializerB
     private JsonParser.Event jsonEvent;
 
     /**
-     * Map runtime type to use according to ordering strategy set in associated JSONB configuration, HashMap if none was set
-     */
-    @SuppressWarnings("rawtypes")
-    private final Class<? extends Map> mapImplType;
-    
-    /**
      * Creates a new builder.
      *
      * @param jsonbContext Context.
      */
     public DeserializerBuilder(JsonbContext jsonbContext) {
         super(jsonbContext);
-        String os = (String) jsonbContext.getConfig().getProperty(JsonbConfig.PROPERTY_ORDER_STRATEGY).orElse(PropertyOrderStrategy.ANY);
-        switch (os) {
-            case PropertyOrderStrategy.LEXICOGRAPHICAL:
-                mapImplType = TreeMap.class;
-                break;
-            case PropertyOrderStrategy.REVERSE:
-                mapImplType = ReverseTreeMap.class;
-                break;
-            case PropertyOrderStrategy.ANY:
-            default:
-                mapImplType = HashMap.class;
-                break;
-        }
-    }
-
-    /**
-     * @return the mapImplType
-     */
-    @SuppressWarnings("rawtypes")
-    public Class<? extends Map> getMapImplType() {
-        return mapImplType;
     }
 
     /**
@@ -151,10 +120,17 @@ public class DeserializerBuilder extends AbstractSerializerBuilder<DeserializerB
             }
         }
 
+        if (isCharArray(rawType)) {
+            return new CharArrayDeserializer(this);
+        }
+
         //Third deserializer is a supported value type to deserialize to JSON_VALUE
-        if (isJsonValueEvent()) {
+        if (isJsonValueEvent(jsonEvent)) {
             final Optional<AbstractValueTypeDeserializer<?>> supportedTypeDeserializer = getSupportedTypeDeserializer(rawType);
             if (!supportedTypeDeserializer.isPresent()) {
+                if (jsonEvent == JsonParser.Event.VALUE_NULL) {
+                    return NullDeserializer.INSTANCE;
+                }
                 throw new JsonbException(Messages.getMessage(MessageKeys.DESERIALIZE_VALUE_ERROR, getRuntimeType()));
             }
             return wrapAdapted(adapterInfoOptional, supportedTypeDeserializer.get());
@@ -202,8 +178,14 @@ public class DeserializerBuilder extends AbstractSerializerBuilder<DeserializerB
         throw new JsonbException("unresolved type for deserialization: " + getRuntimeType());
     }
 
-    private boolean isJsonValueEvent() {
-        switch (jsonEvent) {
+    /**
+     * Checks if event is a value event.
+     *
+     * @param event JSON event to check.
+     * @return True if one of value events.
+     */
+    public static boolean isJsonValueEvent(JsonParser.Event event) {
+        switch (event) {
             case VALUE_NULL:
             case VALUE_FALSE:
             case VALUE_TRUE:
@@ -252,7 +234,9 @@ public class DeserializerBuilder extends AbstractSerializerBuilder<DeserializerB
                 case START_ARRAY:
                 return ArrayList.class;
                 case START_OBJECT:
-                    return mapImplType;
+                    return jsonbContext.getConfigProperties().getDefaultMapImplType();
+                case VALUE_NULL:
+                    return Object.class;
                 default:
                 throw new IllegalStateException("Can't infer deserialization type type: " + jsonEvent);
 
@@ -306,5 +290,9 @@ public class DeserializerBuilder extends AbstractSerializerBuilder<DeserializerB
 
     private boolean isByteArray(Class<?> rawType) {
         return rawType.isArray() && rawType.getComponentType() == Byte.TYPE;
+    }
+
+    private boolean isCharArray(Class<?> rawType) {
+        return rawType.isArray() && rawType.getComponentType() == Character.TYPE;
     }
 }

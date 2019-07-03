@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2016, 2018 Oracle and/or its affiliates. All rights reserved.
+ * Copyright (c) 2016, 2019 Oracle and/or its affiliates. All rights reserved.
  * This program and the accompanying materials are made available under the
  * terms of the Eclipse Public License v1.0 and Eclipse Distribution License v. 1.0
  * which accompanies this distribution.
@@ -63,8 +63,9 @@ public class UserDeserializerDeserializer<T> extends AbstractContainerDeserializ
         JsonParser.Event lastEvent = parserContext.getLastEvent();
         final UserDeserializerParser userDeserializerParser = new UserDeserializerParser(parser);
         deserializerResult = (T) deserializerBinding.getJsonbDeserializer().deserialize(userDeserializerParser, context, getRuntimeType());
-        //Avoid moving parser to the end of the object, if deserializer was for one value only.
-        if (lastEvent == JsonParser.Event.START_ARRAY || lastEvent == JsonParser.Event.START_OBJECT) {
+        //In case deserialized structure is json object or array and the parser is not advanced
+        //after enclosing bracket of deserialized object.
+        if (parser.getCurrentLevel() == parserContext && !DeserializerBuilder.isJsonValueEvent(lastEvent)) {
             userDeserializerParser.advanceParserToEnd();
         }
     }

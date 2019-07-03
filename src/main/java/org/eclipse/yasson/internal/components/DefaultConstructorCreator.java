@@ -13,7 +13,8 @@
 
 package org.eclipse.yasson.internal.components;
 
-import org.eclipse.yasson.internal.ReflectionUtils;
+import org.eclipse.yasson.internal.InstanceCreator;
+import org.eclipse.yasson.spi.JsonbComponentInstanceCreator;
 
 import java.io.IOException;
 
@@ -24,9 +25,15 @@ import java.io.IOException;
  */
 public class DefaultConstructorCreator implements JsonbComponentInstanceCreator {
 
+    private final InstanceCreator creator;
+
+    public DefaultConstructorCreator(InstanceCreator creator) {
+        this.creator = creator;
+    }
+
     @Override
     public <T> T getOrCreateComponent(Class<T> componentClass) {
-        return ReflectionUtils.createNoArgConstructorInstance(componentClass);
+        return creator.createInstance(componentClass);
     }
 
     @Override

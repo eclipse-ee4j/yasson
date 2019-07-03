@@ -1,5 +1,6 @@
 /*******************************************************************************
  * Copyright (c) 2015, 2018 Oracle and/or its affiliates. All rights reserved.
+ * Copyright (c) 2019 Payara Foundation and/or its affiliates. All rights reserved.
  * This program and the accompanying materials are made available under the
  * terms of the Eclipse Public License v1.0 and Eclipse Distribution License v. 1.0
  * which accompanies this distribution.
@@ -9,6 +10,7 @@
  *
  * Contributors:
  *     Dmitry Kornilov - initial implementation
+ *     Patrik Dudits
  ******************************************************************************/
 package org.eclipse.yasson.defaultmapping.specific;
 
@@ -166,6 +168,53 @@ public class OptionalTest {
         assertEquals(personWithCorrectGetter, deserialized);
     }
 
+    @Test
+    public void testMarshalEmptyRoot() {
+        final Jsonb jsonb = (new JsonBindingBuilder()).build();
+        assertEquals("null", jsonb.toJson(Optional.empty()));
+    }
+
+    @Test
+    public void testUnmarshalEmptyRoot() {
+        final Jsonb jsonb = (new JsonBindingBuilder()).build();
+        assertEquals(Optional.empty(), jsonb.fromJson("null", new TestTypeToken<Optional<Customer>>() {}.getType()));
+    }
+
+    @Test
+    public void testMarshalEmptyInt() {
+        final Jsonb jsonb = (new JsonBindingBuilder()).build();
+        assertEquals("null", jsonb.toJson(OptionalInt.empty()));
+    }
+
+    @Test
+    public void testUnmarshalEmptyInt() {
+        final Jsonb jsonb = (new JsonBindingBuilder()).build();
+        assertEquals(OptionalInt.empty(), jsonb.fromJson("null", OptionalInt.class));
+    }
+
+    @Test
+    public void testMarshalEmptyLong() {
+        final Jsonb jsonb = (new JsonBindingBuilder()).build();
+        assertEquals("null", jsonb.toJson(OptionalLong.empty()));
+    }
+
+    @Test
+    public void testUnmarshalEmptyLong() {
+        final Jsonb jsonb = (new JsonBindingBuilder()).build();
+        assertEquals(OptionalLong.empty(), jsonb.fromJson("null", OptionalLong.class));
+    }
+
+    @Test
+    public void testMarshalEmptyDouble() {
+        final Jsonb jsonb = (new JsonBindingBuilder()).build();
+        assertEquals("null", jsonb.toJson(OptionalDouble.empty()));
+    }
+
+    @Test
+    public void testUnmarshalEmptyDouble() {
+        final Jsonb jsonb = (new JsonBindingBuilder()).build();
+        assertEquals(OptionalDouble.empty(), jsonb.fromJson("null", OptionalDouble.class));
+    }
 
     public static class Customer {
         private int id;

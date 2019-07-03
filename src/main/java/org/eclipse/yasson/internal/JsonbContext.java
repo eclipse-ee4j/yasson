@@ -13,13 +13,20 @@
 
 package org.eclipse.yasson.internal;
 
-import org.eclipse.yasson.internal.components.JsonbComponentInstanceCreator;
 import org.eclipse.yasson.internal.components.JsonbComponentInstanceCreatorFactory;
+import org.eclipse.yasson.spi.JsonbComponentInstanceCreator;
 
 import javax.json.bind.JsonbConfig;
 import javax.json.spi.JsonProvider;
-import java.util.HashSet;
+
+import java.security.AccessController;
+import java.security.PrivilegedAction;
+import java.util.ArrayList;
+import java.util.Comparator;
+import java.util.List;
 import java.util.Objects;
+import java.util.ServiceLoader;
+import java.util.logging.Logger;
 
 /**
  * Jsonb context holding central components and configuration of jsonb runtime. Scoped to instance of Jsonb runtime.
@@ -27,6 +34,8 @@ import java.util.Objects;
  * @author Roman Grigoriadi
  */
 public class JsonbContext {
+    
+    private static final Logger log = Logger.getLogger(JsonbContext.class.getName());
 
     private final JsonbConfig jsonbConfig;
 
@@ -42,6 +51,8 @@ public class JsonbContext {
 
     private final JsonbConfigProperties configProperties;
 
+    private final InstanceCreator instanceCreator;
+
     /**
      * Creates and initialize context.
      *
@@ -52,7 +63,8 @@ public class JsonbContext {
         Objects.requireNonNull(jsonbConfig);
         this.jsonbConfig = jsonbConfig;
         this.mappingContext = new MappingContext(this);
-        this.componentInstanceCreator = JsonbComponentInstanceCreatorFactory.getComponentInstanceCreator();
+        this.instanceCreator = new InstanceCreator();
+        this.componentInstanceCreator = initComponentInstanceCreator(instanceCreator);
         this.componentMatcher = new ComponentMatcher(this);
         this.annotationIntrospector = new AnnotationIntrospector(this);
         this.jsonProvider = jsonProvider;
@@ -117,6 +129,33 @@ public class JsonbContext {
 
     public JsonbConfigProperties getConfigProperties() {
         return configProperties;
+    }
+
+
+    /**
+     * Returns component for creating instances of non-parsed types.
+     * @return InstanceCreator
+     */
+    public InstanceCreator getInstanceCreator() {
+        return instanceCreator;
+    }
+
+    private JsonbComponentInstanceCreator initComponentInstanceCreator(InstanceCreator instanceCreator) {
+        ServiceLoader<JsonbComponentInstanceCreator> loader = AccessController
+                .doPrivileged((PrivilegedAction<ServiceLoader<JsonbComponentInstanceCreator>>) () -> ServiceLoader
+                        .load(JsonbComponentInstanceCreator.class));
+        List<JsonbComponentInstanceCreator> creators = new ArrayList<>();
+        for (JsonbComponentInstanceCreator creator : loader) {
+            creators.add(creator);
+        }
+        if (creators.isEmpty()) {
+            // No service provider found - use the defaults
+            return JsonbComponentInstanceCreatorFactory.getComponentInstanceCreator(instanceCreator);
+        }
+        creators.sort(Comparator.comparingInt(JsonbComponentInstanceCreator::getPriority).reversed());
+        JsonbComponentInstanceCreator creator = creators.get(0);
+        log.finest("Component instance creator:" + creator.getClass());
+        return creator;
     }
 
 }

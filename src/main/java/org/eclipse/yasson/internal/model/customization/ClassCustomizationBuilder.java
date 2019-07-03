@@ -13,8 +13,11 @@
 package org.eclipse.yasson.internal.model.customization;
 
 import org.eclipse.yasson.internal.model.JsonbCreator;
+import org.eclipse.yasson.internal.model.Property;
 import org.eclipse.yasson.internal.serializer.JsonbDateFormatter;
 import org.eclipse.yasson.internal.serializer.JsonbNumberFormatter;
+
+import javax.json.bind.config.PropertyVisibilityStrategy;
 
 /**
  * The customization builder that would be used to build an instance of {@link ClassCustomization} to ensure its immutability.
@@ -35,6 +38,11 @@ public class ClassCustomizationBuilder extends CustomizationBuilder {
      * The class level date formatter that would be used by default for all date properties that don't have a dedicated date formatter annotation.
      */
     private JsonbDateFormatter dateFormatter;
+
+    /**
+     * The class or package level property visibility strategy.
+     */
+    private PropertyVisibilityStrategy propertyVisibilityStrategy;
 
     /**
      * Creates a customization for class properties.
@@ -98,5 +106,21 @@ public class ClassCustomizationBuilder extends CustomizationBuilder {
      */
     public void setCreator(JsonbCreator jsonbCreator) {
         this.jsonbCreator = jsonbCreator;
+    }
+
+    /**
+     * Property visibility strategy for given class.
+     * @return
+     */
+    public PropertyVisibilityStrategy getPropertyVisibilityStrategy() {
+        return propertyVisibilityStrategy;
+    }
+
+    /**
+     * Sets custom property visibility strategy.
+     * @param propertyVisibilityStrategy strategy
+     */
+    public void setPropertyVisibilityStrategy(PropertyVisibilityStrategy propertyVisibilityStrategy) {
+        this.propertyVisibilityStrategy = propertyVisibilityStrategy;
     }
 }

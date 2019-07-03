@@ -23,9 +23,11 @@ import javax.json.bind.JsonbException;
 import javax.json.stream.JsonLocation;
 import javax.json.stream.JsonParser;
 import java.math.BigDecimal;
+import java.util.ArrayDeque;
 import java.util.Arrays;
+import java.util.Deque;
 import java.util.Map;
-import java.util.Stack;
+import java.util.Objects;
 import java.util.stream.Stream;
 
 /**
@@ -76,6 +78,7 @@ public class JsonbRiParser implements JsonParser, JsonbParser {
         }
 
         private void setLastKeyName(String lastKeyName) {
+            Objects.requireNonNull(lastKeyName);
             this.lastKeyName = lastKeyName;
         }
 
@@ -107,7 +110,7 @@ public class JsonbRiParser implements JsonParser, JsonbParser {
 
     private final JsonParser jsonParser;
 
-    private final Stack<LevelContext> level = new Stack<>();
+    private final Deque<LevelContext> level = new ArrayDeque<>();
 
     /**
      * Creates a parser.
@@ -186,7 +189,7 @@ public class JsonbRiParser implements JsonParser, JsonbParser {
 
     @Override
     public void moveTo(JsonParser.Event required) {
-        if (!level.empty() && level.peek().getLastEvent() == required) {
+        if (!level.isEmpty() && level.peek().getLastEvent() == required) {
             return;
         }
 
@@ -209,7 +212,7 @@ public class JsonbRiParser implements JsonParser, JsonbParser {
     }
 
     private Event moveTo(Event... events) {
-        if (!level.empty() && contains(events, level.peek().getLastEvent())) {
+        if (!level.isEmpty() && contains(events, level.peek().getLastEvent())) {
             return level.peek().getLastEvent();
         }
 

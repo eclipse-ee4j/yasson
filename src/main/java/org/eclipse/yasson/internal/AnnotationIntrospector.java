@@ -523,13 +523,16 @@ public class AnnotationIntrospector {
      * @param clazz Class to lookup annotation
      * @return Instantiated PropertyVisibilityStrategy if annotation is present
      */
-    public Optional<PropertyVisibilityStrategy> getPropertyVisibilityStrategy(Class<?> clazz) {
+    public PropertyVisibilityStrategy getPropertyVisibilityStrategy(Class<?> clazz) {
         JsonbVisibility visibilityAnnotation = findAnnotation(clazz.getDeclaredAnnotations(), JsonbVisibility.class);
         if ((visibilityAnnotation == null) && (clazz.getPackage() != null)) {
             visibilityAnnotation = findAnnotation(clazz.getPackage().getDeclaredAnnotations(), JsonbVisibility.class);
         }
-        final Optional<JsonbVisibility> visibilityOptional = Optional.ofNullable(visibilityAnnotation);
-        return visibilityOptional.map(jsonbVisibility -> ReflectionUtils.createNoArgConstructorInstance(jsonbVisibility.value()));
+        if (visibilityAnnotation != null) {
+            return  ReflectionUtils.createNoArgConstructorInstance(
+                    ReflectionUtils.getDefaultConstructor(visibilityAnnotation.value(), true));
+        }
+        return jsonbContext.getConfigProperties().getPropertyVisibilityStrategy();
     }
 
     /**
@@ -675,6 +678,7 @@ public class AnnotationIntrospector {
         builder.setAdapterInfo(getAdapterBinding(clsElement));
         builder.setSerializerBinding(getSerializerBinding(clsElement));
         builder.setDeserializerBinding(getDeserializerBinding(clsElement));
+        builder.setPropertyVisibilityStrategy(getPropertyVisibilityStrategy(clsElement.getElement()));
         return builder.buildClassCustomization();
     }
 

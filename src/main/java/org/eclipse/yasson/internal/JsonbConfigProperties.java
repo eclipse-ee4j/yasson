@@ -1,5 +1,6 @@
 /*******************************************************************************
  * Copyright (c) 2017, 2018 Oracle and/or its affiliates. All rights reserved.
+ * Copyright (c) 2019 Payara Foundation and/or its affiliates. All rights reserved.
  * This program and the accompanying materials are made available under the
  * terms of the Eclipse Public License v1.0 and Eclipse Distribution License v. 1.0
  * which accompanies this distribution.
@@ -13,6 +14,7 @@
 package org.eclipse.yasson.internal;
 
 import org.eclipse.yasson.YassonProperties;
+import org.eclipse.yasson.internal.model.ReverseTreeMap;
 import org.eclipse.yasson.internal.model.customization.naming.DefaultNamingStrategies;
 import org.eclipse.yasson.internal.model.customization.naming.IdentityStrategy;
 import org.eclipse.yasson.internal.model.customization.ordering.AnyOrderStrategy;
@@ -23,6 +25,7 @@ import org.eclipse.yasson.internal.model.customization.ordering.ReverseOrderStra
 import org.eclipse.yasson.internal.properties.MessageKeys;
 import org.eclipse.yasson.internal.properties.Messages;
 import org.eclipse.yasson.internal.serializer.JsonbDateFormatter;
+import org.eclipse.yasson.internal.serializer.NullSerializer;
 
 import javax.json.bind.JsonbConfig;
 import javax.json.bind.JsonbException;
@@ -31,13 +34,16 @@ import javax.json.bind.config.BinaryDataStrategy;
 import javax.json.bind.config.PropertyNamingStrategy;
 import javax.json.bind.config.PropertyOrderStrategy;
 import javax.json.bind.config.PropertyVisibilityStrategy;
+import javax.json.bind.serializer.JsonbSerializer;
 import java.time.format.DateTimeFormatter;
 import java.time.format.DateTimeFormatterBuilder;
 import java.time.temporal.ChronoField;
 import java.util.Collections;
+import java.util.HashMap;
 import java.util.Locale;
 import java.util.Map;
 import java.util.Optional;
+import java.util.TreeMap;
 
 /**
  * Resolved properties from JSONB config.
@@ -70,6 +76,10 @@ public class JsonbConfigProperties {
 
     private final Map<Class<?>, Class<?>> userTypeMapping;
 
+    private final Class<?> defaultMapImplType;
+
+    private final JsonbSerializer<Object> nullSerializer;
+
     public JsonbConfigProperties(JsonbConfig jsonbConfig) {
         this.jsonbConfig = jsonbConfig;
         this.binaryDataStrategy = initBinaryDataStrategy();
@@ -83,6 +93,24 @@ public class JsonbConfigProperties {
         this.strictIJson = initStrictJson();
         this.userTypeMapping = initUserTypeMapping();
         this.zeroTimeDefaulting = initZeroTimeDefaultingForJavaTime();
+        this.defaultMapImplType = initDefaultMapImplType();
+        this.nullSerializer = initNullSerializer();
+    }
+
+
+    private Class<?> initDefaultMapImplType() {
+        Optional<String> os = getPropertyOrderStrategy();
+        if (os.isPresent()) {
+            switch (os.get()) {
+                case PropertyOrderStrategy.LEXICOGRAPHICAL:
+                    return TreeMap.class;
+                case PropertyOrderStrategy.REVERSE:
+                    return ReverseTreeMap.class;
+                default:
+                    return HashMap.class;
+            }
+        }
+        return HashMap.class;
     }
 
     private boolean initZeroTimeDefaultingForJavaTime() {
@@ -129,13 +157,9 @@ public class JsonbConfigProperties {
     }
 
     private PropOrderStrategy initOrderStrategy() {
-        final Optional<Object> property = jsonbConfig.getProperty(JsonbConfig.PROPERTY_ORDER_STRATEGY);
-        if (property.isPresent()) {
-            final Object strategy = property.get();
-            if (!(strategy instanceof String)) {
-                throw new JsonbException(Messages.getMessage(MessageKeys.PROPERTY_ORDER, strategy));
-            }
-            switch ((String) strategy) {
+        Optional<String> strategy = getPropertyOrderStrategy();
+        if (strategy.isPresent()) {
+            switch (strategy.get()) {
                 case PropertyOrderStrategy.LEXICOGRAPHICAL:
                     return new LexicographicalOrderStrategy();
                 case PropertyOrderStrategy.REVERSE:
@@ -148,6 +172,25 @@ public class JsonbConfigProperties {
         }
         //default by spec
         return new LexicographicalOrderStrategy();
+    }
+
+    private Optional<String> getPropertyOrderStrategy() {
+        final Optional<Object> property = jsonbConfig.getProperty(JsonbConfig.PROPERTY_ORDER_STRATEGY);
+        if (property.isPresent()) {
+            final Object strategy = property.get();
+            if (!(strategy instanceof String)) {
+                throw new JsonbException(Messages.getMessage(MessageKeys.PROPERTY_ORDER, strategy));
+            }
+            switch ((String)strategy) {
+                case PropertyOrderStrategy.LEXICOGRAPHICAL:
+                case PropertyOrderStrategy.REVERSE:
+                case PropertyOrderStrategy.ANY:
+                    return Optional.of((String)strategy);
+                default:
+                    throw new JsonbException(Messages.getMessage(MessageKeys.PROPERTY_ORDER, strategy));
+            }
+        }
+        return Optional.empty();
     }
 
     private PropertyNamingStrategy initPropertyNamingStrategy() {
@@ -197,6 +240,18 @@ public class JsonbConfigProperties {
 
     private boolean initConfigFailOnUnknownProperties() {
         return getBooleanConfigProperty(YassonProperties.FAIL_ON_UNKNOWN_PROPERTIES, false);
+    }
+
+    private JsonbSerializer<Object> initNullSerializer() {
+        Optional<Object> property = jsonbConfig.getProperty(YassonProperties.NULL_ROOT_SERIALIZER);
+        if (!property.isPresent()) {
+            return new NullSerializer();
+        }
+        Object nullSerializer = property.get();
+        if (!(nullSerializer instanceof JsonbSerializer)) {
+            throw new JsonbException("YassonConfig.NULL_ROOT_SERIALIZER must be instance of " + JsonbSerializer.class + "<Object>");
+        }
+        return (JsonbSerializer<Object>) nullSerializer;
     }
 
     /**
@@ -342,5 +397,17 @@ public class JsonbConfigProperties {
      */
     public boolean isZeroTimeDefaulting() {
         return zeroTimeDefaulting;
+    }
+
+    /**
+     * Default {@link java.util.Map} implementation to use, based on order strategy.
+     * @return map impl type
+     */
+    public Class<?> getDefaultMapImplType() {
+        return defaultMapImplType;
+    }
+
+    public JsonbSerializer<Object> getNullSerializer() {
+        return nullSerializer;
     }
 }

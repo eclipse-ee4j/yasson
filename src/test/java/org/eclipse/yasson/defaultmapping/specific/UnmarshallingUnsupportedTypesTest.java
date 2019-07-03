@@ -19,6 +19,7 @@ import org.eclipse.yasson.defaultmapping.generics.model.GenericTestClass;
 import org.eclipse.yasson.defaultmapping.specific.model.ClassWithUnsupportedFields;
 import org.eclipse.yasson.defaultmapping.specific.model.CustomUnsupportedInterface;
 import org.eclipse.yasson.defaultmapping.specific.model.SupportedTypes;
+import org.eclipse.yasson.defaultmapping.specific.model.SupportedTypes.NestedPojo;
 import org.junit.Test;
 
 import javax.json.bind.Jsonb;
@@ -46,8 +47,6 @@ public class UnmarshallingUnsupportedTypesTest {
 
     private final Jsonb jsonb = JsonbBuilder.create();
 
-    private static final Logger logger = Logger.getLogger(UnmarshallingUnsupportedTypesTest.class.getSimpleName());
-
     @Test
     public void testUnmarshallToUnsupportedInterface() {
         ClassWithUnsupportedFields unsupported = new ClassWithUnsupportedFields();
@@ -70,7 +69,8 @@ public class UnmarshallingUnsupportedTypesTest {
             jsonb.fromJson(expected, ClassWithUnsupportedFields.class);
             fail("Should report an error");
         } catch (JsonbException e) {
-            assertTrue(e.getMessage().startsWith("Can't infer a type"));
+            assertTrue(e.getMessage().contains("Can't infer a type"));
+            assertTrue(e.getMessage().contains("customInterface"));
         }
     }
 
@@ -99,24 +99,17 @@ public class UnmarshallingUnsupportedTypesTest {
     }
 
     @Test
-    public void testSupportedTypeAsObjectInJson() {
-        //wrong, instant is wrapped with {}, unmarshalls to object.
-        String json  = "{\"instant\":{\"instantWrongKey\":\"2015-12-28T14:57:00Z\"},\"optionalLong\":11}";
-        assertFail(json, SupportedTypes.class, "Can't create instance of a class: class java.time.Instant, No default constructor found.");
-    }
-
-    @Test
     public void testPojoAsScalarValue() {
         //wrong, nestedPojo is a value.
         String json  = "{\"nestedPojo\":\"10\",\"optionalLong\":11}";
-        assertFail(json, SupportedTypes.class, "Error deserialize JSON value into type: class org.eclipse.yasson.defaultmapping.specific.model.SupportedTypes$NestedPojo");
+        assertFail(json, SupportedTypes.class, "nestedPojo", NestedPojo.class);
     }
 
     @Test
     public void testPojoAsArray() {
         //wrong, nestedPojo is a collection.
         String json  = "{\"nestedPojo\":[\"10\"],\"optionalLong\":11}";
-        assertFail(json, SupportedTypes.class, "Can't deserialize JSON array into: class org.eclipse.yasson.defaultmapping.specific.model.SupportedTypes$NestedPojo");
+        assertFail(json, SupportedTypes.class, "nestedPojo", NestedPojo.class);
     }
 
     @Test()
@@ -147,79 +140,77 @@ public class UnmarshallingUnsupportedTypesTest {
     @Test
     public void testEmptyStringAsInteger() {
         Type type = new TestTypeToken<GenericTestClass<Integer, Integer>>(){}.getType();
-        assertFail("{\"field1\":\"\"}", type, "Error deserialize JSON value into type: class java.lang.Integer.");
+        assertFail("{\"field1\":\"\"}", type, "field1", Integer.class);
     }
 
     @Test
     public void testEmptyStringAsDouble() {
         Type type = new TestTypeToken<GenericTestClass<Double, Double>>(){}.getType();
-        assertFail("{\"field1\":\"\"}", type, "Error deserialize JSON value into type: class java.lang.Double.");
+        assertFail("{\"field1\":\"\"}", type, "field1", Double.class);
     }
 
     @Test
     public void testEmptyStringAsFloat() {
         Type type = new TestTypeToken<GenericTestClass<Float, Float>>(){}.getType();
-        assertFail("{\"field1\":\"\"}", type, "Error deserialize JSON value into type: class java.lang.Float.");
+        assertFail("{\"field1\":\"\"}", type, "field1", Float.class);
     }
 
     @Test
     public void testEmptyStringAsLong() {
         Type type = new TestTypeToken<GenericTestClass<Long, Long>>(){}.getType();
-        assertFail("{\"field1\":\"\"}", type, "Error deserialize JSON value into type: class java.lang.Long.");
+        assertFail("{\"field1\":\"\"}", type, "field1", Long.class);
     }
 
     @Test
     public void testEmptyStringAsShort() {
         Type type = new TestTypeToken<GenericTestClass<Short, Short>>(){}.getType();
-        assertFail("{\"field1\":\"\"}", type, "Error deserialize JSON value into type: class java.lang.Short.");
+        assertFail("{\"field1\":\"\"}", type, "field1", Short.class);
     }
 
     @Test
     public void testEmptyStringAsByte() {
         Type type = new TestTypeToken<GenericTestClass<Byte, Byte>>(){}.getType();
-        assertFail("{\"field1\":\"\"}", type, "Error deserialize JSON value into type: class java.lang.Byte.");
+        assertFail("{\"field1\":\"\"}", type, "field1", Byte.class);
     }
 
     @Test
     public void testEmptyStringAsBigDecimal() {
         Type type = new TestTypeToken<GenericTestClass<BigDecimal, BigDecimal>>(){}.getType();
-        assertFail("{\"field1\":\"\"}", type, "Error deserialize JSON value into type: class java.math.BigDecimal.");
+        assertFail("{\"field1\":\"\"}", type,"field1", BigDecimal.class);
     }
 
     @Test
     public void testEmptyStringAsBigInteger() {
         Type type = new TestTypeToken<GenericTestClass<BigInteger, BigInteger>>(){}.getType();
-        assertFail("{\"field1\":\"\"}", type, "Error deserialize JSON value into type: class java.math.BigInteger.");
+        assertFail("{\"field1\":\"\"}", type, "field1", BigInteger.class);
     }
 
     @Test
     public void testEmptyStringAsOptionalDouble() {
         Type type = new TestTypeToken<GenericTestClass<OptionalDouble, OptionalDouble>>(){}.getType();
-        assertFail("{\"field1\":\"\"}", type, "Error deserialize JSON value into type: class java.util.OptionalDouble.");
+        assertFail("{\"field1\":\"\"}", type,"field1", OptionalDouble.class);
     }
 
     @Test
     public void testEmptyStringAsOptionalInt() {
         Type type = new TestTypeToken<GenericTestClass<OptionalInt, OptionalInt>>(){}.getType();
-        assertFail("{\"field1\":\"\"}", type, "Error deserialize JSON value into type: class java.util.OptionalInt.");
+        assertFail("{\"field1\":\"\"}", type, "field1", OptionalInt.class);
     }
 
     @Test
     public void testEmptyStringAsOptionalLong() {
         Type type = new TestTypeToken<GenericTestClass<OptionalLong, OptionalLong>>(){}.getType();
-        assertFail("{\"field1\":\"\"}", type, "Error deserialize JSON value into type: class java.util.OptionalLong.");
+        assertFail("{\"field1\":\"\"}", type,"field1", OptionalLong.class);
     }
 
-    private void assertFail(String json, Type type, String msg) {
+    private void assertFail(String json, Type type, String failureProperty, Class<?> failurePropertyClass) {
         try {
             jsonb.fromJson(json, type);
             fail();
         } catch (JsonbException e) {
-            if(!e.getMessage().startsWith(msg)) {
-                logger.severe("Exception message does not match");
-                logger.severe("Expected: "+ msg);
-                logger.severe("Current:  "+e.getMessage());
-                fail();
+            if(!e.getMessage().contains(failureProperty) || !e.getMessage().contains(failurePropertyClass.getName())) {
+                fail("Expected error message to contain '" + failureProperty + "' and '" + failurePropertyClass.getName() + "', but was: " +
+                 e.getMessage());
             }
         }
     }

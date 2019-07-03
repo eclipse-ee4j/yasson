@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2016, 2018 Oracle and/or its affiliates. All rights reserved.
+ * Copyright (c) 2016, 2019 Oracle and/or its affiliates. All rights reserved.
  * This program and the accompanying materials are made available under the
  * terms of the Eclipse Public License v1.0 and Eclipse Distribution License v. 1.0
  * which accompanies this distribution.
@@ -14,14 +14,18 @@ package org.eclipse.yasson.internal;
 
 
 import org.eclipse.yasson.internal.model.ClassModel;
+import org.eclipse.yasson.internal.properties.MessageKeys;
+import org.eclipse.yasson.internal.properties.Messages;
 import org.eclipse.yasson.internal.serializer.CurrentItem;
 import org.eclipse.yasson.internal.serializer.DefaultSerializers;
 import org.eclipse.yasson.internal.serializer.DeserializerBuilder;
 
+import javax.json.bind.JsonbException;
 import javax.json.bind.serializer.DeserializationContext;
 import javax.json.bind.serializer.JsonbDeserializer;
 import javax.json.stream.JsonParser;
 import java.lang.reflect.Type;
+import java.util.logging.Logger;
 
 /**
  * JSONB unmarshaller.
@@ -31,6 +35,8 @@ import java.lang.reflect.Type;
  */
 public class Unmarshaller extends ProcessingContext implements DeserializationContext {
 
+    private static final Logger logger = Logger.getLogger(Unmarshaller.class.getName());
+
     /**
      * Creates instance of unmarshaller.
      *
@@ -39,8 +45,6 @@ public class Unmarshaller extends ProcessingContext implements DeserializationCo
     public Unmarshaller(JsonbContext jsonbContext) {
         super(jsonbContext);
     }
-
-    private CurrentItem<?> current;
 
     @Override
     public <T> T deserialize(Class<T> clazz, JsonParser parser) {
@@ -54,15 +58,23 @@ public class Unmarshaller extends ProcessingContext implements DeserializationCo
 
     @SuppressWarnings("unchecked")
     private <T> T deserializeItem(Type type, JsonParser parser) {
-        DeserializerBuilder deserializerBuilder = new DeserializerBuilder(jsonbContext).withWrapper(current)
-                .withType(type).withJsonValueType(getRootEvent(parser));
-        Class<?> rawType = ReflectionUtils.getRawType(type);
-        if (!DefaultSerializers.getInstance().isKnownType(rawType)) {
-            ClassModel classModel = getMappingContext().getOrCreateClassModel(rawType);
-            deserializerBuilder.withCustomization(classModel.getCustomization());
-        }
+        try {
+            DeserializerBuilder deserializerBuilder = new DeserializerBuilder(jsonbContext)
+                    .withType(type).withJsonValueType(getRootEvent(parser));
+            Class<?> rawType = ReflectionUtils.getRawType(type);
+            if (!DefaultSerializers.getInstance().isKnownType(rawType)) {
+                ClassModel classModel = getMappingContext().getOrCreateClassModel(rawType);
+                deserializerBuilder.withCustomization(classModel.getCustomization());
+            }
 
-        return (T) deserializerBuilder.build().deserialize(parser, this, type);
+            return (T) deserializerBuilder.build().deserialize(parser, this, type);
+        } catch (JsonbException e) {
+            logger.severe(e.getMessage());
+            throw e;
+        } catch (Exception e) {
+            logger.severe(e.getMessage());
+            throw new JsonbException(Messages.getMessage(MessageKeys.INTERNAL_ERROR, e.getMessage()), e);
+        }
     }
 
     /**
@@ -70,29 +82,13 @@ public class Unmarshaller extends ProcessingContext implements DeserializationCo
      * custom user deserializer.
      */
     private JsonParser.Event getRootEvent(JsonParser parser) {
-        if (parser.getLocation().getStreamOffset() == 0) {
+        JsonbRiParser.LevelContext currentLevel = ((JsonbParser) parser).getCurrentLevel();
+        //Wrapper parser is at start
+        if (currentLevel.getParent() == null) {
             return parser.next();
         }
-        final JsonParser.Event lastEvent = ((JsonbParser) parser).getCurrentLevel().getLastEvent();
+        final JsonParser.Event lastEvent = currentLevel.getLastEvent();
         return lastEvent == JsonParser.Event.KEY_NAME ? parser.next() : lastEvent;
-    }
-
-    /**
-     * Get currently processed json item.
-     *
-     * @return current item
-     */
-    public CurrentItem<?> getCurrent() {
-        return current;
-    }
-
-    /**
-     * Set currently processed item.
-     *
-     * @param current current item
-     */
-    public void setCurrent(CurrentItem<?> current) {
-        this.current = current;
     }
 
 }

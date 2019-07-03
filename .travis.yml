@@ -10,5 +10,13 @@ cache:
 
 install: true
 
-script:
-- mvn -U -C -Pstaging clean verify
+jobs:
+  include:
+    - stage: install-yasson
+      script: mvn -U -C -Pstaging clean install
+    - stage: run-jmh
+      script:
+        - cd yasson-jmh
+        - mvn clean install
+        - java -jar target/yasson-jmh.jar -t 1 -f 2
+

@@ -39,6 +39,8 @@ public class Crate {
 
     public AnnotatedWithSerializerType annotatedType;
 
+    public AnnotatedGenericWithSerializerType<Crate> annotatedGenericType;
+
     @JsonbTypeSerializer(AnnotatedWithSerializerTypeSerializerOverride.class)
     public AnnotatedWithSerializerType annotatedTypeOverriddenOnProperty;
 }

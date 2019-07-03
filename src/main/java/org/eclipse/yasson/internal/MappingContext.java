@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2015, 2018 Oracle and/or its affiliates. All rights reserved.
+ * Copyright (c) 2015, 2019 Oracle and/or its affiliates. All rights reserved.
  * This program and the accompanying materials are made available under the
  * terms of the Eclipse Public License v1.0 and Eclipse Distribution License v. 1.0
  * which accompanies this distribution.
@@ -12,14 +12,15 @@
  ******************************************************************************/
 package org.eclipse.yasson.internal;
 
-import org.eclipse.yasson.internal.serializer.ContainerSerializerProvider;
 import org.eclipse.yasson.internal.model.ClassModel;
 import org.eclipse.yasson.internal.model.JsonbAnnotatedElement;
 import org.eclipse.yasson.internal.model.customization.ClassCustomization;
+import org.eclipse.yasson.internal.serializer.ContainerSerializerProvider;
 
+import java.util.ArrayDeque;
+import java.util.Deque;
 import java.util.Iterator;
 import java.util.Objects;
-import java.util.Stack;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.function.Function;
 
@@ -89,7 +90,7 @@ public class MappingContext {
         if (classModel != null) {
             return classModel;
         }
-        final Stack<Class> newClassModels = new Stack<>();
+        final Deque<Class> newClassModels = new ArrayDeque<>();
         for (Class classToParse = clazz; classToParse != Object.class; classToParse = classToParse.getSuperclass()) {
             if (classToParse == null){
                 break;
@@ -102,7 +103,7 @@ public class MappingContext {
         }
 
         ClassModel parentClassModel = null;
-        while (!newClassModels.empty()) {
+        while (!newClassModels.isEmpty()) {
             Class toParse = newClassModels.pop();
             parentClassModel = classes.computeIfAbsent(toParse, new ParseClassModelFunction(parentClassModel, classParser, jsonbContext));
         }

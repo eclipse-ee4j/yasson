@@ -38,12 +38,6 @@ import org.eclipse.yasson.internal.Unmarshaller;
 public class MapDeserializer<T extends Map<?,?>> extends AbstractContainerDeserializer<T> implements EmbeddedItem {
 
     /**
-     * Sorted map runtime type to use according to ordering strategy set in associated JSONB configuration
-     */
-    @SuppressWarnings("rawtypes")
-    private final Class<? extends SortedMap> sortedMapImplType;
-
-    /**
      * Type of value in the map. (Keys must always be Strings, because of JSON spec)
      */
     private final Type mapValueRuntimeType;
@@ -58,33 +52,27 @@ public class MapDeserializer<T extends Map<?,?>> extends AbstractContainerDeseri
     @SuppressWarnings({ "unchecked", "rawtypes" })
     protected MapDeserializer(DeserializerBuilder builder) {
         super(builder);
-
-        Class<? extends Map> mapImplType = builder.getMapImplType();
-        if (SortedMap.class.isAssignableFrom(mapImplType)) {
-            // if deser. builder decided to deal with sorted maps by default : using its choice for lex or reverse order
-            sortedMapImplType = (Class<SortedMap>) mapImplType;
-        } else {
-            // if deser. builder decided not to deal with sorted maps by default : defaulting sorted maps to lex order
-            sortedMapImplType = TreeMap.class;
-        }
-
         mapValueRuntimeType = getRuntimeType() instanceof ParameterizedType ?
                 ReflectionUtils.resolveType(this, ((ParameterizedType) getRuntimeType()).getActualTypeArguments()[1])
                 : Object.class;
 
-        this.instance = createInstance();
+        this.instance = createInstance(builder);
     }
 
     @SuppressWarnings("unchecked")
-    private T createInstance() {
-        Class<T> rawType = (Class<T>) ReflectionUtils.getRawType(getRuntimeType());
-        return rawType.isInterface() ? (T) getMapImpl(rawType) : ReflectionUtils.createNoArgConstructorInstance(rawType);
+    private T createInstance(DeserializerBuilder builder) {
+        Class<?> rawType = ReflectionUtils.getRawType(getRuntimeType());
+        return rawType.isInterface() ? (T) getMapImpl(rawType, builder)
+                : (T) builder.getJsonbContext().getInstanceCreator().createInstance(rawType);
     }
 
-    private Map<?, ?> getMapImpl(Class ifcType) {
+    private Map getMapImpl(Class ifcType, DeserializerBuilder builder) {
         // SortedMap, NavigableMap
         if (SortedMap.class.isAssignableFrom(ifcType)) {
-            return ReflectionUtils.createNoArgConstructorInstance(sortedMapImplType);
+            Class<?> defaultMapImplType = builder.getJsonbContext().getConfigProperties().getDefaultMapImplType();
+            return SortedMap.class.isAssignableFrom(defaultMapImplType) ?
+                    (Map) builder.getJsonbContext().getInstanceCreator().createInstance(defaultMapImplType) :
+                    new TreeMap<>();
         }
         return new HashMap<>();
     }

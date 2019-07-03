@@ -191,28 +191,43 @@ public class ReflectionUtils {
     }
 
     /**
-     * Search for no argument constructor of a class and create instance.
+     * Create instance with constructor.
      *
-     * @param clazz not null
+     * @param constructor const not null
      * @param <T> type of instance
      * @return instance
      */
-    public static <T> T createNoArgConstructorInstance(Class<T> clazz) {
+    public static <T> T createNoArgConstructorInstance(Constructor<T> constructor) {
+        Objects.requireNonNull(constructor);
+        try {
+            return constructor.newInstance();
+        } catch (InstantiationException | IllegalAccessException | InvocationTargetException e) {
+            throw new JsonbException("Can't create instance", e);
+        }
+    }
+
+    /**
+     * Get default no argument constructor of the class.
+     * @param clazz Class to get constructor from
+     * @param <T> Class generic type
+     * @return constructor
+     */
+    public static <T> Constructor<T> getDefaultConstructor(Class<T> clazz, boolean required) {
         Objects.requireNonNull(clazz);
-        return AccessController.doPrivileged((PrivilegedAction<T>) () -> {
+        return AccessController.doPrivileged((PrivilegedAction<Constructor<T>>) () -> {
             try {
                 final Constructor<T> declaredConstructor = clazz.getDeclaredConstructor();
                 if (declaredConstructor.getModifiers() == Modifier.PROTECTED) {
                     declaredConstructor.setAccessible(true);
                 }
-                return declaredConstructor.newInstance();
-            } catch (InstantiationException | IllegalAccessException | InvocationTargetException e) {
-                throw new JsonbException("Can't create instance", e);
+                return declaredConstructor;
             } catch (NoSuchMethodException e) {
-                throw new JsonbException(Messages.getMessage(MessageKeys.NO_DEFAULT_CONSTRUCTOR, clazz), e);
+                if (required) {
+                    throw new JsonbException(Messages.getMessage(MessageKeys.NO_DEFAULT_CONSTRUCTOR, clazz), e);
+                }
+                return null;
             }
         });
-
     }
 
     /**

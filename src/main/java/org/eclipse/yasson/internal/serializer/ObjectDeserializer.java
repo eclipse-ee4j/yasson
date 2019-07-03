@@ -22,6 +22,7 @@ import org.eclipse.yasson.internal.model.PropertyModel;
 import javax.json.bind.JsonbException;
 import javax.json.bind.serializer.JsonbDeserializer;
 import javax.json.stream.JsonParser;
+import java.lang.reflect.Constructor;
 import java.lang.reflect.Type;
 import java.util.ArrayList;
 import java.util.LinkedHashMap;
@@ -90,7 +91,7 @@ class ObjectDeserializer<T> extends AbstractContainerDeserializer<T> {
         final Class<?> rawType = ReflectionUtils.getRawType(getRuntimeType());
         final JsonbCreator creator = getClassModel().getClassCustomization().getCreator();
         instance = creator != null ? createInstance((Class<T>) rawType, creator)
-                : ReflectionUtils.createNoArgConstructorInstance((Class<T>) rawType);
+                : ReflectionUtils.createNoArgConstructorInstance((Constructor<T>) getClassModel().getDefaultConstructor());
 
         //values must be set in order, in which they appears in JSON by spec
         values.forEach((key, wrapper) -> {
