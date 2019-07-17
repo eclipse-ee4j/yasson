@@ -8,6 +8,7 @@ import org.eclipse.yasson.internal.AnnotationIntrospectorTestFixtures.ObjectWith
 import org.eclipse.yasson.internal.AnnotationIntrospectorTestFixtures.ObjectWithJsonbCreatorAnnotatedConstructor;
 import org.eclipse.yasson.internal.AnnotationIntrospectorTestFixtures.ObjectWithJsonbCreatorAnnotatedFactoryMethod;
 import org.eclipse.yasson.internal.AnnotationIntrospectorTestFixtures.ObjectWithJsonbCreatorAnnotatedProtectedConstructor;
+import org.eclipse.yasson.internal.AnnotationIntrospectorTestFixtures.ObjectWithNoArgAndJsonbCreatorAnnotatedProtectedConstructor;
 import org.eclipse.yasson.internal.AnnotationIntrospectorTestFixtures.ObjectWithTwoJsonbCreatorAnnotatedSpots;
 import org.eclipse.yasson.internal.AnnotationIntrospectorTestFixtures.ObjectWithoutAnnotatedConstructor;
 import org.eclipse.yasson.internal.model.JsonbCreator;
@@ -18,6 +19,7 @@ import javax.json.bind.JsonbException;
 import javax.json.spi.JsonProvider;
 
 import org.hamcrest.core.IsInstanceOf;
+import org.junit.Ignore;
 import org.junit.Rule;
 import org.junit.Test;
 import org.junit.rules.ExpectedException;
@@ -67,6 +69,15 @@ public class AnnotationIntrospectorTest {
         exception.expectCause(IsInstanceOf.instanceOf(IllegalAccessException.class));
         JsonbCreator creator = instrospector.getCreator(ObjectWithJsonbCreatorAnnotatedProtectedConstructor.class);
         assertCreatedInstanceContainsAllParameters(ObjectWithJsonbCreatorAnnotatedProtectedConstructor.example(), creator);
+    }
+
+    // TODO Under discussion. Shouldn't this test work?
+    @Ignore
+    @Test
+    public void testNoArgConstructorShouldBePreferredOverUnusableJsonbAnnotatedProtectedConstructor() {
+        JsonbCreator creator = instrospector.getCreator(ObjectWithNoArgAndJsonbCreatorAnnotatedProtectedConstructor.class);
+        assertParameters(ObjectWithNoArgAndJsonbCreatorAnnotatedProtectedConstructor.parameters(), creator);
+        assertCreatedInstanceContainsAllParameters(ObjectWithNoArgAndJsonbCreatorAnnotatedProtectedConstructor.example(), creator);
     }
 
     @Test

@@ -121,6 +121,57 @@ class AnnotationIntrospectorTestFixtures {
         }
     }
 
+    public static class ObjectWithNoArgAndJsonbCreatorAnnotatedProtectedConstructor implements ProvidesParameterRepresentation {
+        private String string;
+        private long primitive;
+
+        public static final Map<String, Type> parameters() {
+            return twoParameters("string", String.class, "primitive", long.class);
+        }
+
+        public static final ProvidesParameterRepresentation example() {
+            return new ObjectWithNoArgAndJsonbCreatorAnnotatedProtectedConstructor("a string", Long.MAX_VALUE);
+        }
+
+        public ObjectWithNoArgAndJsonbCreatorAnnotatedProtectedConstructor() {
+            super();
+        }
+
+        @JsonbCreator
+        protected ObjectWithNoArgAndJsonbCreatorAnnotatedProtectedConstructor( //
+                @JsonbProperty("string") String aString, //
+                @JsonbProperty("primitive") long aPrimitive) {
+            this.string = aString;
+            this.primitive = aPrimitive;
+        }
+
+        public String getString() {
+            return string;
+        }
+
+        public void setString(String string) {
+            this.string = string;
+        }
+
+        public long getPrimitive() {
+            return primitive;
+        }
+
+        public void setPrimitive(long primitive) {
+            this.primitive = primitive;
+        }
+
+        @Override
+        public Object[] asParameters() {
+            return new Object[] { string, primitive };
+        }
+
+        @Override
+        public String toString() {
+            return "ObjectWithNoArgAndJsonbCreatorAnnotatedProtectedConstructor [string=" + string + ", primitive=" + primitive + "]";
+        }
+    }
+
     public static class ObjectWithJsonbCreatorAnnotatedFactoryMethod implements ProvidesParameterRepresentation {
         private final String string;
         private final long primitive;
