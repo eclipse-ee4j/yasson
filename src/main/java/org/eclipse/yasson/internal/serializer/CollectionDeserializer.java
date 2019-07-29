@@ -56,6 +56,8 @@ class CollectionDeserializer<T extends Collection<?>> extends AbstractContainerD
         if (rawType.isInterface()) {
             final T x = createInterfaceInstance(rawType);
             if (x != null) return x;
+        } else if (EnumSet.class.isAssignableFrom(rawType)) {
+            return (T) EnumSet.noneOf((Class<Enum>) collectionValueType);
         }
         return builder.getJsonbContext().getInstanceCreator().createInstance(rawType);
     }
