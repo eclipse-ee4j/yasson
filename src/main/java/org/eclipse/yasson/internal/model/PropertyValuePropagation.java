@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2015, 2018 Oracle and/or its affiliates. All rights reserved.
+ * Copyright (c) 2015, 2019 Oracle and/or its affiliates. All rights reserved.
  * This program and the accompanying materials are made available under the
  * terms of the Eclipse Public License v1.0 and Eclipse Distribution License v. 1.0
  * which accompanies this distribution.
@@ -116,10 +116,18 @@ public abstract class PropertyValuePropagation {
         }
         Boolean accessible = isVisible(strategy -> strategy.isVisible(field), field, method);
         //overridden by strategy, or anonymous class (readable by spec)
-        if (accessible && (!Modifier.isPublic(field.getModifiers()) || field.getDeclaringClass().isAnonymousClass())) {
+        if (accessible && (
+                !Modifier.isPublic(field.getModifiers())
+                        || field.getDeclaringClass().isAnonymousClass()
+                        || isClassPackagePrivate(field.getDeclaringClass()))) {
             overrideAccessible(field);
         }
         return accessible;
+    }
+
+    private boolean isClassPackagePrivate(Class<?> declaringClass) {
+        int modifiers = declaringClass.getModifiers();
+        return !(Modifier.isPublic(modifiers) || Modifier.isProtected(modifiers) || Modifier.isPrivate(modifiers));
     }
 
     private boolean isMethodVisible(Field field, Method method) {
