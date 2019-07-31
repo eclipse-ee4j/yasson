@@ -53,7 +53,7 @@ public class PropertyOrdering {
      */
     public List<PropertyModel> orderProperties(List<PropertyModel> properties, ClassModel classModel) {
         Map<String, PropertyModel> byReadName = new HashMap<>();
-        properties.stream().forEach(propertyModel -> byReadName.put(propertyModel.getReadName(), propertyModel));
+        properties.stream().forEach(propertyModel -> byReadName.put(propertyModel.getPropertyName(), propertyModel));
 
         String[] order = classModel.getClassCustomization().getPropertyOrder();
         List<PropertyModel> sortedProperties = new ArrayList<>();
