@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2016, 2018 Oracle and/or its affiliates. All rights reserved.
+ * Copyright (c) 2016, 2019 Oracle and/or its affiliates. All rights reserved.
  * This program and the accompanying materials are made available under the
  * terms of the Eclipse Public License v1.0 and Eclipse Distribution License v. 1.0
  * which accompanies this distribution.
@@ -13,20 +13,24 @@
 
 package org.eclipse.yasson.internal.serializer;
 
-import org.eclipse.yasson.internal.*;
-import org.eclipse.yasson.internal.model.ClassModel;
-import org.eclipse.yasson.internal.properties.MessageKeys;
-import org.eclipse.yasson.internal.properties.Messages;
-
-import javax.json.bind.JsonbException;
-import javax.json.bind.serializer.DeserializationContext;
-import javax.json.bind.serializer.JsonbDeserializer;
-import javax.json.stream.JsonParser;
 import java.lang.reflect.Type;
 import java.util.Optional;
 import java.util.OptionalDouble;
 import java.util.OptionalInt;
 import java.util.OptionalLong;
+
+import javax.json.bind.JsonbException;
+import javax.json.bind.serializer.DeserializationContext;
+import javax.json.bind.serializer.JsonbDeserializer;
+import javax.json.stream.JsonParser;
+
+import org.eclipse.yasson.internal.JsonbContext;
+import org.eclipse.yasson.internal.JsonbParser;
+import org.eclipse.yasson.internal.JsonbRiParser;
+import org.eclipse.yasson.internal.ReflectionUtils;
+import org.eclipse.yasson.internal.Unmarshaller;
+import org.eclipse.yasson.internal.properties.MessageKeys;
+import org.eclipse.yasson.internal.properties.Messages;
 
 /**
  * Base class for all deserializers producing non single value result.
@@ -122,19 +126,11 @@ public abstract class AbstractContainerDeserializer<T> extends AbstractItem<T> i
     protected abstract JsonbRiParser.LevelContext moveToFirst(JsonbParser parser);
 
     protected DeserializerBuilder newUnmarshallerItemBuilder(JsonbContext ctx) {
-        return new DeserializerBuilder(ctx).withWrapper(this).withJsonValueType(parserContext.getLastEvent());
+    	return ContainerDeserializer.newUnmarshallerItemBuilder(this, ctx, parserContext.getLastEvent());
     }
 
     protected JsonbDeserializer<?> newCollectionOrMapItem(Type valueType, JsonbContext ctx) {
-        //TODO needs performance optimization on not to create deserializer each time
-        //TODO In contrast to serialization value type cannot change here
-        Type actualValueType = ReflectionUtils.resolveType(this, valueType);
-        DeserializerBuilder deserializerBuilder = newUnmarshallerItemBuilder(ctx).withType(actualValueType);
-        if (!DefaultSerializers.getInstance().isKnownType(ReflectionUtils.getRawType(actualValueType))) {
-            ClassModel classModel = ctx.getMappingContext().getOrCreateClassModel(ReflectionUtils.getRawType(actualValueType));
-            deserializerBuilder.withCustomization(classModel == null ? null : classModel.getCustomization());
-        }
-        return deserializerBuilder.build();
+    	return ContainerDeserializer.newCollectionOrMapItem(this, valueType, ctx, parserContext.getLastEvent());
     }
 
     /**
@@ -176,4 +172,5 @@ public abstract class AbstractContainerDeserializer<T> extends AbstractItem<T> i
      * @param result An instance result of an item.
      */
     public abstract void appendResult(Object result);
+
 }

@@ -12,22 +12,23 @@
  ******************************************************************************/
 package org.eclipse.yasson.internal.serializer;
 
+import java.lang.reflect.Type;
+import java.util.Optional;
+import java.util.OptionalDouble;
+import java.util.OptionalInt;
+import java.util.OptionalLong;
+
+import javax.json.bind.JsonbException;
+import javax.json.bind.serializer.JsonbSerializer;
+import javax.json.bind.serializer.SerializationContext;
+import javax.json.stream.JsonGenerator;
+
 import org.eclipse.yasson.internal.Marshaller;
 import org.eclipse.yasson.internal.ReflectionUtils;
 import org.eclipse.yasson.internal.model.ClassModel;
 import org.eclipse.yasson.internal.model.PropertyModel;
 import org.eclipse.yasson.internal.properties.MessageKeys;
 import org.eclipse.yasson.internal.properties.Messages;
-
-import javax.json.bind.JsonbException;
-import javax.json.bind.serializer.JsonbSerializer;
-import javax.json.bind.serializer.SerializationContext;
-import javax.json.stream.JsonGenerator;
-import java.lang.reflect.Type;
-import java.util.Optional;
-import java.util.OptionalDouble;
-import java.util.OptionalInt;
-import java.util.OptionalLong;
 
 /**
  * Serializes arbitrary object by reading its properties.
@@ -57,9 +58,8 @@ public class ObjectSerializer<T> extends AbstractContainerSerializer<T> {
     }
 
     @Override
-    protected void serializeInternal(T object, JsonGenerator generator, SerializationContext ctx) {
-        final PropertyModel[] allProperties = ((Marshaller) ctx).getMappingContext()
-                .getOrCreateClassModel(object.getClass()).getSortedProperties();
+    public void serializeContainer(T object, JsonGenerator generator, SerializationContext ctx) {
+        final PropertyModel[] allProperties = ((Marshaller) ctx).getMappingContext().getOrCreateClassModel(object.getClass()).getSortedProperties();
         for (PropertyModel model : allProperties) {
             try {
                 marshallProperty(object, generator, ctx, model);
@@ -71,12 +71,12 @@ public class ObjectSerializer<T> extends AbstractContainerSerializer<T> {
     }
 
     @Override
-    protected void writeStart(JsonGenerator generator) {
+    public void writeStart(JsonGenerator generator) {
         generator.writeStartObject();
     }
 
     @Override
-    protected void writeStart(String key, JsonGenerator generator) {
+    public void writeStart(String key, JsonGenerator generator) {
         generator.writeStartObject(key);
     }
 

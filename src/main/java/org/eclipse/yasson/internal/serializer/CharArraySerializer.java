@@ -28,7 +28,7 @@ public class CharArraySerializer extends AbstractArraySerializer<char[]> {
     }
 
     @Override
-    protected void serializeInternal(char[] obj, JsonGenerator generator, SerializationContext ctx) {
+    public void serializeContainer(char[] obj, JsonGenerator generator, SerializationContext ctx) {
         for (char c : obj) {
             generator.write(Character.valueOf(c).toString());
         }

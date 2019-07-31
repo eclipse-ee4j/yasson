@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2016, 2018 Oracle and/or its affiliates. All rights reserved.
+ * Copyright (c) 2016, 2019 Oracle and/or its affiliates. All rights reserved.
  * This program and the accompanying materials are made available under the
  * terms of the Eclipse Public License v1.0 and Eclipse Distribution License v. 1.0
  * which accompanies this distribution.
@@ -13,18 +13,19 @@
 
 package org.eclipse.yasson.internal.serializer;
 
-import org.eclipse.yasson.internal.JsonbContext;
+import java.util.Collection;
 
 import javax.json.bind.serializer.SerializationContext;
 import javax.json.stream.JsonGenerator;
-import java.util.Collection;
+
+import org.eclipse.yasson.internal.JsonbContext;
 
 /**
  * Serializer for collections.
  *
- * @author Roman Grigoriadi
+ * @param <V> type of {@code Collection} value
  */
-public class CollectionSerializer<T extends Collection> extends AbstractContainerSerializer<T> implements EmbeddedItem {
+public class CollectionSerializer<V> extends AbstractContainerSerializer<Collection<V>> implements EmbeddedItem {
 
     protected final JsonbContext jsonbContext;
 
@@ -34,19 +35,19 @@ public class CollectionSerializer<T extends Collection> extends AbstractContaine
     }
 
     @Override
-    protected void serializeInternal(T collection, JsonGenerator generator, SerializationContext ctx) {
+    public void serializeContainer(Collection<V> collection, JsonGenerator generator, SerializationContext ctx) {
         for (Object item : collection) {
             serializeItem(item, generator, ctx);
         }
     }
 
     @Override
-    protected void writeStart(JsonGenerator generator) {
+    public void writeStart(JsonGenerator generator) {
         generator.writeStartArray();
     }
 
     @Override
-    protected void writeStart(String key, JsonGenerator generator) {
+    public void writeStart(String key, JsonGenerator generator) {
         generator.writeStartArray(key);
     }
 }

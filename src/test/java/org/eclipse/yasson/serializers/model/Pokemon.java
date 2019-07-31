@@ -8,28 +8,29 @@
  * http://www.eclipse.org/org/documents/edl-v10.php.
  *
  * Contributors:
- * Roman Grigoriadi
+ * Tomas Kraus
  ******************************************************************************/
 
-package org.eclipse.yasson.internal.serializer;
-
-import javax.json.bind.serializer.SerializationContext;
-import javax.json.stream.JsonGenerator;
+package org.eclipse.yasson.serializers.model;
 
 /**
- * Serializer for arrays of doubles.
- * @author Roman Grigoriadi
+ * Serialization and de-serialization test model: {@code Pokemon}.
  */
-public class DoubleArraySerializer extends AbstractArraySerializer<double[]> {
+public final class Pokemon {
+	public String name;
+	public String type;
+	public int cp;
 
-    protected DoubleArraySerializer(SerializerBuilder builder) {
-        super(builder);
-    }
+	public Pokemon() {
+		this.name = null;
+		this.type = null;
+		this.cp = -1;
+	}
 
-    @Override
-    public void serializeContainer(double[] arr, JsonGenerator generator, SerializationContext ctx) {
-        for (double obj : arr) {
-            generator.write(obj);
-        }
-    }
+	Pokemon(String name, String type, int cp) {
+		this.name = name;
+		this.type = type;
+		this.cp = cp;
+	}
+
 }

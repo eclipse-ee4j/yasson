@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2016, 2017 Oracle and/or its affiliates. All rights reserved.
+ * Copyright (c) 2016, 2019 Oracle and/or its affiliates. All rights reserved.
  * This program and the accompanying materials are made available under the
  * terms of the Eclipse Public License v1.0 and Eclipse Distribution License v. 1.0
  * which accompanies this distribution.
@@ -30,19 +30,19 @@ public class JsonArraySerializer extends AbstractJsonpSerializer<JsonArray> {
     }
 
     @Override
-    protected void serializeInternal(JsonArray obj, JsonGenerator generator, SerializationContext ctx) {
+    public void serializeContainer(JsonArray obj, JsonGenerator generator, SerializationContext ctx) {
         for (JsonValue value : obj) {
             generator.write(value);
         }
     }
 
     @Override
-    protected void writeStart(JsonGenerator generator) {
+    public void writeStart(JsonGenerator generator) {
         generator.writeStartArray();
     }
 
     @Override
-    protected void writeStart(String key, JsonGenerator generator) {
+    public void writeStart(String key, JsonGenerator generator) {
         generator.writeStartArray(key);
     }
 }

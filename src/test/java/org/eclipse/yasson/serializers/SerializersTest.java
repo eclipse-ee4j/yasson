@@ -19,17 +19,23 @@ import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNull;
 import static org.junit.Assert.fail;
 
+import java.io.StringReader;
+import java.lang.reflect.ParameterizedType;
 import java.lang.reflect.Type;
 import java.math.BigDecimal;
 import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.Date;
 import java.util.HashMap;
+import java.util.Map;
 import java.util.SortedMap;
 import java.util.TimeZone;
 import java.util.TreeMap;
 
+import javax.json.Json;
+import javax.json.JsonArray;
 import javax.json.JsonObject;
+import javax.json.JsonValue;
 import javax.json.bind.Jsonb;
 import javax.json.bind.JsonbBuilder;
 import javax.json.bind.JsonbConfig;
@@ -54,15 +60,16 @@ import org.eclipse.yasson.serializers.model.CrateJsonObjectDeserializer;
 import org.eclipse.yasson.serializers.model.CrateSerializer;
 import org.eclipse.yasson.serializers.model.CrateSerializerWithConversion;
 import org.eclipse.yasson.serializers.model.GenericPropertyPojo;
-import org.eclipse.yasson.serializers.model.GenericPropertyPojoSerializer;
 import org.eclipse.yasson.serializers.model.NumberDeserializer;
 import org.eclipse.yasson.serializers.model.NumberSerializer;
+import org.eclipse.yasson.serializers.model.Pokemon;
 import org.eclipse.yasson.serializers.model.RecursiveDeserializer;
 import org.eclipse.yasson.serializers.model.RecursiveSerializer;
 import org.eclipse.yasson.serializers.model.SimpleAnnotatedSerializedArrayContainer;
 import org.eclipse.yasson.serializers.model.SimpleContainer;
 import org.eclipse.yasson.serializers.model.StringWrapper;
 import org.eclipse.yasson.serializers.model.SupertypeSerializerPojo;
+import org.eclipse.yasson.serializers.model.Trainer;
 import org.junit.Assert;
 import org.junit.Test;
 
@@ -450,6 +457,276 @@ public class SerializersTest {
         assertEquals("{\"null\":null}", jsonb.toJson(singletonMap(null, null)));
         assertEquals("{\"key\":null}", jsonb.toJson(singletonMap("key", null)));
         assertEquals("{\"null\":\"value\"}", jsonb.toJson(singletonMap(null, "value")));
+    }
+
+    /**
+     * Test serialization of Map with String keys only.
+     * Map shall be stored as a single JsonObject with keys as object properties names.
+     */
+    @Test
+    public void testSerializeMapToJsonObject() {
+        Map<String, Object> map = new HashMap<>();
+        Jsonb jsonb = JsonbBuilder.create(new JsonbConfig());
+        map.put("name", "John SMith");
+        map.put("age", 35);
+        map.put("married", true);
+        String json = jsonb.toJson(map);
+        JsonObject jobj = Json.createReader(new StringReader(json)).read().asJsonObject();
+        assertEquals("John SMith", jobj.getString("name"));
+        assertEquals(35, jobj.getInt("age"));
+        assertEquals(true, jobj.getBoolean("married"));
+    }
+
+    /**
+     * Test de-serialization of Map<?, ?> with various simple values as keys and values.
+     * Map is stored as an JsonArray of map entries represented as JsonObjects.
+     */
+    @Test
+    public void testDeSerializePrimitivesMapToEntriesArray() {
+        String jsonString =
+            "[" +
+            "    {" +
+            "        \"key\": \"first\"," +
+            "        \"value\": \"Peter Parker\"" +
+            "    }," +
+            "    {" +
+            "        \"key\": 42," +
+            "        \"value\": true" +
+            "    }," +
+            "    {" +
+            "        \"key\": false," +
+            "        \"value\": 21" +
+            "    }" +
+            "]";
+        Jsonb jsonb = JsonbBuilder.create(new JsonbConfig());
+        Map<?, ?> map = jsonb.fromJson(jsonString, Map.class);
+        assertEquals(3, map.size());
+        // Make sure that all 3 pokemons were checked.
+        int valueCheck = 0x00;
+        for (Map.Entry<?, ?> entry : map.entrySet()) {
+        	if ((entry.getKey() instanceof String) && "first".equals((String)entry.getKey())) {
+        		assertEquals("Peter Parker", entry.getValue());
+        		valueCheck |= 0x01;
+        	}
+        	if ((entry.getKey() instanceof Number) && ((Number)entry.getKey()).equals(new BigDecimal(42))) {
+        		assertEquals(true, entry.getValue());
+        		valueCheck |= 0x02;
+        	}
+        	if ((entry.getKey() instanceof Boolean) && ((Boolean)entry.getKey()).equals(false)) {
+        		assertEquals(new BigDecimal(21), entry.getValue());
+        		valueCheck |= 0x04;
+        	}
+        }
+        assertEquals("Some of Map keys did not match expected values", 0x07, valueCheck);
+    }
+
+    /**
+     * Test de-serialization of Map<String, Pokemon> with various classes instances as keys.
+     * Map is stored as an JsonArray of map entries represented as JsonObjects.
+     */
+    @Test
+    public void testDeSerializeStringPoJoMapToEntriesArray() {
+        String jsonString =
+            "[" +
+            "    {" +
+            "        \"key\": \"Pikachu\"," +
+            "        \"value\": {" +
+            "            \"name\": \"Pikachu\"," +
+            "            \"type\": \"electric\"," +
+            "            \"cp\": 456" +
+            "         }" +
+            "    }," +
+            "    {" +
+            "        \"key\": \"Squirtle\"," +
+            "        \"value\": {" +
+            "            \"name\": \"Squirtle\"," +
+            "            \"type\": \"water\"," +
+            "            \"cp\": 124" +
+            "         }" +
+            "    }," +
+            "    {" +
+            "        \"key\": \"Rayquaza\"," +
+            "        \"value\": {" +
+            "            \"name\": \"Rayquaza\"," +
+            "            \"type\": \"dragon\"," +
+            "            \"cp\": 3273" +
+            "        }" +
+            "    }" +
+            "]";
+        ParameterizedType pt = new ParameterizedType() {
+            @Override
+            public Type[] getActualTypeArguments() {
+                return new Type[] {String.class, Pokemon.class};
+            }
+
+            @Override
+            public Type getRawType() {
+                return Map.class;
+            }
+
+            @Override
+            public Type getOwnerType() {
+                return null;
+            }
+        };
+        Jsonb jsonb = JsonbBuilder.create(new JsonbConfig());
+        Map<String, Pokemon> map = jsonb.fromJson(jsonString, pt);
+        assertEquals(3, map.size());
+        // Make sure that all 3 pokemons were checked.
+        int valueCheck = 0x00;
+        for (Map.Entry<String, Pokemon> entry : map.entrySet()) {
+        	Pokemon pokemon = entry.getValue();
+        	if ("Pikachu".equals(entry.getKey())) {
+        		assertEquals("Pikachu", pokemon.name);
+        		assertEquals("electric", pokemon.type);
+        		assertEquals(456, pokemon.cp);
+        		valueCheck |= 0x01;
+        	}
+        	if ("Squirtle".equals(entry.getKey())) {
+        		assertEquals("Squirtle", pokemon.name);
+        		assertEquals("water", pokemon.type);
+        		assertEquals(124, pokemon.cp);
+        		valueCheck |= 0x02;
+        	}
+        	if ("Rayquaza".equals(entry.getKey())) {
+        		assertEquals("Rayquaza", pokemon.name);
+        		assertEquals("dragon", pokemon.type);
+        		assertEquals(3273, pokemon.cp);
+        		valueCheck |= 0x04;
+        	}
+        }
+        assertEquals("Some of Map keys did not match expected values", 0x07, valueCheck);
+    }    
+
+    /**
+     * Test de-serialization of Map<Trainer, Pokemon> with various classes instances as keys.
+     * Map is stored as an JsonArray of map entries represented as JsonObjects.
+     */
+    @Test
+    public void testDeSerializePoJoPoJoMapToEntriesArray() {
+        String jsonString =
+            "[" +
+            "    {" +
+            "        \"key\": {" +
+            "            \"name\": \"Bob\"," +
+            "            \"age\": 12" +
+            "        }," +
+            "        \"value\": {" +
+            "            \"name\": \"Pikachu\"," +
+            "            \"type\": \"electric\"," +
+            "            \"cp\": 456" +
+            "         }" +
+            "    }," +
+            "    {" +
+            "        \"key\": {" +
+            "            \"name\": \"Ash\"," +
+            "            \"age\": 10" +
+            "        }," +
+            "        \"value\": {" +
+            "            \"name\": \"Squirtle\"," +
+            "            \"type\": \"water\"," +
+            "            \"cp\": 124" +
+            "         }" +
+            "    }," +
+            "    {" +
+            "        \"key\": {" +
+            "            \"name\": \"Joe\"," +
+            "            \"age\": 15" +
+            "        }," +
+            "        \"value\": {" +
+            "            \"name\": \"Rayquaza\"," +
+            "            \"type\": \"dragon\"," +
+            "            \"cp\": 3273" +
+            "        }" +
+            "    }" +
+            "]";
+        ParameterizedType pt = new ParameterizedType() {
+            @Override
+            public Type[] getActualTypeArguments() {
+                return new Type[] {Trainer.class, Pokemon.class};
+            }
+
+            @Override
+            public Type getRawType() {
+                return Map.class;
+            }
+
+            @Override
+            public Type getOwnerType() {
+                return null;
+            }
+        };
+        Jsonb jsonb = JsonbBuilder.create(new JsonbConfig());
+        Map<Trainer, Pokemon> map = jsonb.fromJson(jsonString, pt);
+        assertEquals(3, map.size());
+        // Make sure that all 3 pokemons were checked.
+        int valueCheck = 0x00;
+        for (Map.Entry<Trainer, Pokemon> entry : map.entrySet()) {
+        	Trainer trainer = entry.getKey();
+        	Pokemon pokemon = entry.getValue();
+        	if ("Bob".equals(trainer.name)) {
+        		assertEquals(12, trainer.age);
+        		assertEquals("Pikachu", pokemon.name);
+        		assertEquals("electric", pokemon.type);
+        		assertEquals(456, pokemon.cp);
+        		valueCheck |= 0x01;
+        	}
+        	if ("Ash".equals(trainer.name)) {
+        		assertEquals(10, trainer.age);
+        		assertEquals("Squirtle", pokemon.name);
+        		assertEquals("water", pokemon.type);
+        		assertEquals(124, pokemon.cp);
+        		valueCheck |= 0x02;
+        	}
+        	if ("Joe".equals(trainer.name)) {
+        		assertEquals(15, trainer.age);
+        		assertEquals("Rayquaza", pokemon.name);
+        		assertEquals("dragon", pokemon.type);
+        		assertEquals(3273, pokemon.cp);
+        		valueCheck |= 0x04;
+        	}
+        }
+        assertEquals("Some of Map keys did not match expected values", 0x07, valueCheck);
+    }    
+
+    /**
+     * Test serialization of Map with various classes instances as keys.
+     * Map shall be stored as an JsonArray of map entries represented as JsonObjects.
+     */
+    @Test
+    public void testSerializeMapToEntriesArray() {
+        Map<Object, Object> map = new HashMap<>();
+        Jsonb jsonb = JsonbBuilder.create(new JsonbConfig().withFormatting(true));
+        map.put("Name", "John Smith");
+        map.put(10, 24l);
+        map.put(Boolean.FALSE, Boolean.TRUE);
+        String json = jsonb.toJson(map);
+        JsonArray jarr = Json.createReader(new StringReader(json)).read().asJsonArray();
+        assertEquals(3, jarr.size());
+        jarr.forEach(entry -> {
+            JsonObject jentry = entry.asJsonObject();
+            JsonValue key = jentry.getValue("/key");
+            switch(key.getValueType()) {
+                case STRING: {
+                    String keyValue = jentry.getString("key");
+                    String value = jentry.getString("value");
+                    assertEquals("Name", keyValue);
+                    assertEquals("John Smith", value);
+                } break;
+                case NUMBER: {
+                    int keyValue = jentry.getInt("key");
+                    int value = jentry.getInt("value");
+                    assertEquals(10, keyValue);
+                    assertEquals(24, value);
+                } break;
+                case FALSE: {
+                    boolean keyValue = jentry.getBoolean("key");
+                    boolean value = jentry.getBoolean("value");
+                    assertEquals(false, keyValue);
+                    assertEquals(true, value);
+                }
+            }
+        });
     }
 
     @Test
