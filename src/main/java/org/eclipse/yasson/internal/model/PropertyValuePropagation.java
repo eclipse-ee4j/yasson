@@ -13,8 +13,6 @@
 
 package org.eclipse.yasson.internal.model;
 
-import org.eclipse.yasson.internal.JsonbContext;
-
 import javax.json.bind.config.PropertyVisibilityStrategy;
 import java.lang.reflect.AccessibleObject;
 import java.lang.reflect.Field;
@@ -22,7 +20,6 @@ import java.lang.reflect.Method;
 import java.lang.reflect.Modifier;
 import java.security.AccessController;
 import java.security.PrivilegedAction;
-import java.util.Optional;
 import java.util.function.Function;
 
 /**
@@ -119,15 +116,14 @@ public abstract class PropertyValuePropagation {
         if (accessible && (
                 !Modifier.isPublic(field.getModifiers())
                         || field.getDeclaringClass().isAnonymousClass()
-                        || isClassPackagePrivate(field.getDeclaringClass()))) {
+                        || isNotPublicAndNonNested(field.getDeclaringClass()))) {
             overrideAccessible(field);
         }
         return accessible;
     }
 
-    private boolean isClassPackagePrivate(Class<?> declaringClass) {
-        int modifiers = declaringClass.getModifiers();
-        return !(Modifier.isPublic(modifiers) || Modifier.isProtected(modifiers) || Modifier.isPrivate(modifiers));
+    private boolean isNotPublicAndNonNested(Class<?> declaringClass) {
+        return !declaringClass.isMemberClass() && !Modifier.isPublic(declaringClass.getModifiers());
     }
 
     private boolean isMethodVisible(Field field, Method method) {
