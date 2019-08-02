@@ -1,5 +1,7 @@
 /*******************************************************************************
- * Copyright (c) 2016, 2019 Oracle and/or its affiliates. All rights reserved.
+ * Copyright (c) 2016, 2019 Oracle and/or its affiliates and others.
+ * All rights reserved.
+ * 
  * This program and the accompanying materials are made available under the
  * terms of the Eclipse Public License v1.0 and Eclipse Distribution License v. 1.0
  * which accompanies this distribution.
@@ -8,7 +10,8 @@
  * http://www.eclipse.org/org/documents/edl-v10.php.
  *
  * Contributors:
- * Roman Grigoriadi
+ *  Roman Grigoriadi
+ *  Payara Services - Added default serialiser to user serializer
  ******************************************************************************/
 package org.eclipse.yasson.internal.serializer;
 
@@ -71,7 +74,7 @@ public class SerializerBuilder extends AbstractSerializerBuilder<SerializerBuild
             final ComponentMatcher componentMatcher = jsonbContext.getComponentMatcher();
             Optional<SerializerBinding<?>> userSerializer = componentMatcher.getSerializerBinding(getRuntimeType(), customization);
             if (userSerializer.isPresent()) {
-                return new UserSerializerSerializer<>(classModel, userSerializer.get().getJsonbSerializer());
+                return new UserSerializerSerializer<>(userSerializer.get().getJsonbSerializer(), new ObjectSerializer<>(this));
             }
 
             //Second user components is registered.
@@ -140,7 +143,7 @@ public class SerializerBuilder extends AbstractSerializerBuilder<SerializerBuild
         } else if (componentType == double.class) {
             return new DoubleArraySerializer(this);
         } else {
-            return new ObjectArraySerializer(this);
+            return new ObjectArraySerializer<>(this);
         }
     }
 
