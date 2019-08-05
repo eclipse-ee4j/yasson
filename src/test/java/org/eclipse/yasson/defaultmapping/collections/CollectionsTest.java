@@ -21,12 +21,14 @@ import org.junit.Test;
 
 import javax.json.bind.Jsonb;
 import javax.json.bind.JsonbConfig;
+import javax.json.bind.JsonbException;
 import javax.json.bind.JsonbBuilder;
 import java.math.BigDecimal;
 import java.util.*;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertTrue;
+import static org.junit.Assert.fail;
 
 /**
  * Default mapping arrays/collections/enums tests.
@@ -226,6 +228,32 @@ public class CollectionsTest {
         final String result = jsonb.toJson(languageEnumMap);
         assertTrue("{\"Russian\":\"ru\",\"English\":\"en\"}".equals(result) ||
                 "{\"English\":\"en\",\"Russian\":\"ru\"}".equals(result));
+        
+        assertEquals(languageEnumMap, jsonb.fromJson(result, new EnumMap<Language,String>(Language.class) {}.getClass().getGenericSuperclass()));
+        
+        try {
+            jsonb.fromJson("{\"Bogus\":\"bog\"}", new EnumMap<Language,String>(Language.class) {}.getClass().getGenericSuperclass());
+            fail("Should have failed to deserialize an invalid enum");
+        } catch(JsonbException expected) {
+        }
+    }
+    
+    public static enum Letter {
+        A, B, C
+    }
+    
+    public static class Container {
+        public Map<Letter, Integer> letterToOrdinal;
+        public Map<String, Letter> nameToLetter;
+    }
+
+    @Test
+    // Test case submitted by a user in issue #283
+    public void testMapWithEnumKeys() {
+        Jsonb jsonb = JsonbBuilder.create();
+        Container container = jsonb.fromJson("{\"letterToOrdinal\":{\"B\": 1}, \"nameToLetter\":{\"a\":\"A\"}}", Container.class);
+        assertEquals(Letter.A, container.nameToLetter.values().iterator().next());
+        assertEquals(Letter.B, container.letterToOrdinal.keySet().iterator().next());
     }
 
     @Test
