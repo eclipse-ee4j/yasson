@@ -13,14 +13,20 @@
  ******************************************************************************/
 package org.eclipse.yasson.internal.serializer;
 
+import java.lang.reflect.InvocationTargetException;
+import java.lang.reflect.Method;
+import java.lang.reflect.Modifier;
 import java.lang.reflect.ParameterizedType;
 import java.lang.reflect.Type;
+import java.math.BigDecimal;
 import java.util.EnumMap;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.SortedMap;
 import java.util.TreeMap;
+import java.util.WeakHashMap;
 
+import javax.json.bind.JsonbException;
 import javax.json.bind.serializer.JsonbDeserializer;
 import javax.json.stream.JsonParser;
 
@@ -28,6 +34,8 @@ import org.eclipse.yasson.internal.JsonbParser;
 import org.eclipse.yasson.internal.JsonbRiParser;
 import org.eclipse.yasson.internal.ReflectionUtils;
 import org.eclipse.yasson.internal.Unmarshaller;
+import org.eclipse.yasson.internal.properties.MessageKeys;
+import org.eclipse.yasson.internal.properties.Messages;
 
 /**
  * Item implementation for {@link java.util.Map} fields.
@@ -41,7 +49,6 @@ public class MapDeserializer<T extends Map<?,?>> extends AbstractContainerDeseri
 
     private final Type mapKeyRuntimeType;
     private final Type mapValueRuntimeType;
-
     private final T instance;
     
     /**
@@ -93,16 +100,52 @@ public class MapDeserializer<T extends Map<?,?>> extends AbstractContainerDeseri
         appendCaptor(parserContext.getLastKeyName(), convertNullToOptionalEmpty(mapValueRuntimeType, result));
     }
 
-    @SuppressWarnings({ "unchecked", "rawtypes" })
+    @SuppressWarnings({ "unchecked" })
     private <V> void appendCaptor(String key, V value) {
-        if (Enum.class.isAssignableFrom((Class<?>) mapKeyRuntimeType)) {
-            Enum<?> enumKey = Enum.valueOf((Class<Enum>) mapKeyRuntimeType, key);
-            ((Map<Enum<?>, V>) getInstance(null)).put(enumKey, value);
+        // First check if the key is String/Object type
+        if (mapKeyRuntimeType == String.class || mapKeyRuntimeType == Object.class) {
+            ((Map<String, V>) getInstance(null)).put(key, value);
+            return;
+        }
+        // If the map key is non-String, check to see if the class has a well known "stringable"
+        // method such as X.valueOf(String s) or X.fromString(String s)
+        Object valueAsObject = asStringable((Class<?>) mapKeyRuntimeType, key);
+        if (valueAsObject != null) {
+            ((Map<Object, V>) getInstance(null)).put(valueAsObject, value);
         } else {
+            // If the key type is not a String and is not stringable, force it to be a String
+            // In the future, we may support user-defined adapters here for more complex map keys
             ((Map<String, V>) getInstance(null)).put(key, value);
         }
     }
-
+    
+    @SuppressWarnings("unchecked")
+    private <K> K asStringable(Class<K> clazz, String value) {
+        Method found = null;
+        try {
+            Method m = clazz.getMethod("valueOf", String.class);
+            if (Modifier.isStatic(m.getModifiers()) && Modifier.isPublic(m.getModifiers()))
+                found = m;
+        } catch (NoSuchMethodException ignore) {
+        }
+        if (found == null) {
+        try {
+            Method m = clazz.getMethod("fromString", String.class);
+            if (Modifier.isStatic(m.getModifiers()) && Modifier.isPublic(m.getModifiers()))
+                found = m;
+        } catch (NoSuchMethodException ignore) {
+        }
+        }
+        if (found != null) {
+            try {
+                return (K) found.invoke(null, value);
+            } catch (IllegalAccessException | IllegalArgumentException | InvocationTargetException e) {
+                throw new JsonbException(Messages.getMessage(MessageKeys.DESERIALIZE_VALUE_ERROR, value, clazz), e);
+            }
+        }
+        return null;
+    }
+    
     @Override
     protected void deserializeNext(JsonParser parser, Unmarshaller context) {
         final JsonbDeserializer<?> deserializer = newCollectionOrMapItem(mapValueRuntimeType, context.getJsonbContext());

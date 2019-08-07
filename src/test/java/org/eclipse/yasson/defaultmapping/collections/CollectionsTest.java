@@ -250,10 +250,47 @@ public class CollectionsTest {
     @Test
     // Test case submitted by a user in issue #283
     public void testMapWithEnumKeys() {
-        Jsonb jsonb = JsonbBuilder.create();
-        Container container = jsonb.fromJson("{\"letterToOrdinal\":{\"B\": 1}, \"nameToLetter\":{\"a\":\"A\"}}", Container.class);
+        String expectedJSON = "{\"letterToOrdinal\":{\"B\":1},\"nameToLetter\":{\"a\":\"A\"}}";
+        Container original = new Container();
+        original.letterToOrdinal = new HashMap<>();
+        original.letterToOrdinal.put(Letter.B, 1);
+        original.nameToLetter = new HashMap<>();
+        original.nameToLetter.put("a", Letter.A);
+        assertEquals(expectedJSON, jsonb.toJson(original));
+        
+        Container container = jsonb.fromJson(expectedJSON, Container.class);
         assertEquals(Letter.A, container.nameToLetter.values().iterator().next());
         assertEquals(Letter.B, container.letterToOrdinal.keySet().iterator().next());
+    }
+    
+    @Test
+    public void testMapWithUUIDKeys() {
+        UUID uuid1 = UUID.fromString("1be8f537-0d9b-4d5c-bcca-f7eaad2fba8d");
+        UUID uuid2 = UUID.fromString("dea6f3b4-e35d-4a27-a6c8-60963a4c0b15");
+        String expectedJSON = "{\"" + uuid1 + "\":\"first\",\"" + uuid2 + "\":\"second\"}";
+        Map<UUID,String> original = new HashMap<>();
+        original.put(uuid1, "first");
+        original.put(uuid2, "second");
+        assertEquals(expectedJSON, jsonb.toJson(original));
+        
+        Map<UUID,String> after = jsonb.fromJson(expectedJSON, new HashMap<UUID,String>(){
+            private static final long serialVersionUID = -9103805082954213878L;
+        }.getClass().getGenericSuperclass());
+        assertEquals(original, after);
+    }
+    
+    @Test
+    public void testMapWithPrimitive() {
+        String expectedJSON = "{\"1\":\"first\",\"2\":\"second\"}";
+        Map<Integer,String> original = new HashMap<>();
+        original.put(Integer.valueOf(1), "first");
+        original.put(Integer.valueOf(2), "second");
+        assertEquals(expectedJSON, jsonb.toJson(original));
+        
+        Map<Integer,String> after = jsonb.fromJson(expectedJSON, new HashMap<Integer,String>(){
+            private static final long serialVersionUID = -9103805082954213878L;
+        }.getClass().getGenericSuperclass());
+        assertEquals(original, after);
     }
 
     @Test
