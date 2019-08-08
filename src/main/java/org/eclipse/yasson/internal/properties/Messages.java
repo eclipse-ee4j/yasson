@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2015, 2017 Oracle and/or its affiliates. All rights reserved.
+ * Copyright (c) 2015, 2019 Oracle and/or its affiliates. All rights reserved.
  * This program and the accompanying materials are made available under the
  * terms of the Eclipse Public License v1.0 and Eclipse Distribution License v. 1.0
  * which accompanies this distribution.
@@ -43,7 +43,7 @@ public class Messages {
      * @return Formatted message in string.
      */
     public static String getMessage(MessageKeys key, Object... objects) {
-        return getMessage(key, Locale.getDefault(), objects);
+        return getMessageWithLocale(key, Locale.getDefault(), objects);
     }
 
     /**
@@ -54,7 +54,7 @@ public class Messages {
      * @param objects Message parameters.
      * @return Formatted message in string.
      */
-    public static String getMessage(MessageKeys key, Locale locale, Object... objects) {
+    public static String getMessageWithLocale(MessageKeys key, Locale locale, Object... objects) {
         ResourceBundle messages = getResourceBundle(locale);
         MessageFormat formatter = new MessageFormat(messages.getString(key.key));
         return formatter.format(objects);

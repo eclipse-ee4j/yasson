@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2015, 2017 Oracle and/or its affiliates. All rights reserved.
+ * Copyright (c) 2015, 2019 Oracle and/or its affiliates. All rights reserved.
  * This program and the accompanying materials are made available under the
  * terms of the Eclipse Public License v1.0 and Eclipse Distribution License v. 1.0
  * which accompanies this distribution.
@@ -40,9 +40,9 @@ public class PropertiesTest {
     @Test
     public void testPropertiesWithLocale() throws IOException {
         String templateCS = "Zpracovávám třídu: {0} do jsonu za použití convertoru: {1}";
-        String messageCS = Messages.getMessage(MessageKeys.PROCESS_TO_JSON, new Locale("cs"));
+        String messageCS = Messages.getMessageWithLocale(MessageKeys.PROCESS_TO_JSON, new Locale("cs"));
         String templateEN = "Process class: {0} to json using converter: {1}";
-        String messageEN = Messages.getMessage(MessageKeys.PROCESS_TO_JSON, new Locale("en"));
+        String messageEN = Messages.getMessageWithLocale(MessageKeys.PROCESS_TO_JSON, new Locale("en"));
 
         assertEquals(templateCS, messageCS);
         assertEquals(templateEN, messageEN);
@@ -51,7 +51,7 @@ public class PropertiesTest {
     @Test
     public void testPropertiesAttributeSetting() throws IOException {
         String template = "Zpracovávám třídu: Test do jsonu za použití convertoru: Test1";
-        String message = Messages.getMessage(MessageKeys.PROCESS_TO_JSON, new Locale("cs"), "Test", "Test1");
+        String message = Messages.getMessageWithLocale(MessageKeys.PROCESS_TO_JSON, new Locale("cs"), "Test", "Test1");
 
         assertEquals(template, message);
     }

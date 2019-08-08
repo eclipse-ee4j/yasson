@@ -18,13 +18,11 @@ import java.lang.reflect.Method;
 import java.lang.reflect.Modifier;
 import java.lang.reflect.ParameterizedType;
 import java.lang.reflect.Type;
-import java.math.BigDecimal;
 import java.util.EnumMap;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.SortedMap;
 import java.util.TreeMap;
-import java.util.WeakHashMap;
 
 import javax.json.bind.JsonbException;
 import javax.json.bind.serializer.JsonbDeserializer;

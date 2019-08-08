@@ -131,7 +131,8 @@ public class DeserializerBuilder extends AbstractSerializerBuilder<DeserializerB
                 if (jsonEvent == JsonParser.Event.VALUE_NULL) {
                     return NullDeserializer.INSTANCE;
                 }
-                throw new JsonbException(Messages.getMessage(MessageKeys.DESERIALIZE_VALUE_ERROR, getRuntimeType()));
+                throw new JsonbException(Messages.getMessage(MessageKeys.DESERIALIZE_VALUE_ERROR, 
+                        null, getRuntimeType()));
             }
             return wrapAdapted(adapterInfoOptional, supportedTypeDeserializer.get());
         }

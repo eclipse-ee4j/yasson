@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2015, 2017 Oracle and/or its affiliates. All rights reserved.
+ * Copyright (c) 2015, 2019 Oracle and/or its affiliates. All rights reserved.
  * This program and the accompanying materials are made available under the
  * terms of the Eclipse Public License v1.0 and Eclipse Distribution License v. 1.0
  * which accompanies this distribution.
@@ -36,7 +36,6 @@ import java.time.ZonedDateTime;
 import java.util.OptionalDouble;
 import java.util.OptionalInt;
 import java.util.OptionalLong;
-import java.util.logging.Logger;
 
 import static org.junit.Assert.*;
 
@@ -69,7 +68,7 @@ public class UnmarshallingUnsupportedTypesTest {
             jsonb.fromJson(expected, ClassWithUnsupportedFields.class);
             fail("Should report an error");
         } catch (JsonbException e) {
-            assertTrue(e.getMessage().contains("Can't infer a type"));
+            assertTrue(e.getMessage().contains("Can not infer a type"));
             assertTrue(e.getMessage().contains("customInterface"));
         }
     }
@@ -207,10 +206,16 @@ public class UnmarshallingUnsupportedTypesTest {
         try {
             jsonb.fromJson(json, type);
             fail();
-        } catch (JsonbException e) {
-            if(!e.getMessage().contains(failureProperty) || !e.getMessage().contains(failurePropertyClass.getName())) {
-                fail("Expected error message to contain '" + failureProperty + "' and '" + failurePropertyClass.getName() + "', but was: " +
-                 e.getMessage());
+        } catch (JsonbException ex) {
+            String fullCause = ex.getMessage();
+            Throwable current = ex;
+            while (current.getCause() != null && current.getCause() != current) {
+                current = current.getCause();
+                fullCause += "  " + current.getMessage();
+            }
+            if (!fullCause.contains(failureProperty) || !fullCause.contains(failurePropertyClass.getName())) {
+                fail("Expected error message to contain '" + failureProperty + "' and '"
+                        + failurePropertyClass.getName() + "', but was: " + fullCause);
             }
         }
     }

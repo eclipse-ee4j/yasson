@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2016 Oracle and/or its affiliates. All rights reserved.
+ * Copyright (c) 2016, 2019 Oracle and/or its affiliates. All rights reserved.
  * This program and the accompanying materials are made available under the
  * terms of the Eclipse Public License v1.0 and Eclipse Distribution License v. 1.0
  * which accompanies this distribution.
@@ -74,7 +74,9 @@ public class JsonbPropertyTest {
             clashCommand.run();
             fail();
         } catch (Exception e) {
-            assertTrue(e.getMessage().startsWith("Property pojoName clashes with property pojoNameCollision"));
+            String token = "Property 'pojoName' clashes with property 'pojoNameCollision'";
+            assertTrue("Expected error to contain '" + token + "' but did not: " + e.getMessage(),
+                    e.getMessage().contains(token));
         }
     }
 
@@ -121,7 +123,7 @@ public class JsonbPropertyTest {
             jsonb.toJson(conflictingProperties);
             fail();
         } catch (JsonbException e) {
-            if (!e.getMessage().equals("Property DOI clashes with property doi by read or write name in class org.eclipse.yasson.customization.JsonbPropertyTest$ConflictingProperties.")) {
+            if (!e.getMessage().contains("Property 'DOI' clashes with property 'doi' by read or write name in class org.eclipse.yasson.customization.JsonbPropertyTest$ConflictingProperties.")) {
                 throw e;
             }
         }
@@ -146,7 +148,7 @@ public class JsonbPropertyTest {
             jsonb.toJson(pojo);
             fail();
         } catch (JsonbException e) {
-            if (!e.getMessage().equals("Property DOI clashes with property doi by read or write name in class org.eclipse.yasson.customization.JsonbPropertyTest$ConflictingWithUpperCamelStrategy.")) {
+            if (!e.getMessage().contains("Property 'DOI' clashes with property 'doi' by read or write name in class org.eclipse.yasson.customization.JsonbPropertyTest$ConflictingWithUpperCamelStrategy.")) {
                 throw e;
             }
         }
