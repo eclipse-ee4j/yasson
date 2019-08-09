@@ -152,6 +152,22 @@ public class JsonbPropertyTest {
         }
 
     }
+    
+    @Test
+    public void testConflictingWithLowercaseStrategy() {
+    	// scenario raised by user here: https://github.com/eclipse-ee4j/yasson/issues/296
+    	Jsonb jsonb = JsonbBuilder.create(new JsonbConfig().withPropertyNamingStrategy(PropertyNamingStrategy.LOWER_CASE_WITH_UNDERSCORES));
+    	assertEquals("{\"url\":\"http://foo.com\"}", 
+    			jsonb.toJson(new ConflictingIfLowercase()));
+    }
+    
+    public static class ConflictingIfLowercase {
+    	private String foo = "foo";
+    	
+    	public String getFOO() {
+    		return foo + "bar";
+    	}
+    }
 
     public static class NonConflictingProperties {
         private String doi;
