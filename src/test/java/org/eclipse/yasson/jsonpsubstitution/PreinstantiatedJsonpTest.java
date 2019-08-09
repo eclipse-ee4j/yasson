@@ -9,6 +9,7 @@
  ******************************************************************************/
 package org.eclipse.yasson.jsonpsubstitution;
 
+import org.eclipse.yasson.Assertions;
 import org.eclipse.yasson.JsonBindingProvider;
 import org.eclipse.yasson.TestTypeToken;
 import org.eclipse.yasson.YassonJsonb;
@@ -165,12 +166,7 @@ public class PreinstantiatedJsonpTest {
         generator.writeStartObject();
         //key not written
 
-        try {
-            jsonb.toJson(dog, generator);
-            Assert.fail("JsonbException not thrown");
-        } catch (JsonbException e) {
-            //OK
-        }
+        Assertions.shouldFail(() -> jsonb.toJson(dog, generator));
     }
 
     @Test

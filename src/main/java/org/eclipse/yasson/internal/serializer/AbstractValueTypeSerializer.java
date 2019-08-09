@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2016, 2018 Oracle and/or its affiliates. All rights reserved.
+ * Copyright (c) 2016, 2019 Oracle and/or its affiliates. All rights reserved.
  * This program and the accompanying materials are made available under the
  * terms of the Eclipse Public License v1.0 and Eclipse Distribution License v. 1.0
  * which accompanies this distribution.
@@ -15,7 +15,10 @@ package org.eclipse.yasson.internal.serializer;
 
 import org.eclipse.yasson.internal.Marshaller;
 import org.eclipse.yasson.internal.model.customization.Customization;
+import org.eclipse.yasson.internal.properties.MessageKeys;
+import org.eclipse.yasson.internal.properties.Messages;
 
+import javax.json.bind.JsonbException;
 import javax.json.bind.serializer.JsonbSerializer;
 import javax.json.bind.serializer.SerializationContext;
 import javax.json.stream.JsonGenerator;
@@ -48,7 +51,12 @@ public abstract class AbstractValueTypeSerializer<T> implements JsonbSerializer<
     @Override
     public void serialize(T obj, JsonGenerator generator, SerializationContext ctx) {
         Marshaller marshaller = (Marshaller) ctx;
-        serialize(obj, generator, marshaller);
+        try {
+        	serialize(obj, generator, marshaller);
+        } catch (Exception e) {
+    		throw new JsonbException(Messages.getMessage(MessageKeys.SERIALIZE_VALUE_ERROR, 
+    				obj, obj.getClass().getCanonicalName(), e.getMessage()));
+        }
     }
 
     protected abstract void serialize(T obj, JsonGenerator generator, Marshaller marshaller);
