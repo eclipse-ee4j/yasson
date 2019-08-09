@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2016 Oracle and/or its affiliates. All rights reserved.
+ * Copyright (c) 2016, 2019 Oracle and/or its affiliates. All rights reserved.
  * This program and the accompanying materials are made available under the
  * terms of the Eclipse Public License v1.0 and Eclipse Distribution License v. 1.0
  * which accompanies this distribution.
@@ -162,10 +162,10 @@ public class JsonbPropertyTest {
     }
     
     public static class ConflictingIfLowercase {
-    	private String foo = "foo";
+    	private String url = "foo.com";
     	
-    	public String getFOO() {
-    		return foo + "bar";
+    	public String getURL() {
+    		return "http://" + url;
     	}
     }
 
