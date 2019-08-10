@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2015, 2018 Oracle and/or its affiliates. All rights reserved.
+ * Copyright (c) 2015, 2019 Oracle and/or its affiliates. All rights reserved.
  * This program and the accompanying materials are made available under the
  * terms of the Eclipse Public License v1.0 and Eclipse Distribution License v. 1.0
  * which accompanies this distribution.
@@ -29,6 +29,7 @@ import javax.json.bind.config.PropertyVisibilityStrategy;
 import java.lang.annotation.Annotation;
 import java.lang.reflect.Field;
 import java.lang.reflect.Method;
+import java.lang.reflect.Modifier;
 import java.security.AccessController;
 import java.security.PrivilegedAction;
 import java.util.ArrayList;
@@ -173,7 +174,7 @@ class ClassParser {
         for (Method method : declaredMethods) {
             String name = method.getName();
             //isBridge method filters out methods inherited from interfaces
-            if (!isPropertyMethod(method) || method.isBridge() || isSpecialCaseMethod(method)) {
+            if (!isPropertyMethod(method) || method.isBridge() || isSpecialCaseMethod(clazz, method)) {
                 continue;
             }
             final String propertyName = toPropertyMethod(name);
@@ -186,8 +187,17 @@ class ClassParser {
      * Filter out certain methods that get forcibly added to some classes.
      * For example the public groovy.lang.MetaClass X.getMetaClass() method from Groovy classes
      */
-    private boolean isSpecialCaseMethod(Method m) {
-        if (m.getName().equals("getMetaClass") && m.getReturnType().getCanonicalName().equals("groovy.lang.MetaClass"))
+    private boolean isSpecialCaseMethod(Class<?> clazz, Method m) {
+        if (!Modifier.isPublic(m.getModifiers()) || Modifier.isStatic(m.getModifiers()) || m.isSynthetic())
+            return false;
+        // Groovy objects will have public groovy.lang.MetaClass X.getMetaClass()
+        // which causes an infinite loop in serialization
+        if (m.getName().equals("getMetaClass") && 
+                m.getReturnType().getCanonicalName().equals("groovy.lang.MetaClass"))
+            return true;
+        // WELD proxy objects will have 'public org.jboss.weld
+        if (m.getName().equals("getMetadata") && 
+                m.getReturnType().getCanonicalName().equals("org.jboss.weld.proxy.WeldClientProxy$Metadata"))
             return true;
         return false;
     }
