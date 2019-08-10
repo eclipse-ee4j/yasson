@@ -173,13 +173,23 @@ class ClassParser {
         for (Method method : declaredMethods) {
             String name = method.getName();
             //isBridge method filters out methods inherited from interfaces
-            if (!isPropertyMethod(method) || method.isBridge()) {
+            if (!isPropertyMethod(method) || method.isBridge() || isSpecialCaseMethod(method)) {
                 continue;
             }
             final String propertyName = toPropertyMethod(name);
 
             Property property = registerMethod(propertyName, method, classElement, classProperties);
         }
+    }
+    
+    /**
+     * Filter out certain methods that get forcibly added to some classes.
+     * For example the public groovy.lang.MetaClass X.getMetaClass() method from Groovy classes
+     */
+    private boolean isSpecialCaseMethod(Method m) {
+        if (m.getName().equals("getMetaClass") && m.getReturnType().getCanonicalName().equals("groovy.lang.MetaClass"))
+            return true;
+        return false;
     }
 
     private boolean isGetter(Method m) {
