@@ -14,7 +14,7 @@ following is a summary of the TCK results for releases of Jakarta JSON Binding.
 - [x] Specification Name, Version and download URL\
    [Jakarta JSON Binding 1.0](https://jakarta.ee/specifications/jsonb/1.0/)
 - [x] TCK Version, digital SHA-256 fingerprint and download URL\
-  [Jakarta JSON Binding TCK 1.1.0](http://download.eclipse.org/ee4j/jakartaee-tck/jakartaee8-eftl/promoted/eclipse-jsonb-tck-1.0.0.zip), SHA-256: cac5d048a4017c929cd4f4ec4196a13a25b9f6e8c06f3fff271e070338c4a9fe
+  [Jakarta JSON Binding TCK 1.1.0](http://download.eclipse.org/ee4j/jakartaee-tck/jakartaee8-eftl/promoted/eclipse-jsonb-tck-1.0.0.zip), SHA-256: 9155d6979f7e11e77075136b9b61da6543f76473430b2deac4b822dfa8a19be4
 - [x] Public URL of TCK Results Summary\
   [TCK results summary](jakarta-json-binding-1.0.html)
 - [x] Any Additional Specification Certification Requirements\
