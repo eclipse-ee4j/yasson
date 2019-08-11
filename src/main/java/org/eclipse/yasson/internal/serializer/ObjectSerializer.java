@@ -59,14 +59,15 @@ public class ObjectSerializer<T> extends AbstractContainerSerializer<T> {
 
     @Override
     protected void serializeInternal(T object, JsonGenerator generator, SerializationContext ctx) {
-        final PropertyModel[] allProperties = ((Marshaller) ctx).getMappingContext().getOrCreateClassModel(object.getClass()).getSortedProperties();
+        final PropertyModel[] allProperties = ((Marshaller) ctx).getMappingContext()
+                .getOrCreateClassModel(object.getClass()).getSortedProperties();
         for (PropertyModel model : allProperties) {
-        	try {
-        		marshallProperty(object, generator, ctx, model);
-        	} catch (Exception e) {
-        		throw new JsonbException(Messages.getMessage(MessageKeys.SERIALIZE_PROPERTY_ERROR, 
-        				model.getWriteName(), object.getClass().getCanonicalName(), model.getValue(object)), e);
-        	}
+            try {
+                marshallProperty(object, generator, ctx, model);
+            } catch (Exception e) {
+                throw new JsonbException(Messages.getMessage(MessageKeys.SERIALIZE_PROPERTY_ERROR, model.getWriteName(),
+                        object.getClass().getCanonicalName()), e);
+            }
         }
     }
 

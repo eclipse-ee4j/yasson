@@ -15,10 +15,7 @@ package org.eclipse.yasson.internal.serializer;
 
 import org.eclipse.yasson.internal.Marshaller;
 import org.eclipse.yasson.internal.model.customization.Customization;
-import org.eclipse.yasson.internal.properties.MessageKeys;
-import org.eclipse.yasson.internal.properties.Messages;
 
-import javax.json.bind.JsonbException;
 import javax.json.bind.serializer.JsonbSerializer;
 import javax.json.bind.serializer.SerializationContext;
 import javax.json.stream.JsonGenerator;
@@ -51,12 +48,7 @@ public abstract class AbstractValueTypeSerializer<T> implements JsonbSerializer<
     @Override
     public void serialize(T obj, JsonGenerator generator, SerializationContext ctx) {
         Marshaller marshaller = (Marshaller) ctx;
-        try {
-        	serialize(obj, generator, marshaller);
-        } catch (Exception e) {
-    		throw new JsonbException(Messages.getMessage(MessageKeys.SERIALIZE_VALUE_ERROR, 
-    				obj, obj.getClass().getCanonicalName(), e.getMessage()));
-        }
+        serialize(obj, generator, marshaller);
     }
 
     protected abstract void serialize(T obj, JsonGenerator generator, Marshaller marshaller);

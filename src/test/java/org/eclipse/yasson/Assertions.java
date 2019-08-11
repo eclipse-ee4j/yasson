@@ -46,9 +46,10 @@ public class Assertions {
 			operation.get();
 			fail("The operation should have failed with a " + expectedType.getCanonicalName() + " but it succeeded.");
 		} catch (Throwable t) {
-			String fullErrorMessage = t.getMessage();
-			for (Throwable current = t; current.getCause() != null && current.getCause() != current; current = current.getCause()) {
-				fullErrorMessage += current.getMessage();
+			String fullErrorMessage = "";
+			for (Throwable current = t; current != null && current.getCause() != current; current = current.getCause()) {
+			    fullErrorMessage += current.getClass().getCanonicalName() + ": ";
+				fullErrorMessage += current.getMessage() + "\n";
 			}
 			if (expectedType.isAssignableFrom(t.getClass())) {
 				if (!checkExceptionMessage.apply(fullErrorMessage)) {

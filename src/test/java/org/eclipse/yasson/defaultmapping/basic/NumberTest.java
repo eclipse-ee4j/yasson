@@ -225,30 +225,28 @@ public class NumberTest {
     
     @Test
     public void testSerializeInvalidDouble() {
-    	shouldFail(() -> jsonb.toJson(Double.POSITIVE_INFINITY), 
-    			msg -> msg.contains("Unable to serialize value") && msg.contains("java.lang.Double"));
-    	
-    	NumberContainer obj = new NumberContainer();
-    	obj.doubleProp = Double.POSITIVE_INFINITY;
-    	shouldFail(() -> jsonb.toJson(obj),
-    			msg -> msg.contains("doubleProp") && msg.contains("NumberContainer"));
+        shouldFail(() -> jsonb.toJson(Double.POSITIVE_INFINITY));
+
+        NumberContainer obj = new NumberContainer();
+        obj.doubleProp = Double.POSITIVE_INFINITY;
+        shouldFail(() -> jsonb.toJson(obj), msg -> msg.contains("doubleProp") && msg.contains("NumberContainer"));
     }
     
     
     @Test
     public void testSerializeInvalidDoubleCollection() {
-    	NumberContainer obj = new NumberContainer();
-    	obj.collectionProp = Collections.singleton(Double.POSITIVE_INFINITY);
-    	shouldFail(() -> jsonb.toJson(obj),
-    			msg -> msg.contains("collectionProp") && msg.contains("NumberContainer") && msg.contains("Infinity"));
+        NumberContainer obj = new NumberContainer();
+        obj.collectionProp = Collections.singleton(Double.POSITIVE_INFINITY);
+        shouldFail(() -> jsonb.toJson(obj),
+                msg -> msg.contains("collectionProp") && msg.contains("NumberContainer"));
     }
-    
+
     @Test
     public void testSerializeInvalidDoubleMap() {
-    	NumberContainer obj = new NumberContainer();
-    	obj.mapProp = Collections.singletonMap("doubleKey", Double.POSITIVE_INFINITY);
-    	shouldFail(() -> jsonb.toJson(obj),
-    			msg -> msg.contains("mapProp") && msg.contains("NumberContainer") && msg.contains("Infinity"));
+        NumberContainer obj = new NumberContainer();
+        obj.mapProp = Collections.singletonMap("doubleKey", Double.POSITIVE_INFINITY);
+        shouldFail(() -> jsonb.toJson(obj),
+                msg -> msg.contains("mapProp") && msg.contains("NumberContainer"));
     }
 
 }
