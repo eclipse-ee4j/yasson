@@ -38,6 +38,10 @@ public class NumberTypeSerializer extends AbstractValueTypeSerializer<Number> {
     @Override
     protected void serialize(Number obj, JsonGenerator generator, Marshaller marshaller) {
         BigDecimal bigDecimalValue = new BigDecimal(String.valueOf(obj));
-        generator.write(bigDecimalValue);
+        if (BigNumberUtil.isIEEE754(bigDecimalValue)) {
+            generator.write(bigDecimalValue);
+        } else {
+            generator.write(String.valueOf(obj));
+        }
     }
 }

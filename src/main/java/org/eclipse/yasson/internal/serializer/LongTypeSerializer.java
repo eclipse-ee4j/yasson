@@ -35,11 +35,19 @@ public class LongTypeSerializer extends AbstractNumberSerializer<Long> {
 
     @Override
     protected void serializeNonFormatted(Long obj, JsonGenerator generator, String key) {
-        generator.write(key, obj);
+        if (BigNumberUtil.isIEEE754(obj)) {
+            generator.write(key, obj);
+        } else {
+            generator.write(key, obj.toString());
+        }
     }
 
     @Override
     protected void serializeNonFormatted(Long obj, JsonGenerator generator) {
-        generator.write(obj);
+        if (BigNumberUtil.isIEEE754(obj)) {
+            generator.write(obj);
+        } else {
+            generator.write(obj.toString());
+        }
     }
 }

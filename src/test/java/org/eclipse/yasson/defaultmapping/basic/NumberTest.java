@@ -50,7 +50,7 @@ public class NumberTest {
     @Test
     public void testBigDecimalMarshalling() {
         String jsonString = jsonb.toJson(new BigDecimal("0.10000000000000001"));
-        Assert.assertEquals("0.10000000000000001", jsonString);
+        Assert.assertEquals("\"0.10000000000000001\"", jsonString);
 
         jsonString = jsonb.toJson(new BigDecimal("0.1000000000000001"));
         Assert.assertEquals("0.1000000000000001", jsonString);
@@ -58,7 +58,7 @@ public class NumberTest {
         BigDecimal result = jsonb.fromJson("0.10000000000000001", BigDecimal.class);
         Assert.assertEquals(new BigDecimal("0.10000000000000001"), result);
 
-        result = jsonb.fromJson("0.100000000000000001", BigDecimal.class);
+        result = jsonb.fromJson("\"0.100000000000000001\"", BigDecimal.class);
         Assert.assertEquals(new BigDecimal("0.100000000000000001"), result);
     }
 
@@ -68,13 +68,13 @@ public class NumberTest {
         Assert.assertEquals("9007199254740991", jsonString);
 
         jsonString = jsonb.toJson(new BigDecimal("9007199254740992"));
-        Assert.assertEquals("9007199254740992", jsonString);
+        Assert.assertEquals("\"9007199254740992\"", jsonString);
 
         jsonString = jsonb.toJson(new BigDecimal("9007199254740991.1"));
-        Assert.assertEquals("9007199254740991.1", jsonString);
+        Assert.assertEquals("\"9007199254740991.1\"", jsonString);
 
         jsonString = jsonb.toJson(new BigDecimal(new BigInteger("1"), -400));
-        Assert.assertEquals(new BigDecimal(new BigInteger("1"), -400).toString(), jsonString);
+        Assert.assertEquals("\"" + new BigDecimal(new BigInteger("1"), -400) + "\"", jsonString);
     }
 
     @Test
@@ -83,7 +83,7 @@ public class NumberTest {
         Assert.assertEquals("9007199254740991", jsonString);
 
         jsonString = jsonb.toJson(new BigInteger("9007199254740992"));
-        Assert.assertEquals("9007199254740992", jsonString);
+        Assert.assertEquals("\"9007199254740992\"", jsonString);
     }
 
     @Test
@@ -91,12 +91,12 @@ public class NumberTest {
         BigDecimalInNumber testValueQuoted = new BigDecimalInNumber() {{setBigDecValue(new BigDecimal("9007199254740992"));}};
         BigDecimalInNumber testValueUnQuoted = new BigDecimalInNumber() {{setBigDecValue(new BigDecimal("9007199254740991"));}};
         String jsonString = jsonb.toJson(testValueQuoted);
-        Assert.assertEquals("{\"bigDecValue\":9007199254740992}", jsonString);
+        Assert.assertEquals("{\"bigDecValue\":\"9007199254740992\"}", jsonString);
 
         jsonString = jsonb.toJson(testValueUnQuoted);
         Assert.assertEquals("{\"bigDecValue\":9007199254740991}", jsonString);
 
-        BigDecimalInNumber result = jsonb.fromJson("{\"bigDecValue\":9007199254740992}", BigDecimalInNumber.class);
+        BigDecimalInNumber result = jsonb.fromJson("{\"bigDecValue\":\"9007199254740992\"}", BigDecimalInNumber.class);
         Assert.assertEquals(testValueQuoted.getBigDecValue(), result.getBigDecValue());
 
         result = jsonb.fromJson("{\"bigDecValue\":9007199254740991}", BigDecimalInNumber.class);
@@ -109,19 +109,19 @@ public class NumberTest {
         Assert.assertEquals("{\"value\":0.1000000000000001}", jsonString);
 
         jsonString = jsonb.toJson(new ScalarValueWrapper<>(new BigDecimal("0.10000000000000001")));
-        Assert.assertEquals("{\"value\":0.10000000000000001}", jsonString);
+        Assert.assertEquals("{\"value\":\"0.10000000000000001\"}", jsonString);
 
         ScalarValueWrapper<BigDecimal> result = jsonb.fromJson("{\"value\":0.1000000000000001}", new TestTypeToken<ScalarValueWrapper<BigDecimal>>(){}.getType());
         Assert.assertEquals(new BigDecimal("0.1000000000000001"), result.getValue());
 
-        result = jsonb.fromJson("{\"value\":0.10000000000000001}", new TestTypeToken<ScalarValueWrapper<BigDecimal>>(){}.getType());
+        result = jsonb.fromJson("{\"value\":\"0.10000000000000001\"}", new TestTypeToken<ScalarValueWrapper<BigDecimal>>(){}.getType());
         Assert.assertEquals(new BigDecimal("0.10000000000000001"), result.getValue());
     }
 
     @Test
     public void testBigDecimalCastedToNumber() {
         String jsonString = jsonb.toJson(new Object() { public Number number = new BigDecimal("0.10000000000000001"); });
-        Assert.assertEquals("{\"number\":0.10000000000000001}", jsonString);
+        Assert.assertEquals("{\"number\":\"0.10000000000000001\"}", jsonString);
 
         jsonString = jsonb.toJson(new Object() { public Number number = new BigDecimal("0.1000000000000001"); });
         Assert.assertEquals("{\"number\":0.1000000000000001}", jsonString);
@@ -140,7 +140,7 @@ public class NumberTest {
         Assert.assertEquals(Long.valueOf("9007199254740991"), deserialized);
 
         json = jsonb.toJson(upperJsUnsafeValue);
-        Assert.assertEquals("9007199254740992", json);
+        Assert.assertEquals("\"9007199254740992\"", json);
         deserialized = jsonb.fromJson(json, Long.class);
         Assert.assertEquals(Long.valueOf("9007199254740992"), deserialized);
 
@@ -154,7 +154,7 @@ public class NumberTest {
         Assert.assertEquals(Long.valueOf("-9007199254740991"), deserialized);
 
         json = jsonb.toJson(lowerJsUnsafeValue);
-        Assert.assertEquals("-9007199254740992", json);
+        Assert.assertEquals("\"-9007199254740992\"", json);
         deserialized = jsonb.fromJson(json, Long.class);
         Assert.assertEquals(Long.valueOf("-9007199254740992"), deserialized);
     }
