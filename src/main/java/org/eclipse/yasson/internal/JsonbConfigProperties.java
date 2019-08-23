@@ -101,15 +101,15 @@ public class JsonbConfigProperties {
         String os = getPropertyOrderStrategy();
         
         if(os == null) {
-        	return HashMap.class;
+            return HashMap.class;
         }
         switch(os) {
-        	case PropertyOrderStrategy.LEXICOGRAPHICAL:
-        		return TreeMap.class;
-        	case PropertyOrderStrategy.REVERSE:
-        		return ReverseTreeMap.class;
-        	default:
-        		return HashMap.class;
+            case PropertyOrderStrategy.LEXICOGRAPHICAL:
+                return TreeMap.class;
+            case PropertyOrderStrategy.REVERSE:
+                return ReverseTreeMap.class;
+            default:
+                return HashMap.class;
         }
     }
 
@@ -160,8 +160,8 @@ public class JsonbConfigProperties {
         String strategy = getPropertyOrderStrategy();
         
         if(strategy == null) {
-        	//default by spec
-        	return StrategiesProvider.getOrderingFunction(PropertyOrderStrategy.LEXICOGRAPHICAL);
+            //default by spec
+            return StrategiesProvider.getOrderingFunction(PropertyOrderStrategy.LEXICOGRAPHICAL);
         }
         
         return StrategiesProvider.getOrderingFunction(strategy);
@@ -189,7 +189,7 @@ public class JsonbConfigProperties {
     private PropertyNamingStrategy initPropertyNamingStrategy() {
         final Optional<Object> property = jsonbConfig.getProperty(JsonbConfig.PROPERTY_NAMING_STRATEGY);
         if (!property.isPresent()) {
-        	return StrategiesProvider.getPropertyNamingStrategy(PropertyNamingStrategy.IDENTITY);
+            return StrategiesProvider.getPropertyNamingStrategy(PropertyNamingStrategy.IDENTITY);
         }
         Object propertyNamingStrategy = property.get();
         if (propertyNamingStrategy instanceof String) {
