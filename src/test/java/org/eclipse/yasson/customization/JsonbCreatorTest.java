@@ -46,6 +46,16 @@ public class JsonbCreatorTest {
     }
 
     @Test
+    public void testRootConstructorOptional() {
+        String json = "{\"str1\":\"abc\",\"bigDec\":25}";
+        final Jsonb jsonb = JsonbBuilder.create();
+        CreatorConstructorPojoOptional pojo = jsonb.fromJson(json, CreatorConstructorPojoOptional.class);
+        assertEquals("abc", pojo.str1);
+        assertEquals(false, pojo.str2.isPresent());
+        assertEquals(new BigDecimal("25"), pojo.bigDec);
+    }
+
+    @Test
     public void testRootFactoryMethod() {
         String json = "{\"par1\":\"abc\",\"par2\":\"def\",\"bigDec\":25}";
         final Jsonb jsonb = JsonbBuilder.create();
