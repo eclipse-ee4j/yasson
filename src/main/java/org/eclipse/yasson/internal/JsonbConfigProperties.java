@@ -15,13 +15,9 @@ package org.eclipse.yasson.internal;
 
 import org.eclipse.yasson.YassonProperties;
 import org.eclipse.yasson.internal.model.ReverseTreeMap;
-import org.eclipse.yasson.internal.model.customization.naming.DefaultNamingStrategies;
-import org.eclipse.yasson.internal.model.customization.naming.IdentityStrategy;
-import org.eclipse.yasson.internal.model.customization.ordering.AnyOrderStrategy;
-import org.eclipse.yasson.internal.model.customization.ordering.LexicographicalOrderStrategy;
-import org.eclipse.yasson.internal.model.customization.ordering.PropOrderStrategy;
-import org.eclipse.yasson.internal.model.customization.ordering.PropertyOrdering;
-import org.eclipse.yasson.internal.model.customization.ordering.ReverseOrderStrategy;
+import org.eclipse.yasson.internal.model.PropertyModel;
+import org.eclipse.yasson.internal.model.customization.PropertyOrdering;
+import org.eclipse.yasson.internal.model.customization.StrategiesProvider;
 import org.eclipse.yasson.internal.properties.MessageKeys;
 import org.eclipse.yasson.internal.properties.Messages;
 import org.eclipse.yasson.internal.serializer.JsonbDateFormatter;
@@ -38,12 +34,15 @@ import javax.json.bind.serializer.JsonbSerializer;
 import java.time.format.DateTimeFormatter;
 import java.time.format.DateTimeFormatterBuilder;
 import java.time.temporal.ChronoField;
+import java.util.Collection;
 import java.util.Collections;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Locale;
 import java.util.Map;
 import java.util.Optional;
 import java.util.TreeMap;
+import java.util.function.Function;
 
 /**
  * Resolved properties from JSONB config.
@@ -99,18 +98,19 @@ public class JsonbConfigProperties {
 
 
     private Class<?> initDefaultMapImplType() {
-        Optional<String> os = getPropertyOrderStrategy();
-        if (os.isPresent()) {
-            switch (os.get()) {
-                case PropertyOrderStrategy.LEXICOGRAPHICAL:
-                    return TreeMap.class;
-                case PropertyOrderStrategy.REVERSE:
-                    return ReverseTreeMap.class;
-                default:
-                    return HashMap.class;
-            }
+        String os = getPropertyOrderStrategy();
+        
+        if(os == null) {
+            return HashMap.class;
         }
-        return HashMap.class;
+        switch(os) {
+            case PropertyOrderStrategy.LEXICOGRAPHICAL:
+                return TreeMap.class;
+            case PropertyOrderStrategy.REVERSE:
+                return ReverseTreeMap.class;
+            default:
+                return HashMap.class;
+        }
     }
 
     private boolean initZeroTimeDefaultingForJavaTime() {
@@ -156,25 +156,18 @@ public class JsonbConfigProperties {
         }).orElse(JsonbDateFormat.DEFAULT_FORMAT);
     }
 
-    private PropOrderStrategy initOrderStrategy() {
-        Optional<String> strategy = getPropertyOrderStrategy();
-        if (strategy.isPresent()) {
-            switch (strategy.get()) {
-                case PropertyOrderStrategy.LEXICOGRAPHICAL:
-                    return new LexicographicalOrderStrategy();
-                case PropertyOrderStrategy.REVERSE:
-                    return new ReverseOrderStrategy();
-                case PropertyOrderStrategy.ANY:
-                    return new AnyOrderStrategy();
-                default:
-                    throw new JsonbException(Messages.getMessage(MessageKeys.PROPERTY_ORDER, strategy));
-            }
+    private Function<Collection<PropertyModel>, List<PropertyModel>> initOrderStrategy() {
+        String strategy = getPropertyOrderStrategy();
+        
+        if(strategy == null) {
+            //default by spec
+            return StrategiesProvider.getOrderingFunction(PropertyOrderStrategy.LEXICOGRAPHICAL);
         }
-        //default by spec
-        return new LexicographicalOrderStrategy();
+        
+        return StrategiesProvider.getOrderingFunction(strategy);
     }
 
-    private Optional<String> getPropertyOrderStrategy() {
+    private String getPropertyOrderStrategy() {
         final Optional<Object> property = jsonbConfig.getProperty(JsonbConfig.PROPERTY_ORDER_STRATEGY);
         if (property.isPresent()) {
             final Object strategy = property.get();
@@ -185,27 +178,22 @@ public class JsonbConfigProperties {
                 case PropertyOrderStrategy.LEXICOGRAPHICAL:
                 case PropertyOrderStrategy.REVERSE:
                 case PropertyOrderStrategy.ANY:
-                    return Optional.of((String)strategy);
+                    return (String) strategy;
                 default:
                     throw new JsonbException(Messages.getMessage(MessageKeys.PROPERTY_ORDER, strategy));
             }
         }
-        return Optional.empty();
+        return null;
     }
 
     private PropertyNamingStrategy initPropertyNamingStrategy() {
         final Optional<Object> property = jsonbConfig.getProperty(JsonbConfig.PROPERTY_NAMING_STRATEGY);
         if (!property.isPresent()) {
-            return new IdentityStrategy();
+            return StrategiesProvider.getPropertyNamingStrategy(PropertyNamingStrategy.IDENTITY);
         }
         Object propertyNamingStrategy = property.get();
         if (propertyNamingStrategy instanceof String) {
-            String namingStrategyName = (String) propertyNamingStrategy;
-            final PropertyNamingStrategy foundNamingStrategy = DefaultNamingStrategies.getStrategy(namingStrategyName);
-            if (foundNamingStrategy == null) {
-                throw new JsonbException("No property naming strategy was found for: " + namingStrategyName);
-            }
-            return foundNamingStrategy;
+            return StrategiesProvider.getPropertyNamingStrategy((String) propertyNamingStrategy);
         }
         if (!(propertyNamingStrategy instanceof PropertyNamingStrategy)) {
             throw new JsonbException(Messages.getMessage(MessageKeys.PROPERTY_NAMING_STRATEGY_INVALID));
