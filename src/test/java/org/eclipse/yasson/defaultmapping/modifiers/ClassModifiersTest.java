@@ -17,6 +17,7 @@ import javax.json.bind.Jsonb;
 import javax.json.bind.JsonbBuilder;
 import javax.json.bind.JsonbException;
 
+import org.eclipse.yasson.Assertions;
 import org.eclipse.yasson.defaultmapping.modifiers.model.ChildOfPackagePrivateParent;
 import org.eclipse.yasson.defaultmapping.modifiers.model.FieldModifiersClass;
 import org.junit.Before;
@@ -67,14 +68,9 @@ public class ClassModifiersTest {
         NestedPackageChild child = new NestedPackageChild();
         child.id = 1;
         child.name = "SomeName";
-        try {
-            jsonb.toJson(child);
-            fail();
-        } catch (JsonbException ex) {
-            if (!(ex.getCause() instanceof IllegalAccessException)) {
-                fail();
-            }
-        }
+        Assertions.shouldFail(() -> jsonb.toJson(child),
+                msg -> msg.contains("Unable to serialize property 'id'") &&
+                msg.contains("java.lang.IllegalAccessException")); 
     }
 
     private class NestedPrivateParent {
@@ -90,14 +86,8 @@ public class ClassModifiersTest {
         NestedPrivateChild child = new NestedPrivateChild();
         child.id = 1;
         child.name = "SomeName";
-        try {
-            jsonb.toJson(child);
-            fail();
-        } catch (JsonbException ex) {
-            if (!(ex.getCause() instanceof IllegalAccessException)) {
-                fail();
-            }
-        }
+        Assertions.shouldFail(() -> jsonb.toJson(child),
+                msg -> msg.contains("java.lang.IllegalAccessException"));
     }
 
 
@@ -114,14 +104,8 @@ public class ClassModifiersTest {
         NestedStaticPackageChild child = new NestedStaticPackageChild();
         child.id = 1;
         child.name = "SomeName";
-        try {
-            jsonb.toJson(child);
-            fail();
-        } catch (JsonbException ex) {
-            if (!(ex.getCause() instanceof IllegalAccessException)) {
-                fail();
-            }
-        }
+        Assertions.shouldFail(() -> jsonb.toJson(child),
+                msg -> msg.contains("java.lang.IllegalAccessException"));
     }
 
     private static class NestedStaticPrivateParent {
@@ -137,14 +121,8 @@ public class ClassModifiersTest {
         NestedStaticPrivateChild child = new NestedStaticPrivateChild();
         child.id = 1;
         child.name = "SomeName";
-        try {
-            jsonb.toJson(child);
-            fail();
-        } catch (JsonbException ex) {
-            if (!(ex.getCause() instanceof IllegalAccessException)) {
-                fail();
-            }
-        }
+        Assertions.shouldFail(() -> jsonb.toJson(child),
+                msg -> msg.contains("java.lang.IllegalAccessException"));
     }
 
 }
