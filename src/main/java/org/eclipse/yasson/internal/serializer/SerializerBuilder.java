@@ -76,7 +76,7 @@ public class SerializerBuilder extends AbstractSerializerBuilder<SerializerBuild
             }
 
             //Second user components is registered.
-            Optional<AdapterBinding> adapterInfoOptional = componentMatcher.getAdapterBinding(getRuntimeType(), customization);
+            Optional<AdapterBinding> adapterInfoOptional = componentMatcher.getSerializeAdapterBinding(getRuntimeType(), customization);
             if (adapterInfoOptional.isPresent()) {
                 return new AdaptedObjectSerializer<>(classModel, adapterInfoOptional.get());
             }

@@ -51,7 +51,7 @@ public class CreatorModel {
         JsonbNumberFormatter constructorNumberFormatter = context.getAnnotationIntrospector().getConstructorNumberFormatter(annotated);
         JsonbDateFormatter constructorDateFormatter = context.getAnnotationIntrospector().getConstructorDateFormatter(annotated);
         final JsonbAnnotatedElement<Class<?>> clsElement = annotationIntrospector.collectAnnotations(parameter.getType());
-        final CustomizationBuilder builder = new ClassCustomizationBuilder();
+        final ClassCustomizationBuilder builder = new ClassCustomizationBuilder();
         builder.setAdapterInfo(annotationIntrospector.getAdapterBinding(clsElement));
         builder.setDeserializerBinding(annotationIntrospector.getDeserializerBinding(clsElement));
         builder.setSerializerBinding(annotationIntrospector.getSerializerBinding(clsElement));

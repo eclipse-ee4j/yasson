@@ -137,7 +137,7 @@ class ObjectDeserializer<T> extends AbstractContainerDeserializer<T> {
         if (model == null) {
             return;
         }
-        values.put(model.getReadName(), new ValueWrapper(model, convertNullToOptionalEmpty(model.getPropertyType(), result)));
+        values.put(model.getReadName(), new ValueWrapper(model, convertNullToOptionalEmpty(model.getPropertyDeserializationType(), result)));
     }
 
     @Override

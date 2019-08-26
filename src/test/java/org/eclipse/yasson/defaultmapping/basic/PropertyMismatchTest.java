@@ -3,10 +3,13 @@ package org.eclipse.yasson.defaultmapping.basic;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
 
+import java.time.Instant;
 import java.util.HashMap;
 import java.util.HashSet;
 
+import javax.json.bind.Jsonb;
 import javax.json.bind.JsonbBuilder;
+import javax.json.bind.annotation.JsonbTransient;
 
 import org.jboss.weld.exceptions.IllegalStateException;
 import org.junit.Test;
@@ -100,5 +103,39 @@ public class PropertyMismatchTest {
         CollectionSetterOnly obj = new CollectionSetterOnly();
         String json = JsonbBuilder.create().toJson(obj);
         assertEquals("{}", json);
+    }
+    
+    public static class PropertyTypeMismatch {
+        @JsonbTransient
+        public Instant internalInstantProperty;
+        
+        private String foo;
+        public int getFoo() {
+            return foo.length();
+        }
+        public void setFoo(Instant instant) {
+            this.foo = instant.toString();
+            this.internalInstantProperty = instant;
+        }
+    }
+    
+    /**
+     * Test that properties of the same name with different
+     * field/getter/setter types behave properly and that we don't
+     * assume they are all equal
+     */
+    @Test
+    public void testPropertyTypesMismatch() {
+        PropertyTypeMismatch obj = new PropertyTypeMismatch();
+        Instant now = Instant.now();
+        obj.setFoo(now);
+        
+        Jsonb jsonb = JsonbBuilder.create();
+        String json = jsonb.toJson(obj);
+        assertEquals("{\"foo\":" + now.toString().length() + "}", json);
+        
+        PropertyTypeMismatch after = jsonb.fromJson("{\"foo\":\"" + now.toString() + "\"}", PropertyTypeMismatch.class);
+        assertEquals(obj.getFoo(), after.getFoo());
+        assertEquals(obj.internalInstantProperty, after.internalInstantProperty);
     }
 }

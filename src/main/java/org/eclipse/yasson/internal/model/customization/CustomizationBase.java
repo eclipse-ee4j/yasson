@@ -36,7 +36,7 @@ abstract class CustomizationBase implements Customization, ComponentBoundCustomi
      */
     public CustomizationBase(CustomizationBase other) {
         this.nillable = other.isNillable();
-        this.adapterBinding = other.getAdapterBinding();
+        this.adapterBinding = other.getSerializeAdapterBinding();
         this.serializerBinding = other.getSerializerBinding();
         this.deserializerBinding = other.getDeserializerBinding();
     }
@@ -50,12 +50,12 @@ abstract class CustomizationBase implements Customization, ComponentBoundCustomi
         return nillable;
     }
 
-    /**
-     * Adapter wrapper class with resolved generic information.
-     *
-     * @return components wrapper
-     */
-    public AdapterBinding getAdapterBinding() {
+    public AdapterBinding getSerializeAdapterBinding() {
+        return adapterBinding;
+    }
+    
+    @Override
+    public AdapterBinding getDeserializeAdapterBinding() {
         return adapterBinding;
     }
 

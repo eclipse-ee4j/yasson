@@ -93,7 +93,7 @@ public class ObjectSerializer<T> extends AbstractContainerSerializer<T> {
                 return;
             }
 
-            Optional<Type> runtimeTypeOptional = ReflectionUtils.resolveOptionalType(this, propertyModel.getPropertyType());
+            Optional<Type> runtimeTypeOptional = ReflectionUtils.resolveOptionalType(this, propertyModel.getPropertySerializationType());
             Type genericType = runtimeTypeOptional.orElse(null);
             final JsonbSerializer<?> serializer = new SerializerBuilder(marshaller.getJsonbContext())
                     .withWrapper(this)

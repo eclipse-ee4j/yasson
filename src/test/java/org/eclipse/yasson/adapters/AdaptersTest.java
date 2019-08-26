@@ -37,13 +37,16 @@ import javax.json.bind.JsonbConfig;
 import javax.json.bind.adapter.JsonbAdapter;
 import java.lang.reflect.Type;
 import java.math.BigDecimal;
+import java.time.Instant;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Optional;
 import java.util.UUID;
 
+import static java.util.Collections.unmodifiableMap;
 import static org.junit.Assert.assertEquals;
 
 /**
@@ -482,4 +485,96 @@ public class AdaptersTest {
         Assert.assertEquals(Integer.valueOf(10), pojo.getNumberInteger());
         Assert.assertEquals(Integer.valueOf(11), pojo.getSerializableInteger());
     }
+    
+    public static class PropertyTypeMismatch {
+        private Throwable error = new RuntimeException("foo");
+        
+        public Optional<Throwable> getError() {
+            return Optional.ofNullable(error);
+        }
+        
+        public void setError(Instant errorTime) {
+            this.error = new RuntimeException("Error at: " + errorTime.toString());
+        }
+    }        
+    
+    public static class ThrowableAdapter implements JsonbAdapter<Throwable, Map<String, Object>> {
+
+        public int callCount = 0;
+
+        @Override
+        public Map<String, Object> adaptToJson(Throwable obj) throws Exception {
+            HashMap<String, Object> output = new HashMap<>();
+            output.put("message", obj.getMessage());
+            output.put("type", obj.getClass().getName());
+            callCount++;
+
+            return unmodifiableMap(output);
+        }
+
+        @Override
+        public Throwable adaptFromJson(Map<String, Object> obj) throws Exception {
+            throw new UnsupportedOperationException("not implemented");
+        }
+    }
+    
+    /**
+     * Serialize a class that has mismatching properties. The field is of type
+     * Throwable but the getter method is of type Optional<Throwable>. The user-defined
+     * adapter for Throwable should still be called.
+     */
+    @Test
+    public void testOptionalAdapter() {
+        ThrowableAdapter adapter = new ThrowableAdapter();
+        jsonb = JsonbBuilder.newBuilder()
+                .withConfig(new JsonbConfig().withAdapters(adapter))
+                .build();
+        
+        PropertyTypeMismatch obj = new PropertyTypeMismatch();
+        String json = jsonb.toJson(obj);
+        assertEquals("{\"error\":{\"message\":\"foo\",\"type\":\"java.lang.RuntimeException\"}}", json);
+        assertEquals("The user-defined ThrowableAdapter should have been called", 1, adapter.callCount);
+    }
+    
+    public static class InstantAdapter implements JsonbAdapter<Instant, String> {
+
+        public int callCount = 0;
+
+        @Override
+        public String adaptToJson(Instant obj) throws Exception {
+            return obj.toString();
+        }
+
+        @Override
+        public Instant adaptFromJson(String obj) throws Exception {
+            callCount++;
+            if (obj.equals("CUSTOM_VALUE"))
+                return Instant.MAX;
+            return Instant.parse(obj);
+        }
+    }
+    
+    /**
+     * Make sure that the same property can use a different adapter for
+     * serialization and deserialization.
+     */
+    @Test
+    public void testDifferentAdapters() {
+        ThrowableAdapter throwableAdapter = new ThrowableAdapter();
+        InstantAdapter instantAdapter = new InstantAdapter();
+        jsonb = JsonbBuilder.newBuilder()
+                .withConfig(new JsonbConfig().withAdapters(throwableAdapter, instantAdapter))
+                .build();
+        
+        String json = "{\"error\":\"CUSTOM_VALUE\"}";
+        PropertyTypeMismatch obj = jsonb.fromJson(json, PropertyTypeMismatch.class);
+        assertEquals("Error at: +1000000000-12-31T23:59:59.999999999Z", obj.getError().get().getMessage());
+        assertEquals(1, instantAdapter.callCount);
+        
+        String afterJson = jsonb.toJson(obj);
+        assertEquals("{\"error\":{\"message\":\"Error at: +1000000000-12-31T23:59:59.999999999Z\",\"type\":\"java.lang.RuntimeException\"}}", 
+                afterJson);
+        assertEquals(1, throwableAdapter.callCount);
+    }
+    
 }

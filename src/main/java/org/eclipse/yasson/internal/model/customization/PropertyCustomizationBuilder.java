@@ -13,6 +13,7 @@
 
 package org.eclipse.yasson.internal.model.customization;
 
+import org.eclipse.yasson.internal.components.AdapterBinding;
 import org.eclipse.yasson.internal.serializer.JsonbDateFormatter;
 import org.eclipse.yasson.internal.serializer.JsonbNumberFormatter;
 
@@ -24,20 +25,19 @@ import org.eclipse.yasson.internal.serializer.JsonbNumberFormatter;
 public class PropertyCustomizationBuilder extends CustomizationBuilder {
 
     private String jsonReadName;
-
     private String jsonWriteName;
 
     private JsonbNumberFormatter serializeNumberFormatter;
-
     private JsonbNumberFormatter deserializeNumberFormatter;
 
     private JsonbDateFormatter serializeDateFormatter;
-
     private JsonbDateFormatter deserializeDateFormatter;
 
     private boolean readTransient;
-
     private boolean writeTransient;
+    
+    private AdapterBinding serializeAdapter;
+    private AdapterBinding deserializeAdapter;
 
     private Class implementationClass;
 
@@ -211,5 +211,31 @@ public class PropertyCustomizationBuilder extends CustomizationBuilder {
      */
     public void setImplementationClass(Class implementationClass) {
         this.implementationClass = implementationClass;
+    }
+    
+    @Override
+    public void setAdapterInfo(AdapterBinding adapterInfo) {
+        throw new UnsupportedOperationException();
+    }
+    
+    @Override
+    public AdapterBinding getAdapterInfo() {
+        return null;
+    }
+    
+    public AdapterBinding getSerializeAdapter() {
+        return serializeAdapter;
+    }
+    
+    public void setSerializeAdapter(AdapterBinding adapter) {
+        this.serializeAdapter = adapter;
+    }
+    
+    public AdapterBinding getDeserializeAdapter() {
+        return deserializeAdapter;
+    }
+    
+    public void setDeserializeAdapter(AdapterBinding adapter) {
+        this.deserializeAdapter = adapter;
     }
 }

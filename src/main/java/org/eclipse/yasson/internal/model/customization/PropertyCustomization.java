@@ -13,6 +13,7 @@
 
 package org.eclipse.yasson.internal.model.customization;
 
+import org.eclipse.yasson.internal.components.AdapterBinding;
 import org.eclipse.yasson.internal.serializer.JsonbDateFormatter;
 import org.eclipse.yasson.internal.serializer.JsonbNumberFormatter;
 
@@ -24,22 +25,21 @@ import org.eclipse.yasson.internal.serializer.JsonbNumberFormatter;
 public class PropertyCustomization extends CustomizationBase {
 
     private final String jsonReadName;
-
     private final String jsonWriteName;
 
     private final JsonbNumberFormatter serializeNumberFormatter;
-
     private final JsonbNumberFormatter deserializeNumberFormatter;
 
     private final JsonbDateFormatter serializeDateFormatter;
-
     private final JsonbDateFormatter deserializeDateFormatter;
+    
+    private final AdapterBinding serializeAdapter;
+    private final AdapterBinding deserializeAdapter;
 
     private boolean readTransient;
-
     private boolean writeTransient;
 
-    private final Class implementationClass;
+    private final Class<?> implementationClass;
 
     /**
      * Copies properties from builder an creates immutable instance.
@@ -48,6 +48,8 @@ public class PropertyCustomization extends CustomizationBase {
      */
     public PropertyCustomization(PropertyCustomizationBuilder builder) {
         super(builder);
+        this.serializeAdapter = builder.getSerializeAdapter();
+        this.deserializeAdapter = builder.getDeserializeAdapter();
         this.jsonReadName = builder.getJsonReadName();
         this.jsonWriteName = builder.getJsonWriteName();
         this.serializeNumberFormatter = builder.getSerializeNumberFormatter();
@@ -121,8 +123,18 @@ public class PropertyCustomization extends CustomizationBase {
      *
      * @return class implementing property interface
      */
-    public Class getImplementationClass() {
+    public Class<?> getImplementationClass() {
         return implementationClass;
+    }
+    
+    @Override
+    public AdapterBinding getDeserializeAdapterBinding() {
+        return deserializeAdapter;
+    }
+    
+    @Override
+    public AdapterBinding getSerializeAdapterBinding() {
+        return serializeAdapter;
     }
 
 }
