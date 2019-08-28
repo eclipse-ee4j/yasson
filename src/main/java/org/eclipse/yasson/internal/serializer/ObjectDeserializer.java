@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2015, 2018 Oracle and/or its affiliates. All rights reserved.
+ * Copyright (c) 2015, 2019 Oracle and/or its affiliates. All rights reserved.
  * This program and the accompanying materials are made available under the
  * terms of the Eclipse Public License v1.0 and Eclipse Distribution License v. 1.0
  * which accompanies this distribution.
@@ -28,7 +28,6 @@ import java.util.ArrayList;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.logging.Logger;
 
 /**
  * Item for handling all types of unknown objects by reflection, parsing their fields, according to json key name.
@@ -58,8 +57,6 @@ class ObjectDeserializer<T> extends AbstractContainerDeserializer<T> {
             return propertyModel;
         }
     }
-
-    private static final Logger log = Logger.getLogger(ObjectDeserializer.class.getName());
 
     private Map<String, ValueWrapper> values = new LinkedHashMap<>();
 
@@ -137,7 +134,7 @@ class ObjectDeserializer<T> extends AbstractContainerDeserializer<T> {
         if (model == null) {
             return;
         }
-        values.put(model.getReadName(), new ValueWrapper(model, convertNullToOptionalEmpty(model.getPropertyType(), result)));
+        values.put(model.getReadName(), new ValueWrapper(model, convertNullToOptionalEmpty(model.getPropertyDeserializationType(), result)));
     }
 
     @Override

@@ -351,6 +351,7 @@
                                 <goal>test</goal>
                             </goals>
                             <configuration>
+                                <trimStackTrace>false</trimStackTrace>
                                 <excludes>
                                     <exclude>**/JavaxNamingExcludedTest.class</exclude>
                                     <exclude>**/AnnotationIntrospectorWithoutOptionalModulesTest.class</exclude>

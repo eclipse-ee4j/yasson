@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2016, 2017 Oracle and/or its affiliates. All rights reserved.
+ * Copyright (c) 2016, 2019 Oracle and/or its affiliates. All rights reserved.
  * This program and the accompanying materials are made available under the
  * terms of the Eclipse Public License v1.0 and Eclipse Distribution License v. 1.0
  * which accompanies this distribution.
@@ -10,9 +10,9 @@
  * Contributors:
  *      Ehsan Zaery Moghaddam (zaerymoghaddam@gmail.com)
  ******************************************************************************/
-
 package org.eclipse.yasson.internal.model.customization;
 
+import org.eclipse.yasson.internal.components.AdapterBinding;
 import org.eclipse.yasson.internal.serializer.JsonbDateFormatter;
 import org.eclipse.yasson.internal.serializer.JsonbNumberFormatter;
 
@@ -24,20 +24,19 @@ import org.eclipse.yasson.internal.serializer.JsonbNumberFormatter;
 public class PropertyCustomizationBuilder extends CustomizationBuilder {
 
     private String jsonReadName;
-
     private String jsonWriteName;
 
     private JsonbNumberFormatter serializeNumberFormatter;
-
     private JsonbNumberFormatter deserializeNumberFormatter;
 
     private JsonbDateFormatter serializeDateFormatter;
-
     private JsonbDateFormatter deserializeDateFormatter;
 
     private boolean readTransient;
-
     private boolean writeTransient;
+    
+    private AdapterBinding serializeAdapter;
+    private AdapterBinding deserializeAdapter;
 
     private Class implementationClass;
 
@@ -211,5 +210,31 @@ public class PropertyCustomizationBuilder extends CustomizationBuilder {
      */
     public void setImplementationClass(Class implementationClass) {
         this.implementationClass = implementationClass;
+    }
+    
+    @Override
+    public void setAdapterInfo(AdapterBinding adapterInfo) {
+        throw new UnsupportedOperationException();
+    }
+    
+    @Override
+    public AdapterBinding getAdapterInfo() {
+        return null;
+    }
+    
+    public AdapterBinding getSerializeAdapter() {
+        return serializeAdapter;
+    }
+    
+    public void setSerializeAdapter(AdapterBinding adapter) {
+        this.serializeAdapter = adapter;
+    }
+    
+    public AdapterBinding getDeserializeAdapter() {
+        return deserializeAdapter;
+    }
+    
+    public void setDeserializeAdapter(AdapterBinding adapter) {
+        this.deserializeAdapter = adapter;
     }
 }
