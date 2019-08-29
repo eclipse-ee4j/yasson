@@ -9,6 +9,7 @@
  *
  * Contributors:
  * Roman Grigoriadi
+ * Gyúróczki Gergő
  ******************************************************************************/
 package org.eclipse.yasson.internal.model.customization;
 

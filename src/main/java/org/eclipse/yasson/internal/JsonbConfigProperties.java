@@ -10,6 +10,7 @@
  *
  * Contributors:
  * Roman Grigoriadi
+ * Gyúróczki Gergő
  ******************************************************************************/
 package org.eclipse.yasson.internal;
 
@@ -98,12 +99,12 @@ public class JsonbConfigProperties {
 
 
     private Class<?> initDefaultMapImplType() {
-        String os = getPropertyOrderStrategy();
+        Optional<String> os = getPropertyOrderStrategy();
         
-        if(os == null) {
+        if(os.isEmpty()) {
             return HashMap.class;
         }
-        switch(os) {
+        switch(os.get()) {
             case PropertyOrderStrategy.LEXICOGRAPHICAL:
                 return TreeMap.class;
             case PropertyOrderStrategy.REVERSE:
@@ -157,17 +158,13 @@ public class JsonbConfigProperties {
     }
 
     private Function<Collection<PropertyModel>, List<PropertyModel>> initOrderStrategy() {
-        String strategy = getPropertyOrderStrategy();
+        Optional<String> strategy = getPropertyOrderStrategy();
         
-        if(strategy == null) {
-            //default by spec
-            return StrategiesProvider.getOrderingFunction(PropertyOrderStrategy.LEXICOGRAPHICAL);
-        }
-        
-        return StrategiesProvider.getOrderingFunction(strategy);
+        return strategy.map(StrategiesProvider::getOrderingFunction)
+        			   .orElseGet(() -> StrategiesProvider.getOrderingFunction(PropertyOrderStrategy.LEXICOGRAPHICAL));  //default by spec
     }
 
-    private String getPropertyOrderStrategy() {
+    private Optional<String> getPropertyOrderStrategy() {
         final Optional<Object> property = jsonbConfig.getProperty(JsonbConfig.PROPERTY_ORDER_STRATEGY);
         if (property.isPresent()) {
             final Object strategy = property.get();
@@ -178,12 +175,12 @@ public class JsonbConfigProperties {
                 case PropertyOrderStrategy.LEXICOGRAPHICAL:
                 case PropertyOrderStrategy.REVERSE:
                 case PropertyOrderStrategy.ANY:
-                    return (String) strategy;
+                    return Optional.of((String) strategy);
                 default:
                     throw new JsonbException(Messages.getMessage(MessageKeys.PROPERTY_ORDER, strategy));
             }
         }
-        return null;
+        return Optional.empty();
     }
 
     private PropertyNamingStrategy initPropertyNamingStrategy() {

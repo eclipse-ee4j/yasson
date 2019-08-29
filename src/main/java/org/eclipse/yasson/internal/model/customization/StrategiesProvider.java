@@ -1,3 +1,15 @@
+/*******************************************************************************
+ * Copyright (c) 2016, 2018 Oracle and/or its affiliates. All rights reserved.
+ * This program and the accompanying materials are made available under the
+ * terms of the Eclipse Public License v1.0 and Eclipse Distribution License v. 1.0
+ * which accompanies this distribution.
+ * The Eclipse Public License is available at http://www.eclipse.org/legal/epl-v10.html
+ * and the Eclipse Distribution License is available at
+ * http://www.eclipse.org/org/documents/edl-v10.php.
+ *
+ * Contributors:
+ * Gyúróczki Gergő
+ ******************************************************************************/
 package org.eclipse.yasson.internal.model.customization;
 
 import static java.util.stream.Collectors.toList;
@@ -22,22 +34,33 @@ public final class StrategiesProvider {
     
     public static Function<Collection<PropertyModel>, List<PropertyModel>> getOrderingFunction(String strategy){
         switch(strategy) {
-            case LEXICOGRAPHICAL: return createSortingOrdererFunction(comparing(PropertyModel::getWriteName));
-            case ANY:               return ArrayList::new;
-            case REVERSE:           return createSortingOrdererFunction(comparing(PropertyModel::getWriteName).reversed());
-            default:               throw new JsonbException(Messages.getMessage(MessageKeys.PROPERTY_ORDER, strategy));
+            case LEXICOGRAPHICAL:
+            	return createSortingOrdererFunction(comparing(PropertyModel::getWriteName));
+            case ANY:
+            	return ArrayList::new;
+            case REVERSE:
+            	return createSortingOrdererFunction(comparing(PropertyModel::getWriteName).reversed());
+            default:
+            	throw new JsonbException(Messages.getMessage(MessageKeys.PROPERTY_ORDER, strategy));
         }
     }
     
     public static PropertyNamingStrategy getPropertyNamingStrategy(String strategy) {
         switch(strategy) {
-            case LOWER_CASE_WITH_UNDERSCORES:  return createLowerCaseStrategyWithSeparator('_');
-            case LOWER_CASE_WITH_DASHES:        return createLowerCaseStrategyWithSeparator('-');
-            case UPPER_CAMEL_CASE:                return createUpperCamelCaseStrategy();
-            case UPPER_CAMEL_CASE_WITH_SPACES: return createUpperCamelCaseWithSpaceStrategy();
-            case IDENTITY:                        return Objects::requireNonNull;
-            case CASE_INSENSITIVE:                return CASE_INSENSITIVE_STRATEGY;
-            default:                            throw new JsonbException("No property naming strategy was found for: " + strategy);
+            case LOWER_CASE_WITH_UNDERSCORES:
+            	return createLowerCaseStrategyWithSeparator('_');
+            case LOWER_CASE_WITH_DASHES:
+            	return createLowerCaseStrategyWithSeparator('-');
+            case UPPER_CAMEL_CASE:
+            	return createUpperCamelCaseStrategy();
+            case UPPER_CAMEL_CASE_WITH_SPACES:
+            	return createUpperCamelCaseWithSpaceStrategy();
+            case IDENTITY:
+            	return Objects::requireNonNull;
+            case CASE_INSENSITIVE:
+            	return CASE_INSENSITIVE_STRATEGY;
+            default:
+            	throw new JsonbException("No property naming strategy was found for: " + strategy);
         }
     }
     
@@ -51,8 +74,7 @@ public final class StrategiesProvider {
             Objects.requireNonNull(propertyName);
             char first = Character.toUpperCase(propertyName.charAt(0));
             
-            return propertyName.length() == 1 ? String.valueOf(first)
-                                              : first + propertyName.substring(1, propertyName.length());
+            return first + propertyName.substring(1, propertyName.length());
         };
     }
     
