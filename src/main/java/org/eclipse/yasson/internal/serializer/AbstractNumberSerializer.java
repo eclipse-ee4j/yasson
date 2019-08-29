@@ -19,6 +19,7 @@ import org.eclipse.yasson.internal.model.customization.Customization;
 import javax.json.stream.JsonGenerator;
 import java.text.DecimalFormat;
 import java.text.NumberFormat;
+import java.util.Locale;
 
 /**
  * Common serializer for numbers, using number format.
@@ -52,7 +53,7 @@ public abstract class AbstractNumberSerializer<T extends Number> extends Abstrac
     @Override
     protected void serialize(T obj, JsonGenerator generator, Marshaller marshaller) {
         if (formatter != null) {
-            final NumberFormat format = NumberFormat.getInstance(marshaller.getJsonbContext().getConfigProperties().getLocale(formatter.getLocale()));
+            final NumberFormat format = NumberFormat.getInstance(Locale.ENGLISH);
             ((DecimalFormat)format).applyPattern(formatter.getFormat());
             generator.write(format.format(obj));
         } else {

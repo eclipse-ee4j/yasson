@@ -358,7 +358,7 @@ public class DocumentationExampleTest {
         @JsonbDateFormat("dd.MM.yyyy")
         public LocalDate birthDate;
 
-        @JsonbNumberFormat("#0.00")
+        @JsonbNumberFormat(value = "#0.00", locale = "de-de")
         public BigDecimal salary;
     }
     
