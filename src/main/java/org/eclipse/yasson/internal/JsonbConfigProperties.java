@@ -101,7 +101,7 @@ public class JsonbConfigProperties {
     private Class<?> initDefaultMapImplType() {
         Optional<String> os = getPropertyOrderStrategy();
         
-        if(os.isEmpty()) {
+        if(!os.isPresent()) {
             return HashMap.class;
         }
         switch(os.get()) {
