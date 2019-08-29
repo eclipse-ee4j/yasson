@@ -92,7 +92,7 @@ class ObjectDeserializer<T> extends AbstractContainerDeserializer<T> {
         } else {
             Constructor<T> defaultConstructor = (Constructor<T>) getClassModel().getDefaultConstructor();
             if (defaultConstructor == null) {
-                throw new NullPointerException(rawType.getName() + " does not have a default constructor.");
+                throw new JsonbException(Messages.getMessage(MessageKeys.NO_DEFAULT_CONSTRUCTOR, rawType));
             }
             instance = ReflectionUtils.createNoArgConstructorInstance(defaultConstructor);
         }
