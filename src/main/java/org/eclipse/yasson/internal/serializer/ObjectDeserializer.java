@@ -87,9 +87,15 @@ class ObjectDeserializer<T> extends AbstractContainerDeserializer<T> {
         }
         final Class<?> rawType = ReflectionUtils.getRawType(getRuntimeType());
         final JsonbCreator creator = getClassModel().getClassCustomization().getCreator();
-        instance = creator != null ? createInstance((Class<T>) rawType, creator)
-                : ReflectionUtils.createNoArgConstructorInstance((Constructor<T>) getClassModel().getDefaultConstructor());
-
+        if (creator != null) {
+            instance = createInstance((Class<T>) rawType, creator);
+        } else {
+            Constructor<T> defaultConstructor = (Constructor<T>) getClassModel().getDefaultConstructor();
+            if (defaultConstructor == null) {
+                throw new JsonbException(Messages.getMessage(MessageKeys.NO_DEFAULT_CONSTRUCTOR, rawType));
+            }
+            instance = ReflectionUtils.createNoArgConstructorInstance(defaultConstructor);
+        }
         //values must be set in order, in which they appears in JSON by spec
         values.forEach((key, wrapper) -> {
             //skip creator values
