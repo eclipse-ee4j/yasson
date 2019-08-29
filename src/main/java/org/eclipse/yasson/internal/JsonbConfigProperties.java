@@ -100,18 +100,17 @@ public class JsonbConfigProperties {
 
     private Class<?> initDefaultMapImplType() {
         Optional<String> os = getPropertyOrderStrategy();
-        
-        if(!os.isPresent()) {
-            return HashMap.class;
+        if (os.isPresent()) {
+            switch (os.get()) {
+                case PropertyOrderStrategy.LEXICOGRAPHICAL:
+                    return TreeMap.class;
+                case PropertyOrderStrategy.REVERSE:
+                    return ReverseTreeMap.class;
+                default:
+                    return HashMap.class;
+            }
         }
-        switch(os.get()) {
-            case PropertyOrderStrategy.LEXICOGRAPHICAL:
-                return TreeMap.class;
-            case PropertyOrderStrategy.REVERSE:
-                return ReverseTreeMap.class;
-            default:
-                return HashMap.class;
-        }
+        return HashMap.class;
     }
 
     private boolean initZeroTimeDefaultingForJavaTime() {
