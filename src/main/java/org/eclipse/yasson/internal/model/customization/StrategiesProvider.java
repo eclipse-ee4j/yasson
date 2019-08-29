@@ -74,7 +74,7 @@ public final class StrategiesProvider {
             Objects.requireNonNull(propertyName);
             char first = Character.toUpperCase(propertyName.charAt(0));
             
-            return first + propertyName.substring(1, propertyName.length());
+            return first + propertyName.substring(1);
         };
     }
     
