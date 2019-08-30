@@ -55,6 +55,7 @@ public abstract class AbstractNumberSerializer<T extends Number> extends Abstrac
         if (formatter != null) {
             final NumberFormat format = NumberFormat.getInstance(Locale.ENGLISH);
             ((DecimalFormat)format).applyPattern(formatter.getFormat());
+            format.setGroupingUsed(false);
             generator.write(format.format(obj));
         } else {
             serializeNonFormatted(obj, generator);

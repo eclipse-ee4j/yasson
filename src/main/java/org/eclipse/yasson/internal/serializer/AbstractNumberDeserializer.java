@@ -53,6 +53,7 @@ public abstract class AbstractNumberDeserializer<T extends Number> extends Abstr
         final NumberFormat format = NumberFormat.getInstance((Locale.ENGLISH));
         ((DecimalFormat)format).applyPattern(numberFormat.getFormat());
         format.setParseIntegerOnly(integerOnly);
+        format.setGroupingUsed(false);
         try {
             return Optional.of(format.parse(jsonValue));
         } catch (ParseException e) {
