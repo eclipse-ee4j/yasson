@@ -6,6 +6,7 @@ import org.junit.rules.ExpectedException;
 
 import javax.json.bind.Jsonb;
 import javax.json.bind.JsonbBuilder;
+import javax.json.bind.JsonbException;
 
 public class ObjectDeserializerTest {
 
@@ -14,8 +15,8 @@ public class ObjectDeserializerTest {
 
     @Test
     public void testGetInstanceExceptionShouldContainClassNameOnMissingConstructor() {
-        expectedException.expect(RuntimeException.class);
-        expectedException.expectMessage("org.eclipse.yasson.internal.serializer.ObjectDeserializerTest$DummyDeserializationClass");
+        expectedException.expect(JsonbException.class);
+        expectedException.expectMessage(DummyDeserializationClass.class.getName());
 
         Jsonb jsonb = JsonbBuilder.create();
         jsonb.fromJson("{\"key\":\"value\"}", DummyDeserializationClass.class);
