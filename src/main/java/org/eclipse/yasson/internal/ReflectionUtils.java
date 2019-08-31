@@ -210,7 +210,9 @@ public class ReflectionUtils {
      * Get default no argument constructor of the class.
      * @param clazz Class to get constructor from
      * @param <T> Class generic type
-     * @return constructor
+     * @param required if true, throws an exception if the default constructor is missing.
+     *                 If false, returns null in that case
+     * @return the constructor of the class, or null. Depending on required.
      */
     public static <T> Constructor<T> getDefaultConstructor(Class<T> clazz, boolean required) {
         Objects.requireNonNull(clazz);
