@@ -13,12 +13,10 @@
 
 package org.eclipse.yasson.customization;
 
-import org.eclipse.yasson.YassonProperties;
 import org.eclipse.yasson.customization.model.DateFormatPojo;
 import org.eclipse.yasson.customization.model.DateFormatPojoWithClassLevelFormatter;
 import org.eclipse.yasson.customization.model.TrimmedDatePojo;
 import org.eclipse.yasson.internal.JsonBindingBuilder;
-import org.junit.Assert;
 import org.junit.Test;
 
 import javax.json.bind.Jsonb;
@@ -147,11 +145,11 @@ public class JsonbDateFormatterTest {
         pojo.setZonedInstant(zdt.withZoneSameInstant(ZoneId.of("Europe/Paris")).toInstant());
 
         Jsonb zeroDefaultingJsonb = new JsonBindingBuilder()
-                .withConfig(new JsonbConfig().setProperty(YassonProperties.ZERO_TIME_PARSE_DEFAULTING, true))
+                .withConfig(new JsonbConfig().setProperty("jsonb.zero-time-defaulting", true))
                 .build();
 
         String serialized = zeroDefaultingJsonb.toJson(pojo);
-        Assert.assertEquals(
+        assertEquals(
                 "{\"calendar\":\"2018.01.30\",\"date\":\"2018.01.30\",\"localDateTime\":\"2018.01.30\",\"zonedDateTime\":\"2018.01.30\",\"zonedDateTimeHoursAndSeconds\":\"2018.01.30 00:00\",\"zonedDateTimeNanosOfDay\":\"2018.01.30 3000\",\"zonedDateTimeOverriddenZone\":\"2018.01.30 Europe/Paris\",\"zonedInstant\":\"2018.01.30 UTC\"}",
                 serialized);
 
@@ -159,62 +157,62 @@ public class JsonbDateFormatterTest {
         TrimmedDatePojo trimmedDatePojo = zeroDefaultingJsonb.fromJson(jsonToDeserialize, TrimmedDatePojo.class);
 
         //Nanos are overridden in json for deserialization. Tests that defaulting hour/minute/second does not affect other units.
-        Assert.assertEquals(2018, trimmedDatePojo.getZonedDateTimeNanosOfDay().getYear());
-        Assert.assertEquals(1, trimmedDatePojo.getZonedDateTimeNanosOfDay().getMonthValue());
-        Assert.assertEquals(30, trimmedDatePojo.getZonedDateTimeNanosOfDay().getDayOfMonth());
-        Assert.assertEquals(0, trimmedDatePojo.getZonedDateTimeNanosOfDay().getHour());
-        Assert.assertEquals(0, trimmedDatePojo.getZonedDateTimeNanosOfDay().getMinute());
-        Assert.assertEquals(0, trimmedDatePojo.getZonedDateTimeNanosOfDay().getSecond());
-        Assert.assertEquals(9000, trimmedDatePojo.getZonedDateTimeNanosOfDay().getNano());
-        Assert.assertEquals(utcZone, trimmedDatePojo.getZonedDateTimeNanosOfDay().getZone());
+        assertEquals(2018, trimmedDatePojo.getZonedDateTimeNanosOfDay().getYear());
+        assertEquals(1, trimmedDatePojo.getZonedDateTimeNanosOfDay().getMonthValue());
+        assertEquals(30, trimmedDatePojo.getZonedDateTimeNanosOfDay().getDayOfMonth());
+        assertEquals(0, trimmedDatePojo.getZonedDateTimeNanosOfDay().getHour());
+        assertEquals(0, trimmedDatePojo.getZonedDateTimeNanosOfDay().getMinute());
+        assertEquals(0, trimmedDatePojo.getZonedDateTimeNanosOfDay().getSecond());
+        assertEquals(9000, trimmedDatePojo.getZonedDateTimeNanosOfDay().getNano());
+        assertEquals(utcZone, trimmedDatePojo.getZonedDateTimeNanosOfDay().getZone());
 
         //Test trimmed zoned date time have correct values.
-        Assert.assertEquals(2018, trimmedDatePojo.getZonedDateTime().getYear());
-        Assert.assertEquals(1, trimmedDatePojo.getZonedDateTime().getMonthValue());
-        Assert.assertEquals(30, trimmedDatePojo.getZonedDateTime().getDayOfMonth());
-        Assert.assertEquals(0, trimmedDatePojo.getZonedDateTime().getHour());
-        Assert.assertEquals(0, trimmedDatePojo.getZonedDateTime().getMinute());
-        Assert.assertEquals(0, trimmedDatePojo.getZonedDateTime().getSecond());
-        Assert.assertEquals(utcZone, trimmedDatePojo.getZonedDateTime().getZone());
+        assertEquals(2018, trimmedDatePojo.getZonedDateTime().getYear());
+        assertEquals(1, trimmedDatePojo.getZonedDateTime().getMonthValue());
+        assertEquals(30, trimmedDatePojo.getZonedDateTime().getDayOfMonth());
+        assertEquals(0, trimmedDatePojo.getZonedDateTime().getHour());
+        assertEquals(0, trimmedDatePojo.getZonedDateTime().getMinute());
+        assertEquals(0, trimmedDatePojo.getZonedDateTime().getSecond());
+        assertEquals(utcZone, trimmedDatePojo.getZonedDateTime().getZone());
 
 
         //Zone is overridden in JSON, causing
-        Assert.assertEquals(2018, trimmedDatePojo.getZonedDateTimeHoursAndSeconds().getYear());
-        Assert.assertEquals(1, trimmedDatePojo.getZonedDateTimeHoursAndSeconds().getMonthValue());
-        Assert.assertEquals(30, trimmedDatePojo.getZonedDateTimeHoursAndSeconds().getDayOfMonth());
-        Assert.assertEquals(12, trimmedDatePojo.getZonedDateTimeHoursAndSeconds().getHour());
-        Assert.assertEquals(0, trimmedDatePojo.getZonedDateTimeHoursAndSeconds().getMinute());
-        Assert.assertEquals(15, trimmedDatePojo.getZonedDateTimeHoursAndSeconds().getSecond());
-        Assert.assertEquals(utcZone, trimmedDatePojo.getZonedDateTimeHoursAndSeconds().getZone());
+        assertEquals(2018, trimmedDatePojo.getZonedDateTimeHoursAndSeconds().getYear());
+        assertEquals(1, trimmedDatePojo.getZonedDateTimeHoursAndSeconds().getMonthValue());
+        assertEquals(30, trimmedDatePojo.getZonedDateTimeHoursAndSeconds().getDayOfMonth());
+        assertEquals(12, trimmedDatePojo.getZonedDateTimeHoursAndSeconds().getHour());
+        assertEquals(0, trimmedDatePojo.getZonedDateTimeHoursAndSeconds().getMinute());
+        assertEquals(15, trimmedDatePojo.getZonedDateTimeHoursAndSeconds().getSecond());
+        assertEquals(utcZone, trimmedDatePojo.getZonedDateTimeHoursAndSeconds().getZone());
 
         //Defaulting UTC zone is overridden in JSON.
-        Assert.assertEquals(2018, trimmedDatePojo.getZonedDateTimeOverriddenZone().getYear());
-        Assert.assertEquals(1, trimmedDatePojo.getZonedDateTimeOverriddenZone().getMonthValue());
-        Assert.assertEquals(30, trimmedDatePojo.getZonedDateTimeOverriddenZone().getDayOfMonth());
-        Assert.assertEquals(0, trimmedDatePojo.getZonedDateTimeOverriddenZone().getHour());
-        Assert.assertEquals(0, trimmedDatePojo.getZonedDateTimeOverriddenZone().getMinute());
-        Assert.assertEquals(0, trimmedDatePojo.getZonedDateTimeOverriddenZone().getSecond());
-        Assert.assertEquals(ZoneId.of("Europe/Prague"), trimmedDatePojo.getZonedDateTimeOverriddenZone().getZone());
+        assertEquals(2018, trimmedDatePojo.getZonedDateTimeOverriddenZone().getYear());
+        assertEquals(1, trimmedDatePojo.getZonedDateTimeOverriddenZone().getMonthValue());
+        assertEquals(30, trimmedDatePojo.getZonedDateTimeOverriddenZone().getDayOfMonth());
+        assertEquals(0, trimmedDatePojo.getZonedDateTimeOverriddenZone().getHour());
+        assertEquals(0, trimmedDatePojo.getZonedDateTimeOverriddenZone().getMinute());
+        assertEquals(0, trimmedDatePojo.getZonedDateTimeOverriddenZone().getSecond());
+        assertEquals(ZoneId.of("Europe/Prague"), trimmedDatePojo.getZonedDateTimeOverriddenZone().getZone());
 
         //Tests LocalDateTime trimmed values
-        Assert.assertEquals(2018, trimmedDatePojo.getLocalDateTime().getYear());
-        Assert.assertEquals(1, trimmedDatePojo.getLocalDateTime().getMonthValue());
-        Assert.assertEquals(30, trimmedDatePojo.getLocalDateTime().getDayOfMonth());
-        Assert.assertEquals(0, trimmedDatePojo.getLocalDateTime().getHour());
-        Assert.assertEquals(0, trimmedDatePojo.getLocalDateTime().getMinute());
-        Assert.assertEquals(0, trimmedDatePojo.getLocalDateTime().getSecond());
+        assertEquals(2018, trimmedDatePojo.getLocalDateTime().getYear());
+        assertEquals(1, trimmedDatePojo.getLocalDateTime().getMonthValue());
+        assertEquals(30, trimmedDatePojo.getLocalDateTime().getDayOfMonth());
+        assertEquals(0, trimmedDatePojo.getLocalDateTime().getHour());
+        assertEquals(0, trimmedDatePojo.getLocalDateTime().getMinute());
+        assertEquals(0, trimmedDatePojo.getLocalDateTime().getSecond());
 
         //Test date and instant have correct time.
-        Assert.assertEquals(zdt.toInstant().toEpochMilli(), trimmedDatePojo.getDate().getTime());
-        Assert.assertEquals(zdt.withZoneSameLocal(ZoneId.of("Europe/Prague")).toInstant().toEpochMilli(), trimmedDatePojo.getZonedInstant().toEpochMilli());
+        assertEquals(zdt.toInstant().toEpochMilli(), trimmedDatePojo.getDate().getTime());
+        assertEquals(zdt.withZoneSameLocal(ZoneId.of("Europe/Prague")).toInstant().toEpochMilli(), trimmedDatePojo.getZonedInstant().toEpochMilli());
 
         //Test calendar instance
         //Tests LocalDateTime trimmed values
-        Assert.assertEquals(2018, trimmedDatePojo.getCalendar().get(Calendar.YEAR));
-        Assert.assertEquals(0, trimmedDatePojo.getCalendar().get(Calendar.MONTH));
-        Assert.assertEquals(30, trimmedDatePojo.getCalendar().get(Calendar.DAY_OF_MONTH));
-        Assert.assertEquals(0, trimmedDatePojo.getCalendar().get(Calendar.HOUR_OF_DAY));
-        Assert.assertEquals(0, trimmedDatePojo.getCalendar().get(Calendar.MINUTE));
-        Assert.assertEquals(0, trimmedDatePojo.getCalendar().get(Calendar.SECOND));
+        assertEquals(2018, trimmedDatePojo.getCalendar().get(Calendar.YEAR));
+        assertEquals(0, trimmedDatePojo.getCalendar().get(Calendar.MONTH));
+        assertEquals(30, trimmedDatePojo.getCalendar().get(Calendar.DAY_OF_MONTH));
+        assertEquals(0, trimmedDatePojo.getCalendar().get(Calendar.HOUR_OF_DAY));
+        assertEquals(0, trimmedDatePojo.getCalendar().get(Calendar.MINUTE));
+        assertEquals(0, trimmedDatePojo.getCalendar().get(Calendar.SECOND));
     }
 }

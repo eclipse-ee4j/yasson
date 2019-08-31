@@ -14,7 +14,6 @@
 package org.eclipse.yasson.defaultmapping.specific;
 
 import org.eclipse.yasson.TestTypeToken;
-import org.eclipse.yasson.YassonProperties;
 import org.eclipse.yasson.defaultmapping.generics.model.GenericTestClass;
 import org.eclipse.yasson.defaultmapping.specific.model.ClassWithUnsupportedFields;
 import org.eclipse.yasson.defaultmapping.specific.model.CustomUnsupportedInterface;
@@ -132,7 +131,7 @@ public class UnmarshallingUnsupportedTypesTest {
 
     @Test(expected = JsonbException.class)
     public void testMissingFieldIgnored() {
-        Jsonb defaultConfig = JsonbBuilder.create(new JsonbConfig().setProperty(YassonProperties.FAIL_ON_UNKNOWN_PROPERTIES, true));
+        Jsonb defaultConfig = JsonbBuilder.create(new JsonbConfig().setProperty("jsonb.fail-on-unknown-properties", true));
         String json  = "{\"nestedPojo\":{\"integerValue\":10,\"missingField\":5},\"optionalLong\":11}";
         SupportedTypes result = defaultConfig.fromJson(json, SupportedTypes.class);
     }

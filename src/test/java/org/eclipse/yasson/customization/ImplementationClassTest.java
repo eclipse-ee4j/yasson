@@ -12,17 +12,18 @@
  ******************************************************************************/
 package org.eclipse.yasson.customization;
 
-import org.eclipse.yasson.YassonProperties;
 import org.eclipse.yasson.customization.model.Animal;
 import org.eclipse.yasson.customization.model.Dog;
 import org.eclipse.yasson.customization.model.ImplementationClassPojo;
-import org.junit.Assert;
 import org.junit.Test;
 
 import javax.json.bind.Jsonb;
 import javax.json.bind.JsonbBuilder;
 import javax.json.bind.JsonbConfig;
 import java.util.HashMap;
+
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertTrue;
 
 public class ImplementationClassTest {
 
@@ -36,23 +37,24 @@ public class ImplementationClassTest {
         String expected = "{\"animal\":{\"dogProperty\":\"Bulldog\"}}";
         String json = jsonb.toJson(pojo);
 
-        Assert.assertEquals(expected, json);
+        assertEquals(expected, json);
         ImplementationClassPojo result = jsonb.fromJson(expected, ImplementationClassPojo.class);
-        Assert.assertTrue(result.getAnimal() instanceof Dog);
-        Assert.assertEquals("Bulldog", ((Dog)result.getAnimal()).getDogProperty());
+        assertTrue(result.getAnimal() instanceof Dog);
+        assertEquals("Bulldog", ((Dog)result.getAnimal()).getDogProperty());
     }
 
     @Test
     public void testJsonbConfigUserImplementation() {
         HashMap<Class, Class> userMapping = new HashMap<>();
         userMapping.put(Animal.class, Dog.class);
-        Jsonb jsonb = JsonbBuilder.create(new JsonbConfig().setProperty(YassonProperties.USER_TYPE_MAPPING, userMapping));
+        Jsonb jsonb = JsonbBuilder.create(new JsonbConfig().setProperty("jsonb.user-type-mapping", userMapping));
         Animal animal = new Dog("Bulldog");
         String expected = "{\"dogProperty\":\"Bulldog\"}";
         String json = jsonb.toJson(animal);
 
-        Assert.assertEquals(expected, json);
+        assertEquals(expected, json);
 
-        Animal result = jsonb.fromJson("{\"dogProperty\":\"Bulldog\"}", Animal.class);
+        Dog result = (Dog) jsonb.fromJson("{\"dogProperty\":\"Bulldog\"}", Animal.class);
+        assertEquals("Bulldog", result.getDogProperty());
     }
 }
