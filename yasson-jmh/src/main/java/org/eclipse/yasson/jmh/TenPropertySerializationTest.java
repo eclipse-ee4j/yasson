@@ -15,7 +15,7 @@ import java.util.concurrent.TimeUnit;
 @State(Scope.Benchmark)
 @Warmup(iterations = 3)
 @OutputTimeUnit(TimeUnit.MILLISECONDS)
-public class TenPropertySerialization {
+public class TenPropertySerializationTest {
 	private Jsonb json;
 	private TenPropertyData testData;
 	
