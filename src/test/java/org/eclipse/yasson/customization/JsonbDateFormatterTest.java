@@ -28,6 +28,7 @@ import java.util.Calendar;
 import java.util.Date;
 import java.util.TimeZone;
 
+import static org.eclipse.yasson.YassonProperties.ZERO_TIME_PARSE_DEFAULTING;
 import static org.junit.Assert.assertEquals;
 
 /**
@@ -40,7 +41,7 @@ public class JsonbDateFormatterTest {
     private final Jsonb jsonb = JsonbBuilder.create();
 
     @Test
-    public void testCustomDateFormatSerialization() throws Exception {
+    public void testCustomDateFormatSerialization() {
         final Calendar timeCalendar = new Calendar.Builder()
                 .setDate(2017, Calendar.MARCH, 3)
                 .setTimeOfDay(11, 11, 10)
@@ -63,7 +64,7 @@ public class JsonbDateFormatterTest {
     }
 
     @Test
-    public void testCustomDateFormatDeserialization() throws Exception {
+    public void testCustomDateFormatDeserialization() {
         final Calendar timeCalendar = new Calendar.Builder()
                 .setDate(2017, Calendar.MARCH, 3)
                 .setTimeOfDay(11, 11, 10)
@@ -83,7 +84,7 @@ public class JsonbDateFormatterTest {
     }
 
     @Test
-    public void testCustomDateFormatSerializationWithClassLevelDateFormatterDefined() throws Exception {
+    public void testCustomDateFormatSerializationWithClassLevelDateFormatterDefined() {
         final Calendar timeCalendar = new Calendar.Builder()
                 .setDate(2017, Calendar.MARCH, 3)
                 .setTimeOfDay(11, 11, 10)
@@ -106,7 +107,7 @@ public class JsonbDateFormatterTest {
     }
 
     @Test
-    public void testCustomDateFormatDeserializationWithClassLevelDateFormatterDefined() throws Exception {
+    public void testCustomDateFormatDeserializationWithClassLevelDateFormatterDefined() {
         final Calendar timeCalendar = new Calendar.Builder()
                 .setDate(2017, Calendar.MARCH, 3)
                 .setTimeOfDay(11, 11, 10)
@@ -145,7 +146,7 @@ public class JsonbDateFormatterTest {
         pojo.setZonedInstant(zdt.withZoneSameInstant(ZoneId.of("Europe/Paris")).toInstant());
 
         Jsonb zeroDefaultingJsonb = new JsonBindingBuilder()
-                .withConfig(new JsonbConfig().setProperty("jsonb.zero-time-defaulting", true))
+                .withConfig(new JsonbConfig().setProperty(ZERO_TIME_PARSE_DEFAULTING, true))
                 .build();
 
         String serialized = zeroDefaultingJsonb.toJson(pojo);

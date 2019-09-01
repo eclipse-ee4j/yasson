@@ -35,8 +35,8 @@ import java.time.ZonedDateTime;
 import java.util.OptionalDouble;
 import java.util.OptionalInt;
 import java.util.OptionalLong;
-import java.util.logging.Logger;
 
+import static org.eclipse.yasson.YassonProperties.FAIL_ON_UNKNOWN_PROPERTIES;
 import static org.junit.Assert.*;
 
 /**
@@ -74,7 +74,7 @@ public class UnmarshallingUnsupportedTypesTest {
     }
 
     @Test
-    public void testPojoForMalformedJson() throws Exception {
+    public void testPojoForMalformedJson() {
 
         SupportedTypes supportedTypes = new SupportedTypes();
         LocalDateTime localDateTime = LocalDateTime.of(2015, 12, 28, 15, 57);
@@ -131,7 +131,7 @@ public class UnmarshallingUnsupportedTypesTest {
 
     @Test(expected = JsonbException.class)
     public void testMissingFieldIgnored() {
-        Jsonb defaultConfig = JsonbBuilder.create(new JsonbConfig().setProperty("jsonb.fail-on-unknown-properties", true));
+        Jsonb defaultConfig = JsonbBuilder.create(new JsonbConfig().setProperty(FAIL_ON_UNKNOWN_PROPERTIES, true));
         String json  = "{\"nestedPojo\":{\"integerValue\":10,\"missingField\":5},\"optionalLong\":11}";
         SupportedTypes result = defaultConfig.fromJson(json, SupportedTypes.class);
     }

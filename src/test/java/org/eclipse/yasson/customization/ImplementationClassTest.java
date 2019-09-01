@@ -22,6 +22,7 @@ import javax.json.bind.JsonbBuilder;
 import javax.json.bind.JsonbConfig;
 import java.util.HashMap;
 
+import static org.eclipse.yasson.YassonProperties.USER_TYPE_MAPPING;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertTrue;
 
@@ -47,7 +48,7 @@ public class ImplementationClassTest {
     public void testJsonbConfigUserImplementation() {
         HashMap<Class, Class> userMapping = new HashMap<>();
         userMapping.put(Animal.class, Dog.class);
-        Jsonb jsonb = JsonbBuilder.create(new JsonbConfig().setProperty("jsonb.user-type-mapping", userMapping));
+        Jsonb jsonb = JsonbBuilder.create(new JsonbConfig().setProperty(USER_TYPE_MAPPING, userMapping));
         Animal animal = new Dog("Bulldog");
         String expected = "{\"dogProperty\":\"Bulldog\"}";
         String json = jsonb.toJson(animal);
