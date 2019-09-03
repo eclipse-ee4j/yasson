@@ -9,18 +9,22 @@
 # http://www.eclipse.org/org/documents/edl-v10.php.
 #
 
-export TCK_HOME=`pwd`
+mvn clean install -DskipTests
 
 GF_BUNDLE_URL="central.maven.org/maven2/org/glassfish/main/distributions/glassfish/5.1.0/glassfish-5.1.0.zip"
 TCK_NAME=jsonb-tck
+TCK_VERSION=1.0.0
+
+export TCK_HOME=`pwd`"/target-tck"
+rm -r $TCK_HOME
+mkdir $TCK_HOME
+cd $TCK_HOME
 TS_HOME=$TCK_HOME/$TCK_NAME
 
-mvn clean install -DskipTests
-
 echo "Downloading JSON-B TCK tests"
-wget -q http://download.eclipse.org/ee4j/jakartaee-tck/jakartaee8-eftl/promoted/eclipse-jsonb-tck-1.0.0.zip
+wget -q http://download.eclipse.org/ee4j/jakartaee-tck/jakartaee8-eftl/promoted/eclipse-$TCK_NAME-$TCK_VERSION.zip
 echo "Exporting downloaded TCK tests"
-unzip -qq eclipse-jsonb-tck-*.zip -d ${TCK_HOME}
+unzip -qq eclipse-$TCK_NAME-*.zip -d ${TCK_HOME}
 
 echo "Downloading GlassFish"
 wget -q --no-cache $GF_BUNDLE_URL -O latest-glassfish.zip
@@ -31,9 +35,9 @@ cp -a ${TCK_HOME}/target/yasson.jar ${TCK_HOME}/glassfish5/glassfish/modules/yas
 
 cd $TS_HOME/bin
 
-sed -i "s#^report.dir=.*#report.dir=${TS_HOME}report/${TCK_NAME}#g" ts.jte
-sed -i "s#^work.dir=.*#work.dir=${TS_HOME}work/${TCK_NAME}#g" ts.jte
-sed -i "s#jsonb\.classes=.*#jsonb.classes=$TCK_HOME/glassfish5/glassfish/modules/jakarta.json.jar:$TCK_HOME/glassfish5/glassfish/modules/jakarta.json.bind-api.jar:$TCK_HOME/glassfish5/glassfish/modules/jakarta.json.jar:$TCK_HOME/glassfish5/glassfish/modules/jakarta.inject.jar:$TCK_HOME/glassfish5/glassfish/modules/jakarta.servlet-api.jar:$TCK_HOME/glassfish5/glassfish/modules/yasson.jar#" ts.jte
+sed -i '.bak' "s#^report.dir=.*#report.dir=${TS_HOME}report/${TCK_NAME}#g" ts.jte
+sed -i '.bak' "s#^work.dir=.*#work.dir=${TS_HOME}work/${TCK_NAME}#g" ts.jte
+sed -i '.bak' "s#jsonb\.classes=.*#jsonb.classes=$TCK_HOME/glassfish5/glassfish/modules/jakarta.json.jar:$TCK_HOME/glassfish5/glassfish/modules/jakarta.json.bind-api.jar:$TCK_HOME/glassfish5/glassfish/modules/jakarta.json.jar:$TCK_HOME/glassfish5/glassfish/modules/jakarta.inject.jar:$TCK_HOME/glassfish5/glassfish/modules/jakarta.servlet-api.jar:$TCK_HOME/glassfish5/glassfish/modules/yasson.jar#" ts.jte
 
 # TCK test excludes
 # JDK 11 have date formating changed

@@ -1,4 +1,5 @@
 /target/
+/target-tck/
 .classpath
 .project
 .idea/
