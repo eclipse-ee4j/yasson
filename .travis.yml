@@ -19,4 +19,7 @@ jobs:
         - cd yasson-jmh
         - mvn clean install
         - java -jar target/yasson-jmh.jar -t 1 -f 2
+    - stage: tck-run
+      script: bash tck.sh
+
 
