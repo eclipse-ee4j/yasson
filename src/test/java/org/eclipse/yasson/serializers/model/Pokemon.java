@@ -27,10 +27,37 @@ public final class Pokemon {
 		this.cp = -1;
 	}
 
-	Pokemon(String name, String type, int cp) {
+	public Pokemon(String name, String type, int cp) {
 		this.name = name;
 		this.type = type;
 		this.cp = cp;
 	}
+
+
+    @Override
+    public boolean equals(Object other) {
+		if (other instanceof Pokemon) {
+			return this.cp == ((Pokemon) other).cp
+					&& ((this.name == null && ((Pokemon) other).name == null) || (this.name != null
+							&& ((Pokemon) other).name != null && this.name.equals(((Pokemon) other).name)))
+					&& ((this.type == null && ((Pokemon) other).type == null) || (this.type != null
+							&& ((Pokemon) other).type != null && this.type.equals(((Pokemon) other).type)));
+
+		}
+	return false;
+    }
+
+	public boolean equals(String name, String type, int cp) {
+		return this.cp == cp
+				&& ((this.name == null && name == null)
+						|| (this.name != null && name != null && this.name.equals(name)))
+				&& ((this.type == null && type == null)
+						|| (this.type != null && type != null && this.type.equals(type)));
+	}
+
+    @Override
+    public int hashCode() {
+	return 71 * cp + 37 * (name != null ? name.hashCode() : 0) + 17 * (type != null ? type.hashCode() : 0);
+    }
 
 }

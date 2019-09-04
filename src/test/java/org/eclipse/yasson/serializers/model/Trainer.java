@@ -25,9 +25,29 @@ public final class Trainer {
         this.age = -1;
     }
 
-    Trainer(String name, int age) {
-        this.name = null;
-        this.age = -1;
+    public Trainer(String name, int age) {
+        this.name = name;
+        this.age = age;
+	}
+
+	@Override
+	public boolean equals(Object other) {
+		if (other instanceof Trainer) {
+			return this.age == ((Trainer) other).age
+					&& ((this.name == null && ((Trainer) other).name == null) || (this.name != null
+							&& ((Trainer) other).name != null && this.name.equals(((Trainer) other).name)));
+		}
+		return false;
+	}
+
+	public boolean equals(String name, int age) {
+		return this.age == age && ((this.name == null && name == null)
+				|| (this.name != null && name != null && this.name.equals(name)));
+	}
+
+    @Override
+    public int hashCode() {
+	return 37 * age + 17 * (name != null ? name.hashCode() : 0);
     }
 
 }
