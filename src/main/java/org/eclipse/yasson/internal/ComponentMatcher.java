@@ -172,20 +172,18 @@ public class ComponentMatcher {
      * @param customization customization with component info
      * @return components info if present
      */
-    public Optional<AdapterBinding> getAdapterBinding(Type propertyRuntimeType, ComponentBoundCustomization customization) {
-        if (customization == null || customization.getAdapterBinding() == null) {
+    public Optional<AdapterBinding> getSerializeAdapterBinding(Type propertyRuntimeType, ComponentBoundCustomization customization) {
+        if (customization == null || customization.getSerializeAdapterBinding() == null) {
             return searchComponentBinding(propertyRuntimeType, ComponentBindings::getAdapterInfo);
         }
-        return Optional.of(customization.getAdapterBinding());
+        return Optional.of(customization.getSerializeAdapterBinding());
     }
-
-    private <T extends AbstractComponentBinding> Optional<T> getComponentBinding(Type propertyRuntimeType, T componentBinding) {
-        //need runtime check, ParameterizedType property may have generic components assigned which is not compatible
-        //for given runtime type
-        if (matches(propertyRuntimeType, componentBinding.getBindingType())) {
-            return Optional.of(componentBinding);
+    
+    public Optional<AdapterBinding> getDeserializeAdapterBinding(Type propertyRuntimeType, ComponentBoundCustomization customization) {
+        if (customization == null || customization.getDeserializeAdapterBinding() == null) {
+            return searchComponentBinding(propertyRuntimeType, ComponentBindings::getAdapterInfo);
         }
-        return Optional.empty();
+        return Optional.of(customization.getDeserializeAdapterBinding());
     }
 
     private <T extends AbstractComponentBinding> Optional<T> searchComponentBinding(Type runtimeType, ComponentSupplier<T> supplier) {

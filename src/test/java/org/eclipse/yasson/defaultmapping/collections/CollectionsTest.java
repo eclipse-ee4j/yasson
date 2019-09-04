@@ -213,6 +213,7 @@ public class CollectionsTest {
 
         final String result = jsonb.toJson(languageEnumSet);
         assertTrue("[\"Czech\",\"Slovak\"]".equals(result) || "[\"Slovak\",\"Czech\"]".equals(result));
+        assertEquals(languageEnumSet, jsonb.fromJson(result, new TestTypeToken<EnumSet<Language>>() {}.getType()));
     }
 
     @Test

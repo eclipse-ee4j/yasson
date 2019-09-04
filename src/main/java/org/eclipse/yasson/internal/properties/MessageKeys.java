@@ -68,6 +68,7 @@ public enum MessageKeys {
     INCOMPATIBLE_FACTORY_CREATOR_RETURN_TYPE("incompatibleFactoryCreatorReturnType"),
     MULTIPLE_JSONB_CREATORS("multipleJsonbCreators"),
     INTERNAL_ERROR("internalError"),
+    SERIALIZE_PROPERTY_ERROR("serializePropertyError"),
     DESERIALIZE_VALUE_ERROR("deserializeValueError"),
     PARSING_NUMBER("parsingNumber"),
     UNKNOWN_BINARY_DATA_STRATEGY("unknownBinaryDataStrategy"),

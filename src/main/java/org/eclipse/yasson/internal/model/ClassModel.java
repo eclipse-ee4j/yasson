@@ -13,7 +13,7 @@
 package org.eclipse.yasson.internal.model;
 
 import org.eclipse.yasson.internal.ReflectionUtils;
-import org.eclipse.yasson.internal.model.customization.naming.CaseInsensitiveStrategy;
+import org.eclipse.yasson.internal.model.customization.StrategiesProvider;
 import org.eclipse.yasson.internal.model.customization.ClassCustomization;
 
 import javax.json.bind.config.PropertyNamingStrategy;
@@ -110,7 +110,7 @@ public class ClassModel {
      */
     private boolean equalsReadName(String jsonName, PropertyModel propertyModel) {
         final String propertyReadName = propertyModel.getReadName();
-        if (propertyNamingStrategy instanceof CaseInsensitiveStrategy) {
+        if (propertyNamingStrategy == StrategiesProvider.CASE_INSENSITIVE_STRATEGY) {
             return jsonName.equalsIgnoreCase(propertyReadName);
         }
         return jsonName.equals(propertyReadName);

@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2016, 2017 Oracle and/or its affiliates. All rights reserved.
+ * Copyright (c) 2019 Oracle and/or its affiliates. All rights reserved.
  * This program and the accompanying materials are made available under the
  * terms of the Eclipse Public License v1.0 and Eclipse Distribution License v. 1.0
  * which accompanies this distribution.
@@ -8,28 +8,16 @@
  * http://www.eclipse.org/org/documents/edl-v10.php.
  *
  * Contributors:
- * Roman Grigoriadi
+ * David Kral
  ******************************************************************************/
 
-package org.eclipse.yasson.internal.model.customization.naming;
+package org.eclipse.yasson.defaultmapping.modifiers.model;
 
 /**
- * Lower case with underscores
- *
- * <pre>
- *     myPropertyName -&gt; my_property_name
- * </pre>
- * @author Roman Grigoriadi
+ * @author David Kral
  */
-public class LowerCaseWithUnderscoresStrategy extends LowerCaseStrategy {
+class PackagePrivateParent {
 
-    /**
-     *
-     */
-    public static final Character UNDERSCORE = '_';
+    public int id;
 
-    @Override
-    protected char getSeparator() {
-        return UNDERSCORE;
-    }
 }

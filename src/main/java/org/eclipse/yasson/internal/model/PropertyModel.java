@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2015, 2018 Oracle and/or its affiliates. All rights reserved.
+ * Copyright (c) 2015, 2019 Oracle and/or its affiliates. All rights reserved.
  * This program and the accompanying materials are made available under the
  * terms of the Eclipse Public License v1.0 and Eclipse Distribution License v. 1.0
  * which accompanies this distribution.
@@ -113,8 +113,8 @@ public class PropertyModel implements Comparable<PropertyModel> {
         if (!ReflectionUtils.isResolvedType(serializationType)) {
             return null;
         }
-        if (customization.getAdapterBinding() != null) {
-            return new AdaptedObjectSerializer<>(classModel, customization.getAdapterBinding());
+        if (customization.getSerializeAdapterBinding() != null) {
+            return new AdaptedObjectSerializer<>(classModel, customization.getSerializeAdapterBinding());
         }
         if (customization.getSerializerBinding() != null) {
             return new UserSerializerSerializer<>(classModel, customization.getSerializerBinding().getJsonbSerializer());
@@ -145,14 +145,6 @@ public class PropertyModel implements Comparable<PropertyModel> {
      */
     public Type getPropertySerializationType() {
         return getterMethodType == null ? propertyType : getterMethodType.getMethodType();
-    }
-
-    private AdapterBinding getUserAdapterBinding(Property property, JsonbContext jsonbContext) {
-        final AdapterBinding adapterBinding = jsonbContext.getAnnotationIntrospector().getAdapterBinding(property);
-        if (adapterBinding != null) {
-            return adapterBinding;
-        }
-        return jsonbContext.getComponentMatcher().getAdapterBinding(propertyType, null).orElse(null);
     }
 
     private SerializerBinding<?> getUserSerializerBinding(Property property, JsonbContext jsonbContext) {
@@ -202,7 +194,14 @@ public class PropertyModel implements Comparable<PropertyModel> {
             builder.setDeserializerBinding(introspector.getDeserializerBinding(property));
         }
 
-        builder.setAdapterInfo(getUserAdapterBinding(property, jsonbContext));
+        final AdapterBinding adapterBinding = jsonbContext.getAnnotationIntrospector().getAdapterBinding(property);
+        if (adapterBinding != null) {
+            builder.setSerializeAdapter(adapterBinding);
+            builder.setDeserializeAdapter(adapterBinding);
+       } else {
+           builder.setSerializeAdapter(jsonbContext.getComponentMatcher().getSerializeAdapterBinding(getPropertySerializationType(), null).orElse(null));
+           builder.setDeserializeAdapter(jsonbContext.getComponentMatcher().getDeserializeAdapterBinding(getPropertyDeserializationType(), null).orElse(null));
+       }
 
         introspectDateFormatter(property, introspector, builder, jsonbContext);
         introspectNumberFormatter(property, introspector, builder);
@@ -324,15 +323,6 @@ public class PropertyModel implements Comparable<PropertyModel> {
      */
     public String getPropertyName() {
         return propertyName;
-    }
-
-    /**
-     * Runtime type of a property. May be a TypeVariable or WildcardType.
-     *
-     * @return type of a property
-     */
-    public Type getPropertyType() {
-        return propertyType;
     }
 
     /**
