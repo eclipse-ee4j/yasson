@@ -19,7 +19,6 @@ import org.eclipse.yasson.internal.serializer.ContainerSerializerProvider;
 
 import java.util.ArrayDeque;
 import java.util.Deque;
-import java.util.Iterator;
 import java.util.Objects;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.function.Function;
@@ -34,31 +33,6 @@ import java.util.function.Function;
  * @author Roman Grigoriadi
  */
 public class MappingContext {
-
-    private static class ParseClassModelFunction implements Function<Class, ClassModel> {
-
-        private ClassModel parentClassModel;
-
-        private ClassParser classParser;
-
-        private JsonbContext jsonbContext;
-
-        public ParseClassModelFunction(ClassModel parentClassModel, ClassParser classParser, JsonbContext jsonbContext) {
-            this.parentClassModel = parentClassModel;
-            this.classParser = classParser;
-            this.jsonbContext = jsonbContext;
-        }
-
-        @Override
-        public ClassModel apply(Class aClass) {
-            final JsonbAnnotatedElement<Class<?>> clsElement = jsonbContext.getAnnotationIntrospector().collectAnnotations(aClass);
-            final ClassCustomization customization = jsonbContext.getAnnotationIntrospector().introspectCustomization(clsElement);
-            final ClassModel newClassModel = new ClassModel(aClass, customization, parentClassModel, jsonbContext.getConfigProperties().getPropertyNamingStrategy());
-            classParser.parseProperties(newClassModel, clsElement);
-            return newClassModel;
-        }
-    }
-
     private final JsonbContext jsonbContext;
 
     private final ConcurrentHashMap<Class<?>, ClassModel> classes = new ConcurrentHashMap<>();
@@ -90,48 +64,33 @@ public class MappingContext {
         if (classModel != null) {
             return classModel;
         }
-        final Deque<Class> newClassModels = new ArrayDeque<>();
-        for (Class classToParse = clazz; classToParse != Object.class; classToParse = classToParse.getSuperclass()) {
+        
+        Deque<Class<?>> newClassModels = new ArrayDeque<>();
+        for (Class<?> classToParse = clazz; classToParse != Object.class; classToParse = classToParse.getSuperclass()) {
             if (classToParse == null){
                 break;
             }
             newClassModels.push(classToParse);
         }
         if (clazz == Object.class) {
-            classes.computeIfAbsent(clazz, (c) -> new ClassModel(c, null, null, null));
-            return classes.get(clazz);
+            return classes.computeIfAbsent(clazz, (c) -> new ClassModel(c, null, null, null));
         }
 
         ClassModel parentClassModel = null;
         while (!newClassModels.isEmpty()) {
-            Class toParse = newClassModels.pop();
-            parentClassModel = classes.computeIfAbsent(toParse, new ParseClassModelFunction(parentClassModel, classParser, jsonbContext));
+            Class<?> toParse = newClassModels.pop();
+            parentClassModel = classes.computeIfAbsent(toParse, createParseClassModelFunction(parentClassModel, classParser, jsonbContext));
         }
         return classes.get(clazz);
     }
 
-    /**
-     * Provided class class model is returned first by iterator.
-     * Following class models are sorted by hierarchy from provided class up to the Object.class.
-     *
-     * @param clazz class to start iteration of class models from
-     * @return iterator of class models
-     */
-    public Iterator<ClassModel> classModelIterator(final Class<?> clazz) {
-        return new Iterator<ClassModel>() {
-            private Class<?> next = clazz;
-
-            @Override
-            public boolean hasNext() {
-                return next != Object.class;
-            }
-
-            @Override
-            public ClassModel next() {
-                final ClassModel result = classes.get(next);
-                next = next.getSuperclass();
-                return result;
-            }
+    private static Function<Class<?>, ClassModel> createParseClassModelFunction(ClassModel parentClassModel, ClassParser classParser, JsonbContext jsonbContext){
+        return aClass -> {
+            JsonbAnnotatedElement<Class<?>> clsElement = jsonbContext.getAnnotationIntrospector().collectAnnotations(aClass);
+            ClassCustomization customization = jsonbContext.getAnnotationIntrospector().introspectCustomization(clsElement);
+            ClassModel newClassModel = new ClassModel(aClass, customization, parentClassModel, jsonbContext.getConfigProperties().getPropertyNamingStrategy());
+            classParser.parseProperties(newClassModel, clsElement);
+            return newClassModel;
         };
     }
 
