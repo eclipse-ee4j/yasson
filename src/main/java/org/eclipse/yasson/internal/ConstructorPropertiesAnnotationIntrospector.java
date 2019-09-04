@@ -46,7 +46,8 @@ class ConstructorPropertiesAnnotationIntrospector {
             }
             if (!Modifier.isPublic(constructor.getModifiers())) {
                 String declaringClass = constructor.getDeclaringClass().getName();
-                LOG.finest(Messages.getMessage(MessageKeys.INACCESSIBLE_CONSTRUCTOR_PROPERTIES_CREATOR, declaringClass, Arrays.toString((String[]) properties)));
+                String message = "The constructor of {0} annotated with @ConstructorProperties {1} is not accessible and will be ignored.";
+                LOG.finest(String.format(message, declaringClass, Arrays.toString((String[]) properties)));
                 continue;
             }
             if (jsonbCreator != null) {

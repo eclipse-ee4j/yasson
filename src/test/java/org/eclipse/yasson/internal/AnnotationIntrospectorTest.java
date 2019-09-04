@@ -71,7 +71,7 @@ public class AnnotationIntrospectorTest {
         assertCreatedInstanceContainsAllParameters(ObjectWithJsonbCreatorAnnotatedProtectedConstructor.example(), creator);
     }
 
-    // TODO Under discussion. Shouldn't this test work?
+    // TODO Under discussion: https://github.com/eclipse-ee4j/yasson/issues/326
     @Ignore
     @Test
     public void testNoArgConstructorShouldBePreferredOverUnusableJsonbAnnotatedProtectedConstructor() {
