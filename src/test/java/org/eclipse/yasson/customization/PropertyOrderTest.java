@@ -105,8 +105,8 @@ public class PropertyOrderTest {
 
     @JsonbPropertyOrder(
             {
-                    "from",
-                    "count"
+                    "fromIndex",
+                    "numberOfItems"
             }
     )
     public class Range {

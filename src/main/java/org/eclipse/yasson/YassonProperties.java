@@ -31,7 +31,7 @@ public class YassonProperties {
      * This will made available to parse patterns like yyyy.MM.dd to
      * {@link java.util.Date}, {@link java.util.Calendar}, {@link java.time.Instant} {@link java.time.LocalDate}
      * or even {@link java.time.ZonedDateTime}.
-     * <p>If time zone is not set in the pattern than UTC time zone is used.
+     * <p>If time zone is not set in the pattern then UTC time zone is used.
      * So for example json value 2018.01.01 becomes 2018.01.01 00:00:00 UTC when parsed
      * to instant {@link java.time.Instant} or {@link java.time.ZonedDateTime}.
      */
@@ -39,7 +39,7 @@ public class YassonProperties {
 
     /**
      * Serializer to use when object provided to {@link javax.json.bind.Jsonb#toJson(Object)} is {@code null} or an empty
-     * Optional. Much be instance of {@link javax.json.bind.serializer.JsonbSerializer}{@code <Object>}. Its obj value
+     * Optional. Must be instance of {@link javax.json.bind.serializer.JsonbSerializer}{@code <Object>}. Its obj value
      * will be respective parameter.
      */
     public static final String NULL_ROOT_SERIALIZER = "yasson.null-root-serializer";

@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2016 Oracle and/or its affiliates. All rights reserved.
+ * Copyright (c) 2019 Oracle and/or its affiliates. All rights reserved.
  * This program and the accompanying materials are made available under the
  * terms of the Eclipse Public License v1.0 and Eclipse Distribution License v. 1.0
  * which accompanies this distribution.
@@ -8,26 +8,16 @@
  * http://www.eclipse.org/org/documents/edl-v10.php.
  *
  * Contributors:
- *     David Kral - initial implementation
+ * David Kral
  ******************************************************************************/
-package org.eclipse.yasson.internal.model.customization.ordering;
 
-import org.eclipse.yasson.internal.model.PropertyModel;
-
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.List;
+package org.eclipse.yasson.defaultmapping.modifiers.model;
 
 /**
- * Any ordering strategy
- *
  * @author David Kral
  */
-public class AnyOrderStrategy extends PropOrderStrategy {
+public class ChildOfPackagePrivateParent extends PackagePrivateParent {
 
-    @Override
-    public List<PropertyModel> sortProperties(Collection<PropertyModel> properties) {
-        return new ArrayList<>(properties);
-    }
+    public String name;
 
 }

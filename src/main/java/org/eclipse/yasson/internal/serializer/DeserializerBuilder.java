@@ -76,7 +76,6 @@ public class DeserializerBuilder extends AbstractSerializerBuilder<DeserializerB
      *
      * @return built item
      */
-    @SuppressWarnings("unchecked")
     public JsonbDeserializer<?> build() {
         runtimeType = resolveRuntimeType();
         Class<?> rawType = ReflectionUtils.getRawType(getRuntimeType());
@@ -95,7 +94,7 @@ public class DeserializerBuilder extends AbstractSerializerBuilder<DeserializerB
             }
 
             //Second user components is registered.
-            Optional<AdapterBinding> adapterBinding = componentMatcher.getAdapterBinding(getRuntimeType(), componentBoundCustomization);
+            Optional<AdapterBinding> adapterBinding = componentMatcher.getDeserializeAdapterBinding(getRuntimeType(), componentBoundCustomization);
             if (adapterBinding.isPresent()) {
                 adapterInfoOptional = adapterBinding;
                 runtimeType = adapterInfoOptional.get().getToType();
@@ -247,7 +246,7 @@ public class DeserializerBuilder extends AbstractSerializerBuilder<DeserializerB
 
     private Class<?> getInterfaceMappedType(Class<?> interfaceType) {
         if (interfaceType.isInterface()) {
-            Class implementationClass = null;
+            Class<?> implementationClass = null;
             //annotation
             if (customization instanceof PropertyCustomization) {
                  implementationClass = ((PropertyCustomization) customization).getImplementationClass();

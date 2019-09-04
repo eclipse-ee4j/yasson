@@ -9,19 +9,16 @@
  *
  * Contributors:
  * Roman Grigoriadi
+ * Gyúróczki Gergő
  ******************************************************************************/
-package org.eclipse.yasson.internal.model.customization.ordering;
+package org.eclipse.yasson.internal.model.customization;
 
 import org.eclipse.yasson.internal.model.ClassModel;
 import org.eclipse.yasson.internal.model.PropertyModel;
-
+import java.util.*;
+import java.util.function.*;
 import javax.json.bind.JsonbConfig;
 import javax.json.bind.config.PropertyOrderStrategy;
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-import java.util.Objects;
 
 /**
  * Order properties in bean object. {@link javax.json.bind.annotation.JsonbPropertyOrder} have always precedence.
@@ -31,16 +28,15 @@ import java.util.Objects;
  */
 public class PropertyOrdering {
 
-    private PropOrderStrategy propertyOrderStrategy;
+    private final Function<Collection<PropertyModel>, List<PropertyModel>> propertyOrderStrategy;
 
     /**
      * Creates a new instance.
      *
      * @param propertyOrderStrategy Property order strategy. Must be not null.
      */
-    public PropertyOrdering(PropOrderStrategy propertyOrderStrategy) {
-        Objects.requireNonNull(propertyOrderStrategy);
-        this.propertyOrderStrategy = propertyOrderStrategy;
+    public PropertyOrdering(Function<Collection<PropertyModel>, List<PropertyModel>> propertyOrderStrategy) {
+        this.propertyOrderStrategy = Objects.requireNonNull(propertyOrderStrategy);
     }
 
     /**
@@ -53,7 +49,7 @@ public class PropertyOrdering {
      */
     public List<PropertyModel> orderProperties(List<PropertyModel> properties, ClassModel classModel) {
         Map<String, PropertyModel> byReadName = new HashMap<>();
-        properties.stream().forEach(propertyModel -> byReadName.put(propertyModel.getReadName(), propertyModel));
+        properties.stream().forEach(propertyModel -> byReadName.put(propertyModel.getPropertyName(), propertyModel));
 
         String[] order = classModel.getClassCustomization().getPropertyOrder();
         List<PropertyModel> sortedProperties = new ArrayList<>();
@@ -67,17 +63,7 @@ public class PropertyOrdering {
             }
         }
 
-        sortedProperties.addAll(propertyOrderStrategy.sortProperties(byReadName.values()));
+        sortedProperties.addAll(propertyOrderStrategy.apply(byReadName.values()));
         return sortedProperties;
-
-    }
-
-    /**
-     * Returns a property order strategy from {@link JsonbConfig}.
-     *
-     * @return {@link PropOrderStrategy} or null if not present.
-     */
-    public PropOrderStrategy getPropertyOrderStrategy() {
-        return propertyOrderStrategy;
     }
 }

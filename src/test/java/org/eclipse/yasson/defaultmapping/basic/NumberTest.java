@@ -14,6 +14,7 @@
 
 package org.eclipse.yasson.defaultmapping.basic;
 
+import static org.eclipse.yasson.Assertions.*;
 import org.eclipse.yasson.TestTypeToken;
 import org.eclipse.yasson.defaultmapping.basic.model.BigDecimalInNumber;
 import org.eclipse.yasson.defaultmapping.generics.model.ScalarValueWrapper;
@@ -26,10 +27,18 @@ import javax.json.JsonObjectBuilder;
 import javax.json.JsonWriter;
 import javax.json.bind.Jsonb;
 import javax.json.bind.JsonbBuilder;
+import javax.json.bind.JsonbException;
 import javax.json.stream.JsonGenerator;
+
+import static org.junit.Assert.assertTrue;
+import static org.junit.Assert.fail;
+
 import java.io.StringWriter;
 import java.math.BigDecimal;
 import java.math.BigInteger;
+import java.util.Collection;
+import java.util.Collections;
+import java.util.Map;
 
 /**
  * @author Roman Grigoriadi
@@ -206,6 +215,38 @@ public class NumberTest {
                 "\"safeBigDecimalValue\":9007199254740991," +
                 "\"unsafeBigDecimalValue\":9223372036854775807}", w.toString());
 
+    }
+    
+    public static class NumberContainer {
+    	public Double doubleProp;
+    	public Collection<Double> collectionProp;
+    	public Map<String,Double> mapProp;
+    }
+    
+    @Test
+    public void testSerializeInvalidDouble() {
+        shouldFail(() -> jsonb.toJson(Double.POSITIVE_INFINITY));
+
+        NumberContainer obj = new NumberContainer();
+        obj.doubleProp = Double.POSITIVE_INFINITY;
+        shouldFail(() -> jsonb.toJson(obj), msg -> msg.contains("doubleProp") && msg.contains("NumberContainer"));
+    }
+    
+    
+    @Test
+    public void testSerializeInvalidDoubleCollection() {
+        NumberContainer obj = new NumberContainer();
+        obj.collectionProp = Collections.singleton(Double.POSITIVE_INFINITY);
+        shouldFail(() -> jsonb.toJson(obj),
+                msg -> msg.contains("collectionProp") && msg.contains("NumberContainer"));
+    }
+
+    @Test
+    public void testSerializeInvalidDoubleMap() {
+        NumberContainer obj = new NumberContainer();
+        obj.mapProp = Collections.singletonMap("doubleKey", Double.POSITIVE_INFINITY);
+        shouldFail(() -> jsonb.toJson(obj),
+                msg -> msg.contains("mapProp") && msg.contains("NumberContainer"));
     }
 
 }

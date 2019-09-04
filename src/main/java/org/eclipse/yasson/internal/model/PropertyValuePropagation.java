@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2015, 2018 Oracle and/or its affiliates. All rights reserved.
+ * Copyright (c) 2015, 2019 Oracle and/or its affiliates. All rights reserved.
  * This program and the accompanying materials are made available under the
  * terms of the Eclipse Public License v1.0 and Eclipse Distribution License v. 1.0
  * which accompanies this distribution.
@@ -13,8 +13,6 @@
 
 package org.eclipse.yasson.internal.model;
 
-import org.eclipse.yasson.internal.JsonbContext;
-
 import javax.json.bind.config.PropertyVisibilityStrategy;
 import java.lang.reflect.AccessibleObject;
 import java.lang.reflect.Field;
@@ -22,7 +20,6 @@ import java.lang.reflect.Method;
 import java.lang.reflect.Modifier;
 import java.security.AccessController;
 import java.security.PrivilegedAction;
-import java.util.Optional;
 import java.util.function.Function;
 
 /**
@@ -116,10 +113,17 @@ public abstract class PropertyValuePropagation {
         }
         Boolean accessible = isVisible(strategy -> strategy.isVisible(field), field, method);
         //overridden by strategy, or anonymous class (readable by spec)
-        if (accessible && (!Modifier.isPublic(field.getModifiers()) || field.getDeclaringClass().isAnonymousClass())) {
+        if (accessible && (
+                !Modifier.isPublic(field.getModifiers())
+                        || field.getDeclaringClass().isAnonymousClass()
+                        || isNotPublicAndNonNested(field.getDeclaringClass()))) {
             overrideAccessible(field);
         }
         return accessible;
+    }
+
+    private boolean isNotPublicAndNonNested(Class<?> declaringClass) {
+        return !declaringClass.isMemberClass() && !Modifier.isPublic(declaringClass.getModifiers());
     }
 
     private boolean isMethodVisible(Field field, Method method) {

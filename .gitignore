@@ -1,5 +1,7 @@
 /target/
+/target-tck/
 .classpath
 .project
+.idea/
 .settings/
 /.DS_Store
