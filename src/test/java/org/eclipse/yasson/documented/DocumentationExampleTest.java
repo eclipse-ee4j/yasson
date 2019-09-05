@@ -358,7 +358,7 @@ public class DocumentationExampleTest {
         @JsonbDateFormat("dd.MM.yyyy")
         public LocalDate birthDate;
 
-        @JsonbNumberFormat("#0.00")
+        @JsonbNumberFormat(value = "###,##0.00", locale = "de-de")
         public BigDecimal salary;
     }
     
@@ -367,15 +367,15 @@ public class DocumentationExampleTest {
         Person9 p = new Person9();
         p.name = "Jason Bourne";
         p.birthDate = LocalDate.of(1999, 8, 7);
-        p.salary = new BigDecimal("123.45678");
+        p.salary = new BigDecimal("1234.5678");
         Jsonb jsonb = JsonbBuilder.create();
         String json = jsonb.toJson(p);
-        assertEquals("{\"birthDate\":\"07.08.1999\",\"name\":\"Jason Bourne\",\"salary\":\"123.46\"}", json);
+        assertEquals("{\"birthDate\":\"07.08.1999\",\"name\":\"Jason Bourne\",\"salary\":\"1234.57\"}", json);
         
-        Person9 after = jsonb.fromJson("{\"birthDate\":\"07.08.1999\",\"name\":\"Jason Bourne\",\"salary\":\"123.46\"}", Person9.class);
+        Person9 after = jsonb.fromJson("{\"birthDate\":\"07.08.1999\",\"name\":\"Jason Bourne\",\"salary\":\"1234.57\"}", Person9.class);
         assertEquals(p.name, after.name);
         assertEquals(p.birthDate, after.birthDate);
-        assertEquals(new BigDecimal("123.46"), after.salary);
+        assertEquals(new BigDecimal("1234.57"), after.salary);
     }
     
     public static class Person10 {

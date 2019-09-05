@@ -22,6 +22,7 @@ import javax.json.bind.JsonbException;
 import java.text.DecimalFormat;
 import java.text.NumberFormat;
 import java.text.ParseException;
+import java.util.Locale;
 import java.util.Optional;
 
 /**
@@ -49,9 +50,10 @@ public abstract class AbstractNumberDeserializer<T extends Number> extends Abstr
 
         final JsonbNumberFormatter numberFormat = getCustomization().getDeserializeNumberFormatter();
         //consider synchronizing on format instance or per thread cache.
-        final NumberFormat format = NumberFormat.getInstance(jsonbContext.getConfigProperties().getLocale(numberFormat.getLocale()));
+        final NumberFormat format = NumberFormat.getInstance((Locale.ENGLISH));
         ((DecimalFormat)format).applyPattern(numberFormat.getFormat());
         format.setParseIntegerOnly(integerOnly);
+        format.setGroupingUsed(false);
         try {
             return Optional.of(format.parse(jsonValue));
         } catch (ParseException e) {
