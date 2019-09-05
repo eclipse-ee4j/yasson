@@ -7,8 +7,10 @@ import static org.junit.Assert.assertNull;
 import org.eclipse.yasson.internal.AnnotationIntrospectorTestFixtures.ObjectWithJsonbCreatorAndConstructorPropertiesAnnotation;
 import org.eclipse.yasson.internal.AnnotationIntrospectorTestFixtures.ObjectWithJsonbCreatorAnnotatedConstructor;
 import org.eclipse.yasson.internal.AnnotationIntrospectorTestFixtures.ObjectWithJsonbCreatorAnnotatedFactoryMethod;
-import org.eclipse.yasson.internal.AnnotationIntrospectorTestFixtures.ObjectWithMissingConstructorAnnotation;
+import org.eclipse.yasson.internal.AnnotationIntrospectorTestFixtures.ObjectWithJsonbCreatorAnnotatedProtectedConstructor;
+import org.eclipse.yasson.internal.AnnotationIntrospectorTestFixtures.ObjectWithNoArgAndJsonbCreatorAnnotatedProtectedConstructor;
 import org.eclipse.yasson.internal.AnnotationIntrospectorTestFixtures.ObjectWithTwoJsonbCreatorAnnotatedSpots;
+import org.eclipse.yasson.internal.AnnotationIntrospectorTestFixtures.ObjectWithoutAnnotatedConstructor;
 import org.eclipse.yasson.internal.model.JsonbCreator;
 
 import javax.json.bind.JsonbConfig;
@@ -16,6 +18,8 @@ import javax.json.bind.JsonbException;
 
 import javax.json.spi.JsonProvider;
 
+import org.hamcrest.core.IsInstanceOf;
+import org.junit.Ignore;
 import org.junit.Rule;
 import org.junit.Test;
 import org.junit.rules.ExpectedException;
@@ -60,6 +64,23 @@ public class AnnotationIntrospectorTest {
     }
 
     @Test
+    public void testJsonbAnnotatedProtectedConstructorLeadsToAnException() {
+        exception.expect(JsonbException.class);
+        exception.expectCause(IsInstanceOf.instanceOf(IllegalAccessException.class));
+        JsonbCreator creator = instrospector.getCreator(ObjectWithJsonbCreatorAnnotatedProtectedConstructor.class);
+        assertCreatedInstanceContainsAllParameters(ObjectWithJsonbCreatorAnnotatedProtectedConstructor.example(), creator);
+    }
+
+    // TODO Under discussion: https://github.com/eclipse-ee4j/yasson/issues/326
+    @Ignore
+    @Test
+    public void testNoArgConstructorShouldBePreferredOverUnusableJsonbAnnotatedProtectedConstructor() {
+        JsonbCreator creator = instrospector.getCreator(ObjectWithNoArgAndJsonbCreatorAnnotatedProtectedConstructor.class);
+        assertParameters(ObjectWithNoArgAndJsonbCreatorAnnotatedProtectedConstructor.parameters(), creator);
+        assertCreatedInstanceContainsAllParameters(ObjectWithNoArgAndJsonbCreatorAnnotatedProtectedConstructor.example(), creator);
+    }
+
+    @Test
     public void testMoreThanOneAnnotatedCreatorMethodShouldLeadToAnException() {
         exception.expect(JsonbException.class);
         exception.expectMessage("More than one @" + JsonbCreator.class.getSimpleName());
@@ -68,7 +89,7 @@ public class AnnotationIntrospectorTest {
 
     @Test
     public void testCreatorShouldBeNullOnMissingConstructorAnnotation() {
-        assertNull(instrospector.getCreator(ObjectWithMissingConstructorAnnotation.class));
+        assertNull(instrospector.getCreator(ObjectWithoutAnnotatedConstructor.class));
     }
 
 }

@@ -6,7 +6,7 @@ import static org.junit.Assert.assertNull;
 
 import org.eclipse.yasson.internal.AnnotationIntrospectorTestFixtures.ObjectWithJsonbCreatorAnnotatedConstructor;
 import org.eclipse.yasson.internal.AnnotationIntrospectorTestFixtures.ObjectWithJsonbCreatorAnnotatedFactoryMethod;
-import org.eclipse.yasson.internal.AnnotationIntrospectorTestFixtures.ObjectWithMissingConstructorAnnotation;
+import org.eclipse.yasson.internal.AnnotationIntrospectorTestFixtures.ObjectWithoutAnnotatedConstructor;
 import org.eclipse.yasson.internal.model.JsonbCreator;
 
 import javax.json.bind.JsonbConfig;
@@ -47,7 +47,7 @@ public class AnnotationIntrospectorWithoutOptionalModulesTest {
 
     @Test
     public void testCreatorShouldBeNullOnMissingConstructorAnnotation() {
-        assertNull(instrospector.getCreator(ObjectWithMissingConstructorAnnotation.class));
+        assertNull(instrospector.getCreator(ObjectWithoutAnnotatedConstructor.class));
     }
 
     @Test

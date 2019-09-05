@@ -4,16 +4,17 @@ import org.eclipse.yasson.internal.model.CreatorModel;
 import org.eclipse.yasson.internal.model.JsonbCreator;
 import org.eclipse.yasson.internal.properties.MessageKeys;
 import org.eclipse.yasson.internal.properties.Messages;
-import org.eclipse.yasson.spi.JsonbComponentInstanceCreator;
 
 import java.lang.reflect.Constructor;
 import java.lang.reflect.Executable;
+import java.lang.reflect.Modifier;
 import java.lang.reflect.Parameter;
+import java.util.Arrays;
 import java.util.logging.Logger;
 
 class ConstructorPropertiesAnnotationIntrospector {
 
-    private static final Logger LOG = Logger.getLogger(JsonbComponentInstanceCreator.class.getName());
+    private static final Logger LOG = Logger.getLogger(ConstructorPropertiesAnnotationIntrospector.class.getName());
 
     private final JsonbContext jsonbContext;
     private final AnnotationFinder constructorProperties;
@@ -41,6 +42,12 @@ class ConstructorPropertiesAnnotationIntrospector {
         for (Constructor<?> constructor : constructors) {
             Object properties = constructorProperties.valueIn(constructor.getDeclaredAnnotations());
             if (!(properties instanceof String[])) {
+                continue;
+            }
+            if (!Modifier.isPublic(constructor.getModifiers())) {
+                String declaringClass = constructor.getDeclaringClass().getName();
+                String message = "The constructor of {0} annotated with @ConstructorProperties {1} is not accessible and will be ignored.";
+                LOG.finest(String.format(message, declaringClass, Arrays.toString((String[]) properties)));
                 continue;
             }
             if (jsonbCreator != null) {

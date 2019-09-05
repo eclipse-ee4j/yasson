@@ -8,6 +8,9 @@ import static org.junit.Assert.assertNull;
 
 import org.eclipse.yasson.internal.AnnotationIntrospectorTestFixtures.ObjectWithConstructorPropertiesAnnotation;
 import org.eclipse.yasson.internal.AnnotationIntrospectorTestFixtures.ObjectWithJsonbCreatorAnnotatedConstructor;
+import org.eclipse.yasson.internal.AnnotationIntrospectorTestFixtures.ObjectWithPublicNoArgAndAnnotatedPackageProtectedConstructor;
+import org.eclipse.yasson.internal.AnnotationIntrospectorTestFixtures.ObjectWithPublicNoArgAndAnnotatedPrivateConstructor;
+import org.eclipse.yasson.internal.AnnotationIntrospectorTestFixtures.ObjectWithPublicNoArgAndAnnotatedProtectedConstructor;
 import org.eclipse.yasson.internal.AnnotationIntrospectorTestFixtures.ObjectWithTwoConstructorPropertiesAnnotation;
 import org.eclipse.yasson.internal.AnnotationIntrospectorTestFixtures.ObjectWithoutAnnotatedConstructor;
 import org.eclipse.yasson.internal.model.JsonbCreator;
@@ -65,4 +68,21 @@ public class ConstructorPropertiesAnnotationIntrospectorTest {
         assertNull(creator);
     }
 
+    @Test
+    public void testAnnotatedInaccessiblePrivateConstructorShouldBeIgnored() {
+        JsonbCreator creator = instrospector.getCreator(constructorsOf(ObjectWithPublicNoArgAndAnnotatedPrivateConstructor.class));
+        assertNull(creator);
+    }
+
+    @Test
+    public void testAnnotatedInaccessiblePackageProtectedConstructorShouldBeIgnored() {
+        JsonbCreator creator = instrospector.getCreator(constructorsOf(ObjectWithPublicNoArgAndAnnotatedPackageProtectedConstructor.class));
+        assertNull(creator);
+    }
+
+    @Test
+    public void testAnnotatedInaccessibleProtectedConstructorShouldBeIgnored() {
+        JsonbCreator creator = instrospector.getCreator(constructorsOf(ObjectWithPublicNoArgAndAnnotatedProtectedConstructor.class));
+        assertNull(creator);
+    }
 }
