@@ -14,6 +14,7 @@ package org.eclipse.yasson.serializers;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertTrue;
 
 import java.io.StringReader;
 import java.lang.reflect.ParameterizedType;
@@ -38,7 +39,7 @@ import org.junit.Test;
 
 /**
  * Test various use-cases with {@code Map} serializer and de-serializer which
- * stores Map.Entries 1:1 as JSON objects.
+ * stores Map.Entries as JSON objects in 1:1 relation.
  */
 public class MapToEntriesArraySerializerTest {
 
@@ -78,6 +79,17 @@ public class MapToEntriesArraySerializerTest {
     /** NumberComparator instance to be used. */
     private static final Comparator<Number> CMP_NUM = new NumberComparator();
 
+    // Verification code for serialization: Covers only use-cases used in jUnit tests.
+    // * Key JsonObject is always mapped to Trainer PoJo.
+    // * Value JsonObject is always mapped to Pokemon Pojo.
+
+    /**
+     * Verify that source Map value and parsed Map entry JsonObject value are equals.
+     *
+     * @param jentry parsed Map entry as JsonObject
+     * @param source source Map for value verification
+     * @param key Map key used to retrieve value
+     */
     private static final <K,V> void verifyMapValues(JsonObject jentry, Map<K,V> source, K key) {
         assertNotNull(jentry);
         assertNotNull(source);
@@ -116,10 +128,200 @@ public class MapToEntriesArraySerializerTest {
     }
 
     /**
-     * Verify that serialized {@code Map} provided as {@code JsonArray} matches source {@code Map}.
+     * Verify that source Map value and parsed Map entry JsonObject value are equals.
      *
-     * @param source source {@code Map}
-     * @param array  serialized {@code Map} parsed and provided as {@code JsonArray}
+     * @param jentry parsed Map entry as JsonObject
+     * @param sourceEntry source Map entry for value verification
+     */
+    private static final <K,V> void verifyMapValues(JsonObject jentry, Map.Entry<K[],V> sourceEntry) {
+        assertNotNull(jentry);
+        assertNotNull(sourceEntry);
+        switch (jentry.getValue("/value").getValueType()) {
+            // Value contains JSON object: it shall be Pokemon PoJo
+            case OBJECT:
+                JsonObject valueObject = jentry.getJsonObject("value");
+                Pokemon sourcePoJo = (Pokemon) sourceEntry.getValue();
+                Pokemon valuePojo = new Pokemon(
+                        valueObject.getString("name"), valueObject.getString("type"), valueObject.getInt("cp"));
+                assertEquals(sourcePoJo, valuePojo);
+                break;
+            case ARRAY:
+                JsonArray valueArray = jentry.getJsonArray("value");
+                assertTrue(valueArray.size() > 0);
+                verifyMapArrayValue(jentry, valueArray, sourceEntry);
+                break;
+            case STRING:
+                String valueString = jentry.getString("value");
+                String sourceString = (String) sourceEntry.getValue();
+                assertEquals(sourceString, valueString);
+                break;
+            case NUMBER:
+                Number valueNumber = jentry.getJsonNumber("value").numberValue();
+                Number sourceNumber = (Number) sourceEntry.getValue();
+                // Number comparator shall be used here because values may not be of the same type.
+                assertEquals(0, CMP_NUM.compare(sourceNumber, valueNumber));
+                break;
+            case TRUE:
+            case FALSE:
+                Boolean valueBool = jentry.getBoolean("value");
+                Boolean sourceBool = (Boolean) sourceEntry.getValue();
+                assertEquals(sourceBool, valueBool);
+                break;
+            default:
+                throw new IllegalStateException(jentry.getValue("/value").getValueType() + "was not expected");
+        }
+    }
+
+    /**
+     * Retrieve Map.Entry with matching array key from source Map.
+     *
+     * @param source source Map
+     * @param key array key to search for
+     * @param cmp optional comparator to use for search
+     * @param keys source map key Set used to check whether all keys were processed. Key will be removed from set on successful match
+     * @return Map.Entry matching provided key
+     */
+    private static final <K,V> Map.Entry<K[], V> getMapEntryForArrayKey(Map<K[], V> source, K[] key, Comparator<K> cmp, Set<K> keys) {
+        for (Map.Entry<K[], V> entry : source.entrySet()) {
+            K[] sourceKey = entry.getKey();
+            boolean match = key.length == sourceKey.length;
+            if (match) {
+                for (int i = 0; i < key.length && match; i++) {
+                    if (cmp != null) {
+                        match = (cmp.compare(key[i], sourceKey[i]) == 0);
+                    } else {
+                        match = key[i].equals(sourceKey[i]);
+                    }
+                }
+                // Matching key is removed from Set for key processing check
+                if (match) {
+                    keys.remove(entry.getKey());
+                    return entry;
+                }
+            }
+        }
+        return null;
+    }
+
+    /**
+     * Verify that source Map array value and parsed map array value are the same.
+     *
+     * @param value parsed value
+     * @param sourceValue source Map value
+     * @param cmp optional comparator to use for verification
+     */
+    private static final <V> void verifyMapArrayValues(V[] value, V[] sourceValue, Comparator<V> cmp) {
+        assertEquals(sourceValue.length, value.length);
+        for (int i = 0; i < sourceValue.length; i++) {
+            if (cmp != null) {
+                assertTrue(cmp.compare(sourceValue[i], value[i]) == 0);
+            } else {
+                assertEquals(sourceValue[i], value[i]);
+            }
+        }
+    }
+
+    /**
+     * Build Map key as an array. Get corresponding key from source Map.
+     *
+     * @param keyArray Map key parsed as JsonArray
+     * @param source source Map
+     */
+    @SuppressWarnings("unchecked")
+    private static final <K,V> void verifyMapArrayValue(JsonObject jentry, final JsonArray valueArray, Map.Entry<K[],V> sourceEntry) {
+        int size = valueArray.size();
+        // All array elements in the tests are of the same type.
+        switch (valueArray.get(0).getValueType()) {
+            case OBJECT:
+                V[] keyPoJo = (V[]) new Pokemon[size];
+                for (int i = 0; i < size; i++) {
+                    JsonObject keyItem = valueArray.getJsonObject(i);
+                    keyPoJo[i] = (V) new Pokemon(keyItem.getString("name"), keyItem.getString("type"), keyItem.getInt("cp"));
+                }
+                verifyMapArrayValues(keyPoJo, (V[]) sourceEntry.getValue(), null);
+                break;
+            case STRING:
+                V[] keyString = (V[]) new String[size];
+                for (int i = 0; i < size; i++) {
+                    keyString[i] = (V) valueArray.getString(i);
+                }
+                verifyMapArrayValues(keyString, (V[]) sourceEntry.getValue(), null);
+                break;
+            case NUMBER:
+                V[] keyNumber = (V[]) new Number[size];
+                for (int i = 0; i < size; i++) {
+                    keyNumber[i] = (V) valueArray.getJsonNumber(i).numberValue();
+                }
+                verifyMapArrayValues(keyNumber, (V[]) sourceEntry.getValue(), (Comparator<V>) CMP_NUM);
+                break;
+            case TRUE:
+            case FALSE:
+                V[] keyBool = (V[]) new Boolean[size];
+                for (int i = 0; i < size; i++) {
+                    keyBool[i] = (V) Boolean.valueOf(valueArray.getBoolean(i));
+                }
+                verifyMapArrayValues(keyBool, (V[]) sourceEntry.getValue(), null);
+                break;
+            default:
+                throw new IllegalStateException(valueArray.getValueType() + "was not expected");
+        }
+    }
+
+    /**
+     * Build Map key as an array. Get corresponding key from source Map.
+     *
+     * @param keyArray Map key parsed as JsonArray
+     * @param source source Map
+     */
+    @SuppressWarnings("unchecked")
+    private static final <K,V> void verifyMapArrayKey(JsonObject jentry, final JsonArray keyArray, Map<K,V> source, Set<K> keys) {
+        int size = keyArray.size();
+        // All array elements in the tests are of the same type.
+        switch (keyArray.get(0).getValueType()) {
+            case OBJECT:
+                K[] keyPoJo = (K[]) new Trainer[size];
+                for (int i = 0; i < size; i++) {
+                    JsonObject keyItem = keyArray.getJsonObject(i);
+                    keyPoJo[i] = (K) new Trainer(keyItem.getString("name"), keyItem.getInt("age"));
+                }
+                Map.Entry<K[],V> entryObject = getMapEntryForArrayKey((Map<K[],V>) source, keyPoJo, null, keys);
+                verifyMapValues(jentry, entryObject);
+                break;
+            case STRING:
+                K[] keyString = (K[]) new String[size];
+                for (int i = 0; i < size; i++) {
+                    keyString[i] = (K) keyArray.getString(i);
+                }
+                Map.Entry<K[],V> entryString = getMapEntryForArrayKey((Map<K[],V>) source, keyString, null, keys);
+                verifyMapValues(jentry, entryString);
+                break;
+            case NUMBER:
+                K[] keyNumber = (K[]) new Number[size];
+                for (int i = 0; i < size; i++) {
+                    keyNumber[i] = (K) keyArray.getJsonNumber(i).numberValue();
+                }
+                Map.Entry<K[],V> entryNumber = getMapEntryForArrayKey((Map<K[],V>) source, keyNumber, (Comparator<K>) CMP_NUM, keys);
+                verifyMapValues(jentry, entryNumber);
+                break;
+            case TRUE:
+            case FALSE:
+                K[] keyBool = (K[]) new Boolean[size];
+                for (int i = 0; i < size; i++) {
+                    keyBool[i] = (K) Boolean.valueOf(keyArray.getBoolean(i));
+                }
+                Map.Entry<K[],V> entryBool = getMapEntryForArrayKey((Map<K[],V>) source, keyBool, null, keys);
+                verifyMapValues(jentry, entryBool);
+                break;
+            default:
+                throw new IllegalStateException(keyArray.getValueType() + "was not expected");
+        }
+    }
+
+    /**
+     * Verify that serialized Map provided as JsonArray matches source Map.
+     *
+     * @param source source Map
+     * @param array  serialized Map parsed and provided as JsonArray
      */
     @SuppressWarnings("unchecked")
     private static final <K,V> void verifySerialization(Map<K, V> source, JsonArray array) {
@@ -135,6 +337,12 @@ public class MapToEntriesArraySerializerTest {
                     Trainer keyPoJo = new Trainer(keyValue.getString("name"), keyValue.getInt("age"));
                     verifyMapValues(jentry, source, (K) keyPoJo);
                     keys.remove((K) keyPoJo);
+                }
+                    break;
+                case ARRAY: {
+                    JsonArray keyArray = jentry.getJsonArray("key");
+                    assertTrue(keyArray.size() > 0);
+                    verifyMapArrayKey(jentry, keyArray, source, keys);
                 }
                     break;
                 case STRING: {
@@ -160,6 +368,8 @@ public class MapToEntriesArraySerializerTest {
                     throw new IllegalStateException(jentry.getValue("/value").getValueType() + "was not expected");
             }
         });
+        // Verify that all keys were processed.
+        assertTrue(keys.isEmpty());
     }
 
 
@@ -222,7 +432,8 @@ public class MapToEntriesArraySerializerTest {
                 new Trainer[] {new Trainer("Bob", 15), new Trainer("Ash", 12)},
                 new Pokemon[] {new Pokemon("Charmander", "fire", 1245), new Pokemon("Kyogre", "water", 3056)});
         String json = jsonb.toJson(map);
-        System.out.println(json);
+        JsonArray jarr = Json.createReader(new StringReader(json)).read().asJsonArray();
+        verifySerialization(map, jarr);
     }
 
     /**
@@ -432,6 +643,166 @@ public class MapToEntriesArraySerializerTest {
             }
         }
         assertEquals("Some of Map keys did not match expected values", 0x07, valueCheck);
+    }
+
+    /**
+     * Test de-serialization of Map<Integer[], String[]>.
+     * Map is stored as an JsonArray of map entries represented as JsonObjects.
+     */
+    @Test
+    public void testDeSerializeIntegerArrayStringArrayMapToEntriesArray() {
+        String jsonString = "[" +
+            "    {" +
+            "        \"key\": [1,2]," +
+            "        \"value\": [" +
+            "            \"Bob\"," +
+            "            \"Tom\"" +
+            "        ]" +
+            "    }," +
+            "    {" +
+            "        \"key\": [3,4]," +
+            "        \"value\": [" +
+            "            \"John\"," +
+            "            \"Greg\"" +
+            "        ]" +
+            "    }" +
+           "]";
+        ParameterizedType pt = new ParameterizedType() {
+            @Override
+            public Type[] getActualTypeArguments() {
+                return new Type[] { Integer[].class, String[].class };
+            }
+
+            @Override
+            public Type getRawType() {
+                return Map.class;
+            }
+
+            @Override
+            public Type getOwnerType() {
+                return null;
+            }
+        };
+        Jsonb jsonb = JsonbBuilder.create(new JsonbConfig());
+        Map<Integer[], String[]> map = jsonb.fromJson(jsonString, pt);
+        assertEquals(2, map.size());
+        // Make sure that all map entries were checked.
+        int valueCheck = 0x00;
+        for (Map.Entry<Integer[], String[]> entry : map.entrySet()) {
+            Integer[] key = entry.getKey();
+            String[] value = entry.getValue();
+            if (key[0] == 1 && key[1] == 2) {
+                assertEquals("Bob" ,value[0]);
+                assertEquals("Tom" ,value[1]);
+                valueCheck |= 0x01;
+            }
+            if (key[0] == 3 && key[1] == 4) {
+                assertEquals("John" ,value[0]);
+                assertEquals("Greg" ,value[1]);
+                valueCheck |= 0x02;
+            }
+        }
+        assertEquals("Some of Map keys did not match expected values", 0x03, valueCheck);
+    }
+
+    /**
+     * Test de-serialization of Map<Trainer[], Pokemon[]>.
+     * Map is stored as an JsonArray of map entries represented as JsonObjects.
+     */
+    @Test
+    public void testDeSerializePoJoArrayPoJoArrayMapToEntriesArray() {
+        String jsonString = "[" +
+                "    {" +
+                "        \"key\": [" +
+                "            {" +
+                "                \"name\": \"Ash\"," +
+                "                \"age\": 12" +
+                "            },{" +
+                "                \"name\": \"Joe\"," +
+                "                \"age\": 14" +
+                "            }" +
+                "        ]," +
+                "        \"value\": [" +
+                "            {" +
+                "                \"name\": \"Rayquaza\"," +
+                "                \"type\": \"dragon\"," +
+                "                \"cp\": 3273" +
+                "            },{" +
+                "                \"name\": \"Tyranitar\"," +
+                "                \"type\": \"dark\"," +
+                "                \"cp\": 3181" +
+                "            }" +
+                "        ]" +
+                "    },{" +
+                "        \"key\": [" +
+                "            {" +
+                "                \"name\": \"Bob\"," +
+                "                \"age\": 13" +
+                "            },{" +
+                "                \"name\": \"Maggie\"," +
+                "                \"age\": 15" +
+                "            }" +
+                "        ]," +
+                "        \"value\": [" +
+                "            {" +
+                "                \"name\": \"Raikou\"," +
+                "                \"type\": \"electric\"," +
+                "                \"cp\": 3095" +
+                "            },{" +
+                "                \"name\": \"Mamoswine\"," +
+                "                \"type\": \"ice\"," +
+                "                \"cp\": 3055" +
+                "            }" +
+                "        ]" +
+                "    }" +
+                "]";
+        ParameterizedType pt = new ParameterizedType() {
+            @Override
+            public Type[] getActualTypeArguments() {
+                return new Type[] { Trainer[].class, Pokemon[].class };
+            }
+
+            @Override
+            public Type getRawType() {
+                return Map.class;
+            }
+
+            @Override
+            public Type getOwnerType() {
+                return null;
+            }
+        };
+        Jsonb jsonb = JsonbBuilder.create(new JsonbConfig());
+        Map<Trainer[], Pokemon[]> map = jsonb.fromJson(jsonString, pt);
+        assertEquals(2, map.size());
+        int valueCheck = 0x00;
+        for (Map.Entry<Trainer[], Pokemon[]> entry : map.entrySet()) {
+            Trainer[] key = entry.getKey();
+            Pokemon[] value = entry.getValue();
+            if (key[0].name.equals("Ash") && key[1].name.equals("Joe")) {
+                assertEquals(12, key[0].age);
+                assertEquals(14, key[1].age);
+                assertEquals("Rayquaza", value[0].name);
+                assertEquals("dragon", value[0].type);
+                assertEquals(3273, value[0].cp);
+                assertEquals("Tyranitar", value[1].name);
+                assertEquals("dark", value[1].type);
+                assertEquals(3181, value[1].cp);
+                valueCheck |= 0x01;
+            }
+            if (key[0].name.equals("Bob") && key[1].name.equals("Maggie")) {
+                assertEquals(13, key[0].age);
+                assertEquals(15, key[1].age);
+                assertEquals("Raikou", value[0].name);
+                assertEquals("electric", value[0].type);
+                assertEquals(3095, value[0].cp);
+                assertEquals("Mamoswine", value[1].name);
+                assertEquals("ice", value[1].type);
+                assertEquals(3055, value[1].cp);
+                valueCheck |= 0x02;
+            }
+        }
+        assertEquals("Some of Map keys did not match expected values", 0x03, valueCheck);
     }
 
 }
