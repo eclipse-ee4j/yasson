@@ -12,7 +12,6 @@
  ******************************************************************************/
 package org.eclipse.yasson.internal.model.customization;
 
-import static java.util.stream.Collectors.toList;
 import static java.util.Comparator.comparing;
 import static javax.json.bind.config.PropertyNamingStrategy.*;
 import static javax.json.bind.config.PropertyOrderStrategy.*;
@@ -24,7 +23,7 @@ import org.eclipse.yasson.internal.properties.Messages;
 import org.eclipse.yasson.internal.properties.MessageKeys;
 
 import java.nio.CharBuffer;
-import java.util.function.Function;
+import java.util.function.Consumer;
 import java.util.*;
 
 public final class StrategiesProvider {
@@ -32,14 +31,14 @@ public final class StrategiesProvider {
     
     public static final PropertyNamingStrategy CASE_INSENSITIVE_STRATEGY = Objects::requireNonNull;
     
-    public static Function<Collection<PropertyModel>, List<PropertyModel>> getOrderingFunction(String strategy){
+    public static Consumer<List<PropertyModel>> getOrderingFunction(String strategy){
         switch(strategy) {
             case LEXICOGRAPHICAL:
-            	return createSortingOrdererFunction(comparing(PropertyModel::getWriteName));
+            	return props -> props.sort(comparing(PropertyModel::getWriteName));
             case ANY:
-            	return ArrayList::new;
+            	return props -> {};
             case REVERSE:
-            	return createSortingOrdererFunction(comparing(PropertyModel::getWriteName).reversed());
+            	return props -> props.sort(comparing(PropertyModel::getWriteName).reversed());
             default:
             	throw new JsonbException(Messages.getMessage(MessageKeys.PROPERTY_ORDER, strategy));
         }
@@ -64,10 +63,6 @@ public final class StrategiesProvider {
         }
     }
     
-    
-    private static Function<Collection<PropertyModel>, List<PropertyModel>> createSortingOrdererFunction(Comparator<PropertyModel> comparator){
-        return props -> props.stream().sorted(comparator).collect(toList());
-    }
     
     private static PropertyNamingStrategy createUpperCamelCaseStrategy() {
         return propertyName -> {

@@ -35,7 +35,6 @@ import javax.json.bind.serializer.JsonbSerializer;
 import java.time.format.DateTimeFormatter;
 import java.time.format.DateTimeFormatterBuilder;
 import java.time.temporal.ChronoField;
-import java.util.Collection;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
@@ -43,7 +42,7 @@ import java.util.Locale;
 import java.util.Map;
 import java.util.Optional;
 import java.util.TreeMap;
-import java.util.function.Function;
+import java.util.function.Consumer;
 
 /**
  * Resolved properties from JSONB config.
@@ -156,7 +155,7 @@ public class JsonbConfigProperties {
         }).orElse(JsonbDateFormat.DEFAULT_FORMAT);
     }
 
-    private Function<Collection<PropertyModel>, List<PropertyModel>> initOrderStrategy() {
+    private Consumer<List<PropertyModel>> initOrderStrategy() {
         Optional<String> strategy = getPropertyOrderStrategy();
         
         return strategy.map(StrategiesProvider::getOrderingFunction)
