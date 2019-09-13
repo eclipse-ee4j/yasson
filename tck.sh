@@ -13,7 +13,7 @@ mvn clean install -DskipTests
 
 GF_BUNDLE_URL="central.maven.org/maven2/org/glassfish/main/distributions/glassfish/5.1.0/glassfish-5.1.0.zip"
 TCK_NAME=jsonb-tck
-TCK_VERSION=1.0.0
+TCK_VERSION=1.0.1
 
 export TCK_HOME=`pwd`"/target-tck"
 rm -r ${TCK_HOME}
@@ -43,16 +43,6 @@ sed -i.bak "s#jsonb\.classes=.*#jsonb.classes=${TCK_HOME}/glassfish5/glassfish/m
 # TCK test excludes
 # JDK 11 have date formating changed
 echo "com/sun/ts/tests/jsonb/api/annotation/AnnotationTest.java#testJsonbDateFormat_from_standalone" >> ts.jtx
-# Support for big numbers moved to Json-p
-# https://github.com/eclipse-ee4j/jsonb-api/issues/180
-echo "com/sun/ts/tests/jsonb/defaultmapping/basictypes/BasicJavaTypesMappingTest.java#testLongMapping_from_standalone" >> ts.jtx
-echo "com/sun/ts/tests/jsonb/defaultmapping/bignumbers/BigNumbersMappingTest.java#testBigNumberMarshalling_from_standalone" >> ts.jtx
-# There is incorrect negative test on deserialization of EnumMap and EnumSet. Both of them are not defined by the spec so their
-# support is up to the implementation. There should be no negative test present.
-# EnumMap https://github.com/eclipse-ee4j/yasson/issues/283
-# EnumSet https://github.com/eclipse-ee4j/yasson/issues/272
-echo "com/sun/ts/tests/jsonb/defaultmapping/collections/CollectionsMappingTest.java#testEnumMap_from_standalone" >> ts.jtx
-echo "com/sun/ts/tests/jsonb/defaultmapping/collections/CollectionsMappingTest.java#testEnumSet_from_standalone" >> ts.jtx
 # Signature test needs to run on JDK 1.8 . This allowes us to run on any JDK.
 echo "com/sun/ts/tests/signaturetest/jsonb/JSONBSigTest.java#signatureTest_from_standalone" >> ts.jtx
 
