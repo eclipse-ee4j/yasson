@@ -20,7 +20,7 @@
     <modelVersion>4.0.0</modelVersion>
     <groupId>org.eclipse</groupId>
     <artifactId>yasson</artifactId>
-    <version>1.0.5-SNAPSHOT</version>
+    <version>1.0.6-SNAPSHOT</version>
     <packaging>jar</packaging>
     <name>org.eclipse.yasson</name>
 
@@ -95,6 +95,16 @@
                 <role>JSON Binding 1.0 Developer</role>
             </roles>
             <timezone>CET</timezone>
+        </developer>
+        <developer>
+            <email>andy.guibert@gmail.com</email>
+            <id>aguibert</id>
+            <name>Andy Guibert</name>
+            <organization>IBM</organization>
+            <roles>
+                <role>JSON Binding 1.0 Developer</role>
+            </roles>
+            <timezone>CST</timezone>
         </developer>
     </developers>
 
