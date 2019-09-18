@@ -32,7 +32,7 @@ public class MapSerializer<K,V> extends AbstractContainerSerializer<Map<K,V>> im
     private final boolean nullable;
 
     /** Instance that is responsible for serialization. */
-    private ContainerSerializer<Map<K,V>> delegate;
+    private ContainerSerializer<Map<K,V>> serializer;
 
     /**
      * Creates an instance of {@link Map} serialization.
@@ -42,7 +42,7 @@ public class MapSerializer<K,V> extends AbstractContainerSerializer<Map<K,V>> im
     protected MapSerializer(SerializerBuilder builder) {
         super(builder);
         nullable = builder.getJsonbContext().getConfigProperties().getConfigNullable();
-        delegate = null;
+        serializer = null;
     }
 
     /**
@@ -53,7 +53,7 @@ public class MapSerializer<K,V> extends AbstractContainerSerializer<Map<K,V>> im
      */
     @Override
     public void beforeSerialize(Map<K,V> obj) {
-        if (delegate == null) {
+        if (serializer == null) {
             // All keys can be serialized as String
             boolean allStrings = true;
             boolean first = true;
@@ -61,35 +61,30 @@ public class MapSerializer<K,V> extends AbstractContainerSerializer<Map<K,V>> im
             // Cycle shall exit on first negative check
             for (Iterator<? extends Object> i = obj.keySet().iterator(); allStrings && i.hasNext(); ) {
                 Object key = i.next();
-                // 1st pass: check types allowed for JsonObject serialization and store type
-                if (first) {
-                    first = false;
-                    // Keep cls value as null when key is null too
-                    if (key != null) {
-                        if ((key instanceof String) || (key instanceof Number) || (key instanceof Enum) || key == null) {
-                            cls = key.getClass();
-                        } else {
-                            allStrings = false;
-                        }
-                    }
-                // 2nd and later pass: make sure that key types are the same in whole Map for JsonObject serialization
-                } else {
-                    if (cls == null) {
-                        if (key != null) {
-                            allStrings = false;
-                        }
+                // 2nd and later pass: check whether all Map keys are of the same type
+                if (cls != null) {
+                    if (key == null) {
+                        allStrings = false;
                     } else {
-                        if (!cls.equals(key.getClass())) {
-                            allStrings = false;
-                        }
+                        allStrings = cls.equals(key.getClass());
                     }
+                // 1st pass: check whether key type is supported for Map to JSON Object serialization
+                } else if (key instanceof String || key instanceof Number || key instanceof Enum ) {
+                    cls = key.getClass();
+                    first = false;
+                // 1st pass: check whether key is null, which is also supported for Map to JSON Object serialization
+                // Map shall contain only single mapping for null value and nothing else
+                } else if (key == null && first) {
+                    first = false;
+                } else {
+                    allStrings = false;
                 }
             }
             // Set proper serializing algorithm
             if (allStrings) {
-                delegate = new MapToObjectSerializer<>(this);
+                serializer = new MapToObjectSerializer<>(this);
             } else {
-                delegate = new MapToEntriesArraySerializer<>(this);
+                serializer = new MapToEntriesArraySerializer<>(this);
             }
         }
     }
@@ -104,7 +99,7 @@ public class MapSerializer<K,V> extends AbstractContainerSerializer<Map<K,V>> im
      */
     @Override
     public void serializeContainer(Map<K,V> obj, JsonGenerator generator, SerializationContext ctx) {
-        delegate.serializeContainer(obj, generator, ctx);
+        serializer.serializeContainer(obj, generator, ctx);
     }
 
     /**
@@ -115,7 +110,7 @@ public class MapSerializer<K,V> extends AbstractContainerSerializer<Map<K,V>> im
      */
     @Override
     public void writeStart(JsonGenerator generator) {
-        delegate.writeStart(generator);
+        serializer.writeStart(generator);
     }
 
     /**
@@ -127,7 +122,7 @@ public class MapSerializer<K,V> extends AbstractContainerSerializer<Map<K,V>> im
      */
     @Override
     public void writeStart(String key, JsonGenerator generator) {
-        delegate.writeStart(key, generator);
+        serializer.writeStart(key, generator);
     }
 
     /**
@@ -138,7 +133,7 @@ public class MapSerializer<K,V> extends AbstractContainerSerializer<Map<K,V>> im
      */
     @Override
     public void writeEnd(JsonGenerator generator) {
-        delegate.writeEnd(generator);
+        serializer.writeEnd(generator);
     }
 
     /**

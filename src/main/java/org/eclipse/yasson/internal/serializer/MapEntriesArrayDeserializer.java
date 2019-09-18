@@ -151,69 +151,19 @@ public class MapEntriesArrayDeserializer<K,V> extends AbstractItem<Map<K,V>> imp
      * @param event JSON parser token (event)
      */
 	@Override
-	public void keyName(Context ctx, JsonParser.Event event) {
-		switch (state) {
-			case ENTRY_KEY:
-				final String key = ctx.getParser().getString();
-				if (keyEntryName.equals(key)) {
-					state = State.ENTRY_KEY_OBJECT;
-				} else if (valueEntryName.equals(key)) {
-					state = State.ENTRY_VALUE_OBJECT;
-				} else {
-					throw new JsonbException("Invalid Map entry key: " + key);
-				}
-			    break;
-			default:
-				throw new JsonbException("Invalid JSON entry: " + event.name());
-		}
-	}
-
-    /**
-     * De-serialize JSON String value.
-     * Delegates processing to common {@code void simpleValue(Context, JsonParser.Event)} method.
-     *
-     * @param ctx   parser context
-     * @param event JSON parser token (event)
-     */
-    @Override
-    public void valueString(Context ctx, JsonParser.Event event) {
-        simpleValue(ctx, event);
-    }
-
-    /**
-     * De-serialize JSON Number value. 
-     * Delegates processing to common {@code void simpleValue(Context, JsonParser.Event)} method.
-     *
-     * @param ctx   parser context
-     * @param event JSON parser token (event)
-     */
-    @Override
-    public void valueNumber(Context ctx, JsonParser.Event event) {
-        simpleValue(ctx, event);
-    }
-
-    /**
-     * De-serialize JSON boolean value {@code true}
-     * Delegates processing to common {@code void simpleValue(Context, JsonParser.Event)} method.
-     *
-     * @param ctx   parser context
-     * @param event JSON parser token (event)
-     */
-    @Override
-    public void valueTrue(Context ctx, JsonParser.Event event) {
-        simpleValue(ctx, event);
-    }
-
-    /**
-     * De-serialize JSON boolean value {@code false}. 
-     * Delegates processing to common {@code void simpleValue(Context, JsonParser.Event)} method.
-     *
-     * @param ctx   parser context
-     * @param event JSON parser token (event)
-     */
-    @Override
-    public void valueFalse(Context ctx, JsonParser.Event event) {
-        simpleValue(ctx, event);
+    public void keyName(Context ctx, JsonParser.Event event) {
+        if (state == State.ENTRY_KEY) {
+            final String key = ctx.getParser().getString();
+            if (keyEntryName.equals(key)) {
+                state = State.ENTRY_KEY_OBJECT;
+            } else if (valueEntryName.equals(key)) {
+                state = State.ENTRY_VALUE_OBJECT;
+            } else {
+                throw new JsonbException("Invalid Map entry key: " + key);
+            }
+        } else {
+            throw new JsonbException("Invalid JSON entry: " + event.name());
+        }
     }
 
     /**
@@ -222,7 +172,8 @@ public class MapEntriesArrayDeserializer<K,V> extends AbstractItem<Map<K,V>> imp
      * @param ctx   parser context
      * @param event JSON parser token (event)
      */
-    private void simpleValue(Context ctx, JsonParser.Event event) {
+	@Override
+	public void simpleValue(Context ctx, JsonParser.Event event) {
         switch (state) {
             case ENTRY_KEY_OBJECT:
                 key = deserializeContent(ctx, mapKeyType, event);
@@ -263,12 +214,10 @@ public class MapEntriesArrayDeserializer<K,V> extends AbstractItem<Map<K,V>> imp
      */
     @Override
     public void endArray(Context ctx, JsonParser.Event event) {
-        switch (state) {
-            case NEXT_ENTRY:
-                ctx.finish();
-                break;
-            default:
-                throw new JsonbException("Invalid JSON entry: " + event.name());
+        if (state == State.NEXT_ENTRY) {
+            ctx.finish();
+        } else {
+            throw new JsonbException("Invalid JSON entry: " + event.name());
         }
         state = State.ARRAY_END;
     }
@@ -283,12 +232,10 @@ public class MapEntriesArrayDeserializer<K,V> extends AbstractItem<Map<K,V>> imp
      */
     @Override
     public void endObject(Context ctx, JsonParser.Event event) {
-        switch (state) {
-            case ENTRY_KEY:
-                instance.put(key, value);
-                break;
-            default:
-                throw new JsonbException("Invalid JSON entry: " + event.name());
+        if (state == State.ENTRY_KEY) {
+            instance.put(key, value);
+        } else {
+            throw new JsonbException("Invalid JSON entry: " + event.name());
         }
         state = State.NEXT_ENTRY;
     }

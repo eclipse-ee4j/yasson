@@ -15,6 +15,7 @@ package org.eclipse.yasson.serializers;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertTrue;
+import static org.junit.Assert.fail;
 
 import java.io.StringReader;
 import java.lang.reflect.ParameterizedType;
@@ -52,16 +53,8 @@ public class MapToEntriesArraySerializerTest {
         @Override
         public int compare(Number n1, Number n2) {
             if (n1 != null && n2 != null) {
-                if (
-                    ((n1 instanceof Byte) || (n1 instanceof Short) || (n1 instanceof Integer) || (n1 instanceof Long))
-                    && ((n2 instanceof Byte) || (n2 instanceof Short) || (n2 instanceof Integer) || (n2 instanceof Long))
-                ) {
-                    return Long.compare(n1.longValue(), n2.longValue());
-                }
-                if (
-                    ((n1 instanceof Float) || (n1 instanceof Double))
-                    && ((n2 instanceof Float) || (n2 instanceof Double))
-                ) {
+                if (((n1 instanceof Float) || (n1 instanceof Double))
+                    && ((n2 instanceof Float) || (n2 instanceof Double))) {
                     return Double.compare(n1.doubleValue(), n2.doubleValue());
                 }
                 return Long.compare(n1.longValue(), n2.longValue());
@@ -71,9 +64,7 @@ public class MapToEntriesArraySerializerTest {
             } else {
                 return 1;
             }
-
         }
-
     }
 
     /** NumberComparator instance to be used. */
@@ -476,7 +467,15 @@ public class MapToEntriesArraySerializerTest {
                 valueCheck |= 0x04;
             }
         }
-        assertEquals("Some of Map keys did not match expected values", 0x07, valueCheck);
+        if ((valueCheck & 0x01) == 0) {
+            fail("Did not find key \"first\" in the Map");
+        }
+        if ((valueCheck & 0x02) == 0) {
+            fail("Did not find key 42 in the Map");
+        }
+        if ((valueCheck & 0x04) == 0) {
+            fail("Did not find key false in the Map");
+        }
     }
 
     /**
@@ -553,7 +552,15 @@ public class MapToEntriesArraySerializerTest {
                 valueCheck |= 0x04;
             }
         }
-        assertEquals("Some of Map keys did not match expected values", 0x07, valueCheck);
+        if ((valueCheck & 0x01) == 0) {
+            fail("Did not find key \"Pikachu\" in the Map");
+        }
+        if ((valueCheck & 0x02) == 0) {
+            fail("Did not find key \"Squirtle\" in the Map");
+        }
+        if ((valueCheck & 0x04) == 0) {
+            fail("Did not find key \"Rayquaza\" in the Map");
+        }
     }
 
     /**
@@ -642,7 +649,15 @@ public class MapToEntriesArraySerializerTest {
                 valueCheck |= 0x04;
             }
         }
-        assertEquals("Some of Map keys did not match expected values", 0x07, valueCheck);
+        if ((valueCheck & 0x01) == 0) {
+            fail("Did not find key \"Bob\" in the Map");
+        }
+        if ((valueCheck & 0x02) == 0) {
+            fail("Did not find key \"Ash\" in the Map");
+        }
+        if ((valueCheck & 0x04) == 0) {
+            fail("Did not find key \"Joe\" in the Map");
+        }
     }
 
     /**
@@ -702,7 +717,12 @@ public class MapToEntriesArraySerializerTest {
                 valueCheck |= 0x02;
             }
         }
-        assertEquals("Some of Map keys did not match expected values", 0x03, valueCheck);
+        if ((valueCheck & 0x01) == 0) {
+            fail("Did not find key [1,2] in the Map");
+        }
+        if ((valueCheck & 0x02) == 0) {
+            fail("Did not find key [3,4] in the Map");
+        }
     }
 
     /**
@@ -802,7 +822,12 @@ public class MapToEntriesArraySerializerTest {
                 valueCheck |= 0x02;
             }
         }
-        assertEquals("Some of Map keys did not match expected values", 0x03, valueCheck);
+        if ((valueCheck & 0x01) == 0) {
+            fail("Did not find key with \"Ash\" and \"Joe\" in the Map");
+        }
+        if ((valueCheck & 0x02) == 0) {
+            fail("Did not find key with \"Bob\" and \"Maggie\" in the Map");
+        }
     }
 
 }

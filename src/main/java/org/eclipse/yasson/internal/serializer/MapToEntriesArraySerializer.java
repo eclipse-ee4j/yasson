@@ -87,12 +87,12 @@ public class MapToEntriesArraySerializer<K,V> implements ContainerSerializer<Map
      */
     @Override
     public void serializeContainer(Map<K,V> obj, JsonGenerator generator, SerializationContext ctx) {
-        obj.entrySet().forEach(entry -> {
+        obj.forEach((key,value) -> {
             generator.writeStartObject();
             generator.writeKey(keyEntryName);
-            serializer.serializeItem(entry.getKey(), generator, ctx);
+            serializer.serializeItem(key, generator, ctx);
             generator.writeKey(valueEntryName);
-            serializer.serializeItem(entry.getValue(), generator, ctx);
+            serializer.serializeItem(value, generator, ctx);
             generator.writeEnd();
         });
     }

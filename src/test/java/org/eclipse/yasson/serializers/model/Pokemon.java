@@ -13,6 +13,8 @@
 
 package org.eclipse.yasson.serializers.model;
 
+import java.util.Objects;
+
 /**
  * Serialization and de-serialization test model: {@code Pokemon}.
  */
@@ -33,31 +35,23 @@ public final class Pokemon {
 		this.cp = cp;
 	}
 
-
     @Override
     public boolean equals(Object other) {
-		if (other instanceof Pokemon) {
-			return this.cp == ((Pokemon) other).cp
-					&& ((this.name == null && ((Pokemon) other).name == null) || (this.name != null
-							&& ((Pokemon) other).name != null && this.name.equals(((Pokemon) other).name)))
-					&& ((this.type == null && ((Pokemon) other).type == null) || (this.type != null
-							&& ((Pokemon) other).type != null && this.type.equals(((Pokemon) other).type)));
-
-		}
-	return false;
+        if (this == other) {
+            return true;
+        }
+        if (!(other instanceof Pokemon)) {
+            return false;
+        }
+        Pokemon pokemon = (Pokemon)other;
+        return cp == pokemon.cp
+                && Objects.equals(name, pokemon.name)
+                && Objects.equals(type, pokemon.type);
     }
-
-	public boolean equals(String name, String type, int cp) {
-		return this.cp == cp
-				&& ((this.name == null && name == null)
-						|| (this.name != null && name != null && this.name.equals(name)))
-				&& ((this.type == null && type == null)
-						|| (this.type != null && type != null && this.type.equals(type)));
-	}
 
     @Override
     public int hashCode() {
-	return 71 * cp + 37 * (name != null ? name.hashCode() : 0) + 17 * (type != null ? type.hashCode() : 0);
+        return Objects.hash(cp, name, type);
     }
 
 }

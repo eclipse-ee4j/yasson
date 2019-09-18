@@ -39,7 +39,7 @@ import org.eclipse.yasson.internal.properties.Messages;
  *
  * @param <T> container type
  */
-public interface ContainerDeserializer<T> extends JsonbDeserializer<T> {
+interface ContainerDeserializer<T> extends JsonbDeserializer<T> {
 
 	/** Parser context. */
     public static class Context {
@@ -217,16 +217,30 @@ public interface ContainerDeserializer<T> extends JsonbDeserializer<T> {
         while (parser.hasNext() && ctx.parse()) {
             final JsonParser.Event event = parser.next();
             switch (event) {
-                case START_ARRAY:  startArray(ctx, event);  break;
-                case START_OBJECT: startObject(ctx, event); break;
-                case KEY_NAME:     keyName(ctx, event);     break;
-                case VALUE_STRING: valueString(ctx, event); break;
-                case VALUE_NUMBER: valueNumber(ctx, event); break;
-                case VALUE_TRUE:   valueTrue(ctx, event);   break;
-                case VALUE_FALSE:  valueFalse(ctx, event);  break;
-                case VALUE_NULL:   valueNull(ctx, event);   break;
-                case END_ARRAY:    endArray(ctx, event);    break;
-                case END_OBJECT:   endObject(ctx, event);   break;
+                case START_ARRAY:
+                    startArray(ctx, event);
+                    break;
+                case START_OBJECT:
+                    startObject(ctx, event);
+                    break;
+                case KEY_NAME:
+                    keyName(ctx, event);
+                    break;
+                case VALUE_STRING:
+                case VALUE_NUMBER:
+                case VALUE_TRUE:
+                case VALUE_FALSE:
+                    simpleValue(ctx, event);
+                    break;
+                case VALUE_NULL:
+                    valueNull(ctx, event);
+                    break;
+                case END_ARRAY:
+                    endArray(ctx, event);
+                    break;
+                case END_OBJECT:
+                    endObject(ctx, event);
+                    break;
                 default:
                     throw new JsonbException(Messages.getMessage(MessageKeys.NOT_VALUE_TYPE, event));
             }
@@ -274,36 +288,12 @@ public interface ContainerDeserializer<T> extends JsonbDeserializer<T> {
     void keyName(Context ctx, JsonParser.Event event);
 
     /**
-     * Received JSON String value.
+     * Received JSON simple value (String, Number, boolean).
      *
      * @param ctx parser context
      * @param event JSON parser event
      */
-    void valueString(Context ctx, JsonParser.Event event);
-
-    /**
-     * Received JSON Number value.
-     *
-     * @param ctx parser context
-     * @param event JSON parser event
-     */
-    void valueNumber(Context ctx, JsonParser.Event event);
-
-    /**
-     * Received JSON boolean value {@code true}.
-     *
-     * @param ctx parser context
-     * @param event JSON parser event
-     */
-    void valueTrue(Context ctx, JsonParser.Event event);
-
-    /**
-     * Received JSON boolean value {@code false}.
-     *
-     * @param ctx parser context
-     * @param event JSON parser event
-     */
-    void valueFalse(Context ctx, JsonParser.Event event);
+    void simpleValue(Context ctx, JsonParser.Event event);
 
     /**
      * Received JSON value {@code null}.

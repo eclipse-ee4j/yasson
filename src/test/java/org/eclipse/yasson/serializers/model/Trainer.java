@@ -13,6 +13,8 @@
 
 package org.eclipse.yasson.serializers.model;
 
+import java.util.Objects;
+
 /**
  * Serialization and de-serialization test model: pokemon {@code Trainer}.
  */
@@ -32,22 +34,19 @@ public final class Trainer {
 
 	@Override
 	public boolean equals(Object other) {
-		if (other instanceof Trainer) {
-			return this.age == ((Trainer) other).age
-					&& ((this.name == null && ((Trainer) other).name == null) || (this.name != null
-							&& ((Trainer) other).name != null && this.name.equals(((Trainer) other).name)));
-		}
-		return false;
-	}
-
-	public boolean equals(String name, int age) {
-		return this.age == age && ((this.name == null && name == null)
-				|| (this.name != null && name != null && this.name.equals(name)));
+	    if (this == other) {
+	        return true;
+	    }
+	    if (!(other instanceof Trainer)) {
+	        return false;
+	    }
+	    Trainer trainer = (Trainer)other;
+	    return age == trainer.age && Objects.equals(name, trainer.name);
 	}
 
     @Override
     public int hashCode() {
-	return 37 * age + 17 * (name != null ? name.hashCode() : 0);
+        return Objects.hash(age, name);
     }
 
 }
