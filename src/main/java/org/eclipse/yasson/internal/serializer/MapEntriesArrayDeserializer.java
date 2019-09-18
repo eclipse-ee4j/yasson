@@ -52,6 +52,53 @@ public class MapEntriesArrayDeserializer<K,V> extends AbstractItem<Map<K,V>> imp
         ARRAY_END
     }
 
+    // Finite-state machine transition table:
+    // --------------------------------------
+    // NEXT_ENTRY:
+    //  * START_OBJECT -> ENTRY_KEY
+    //  * END_ARRAY    -> ARRAY_END (terminal state, exit parser)
+    // ENTRY_KEY:
+    //  * KEY_NAME('key)   -> ENTRY_KEY_OBJECT
+    //  * KEY_NAME('value) -> ENTRY_VALUE_OBJECT
+    //  * END_OBJECT       -> NEXT_ENTRY
+    // ENTRY_KEY_OBJECT:
+    //  * START_OBJECT -> external parser -> ENTRY_KEY
+    //  * START_ARRAY  -> external parser -> ENTRY_KEY
+    //  * VALUE_STRING -> external parser -> ENTRY_KEY
+    //  * VALUE_NUMBER -> external parser -> ENTRY_KEY
+    //  * VALUE_TRUE   -> external parser -> ENTRY_KEY
+    //  * VALUE_FALSE  -> external parser -> ENTRY_KEY
+    //  * VALUE_NULL   -> external parser -> ENTRY_KEY
+    // ENTRY_VALUE_OBJECT:
+    //  * START_OBJECT -> external parser -> ENTRY_KEY
+    //  * START_ARRAY  -> external parser -> ENTRY_KEY
+    //  * VALUE_STRING -> external parser -> ENTRY_KEY
+    //  * VALUE_NUMBER -> external parser -> ENTRY_KEY
+    //  * VALUE_TRUE   -> external parser -> ENTRY_KEY
+    //  * VALUE_FALSE  -> external parser -> ENTRY_KEY
+    //  * VALUE_NULL   -> external parser -> ENTRY_KEY
+    // ARRAY_END: No additional JSON token processing is allowed in this state.
+    //            JSON array of map entries parser must finish immediately.
+    //
+    // External parser shall process whole JSON value following 'key' or 'value' MapEntry JSON Object
+    // attribute identifiers. Finite-state machine just moves to ENTRY_KEY state to process next MapEntry
+    // attribute or to finish current MapEntry parsing when END_OBJECT token was received.
+
+    // JSON tokens are mapped to event method calls defined in ContainerDeserializer:
+    //  * START_ARRAY  -> startArray
+    //  * START_OBJECT -> startObject
+    //  * KEY_NAME     -> keyName
+    //  * VALUE_STRING -> simpleValue
+    //  * VALUE_NUMBER -> simpleValue
+    //  * VALUE_TRUE   -> simpleValue
+    //  * VALUE_FALSE  -> simpleValue
+    //  * VALUE_NULL   -> valueNull
+    //  * END_ARRAY    -> endArray
+    //  * END_OBJECT   -> endObject
+    // so JSON token dispatching is already implemented in ContainerDeserializer interface.
+    // Each method needs just current state dispatcher (switch statement) to implement finite-state machine
+    // transition function T(token, state) -> state
+
     /** Default property name for map entry key. */
     private static final String DEFAULT_KEY_ENTRY_NAME = "key";
 
@@ -114,7 +161,7 @@ public class MapEntriesArrayDeserializer<K,V> extends AbstractItem<Map<K,V>> imp
                 value = deserializeContent(ctx, mapValueType, event);
                 break;
             default:
-                throw new JsonbException("Invalid JSON entry: " + event.name());
+                handleSyntaxError(state, event);
         }
         state = State.ENTRY_KEY;
     }
@@ -138,7 +185,7 @@ public class MapEntriesArrayDeserializer<K,V> extends AbstractItem<Map<K,V>> imp
                 value = deserializeContent(ctx, mapValueType, event);
                 break;
             default:
-                throw new JsonbException("Invalid JSON entry: " + event.name());
+                handleSyntaxError(state, event);
         }
         state = State.ENTRY_KEY;
     }
@@ -162,7 +209,7 @@ public class MapEntriesArrayDeserializer<K,V> extends AbstractItem<Map<K,V>> imp
                 throw new JsonbException("Invalid Map entry key: " + key);
             }
         } else {
-            throw new JsonbException("Invalid JSON entry: " + event.name());
+            handleSyntaxError(state, event);
         }
     }
 
@@ -182,7 +229,7 @@ public class MapEntriesArrayDeserializer<K,V> extends AbstractItem<Map<K,V>> imp
                 value = deserializeContent(ctx, mapValueType, event);
                 break;
             default:
-                throw new JsonbException("Invalid JSON entry: " + event.name());
+                handleSyntaxError(state, event);
         }
         state = State.ENTRY_KEY;
     }
@@ -200,12 +247,12 @@ public class MapEntriesArrayDeserializer<K,V> extends AbstractItem<Map<K,V>> imp
             case ENTRY_VALUE_OBJECT:
                 break;
             default:
-                throw new JsonbException("Invalid JSON entry: " + event.name());
+                handleSyntaxError(state, event);
         }
         state = State.ENTRY_KEY;
     }
-    
-   /**
+
+    /**
      * De-serialize end of JSON Array when '[' character is received.
      * This is the last step of Map processing. Reading of JSON tokens from parser on this level shall finish.
      *
@@ -217,7 +264,7 @@ public class MapEntriesArrayDeserializer<K,V> extends AbstractItem<Map<K,V>> imp
         if (state == State.NEXT_ENTRY) {
             ctx.finish();
         } else {
-            throw new JsonbException("Invalid JSON entry: " + event.name());
+            handleSyntaxError(state, event);
         }
         state = State.ARRAY_END;
     }
@@ -235,9 +282,41 @@ public class MapEntriesArrayDeserializer<K,V> extends AbstractItem<Map<K,V>> imp
         if (state == State.ENTRY_KEY) {
             instance.put(key, value);
         } else {
-            throw new JsonbException("Invalid JSON entry: " + event.name());
+            handleSyntaxError(state, event);
         }
         state = State.NEXT_ENTRY;
+    }
+
+    // It's switch called from switch, but it simplified proper error message selection depending
+    // on current state and token.
+    /**
+     * Throw more specific exception for map deserialization JSON parser syntax errors.
+     *
+     * @param state current state
+     * @param event current JSON token
+     */
+    private static void handleSyntaxError(State state, JsonParser.Event event) {
+        switch (state) {
+            // Error handling for individual states and undefined transition from them.
+            case NEXT_ENTRY:
+                throw new JsonbException("Map deserialization error: got " + event.name()
+                        + " when expecting beginning of map entry JSON object or end of whole map entries array");
+            case ENTRY_KEY:
+                throw new JsonbException("Map deserialization error: got " + event.name()
+                        + " when expecting map entry attribute name 'key' or 'value' or end of map entry JSON object");
+            case ENTRY_KEY_OBJECT:
+                throw new JsonbException("Map deserialization error: got " + event.name()
+                        + " when expecting map entry attribute value related to target map entry key");
+            case ENTRY_VALUE_OBJECT:
+                throw new JsonbException("Map deserialization error: got " + event.name()
+                        + " when expecting map entry attribute value related to target map entry value");
+            // Following cases are theoretically unreachable, but let's have full states list to handle coding error
+            case ARRAY_END:
+                throw new JsonbException("Map deserialization error: got " + event.name()
+                        + " when current map deserialization was already finished");
+            default:
+                throw new IllegalStateException("Unknown map deserialization parser state: " + state.name());
+        }
     }
 
     /**
