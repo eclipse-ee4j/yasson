@@ -28,11 +28,63 @@ import javax.json.stream.JsonGenerator;
  */
 public class MapSerializer<K,V> extends AbstractContainerSerializer<Map<K,V>> implements EmbeddedItem {
 
+    /**
+     * Internal Map serializing delegate interface.
+     *
+     * @param <K> {@link Map} key type to serialize
+     * @param <V> {@link Map} value type to serialize
+     */
+    interface Delegate<K,V> {
+
+        /**
+         * Process container before serialization begins.
+         * Does nothing by default.
+         *
+         * @param obj item to be serialized
+         */
+        default void beforeSerialize(Map<K,V> obj) {
+        }
+
+        /**
+         * Write start of an object or an array without a key.
+         *
+         * @param generator JSON format generator
+         */
+        void writeStart(JsonGenerator generator);
+
+        /**
+         * Write start of an object or an array with a key.
+         *
+         * @param key JSON key name.
+         * @param generator JSON format generator
+         */
+        void writeStart(String key, JsonGenerator generator);
+
+        /**
+         * Writes end of an object or an array.
+         *
+         * @param generator JSON format generator
+         */
+        default void writeEnd(JsonGenerator generator) {
+            generator.writeEnd();
+        }
+
+        /**
+         * Serialize content of provided container.
+         *
+         * @param obj container to be serialized
+         * @param generator JSON format generator
+         * @param ctx JSON serialization context
+         */
+        void serializeContainer(Map<K,V> obj, JsonGenerator generator, SerializationContext ctx);
+
+    }
+
     /** Whether to serialize null values too. */
     private final boolean nullable;
 
     /** Instance that is responsible for serialization. */
-    private ContainerSerializer<Map<K,V>> serializer;
+    private Delegate<K,V> serializer;
 
     /**
      * Creates an instance of {@link Map} serialization.
@@ -52,7 +104,7 @@ public class MapSerializer<K,V> extends AbstractContainerSerializer<Map<K,V>> im
      * @param obj {@link Map} to be serialized
      */
     @Override
-    public void beforeSerialize(Map<K,V> obj) {
+    protected void beforeSerialize(Map<K,V> obj) {
         if (serializer == null) {
             // All keys can be serialized as String
             boolean allStrings = true;
@@ -98,7 +150,7 @@ public class MapSerializer<K,V> extends AbstractContainerSerializer<Map<K,V>> im
      * @param ctx JSON serialization context
      */
     @Override
-    public void serializeContainer(Map<K,V> obj, JsonGenerator generator, SerializationContext ctx) {
+    protected void serializeContainer(Map<K,V> obj, JsonGenerator generator, SerializationContext ctx) {
         serializer.serializeContainer(obj, generator, ctx);
     }
 
@@ -109,7 +161,7 @@ public class MapSerializer<K,V> extends AbstractContainerSerializer<Map<K,V>> im
      * @param generator JSON format generator
      */
     @Override
-    public void writeStart(JsonGenerator generator) {
+    protected void writeStart(JsonGenerator generator) {
         serializer.writeStart(generator);
     }
 
@@ -121,7 +173,7 @@ public class MapSerializer<K,V> extends AbstractContainerSerializer<Map<K,V>> im
      * @param generator JSON format generator
      */
     @Override
-    public void writeStart(String key, JsonGenerator generator) {
+    protected void writeStart(String key, JsonGenerator generator) {
         serializer.writeStart(key, generator);
     }
 
@@ -132,7 +184,7 @@ public class MapSerializer<K,V> extends AbstractContainerSerializer<Map<K,V>> im
      * @param generator JSON format generator
      */
     @Override
-    public void writeEnd(JsonGenerator generator) {
+    protected void writeEnd(JsonGenerator generator) {
         serializer.writeEnd(generator);
     }
 

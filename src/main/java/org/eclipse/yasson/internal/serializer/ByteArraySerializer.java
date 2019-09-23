@@ -28,7 +28,7 @@ public class ByteArraySerializer extends AbstractArraySerializer<byte[]> {
     }
 
     @Override
-    public void serializeContainer(byte[] obj, JsonGenerator generator, SerializationContext ctx) {
+    protected void serializeContainer(byte[] obj, JsonGenerator generator, SerializationContext ctx) {
         for (byte b : obj) {
             generator.write(b);
         }

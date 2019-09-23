@@ -28,7 +28,7 @@ public class ShortArraySerializer extends AbstractArraySerializer<short[]> {
     }
 
     @Override
-    public void serializeContainer(short[] arr, JsonGenerator generator, SerializationContext ctx) {
+    protected void serializeContainer(short[] arr, JsonGenerator generator, SerializationContext ctx) {
         for (short obj : arr) {
             generator.write(obj);
         }

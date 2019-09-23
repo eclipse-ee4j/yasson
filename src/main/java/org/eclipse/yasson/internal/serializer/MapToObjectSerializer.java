@@ -30,7 +30,7 @@ import javax.json.stream.JsonGenerator;
  * @param <K> {@link Map} key type to serialize
  * @param <V> {@link Map} value type to serialize
  */
-public class MapToObjectSerializer<K,V> implements ContainerSerializer<Map<K,V>> {
+public class MapToObjectSerializer<K,V> implements MapSerializer.Delegate<K,V> {
 
     /** Reference to {@link Map} serialization entry point. Contains serialization setup information. */
     private final MapSerializer<K,V> serializer;

@@ -28,9 +28,10 @@ public class ObjectArraySerializer<T> extends AbstractArraySerializer<T[]> {
     }
 
     @Override
-    public void serializeContainer(T[] arr, JsonGenerator generator, SerializationContext ctx) {
+    protected void serializeContainer(T[] arr, JsonGenerator generator, SerializationContext ctx) {
         for (T obj : arr) {
             serializeItem(obj, generator, ctx);
         }
     }
+
 }

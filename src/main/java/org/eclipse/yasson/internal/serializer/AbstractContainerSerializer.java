@@ -33,7 +33,7 @@ import org.eclipse.yasson.internal.model.customization.ContainerCustomization;
  *
  * @author Roman Grigoriadi
  */
-public abstract class AbstractContainerSerializer<T> extends AbstractItem<T> implements JsonbSerializer<T>, ContainerSerializer<T> {
+public abstract class AbstractContainerSerializer<T> extends AbstractItem<T> implements JsonbSerializer<T> {
 
     private JsonbSerializer<?> valueSerializer;
 
@@ -58,6 +58,48 @@ public abstract class AbstractContainerSerializer<T> extends AbstractItem<T> imp
     public AbstractContainerSerializer(CurrentItem<?> wrapper, Type runtimeType, ClassModel classModel) {
         super(wrapper, runtimeType, classModel);
     }
+
+    /**
+     * Process container before serialization begins.
+     * Does nothing by default.
+     *
+     * @param obj item to be serialized
+     */
+    protected void beforeSerialize(T obj) {
+    }
+
+    /**
+     * Write start of an object or an array without a key.
+     *
+     * @param generator JSON format generator
+     */
+    protected abstract void writeStart(JsonGenerator generator);
+
+    /**
+     * Write start of an object or an array with a key.
+     *
+     * @param key JSON key name.
+     * @param generator JSON format generator
+     */
+    protected abstract void writeStart(String key, JsonGenerator generator);
+
+    /**
+     * Writes end of an object or an array.
+     *
+     * @param generator JSON format generator
+     */
+    protected void writeEnd(JsonGenerator generator) {
+        generator.writeEnd();
+    }
+
+    /**
+     * Serialize content of provided container.
+     *
+     * @param obj container to be serialized
+     * @param generator JSON format generator
+     * @param ctx JSON serialization context
+     */
+    protected abstract void serializeContainer(T obj, JsonGenerator generator, SerializationContext ctx);
 
     @Override
     public final void serialize(T obj, JsonGenerator generator, SerializationContext ctx) {

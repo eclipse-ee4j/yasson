@@ -27,7 +27,7 @@ public class DoubleArraySerializer extends AbstractArraySerializer<double[]> {
     }
 
     @Override
-    public void serializeContainer(double[] arr, JsonGenerator generator, SerializationContext ctx) {
+    protected void serializeContainer(double[] arr, JsonGenerator generator, SerializationContext ctx) {
         for (double obj : arr) {
             generator.write(obj);
         }

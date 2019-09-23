@@ -41,17 +41,14 @@ import org.eclipse.yasson.internal.properties.Messages;
  */
 interface ContainerDeserializer<T> extends JsonbDeserializer<T> {
 
-	/** Parser context. */
-    public static class Context {
+	/** Internal container de-serializer context. */
+    static class Context {
 
         /** Whether to continue with parsing on this level. */
         private boolean parse;
 
         /** JSON parser. */
         private final JsonParser parser;
-
-        /** State holder for current json structure level. */
-        private final JsonbRiParser.LevelContext parserContext;
 
         /** Current de-serialization context. */
         private final Unmarshaller unmarshallerContext;
@@ -63,9 +60,8 @@ interface ContainerDeserializer<T> extends JsonbDeserializer<T> {
          * @param parserContext state holder for current json structure level
          * @param unmarshallerContext JSON-B unmarshaller
          */
-        public Context(JsonParser parser, JsonbRiParser.LevelContext parserContext, Unmarshaller unmarshallerContext) {
+        public Context(JsonParser parser, Unmarshaller unmarshallerContext) {
             this.parser = parser;
-            this.parserContext = parserContext;
             this.unmarshallerContext = unmarshallerContext;
             this.parse = true;
         }
@@ -85,7 +81,7 @@ interface ContainerDeserializer<T> extends JsonbDeserializer<T> {
          * Parser will finish before reading next JSON token.
          */
         public void finish() {
-            this.parse = true;
+            this.parse = false;
         }
 
         /**
@@ -95,15 +91,6 @@ interface ContainerDeserializer<T> extends JsonbDeserializer<T> {
          */
         public JsonParser getParser() {
             return parser;
-        }
-
-        /**
-         * Get state holder for current json structure level.
-         *
-         * @return state holder for current json structure level
-         */
-        public JsonbRiParser.LevelContext getJsonContext() {
-            return parserContext;
         }
 
         /**
@@ -213,7 +200,8 @@ interface ContainerDeserializer<T> extends JsonbDeserializer<T> {
      */
     @Override
     default T deserialize(final JsonParser parser, DeserializationContext context, Type rtType) {
-        final Context ctx = new Context(parser, moveToFirst((JsonbParser)parser), (Unmarshaller) context);
+        final Context ctx = new Context(parser, (Unmarshaller) context);
+        moveToFirst((JsonbParser)parser);
         while (parser.hasNext() && ctx.parse()) {
             final JsonParser.Event event = parser.next();
             switch (event) {

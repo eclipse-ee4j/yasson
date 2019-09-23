@@ -32,19 +32,19 @@ public class JsonObjectSerializer extends AbstractJsonpSerializer<JsonObject> {
     }
 
     @Override
-    public void serializeContainer(JsonObject obj, JsonGenerator generator, SerializationContext ctx) {
+    protected void serializeContainer(JsonObject obj, JsonGenerator generator, SerializationContext ctx) {
         for (Map.Entry<String, JsonValue> entry : obj.entrySet()) {
             generator.write(entry.getKey(), entry.getValue());
         }
     }
 
     @Override
-    public void writeStart(JsonGenerator generator) {
+    protected void writeStart(JsonGenerator generator) {
         generator.writeStartObject();
     }
 
     @Override
-    public void writeStart(String key, JsonGenerator generator) {
+    protected void writeStart(String key, JsonGenerator generator) {
         generator.writeStartObject(key);
     }
 }

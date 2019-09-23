@@ -28,7 +28,7 @@ public class LongArraySerializer extends AbstractArraySerializer<long[]> {
     }
 
     @Override
-    public void serializeContainer(long[] arr, JsonGenerator generator, SerializationContext ctx) {
+    protected void serializeContainer(long[] arr, JsonGenerator generator, SerializationContext ctx) {
         for (long obj : arr) {
             generator.write(obj);
         }

@@ -49,12 +49,12 @@ public abstract class AbstractArraySerializer<T> extends AbstractContainerSerial
     }
 
     @Override
-    public void writeStart(JsonGenerator generator) {
+    protected void writeStart(JsonGenerator generator) {
         generator.writeStartArray();
     }
 
     @Override
-    public void writeStart(String key, JsonGenerator generator) {
+    protected void writeStart(String key, JsonGenerator generator) {
         generator.writeStartArray(key);
     }
 }
