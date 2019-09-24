@@ -16,11 +16,15 @@ import java.lang.reflect.Type;
 import java.util.Map;
 
 import javax.json.bind.JsonbException;
+import javax.json.bind.serializer.DeserializationContext;
 import javax.json.bind.serializer.JsonbDeserializer;
 import javax.json.stream.JsonParser;
 
 import org.eclipse.yasson.internal.JsonbParser;
 import org.eclipse.yasson.internal.JsonbRiParser;
+import org.eclipse.yasson.internal.Unmarshaller;
+import org.eclipse.yasson.internal.properties.MessageKeys;
+import org.eclipse.yasson.internal.properties.Messages;
 
 /**
  * De-serialize JSON array of map entries JSON objects as {@link Map}.
@@ -36,7 +40,7 @@ import org.eclipse.yasson.internal.JsonbRiParser;
  * @param <K> {@link Map} key type to serialize
  * @param <V> {@link Map} value type to serialize
  */
-public class MapEntriesArrayDeserializer<K,V> extends AbstractItem<Map<K,V>> implements ContainerDeserializer<Map<K,V>> {
+public class MapEntriesArrayDeserializer<K,V> extends AbstractItem<Map<K,V>> implements JsonbDeserializer<Map<K,V>> {
 
     /** Map entries parser internal state. */
     private static enum State {
@@ -99,6 +103,69 @@ public class MapEntriesArrayDeserializer<K,V> extends AbstractItem<Map<K,V>> imp
     // Each method needs just current state dispatcher (switch statement) to implement finite-state machine
     // transition function T(token, state) -> state
 
+    /** Internal container de-serializer context. */
+    static class Context {
+
+        /** Whether to continue with parsing on this level. */
+        private boolean parse;
+
+        /** JSON parser. */
+        private final JsonParser parser;
+
+        /** Current de-serialization context. */
+        private final Unmarshaller unmarshallerContext;
+
+        /**
+         * Creates an instance of parser context.
+         *
+         * @param parser JSON parser
+         * @param parserContext state holder for current json structure level
+         * @param unmarshallerContext JSON-B unmarshaller
+         */
+        public Context(JsonParser parser, Unmarshaller unmarshallerContext) {
+            this.parser = parser;
+            this.unmarshallerContext = unmarshallerContext;
+            this.parse = true;
+        }
+
+        /**
+         * Check whether to continue with parsing on this level.
+         *
+         * @return parsing shall continue when {@code true} or shall finish when {@code false}
+         */
+        private boolean parse() {
+            return parse;
+        }
+
+        /**
+         * Order parser to finish.
+         *
+         * Parser will finish before reading next JSON token.
+         */
+        public void finish() {
+            this.parse = false;
+        }
+
+        /**
+         * Get JSON parser.
+         *
+         * @return JSON parser
+         */
+        public JsonParser getParser() {
+            return parser;
+        }
+
+        /**
+         * Get JSON-B unmarshaller.
+         *
+         * @return JSON-B unmarshaller
+         */
+        public Unmarshaller getUnmarshallerContext() {
+            return unmarshallerContext;
+        }
+
+    }
+
     /** Default property name for map entry key. */
     private static final String DEFAULT_KEY_ENTRY_NAME = "key";
 
@@ -137,12 +204,60 @@ public class MapEntriesArrayDeserializer<K,V> extends AbstractItem<Map<K,V>> imp
     MapEntriesArrayDeserializer(DeserializerBuilder builder) {
         super(builder);
         final Type mapType = getRuntimeType();
-        this.mapKeyType = ContainerDeserializer.mapKeyType(this, mapType);
-        this.mapValueType = ContainerDeserializer.mapValueType(this, mapType);
-        this.instance = ContainerDeserializer.createMapInstance(builder, mapType);
+        this.mapKeyType = ContainerDeserializerUtils.mapKeyType(this, mapType);
+        this.mapValueType = ContainerDeserializerUtils.mapValueType(this, mapType);
+        this.instance = ContainerDeserializerUtils.createMapInstance(builder, mapType);
         this.state = State.NEXT_ENTRY;
         this.keyEntryName = DEFAULT_KEY_ENTRY_NAME;
         this.valueEntryName = DEFAULT_VALUE_ENTRY_NAME;
+    }
+
+    /**
+     * De-serialize container stored as JSON structure.
+     * Reads JSON tokens from JSON parser and calls corresponding handler method for each of the tokens.
+     * Implementing class shall process those tokens and build container instance of {@code T} to be returned.
+     *
+     * @param parser JSON parser
+     * @param context de-serialization context
+     * @param rtType type of returned instance
+     * @return {@code Map} instance with content of source JSON structure
+     */
+    @Override
+    public Map<K,V> deserialize(final JsonParser parser, DeserializationContext context, Type rtType) {
+        final Context ctx = new Context(parser, (Unmarshaller) context);
+        ((JsonbParser)ctx.parser).moveTo(JsonParser.Event.START_ARRAY);
+        while (parser.hasNext() && ctx.parse()) {
+            final JsonParser.Event event = parser.next();
+            switch (event) {
+                case START_ARRAY:
+                    startArray(ctx, event);
+                    break;
+                case START_OBJECT:
+                    startObject(ctx, event);
+                    break;
+                case KEY_NAME:
+                    keyName(ctx, event);
+                    break;
+                case VALUE_STRING:
+                case VALUE_NUMBER:
+                case VALUE_TRUE:
+                case VALUE_FALSE:
+                    simpleValue(ctx, event);
+                    break;
+                case VALUE_NULL:
+                    valueNull(ctx, event);
+                    break;
+                case END_ARRAY:
+                    endArray(ctx, event);
+                    break;
+                case END_OBJECT:
+                    endObject(ctx, event);
+                    break;
+                default:
+                    throw new JsonbException(Messages.getMessage(MessageKeys.NOT_VALUE_TYPE, event));
+            }
+        }
+        return instance;
     }
 
     /**
@@ -151,7 +266,6 @@ public class MapEntriesArrayDeserializer<K,V> extends AbstractItem<Map<K,V>> imp
      * @param ctx   parser context
      * @param event JSON parser token (event)
      */
-    @Override
     public void startArray(Context ctx, JsonParser.Event event) {
         switch (state) {
             case ENTRY_KEY_OBJECT:
@@ -172,8 +286,7 @@ public class MapEntriesArrayDeserializer<K,V> extends AbstractItem<Map<K,V>> imp
      * @param ctx   parser context
      * @param event JSON parser token (event)
      */
-    @Override
-    public void startObject(Context ctx, JsonParser.Event event) {
+    private void startObject(Context ctx, JsonParser.Event event) {
         switch (state) {
             case NEXT_ENTRY:
                 clearMapEntry();
@@ -197,8 +310,7 @@ public class MapEntriesArrayDeserializer<K,V> extends AbstractItem<Map<K,V>> imp
      * @param ctx   parser context
      * @param event JSON parser token (event)
      */
-	@Override
-    public void keyName(Context ctx, JsonParser.Event event) {
+    private void keyName(Context ctx, JsonParser.Event event) {
         if (state == State.ENTRY_KEY) {
             final String key = ctx.getParser().getString();
             if (keyEntryName.equals(key)) {
@@ -219,8 +331,7 @@ public class MapEntriesArrayDeserializer<K,V> extends AbstractItem<Map<K,V>> imp
      * @param ctx   parser context
      * @param event JSON parser token (event)
      */
-	@Override
-	public void simpleValue(Context ctx, JsonParser.Event event) {
+    private void simpleValue(Context ctx, JsonParser.Event event) {
         switch (state) {
             case ENTRY_KEY_OBJECT:
                 key = deserializeContent(ctx, mapKeyType, event);
@@ -240,8 +351,7 @@ public class MapEntriesArrayDeserializer<K,V> extends AbstractItem<Map<K,V>> imp
      * @param ctx   parser context
      * @param event JSON parser token (event)
      */
-    @Override
-    public void valueNull(Context ctx, JsonParser.Event event) {
+    private void valueNull(Context ctx, JsonParser.Event event) {
         switch (state) {
             case ENTRY_KEY_OBJECT:
             case ENTRY_VALUE_OBJECT:
@@ -259,8 +369,7 @@ public class MapEntriesArrayDeserializer<K,V> extends AbstractItem<Map<K,V>> imp
      * @param ctx   parser context
      * @param event JSON parser token (event)
      */
-    @Override
-    public void endArray(Context ctx, JsonParser.Event event) {
+    private void endArray(Context ctx, JsonParser.Event event) {
         if (state == State.NEXT_ENTRY) {
             ctx.finish();
         } else {
@@ -277,8 +386,7 @@ public class MapEntriesArrayDeserializer<K,V> extends AbstractItem<Map<K,V>> imp
      * @param ctx   parser context
      * @param event JSON parser token (event)
      */
-    @Override
-    public void endObject(Context ctx, JsonParser.Event event) {
+    private void endObject(Context ctx, JsonParser.Event event) {
         if (state == State.ENTRY_KEY) {
             instance.put(key, value);
         } else {
@@ -329,7 +437,7 @@ public class MapEntriesArrayDeserializer<K,V> extends AbstractItem<Map<K,V>> imp
      */
     @SuppressWarnings("unchecked")
     private <T> T deserializeContent(Context ctx, Type contentType, JsonParser.Event event) {
-        final JsonbDeserializer<?> deserializer = ContainerDeserializer.newCollectionOrMapItem(this, contentType, ctx.getUnmarshallerContext().getJsonbContext(), event);
+        final JsonbDeserializer<?> deserializer = ContainerDeserializerUtils.newCollectionOrMapItem(this, contentType, ctx.getUnmarshallerContext().getJsonbContext(), event);
         return (T) deserializer.deserialize(ctx.getParser(), ctx.getUnmarshallerContext(), contentType);
     }
 
@@ -339,27 +447,6 @@ public class MapEntriesArrayDeserializer<K,V> extends AbstractItem<Map<K,V>> imp
     private void clearMapEntry() {
         key = null;
         value = null;
-    }
-
-    /**
-     * Move to the first event for current deserializer structure.
-     *
-     * @param parser JSON parser
-     * @return first event
-     */
-    @Override
-    public JsonbRiParser.LevelContext moveToFirst(JsonbParser parser) {
-        parser.moveTo(JsonParser.Event.START_ARRAY);
-        return parser.getCurrentLevel();
-    }
-
-    /**
-     * Return {@code Map} instance build by deserializer.
-     *
-     * @return container instance built by de-serializer
-     */
-    public Map<K,V> getInstance() {
-        return instance;
     }
 
 }

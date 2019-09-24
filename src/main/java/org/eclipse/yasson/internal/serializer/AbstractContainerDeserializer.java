@@ -126,11 +126,11 @@ public abstract class AbstractContainerDeserializer<T> extends AbstractItem<T> i
     protected abstract JsonbRiParser.LevelContext moveToFirst(JsonbParser parser);
 
     protected DeserializerBuilder newUnmarshallerItemBuilder(JsonbContext ctx) {
-    	return ContainerDeserializer.newUnmarshallerItemBuilder(this, ctx, parserContext.getLastEvent());
+        return ContainerDeserializerUtils.newUnmarshallerItemBuilder(this, ctx, parserContext.getLastEvent());
     }
 
     protected JsonbDeserializer<?> newCollectionOrMapItem(Type valueType, JsonbContext ctx) {
-    	return ContainerDeserializer.newCollectionOrMapItem(this, valueType, ctx, parserContext.getLastEvent());
+        return ContainerDeserializerUtils.newCollectionOrMapItem(this, valueType, ctx, parserContext.getLastEvent());
     }
 
     /**
