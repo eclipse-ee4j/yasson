@@ -77,9 +77,9 @@ public class PropertyModel implements Comparable<PropertyModel> {
 
     private final JsonbSerializer<?> propertySerializer;
 
-    private final AccessMethodType getterMethodType;
+    private final Type getterMethodType;
 
-    private final AccessMethodType setterMethodType;
+    private final Type setterMethodType;
 
     /**
      * Creates an instance.
@@ -93,8 +93,8 @@ public class PropertyModel implements Comparable<PropertyModel> {
         this.propertyName = property.getName();
         this.propertyType = property.getPropertyType();
         this.propagation = new ReflectionPropagation(property, classModel.getClassCustomization().getPropertyVisibilityStrategy());
-        this.getterMethodType = propagation.isGetterVisible() ? new AccessMethodType(property.getGetterType()) : null;
-        this.setterMethodType = propagation.isSetterVisible() ? new AccessMethodType(property.getSetterType()) : null;
+        this.getterMethodType = propagation.isGetterVisible() ? property.getGetterType() : null;
+        this.setterMethodType = propagation.isSetterVisible() ? property.getSetterType() : null;
         this.customization = introspectCustomization(property, jsonbContext);
         this.readName = calculateReadWriteName(customization.getJsonReadName(), jsonbContext.getConfigProperties().getPropertyNamingStrategy());
         this.writeName = calculateReadWriteName(customization.getJsonWriteName(), jsonbContext.getConfigProperties().getPropertyNamingStrategy());
@@ -135,7 +135,7 @@ public class PropertyModel implements Comparable<PropertyModel> {
      * @return deserialization type
      */
     public Type getPropertyDeserializationType() {
-        return setterMethodType == null ? propertyType : setterMethodType.getMethodType();
+        return setterMethodType == null ? propertyType : setterMethodType;
     }
 
     /**
@@ -144,7 +144,7 @@ public class PropertyModel implements Comparable<PropertyModel> {
      * @return serialization type
      */
     public Type getPropertySerializationType() {
-        return getterMethodType == null ? propertyType : getterMethodType.getMethodType();
+        return getterMethodType == null ? propertyType : getterMethodType;
     }
 
     private SerializerBinding<?> getUserSerializerBinding(Property property, JsonbContext jsonbContext) {
