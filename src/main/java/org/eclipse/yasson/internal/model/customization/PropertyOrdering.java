@@ -28,14 +28,14 @@ import javax.json.bind.config.PropertyOrderStrategy;
  */
 public class PropertyOrdering {
 
-    private final Function<Collection<PropertyModel>, List<PropertyModel>> propertyOrderStrategy;
+    private final Consumer<List<PropertyModel>> propertyOrderStrategy;
 
     /**
      * Creates a new instance.
      *
      * @param propertyOrderStrategy Property order strategy. Must be not null.
      */
-    public PropertyOrdering(Function<Collection<PropertyModel>, List<PropertyModel>> propertyOrderStrategy) {
+    public PropertyOrdering(Consumer<List<PropertyModel>> propertyOrderStrategy) {
         this.propertyOrderStrategy = Objects.requireNonNull(propertyOrderStrategy);
     }
 
@@ -49,7 +49,7 @@ public class PropertyOrdering {
      */
     public List<PropertyModel> orderProperties(List<PropertyModel> properties, ClassModel classModel) {
         Map<String, PropertyModel> byReadName = new HashMap<>();
-        properties.stream().forEach(propertyModel -> byReadName.put(propertyModel.getPropertyName(), propertyModel));
+        properties.forEach(propertyModel -> byReadName.put(propertyModel.getPropertyName(), propertyModel));
 
         String[] order = classModel.getClassCustomization().getPropertyOrder();
         List<PropertyModel> sortedProperties = new ArrayList<>();
@@ -63,7 +63,9 @@ public class PropertyOrdering {
             }
         }
 
-        sortedProperties.addAll(propertyOrderStrategy.apply(byReadName.values()));
+        List<PropertyModel> readNamesToSort = new ArrayList<>(byReadName.values());
+        propertyOrderStrategy.accept(readNamesToSort);
+        sortedProperties.addAll(readNamesToSort);
         return sortedProperties;
     }
 }
