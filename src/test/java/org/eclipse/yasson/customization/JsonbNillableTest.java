@@ -13,6 +13,9 @@
 
 package org.eclipse.yasson.customization;
 
+import org.junit.jupiter.api.*;
+import static org.junit.jupiter.api.Assertions.*;
+
 import org.eclipse.yasson.customization.model.JsonbNillableClassSecondLevel;
 import org.eclipse.yasson.customization.model.JsonbNillableOverriddenWithJsonbProperty;
 import org.eclipse.yasson.customization.model.JsonbNillableOverridesClass;
@@ -21,15 +24,10 @@ import org.eclipse.yasson.customization.model.JsonbNillableValue;
 import org.eclipse.yasson.customization.model.packagelevelannotations.JsonbNillablePackageLevel;
 import org.eclipse.yasson.customization.model.packagelevelannotations.PackageLevelOverriddenWithClassLevel;
 import org.eclipse.yasson.defaultmapping.generics.model.ScalarValueWrapper;
-import org.junit.Assert;
-import org.junit.Before;
-import org.junit.Test;
 
 import javax.json.bind.Jsonb;
 import javax.json.bind.JsonbBuilder;
 import javax.json.bind.JsonbConfig;
-
-import static org.junit.Assert.assertEquals;
 
 /**
  * Tests a {@link javax.json.bind.annotation.JsonbNillable} annotation.

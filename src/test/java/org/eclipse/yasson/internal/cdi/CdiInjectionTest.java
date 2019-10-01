@@ -13,8 +13,10 @@
 
 package org.eclipse.yasson.internal.cdi;
 
+import org.junit.jupiter.api.*;
+import static org.junit.jupiter.api.Assertions.*;
+
 import org.eclipse.yasson.internal.components.JsonbComponentInstanceCreatorFactory;
-import org.junit.Test;
 
 import javax.enterprise.inject.spi.Bean;
 import javax.enterprise.inject.spi.BeanManager;
@@ -28,8 +30,6 @@ import javax.naming.NamingException;
 import java.lang.reflect.Field;
 import java.lang.reflect.Method;
 import java.util.Map;
-
-import static org.junit.Assert.*;
 
 /**
  * @author Roman Grigoriadi

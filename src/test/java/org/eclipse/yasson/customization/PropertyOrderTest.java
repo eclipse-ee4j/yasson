@@ -13,14 +13,15 @@
 
 package org.eclipse.yasson.customization;
 
+import org.junit.jupiter.api.*;
+import static org.junit.jupiter.api.Assertions.*;
+
 import org.eclipse.yasson.customization.model.FieldCustomOrder;
 import org.eclipse.yasson.customization.model.FieldCustomOrderWrapper;
 import org.eclipse.yasson.customization.model.FieldOrder;
 import org.eclipse.yasson.customization.model.FieldOrderNameAnnotation;
 import org.eclipse.yasson.customization.model.FieldSpecificOrder;
 import org.eclipse.yasson.customization.model.RenamedPropertiesContainer;
-import org.junit.Assert;
-import org.junit.Test;
 
 import javax.json.bind.Jsonb;
 import javax.json.bind.JsonbBuilder;
@@ -29,8 +30,6 @@ import javax.json.bind.annotation.JsonbCreator;
 import javax.json.bind.annotation.JsonbProperty;
 import javax.json.bind.annotation.JsonbPropertyOrder;
 import javax.json.bind.config.PropertyOrderStrategy;
-
-import static org.junit.Assert.assertEquals;
 
 /**
  * @author Roman Grigoriadi

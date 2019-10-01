@@ -10,12 +10,11 @@
  * Contributors:
  *     Ehsan Zaery Moghaddam (zaerymoghaddam@gmail.com) - initial implementation
  ******************************************************************************/
-import org.junit.Test;
+import org.junit.jupiter.api.*;
+import static org.junit.jupiter.api.Assertions.*;
 
 import javax.json.bind.Jsonb;
 import javax.json.bind.JsonbBuilder;
-
-import static org.junit.Assert.assertEquals;
 
 /**
  * Tests the serialization/deserialization of a class that has no package.

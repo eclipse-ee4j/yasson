@@ -12,13 +12,13 @@
  ******************************************************************************/
 package org.eclipse.yasson;
 
+import org.junit.jupiter.api.*;
+import static org.junit.jupiter.api.Assertions.*;
+
 import org.eclipse.yasson.internal.JsonBindingBuilder;
-import org.junit.Test;
 
 import javax.json.bind.Jsonb;
 import javax.json.bind.JsonbBuilder;
-
-import static org.junit.Assert.assertEquals;
 
 /**
  * @author Roman Grigoriadi

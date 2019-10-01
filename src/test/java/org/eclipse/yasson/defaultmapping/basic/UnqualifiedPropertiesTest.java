@@ -12,11 +12,10 @@
  ******************************************************************************/
 package org.eclipse.yasson.defaultmapping.basic;
 
-import static org.junit.Assert.assertEquals;
+import org.junit.jupiter.api.*;
+import static org.junit.jupiter.api.Assertions.*;
 
 import javax.json.bind.JsonbBuilder;
-
-import org.junit.Test;
 
 public class UnqualifiedPropertiesTest {
 	

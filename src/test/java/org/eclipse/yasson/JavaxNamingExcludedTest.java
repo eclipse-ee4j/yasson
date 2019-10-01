@@ -9,16 +9,15 @@
  ******************************************************************************/
 package org.eclipse.yasson;
 
+import org.junit.jupiter.api.*;
+import static org.junit.jupiter.api.Assertions.*;
+
 import org.eclipse.yasson.internal.cdi.NonCdiAdapter;
 import org.eclipse.yasson.internal.components.JsonbComponentInstanceCreatorFactory;
-import org.junit.Assert;
-import org.junit.Test;
 
 import javax.json.bind.Jsonb;
 import javax.json.bind.JsonbBuilder;
 import javax.json.bind.annotation.JsonbTypeAdapter;
-
-import static org.junit.Assert.assertEquals;
 
 /**
  * Requires --limit-modules java.base,java.logging,java.sql (to exclude java.naming) to work.
@@ -30,7 +29,7 @@ public class JavaxNamingExcludedTest {
     public void testNoJavaxNamingModule() {
         try {
             Class.forName(JsonbComponentInstanceCreatorFactory.INITIAL_CONTEXT_CLASS);
-            Assert.fail("Class [" + JsonbComponentInstanceCreatorFactory.INITIAL_CONTEXT_CLASS
+            fail("Class [" + JsonbComponentInstanceCreatorFactory.INITIAL_CONTEXT_CLASS
                     + "] should not be available for this test.");
         } catch (ClassNotFoundException e) {
             //OK, java.naming is not observable

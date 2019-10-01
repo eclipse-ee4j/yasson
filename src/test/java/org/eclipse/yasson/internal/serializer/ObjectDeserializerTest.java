@@ -1,8 +1,7 @@
 package org.eclipse.yasson.internal.serializer;
 
-import org.junit.Rule;
-import org.junit.Test;
-import org.junit.rules.ExpectedException;
+import org.junit.jupiter.api.*;
+import static org.junit.jupiter.api.Assertions.*;
 
 import javax.json.bind.Jsonb;
 import javax.json.bind.JsonbBuilder;

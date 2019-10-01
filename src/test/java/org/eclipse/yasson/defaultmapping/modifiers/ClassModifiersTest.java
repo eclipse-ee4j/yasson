@@ -13,6 +13,9 @@
 
 package org.eclipse.yasson.defaultmapping.modifiers;
 
+import org.junit.jupiter.api.*;
+import static org.junit.jupiter.api.Assertions.*;
+
 import javax.json.bind.Jsonb;
 import javax.json.bind.JsonbBuilder;
 import javax.json.bind.JsonbException;
@@ -20,13 +23,6 @@ import javax.json.bind.JsonbException;
 import org.eclipse.yasson.Assertions;
 import org.eclipse.yasson.defaultmapping.modifiers.model.ChildOfPackagePrivateParent;
 import org.eclipse.yasson.defaultmapping.modifiers.model.FieldModifiersClass;
-import org.junit.Before;
-import org.junit.Test;
-
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertNull;
-import static org.junit.Assert.assertTrue;
-import static org.junit.Assert.fail;
 
 /**
  * Test access modifiers on classes

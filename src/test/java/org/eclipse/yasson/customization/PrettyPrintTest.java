@@ -13,14 +13,13 @@
 
 package org.eclipse.yasson.customization;
 
-import org.junit.Test;
+import org.junit.jupiter.api.*;
+import static org.junit.jupiter.api.Assertions.*;
 
 import javax.json.bind.Jsonb;
 import javax.json.bind.JsonbBuilder;
 import javax.json.bind.JsonbConfig;
 import java.util.Arrays;
-
-import static org.junit.Assert.assertEquals;
 
 /**
  * Tests pretty print to JSONP propagation

@@ -12,9 +12,10 @@
  ******************************************************************************/
 package org.eclipse.yasson.defaultmapping.jsonp;
 
+import org.junit.jupiter.api.*;
+import static org.junit.jupiter.api.Assertions.*;
+
 import org.eclipse.yasson.defaultmapping.jsonp.model.JsonpPojo;
-import org.junit.Assert;
-import org.junit.Test;
 
 import javax.json.*;
 import javax.json.bind.Jsonb;
@@ -22,8 +23,6 @@ import javax.json.bind.JsonbBuilder;
 import javax.json.bind.JsonbConfig;
 import javax.json.spi.JsonProvider;
 import java.math.BigDecimal;
-
-import static org.junit.Assert.assertEquals;
 
 /**
  * Default mapping JSONP integration tests.

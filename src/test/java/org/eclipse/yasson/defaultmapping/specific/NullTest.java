@@ -14,19 +14,18 @@
 
 package org.eclipse.yasson.defaultmapping.specific;
 
+import org.junit.jupiter.api.*;
+import static org.junit.jupiter.api.Assertions.*;
+
 import org.eclipse.yasson.TestTypeToken;
 import org.eclipse.yasson.defaultmapping.specific.model.Street;
 import org.eclipse.yasson.internal.JsonBindingBuilder;
-import org.junit.Before;
-import org.junit.Test;
 
 import javax.json.bind.Jsonb;
 import javax.json.bind.JsonbBuilder;
 
 import java.util.List;
 import java.util.Map;
-
-import static org.junit.Assert.assertNull;
 
 /**
  * @author Roman Grigoriadi

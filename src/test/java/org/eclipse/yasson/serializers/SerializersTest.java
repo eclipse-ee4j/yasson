@@ -14,10 +14,10 @@
 
 package org.eclipse.yasson.serializers;
 
+import org.junit.jupiter.api.*;
+import static org.junit.jupiter.api.Assertions.*;
+
 import static java.util.Collections.singletonMap;
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertNull;
-import static org.junit.Assert.fail;
 
 import java.io.StringReader;
 import java.lang.reflect.Type;
@@ -65,8 +65,6 @@ import org.eclipse.yasson.serializers.model.SimpleAnnotatedSerializedArrayContai
 import org.eclipse.yasson.serializers.model.SimpleContainer;
 import org.eclipse.yasson.serializers.model.StringWrapper;
 import org.eclipse.yasson.serializers.model.SupertypeSerializerPojo;
-import org.junit.Assert;
-import org.junit.Test;
 
 /**
  * @author Roman Grigoriadi

@@ -12,10 +12,10 @@
  ******************************************************************************/
 package org.eclipse.yasson;
 
+import org.junit.jupiter.api.*;
+import static org.junit.jupiter.api.Assertions.*;
+
 import org.eclipse.yasson.internal.JsonbContext;
-import org.junit.Assert;
-import org.junit.Before;
-import org.junit.Test;
 
 import javax.json.bind.Jsonb;
 import javax.json.bind.JsonbBuilder;
@@ -23,8 +23,6 @@ import javax.json.bind.JsonbConfig;
 import javax.json.bind.annotation.JsonbProperty;
 import javax.json.spi.JsonProvider;
 import java.lang.reflect.Method;
-
-import static org.junit.Assert.assertEquals;
 
 /**
  *

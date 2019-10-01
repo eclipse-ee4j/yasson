@@ -1,7 +1,9 @@
 package org.eclipse.yasson.jsonstructure;
 
+import org.junit.jupiter.api.*;
+import static org.junit.jupiter.api.Assertions.*;
+
 import org.eclipse.yasson.YassonJsonb;
-import org.junit.Test;
 
 import javax.json.JsonArray;
 import javax.json.JsonNumber;
@@ -14,9 +16,6 @@ import javax.json.bind.JsonbConfig;
 import java.math.BigDecimal;
 import java.util.ArrayList;
 import java.util.List;
-
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertTrue;
 
 public class JsonGeneratorToStructureAdapterTest {
 

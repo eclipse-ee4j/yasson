@@ -12,6 +12,9 @@
  ******************************************************************************/
 package org.eclipse.yasson.defaultmapping.dates;
 
+import org.junit.jupiter.api.*;
+import static org.junit.jupiter.api.Assertions.*;
+
 import org.eclipse.yasson.TestTypeToken;
 import org.eclipse.yasson.defaultmapping.dates.model.CalendarPojo;
 import org.eclipse.yasson.defaultmapping.dates.model.ClassLevelDateAnnotation;
@@ -27,8 +30,6 @@ import org.eclipse.yasson.defaultmapping.dates.model.ZonedDateTimePojo;
 import org.eclipse.yasson.defaultmapping.generics.model.ScalarValueWrapper;
 import org.eclipse.yasson.internal.JsonBindingBuilder;
 import org.eclipse.yasson.internal.serializer.SqlDateTypeDeserializer;
-import org.junit.Assert;
-import org.junit.Test;
 
 import javax.json.bind.Jsonb;
 import javax.json.bind.JsonbBuilder;
@@ -66,8 +67,6 @@ import java.util.Locale;
 import java.util.Map;
 import java.util.SimpleTimeZone;
 import java.util.TimeZone;
-
-import static org.junit.Assert.assertEquals;
 
 /**
  * This class contains tests for marshalling/unmarshalling dates.

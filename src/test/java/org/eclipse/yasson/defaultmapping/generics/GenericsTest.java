@@ -13,6 +13,9 @@
  ******************************************************************************/
 package org.eclipse.yasson.defaultmapping.generics;
 
+import org.junit.jupiter.api.*;
+import static org.junit.jupiter.api.Assertions.*;
+
 import org.eclipse.yasson.TestTypeToken;
 import org.eclipse.yasson.adapters.model.GenericBox;
 import org.eclipse.yasson.defaultmapping.generics.model.AnotherGenericTestClass;
@@ -33,11 +36,6 @@ import org.eclipse.yasson.defaultmapping.generics.model.WildCardClass;
 import org.eclipse.yasson.defaultmapping.generics.model.WildcardMultipleBoundsClass;
 import org.eclipse.yasson.serializers.model.Box;
 import org.eclipse.yasson.serializers.model.Crate;
-import org.junit.Assert;
-import org.junit.Before;
-import org.junit.Rule;
-import org.junit.Test;
-import org.junit.rules.ExpectedException;
 
 import javax.json.bind.Jsonb;
 import javax.json.bind.JsonbBuilder;
@@ -55,9 +53,6 @@ import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 import java.util.TimeZone;
-
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertTrue;
 
 /**
  * This class contains JSONB default mapping generics tests.

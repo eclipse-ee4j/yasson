@@ -13,10 +13,11 @@
 
 package org.eclipse.yasson.customization;
 
+import org.junit.jupiter.api.*;
+import static org.junit.jupiter.api.Assertions.*;
+
 import org.eclipse.yasson.customization.model.NumberFormatPojo;
 import org.eclipse.yasson.customization.model.NumberFormatPojoWithoutClassLevelFormatter;
-import org.junit.Before;
-import org.junit.Test;
 
 import javax.json.bind.Jsonb;
 import javax.json.bind.JsonbBuilder;
@@ -24,8 +25,6 @@ import java.math.BigDecimal;
 import java.math.BigInteger;
 import java.util.Locale;
 import javax.json.bind.JsonbConfig;
-
-import static org.junit.Assert.assertEquals;
 
 /**
  * Tests number format.

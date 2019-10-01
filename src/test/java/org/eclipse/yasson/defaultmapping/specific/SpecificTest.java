@@ -12,9 +12,11 @@
  ******************************************************************************/
 package org.eclipse.yasson.defaultmapping.specific;
 
+import org.junit.jupiter.api.*;
+import static org.junit.jupiter.api.Assertions.*;
+
 import org.eclipse.yasson.defaultmapping.generics.model.ScalarValueWrapper;
 import org.eclipse.yasson.internal.JsonBindingBuilder;
-import org.junit.Test;
 
 import javax.json.bind.Jsonb;
 import java.math.BigDecimal;
@@ -23,8 +25,6 @@ import java.net.MalformedURLException;
 import java.net.URI;
 import java.net.URISyntaxException;
 import java.net.URL;
-
-import static org.junit.Assert.assertEquals;
 
 /**
  * Specific standard Java SE types tests: {@link BigDecimal}, {@link BigInteger}, {@link URL}, {@link URI}.

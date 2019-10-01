@@ -1,18 +1,17 @@
 package org.eclipse.yasson.defaultmapping.basic;
 
+import org.junit.jupiter.api.*;
+import static org.junit.jupiter.api.Assertions.*;
+
 import org.eclipse.yasson.internal.JsonBindingBuilder;
 import org.eclipse.yasson.internal.properties.MessageKeys;
 import org.eclipse.yasson.internal.properties.Messages;
-import org.junit.Assert;
-import org.junit.Test;
 
 import javax.json.bind.Jsonb;
 import javax.json.bind.JsonbConfig;
 import javax.json.bind.JsonbException;
 import java.math.BigDecimal;
 import java.math.BigInteger;
-
-import static org.junit.Assert.assertEquals;
 
 /**
  * @author David Kral

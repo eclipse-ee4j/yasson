@@ -1,8 +1,7 @@
 package org.eclipse.yasson.defaultmapping.lambda;
 
-import org.junit.Before;
-import org.junit.Test;
-import org.junit.Assert;
+import org.junit.jupiter.api.*;
+import static org.junit.jupiter.api.Assertions.*;
 
 import javax.json.bind.Jsonb;
 import javax.json.bind.JsonbBuilder;
@@ -27,7 +26,7 @@ public class LambdaExpressionTest {
         String name = "WALL-E";
         Addressable control = new Robot(name);
         Addressable lambda = () -> name;
-        Assert.assertEquals(jsonb.toJson(control), jsonb.toJson(lambda));
+        assertEquals(jsonb.toJson(control), jsonb.toJson(lambda));
     }
 
     @Test
@@ -35,6 +34,6 @@ public class LambdaExpressionTest {
         String name = "Cheshire";
         Pet control = new Cat(name);
         Pet lambda = () -> name;
-        Assert.assertEquals(jsonb.toJson(control), jsonb.toJson(lambda));
+        assertEquals(jsonb.toJson(control), jsonb.toJson(lambda));
     }
 }

@@ -13,6 +13,8 @@
 
 package org.eclipse.yasson.adapters;
 
+import org.junit.jupiter.api.*;
+import static org.junit.jupiter.api.Assertions.*;
 
 import org.eclipse.yasson.TestTypeToken;
 import org.eclipse.yasson.adapters.model.AdaptedPojo;
@@ -28,8 +30,6 @@ import org.eclipse.yasson.adapters.model.ReturnNullAdapter;
 import org.eclipse.yasson.adapters.model.SupertypeAdapterPojo;
 import org.eclipse.yasson.adapters.model.UUIDContainer;
 import org.eclipse.yasson.defaultmapping.generics.model.ScalarValueWrapper;
-import org.junit.Assert;
-import org.junit.Test;
 
 import javax.json.bind.Jsonb;
 import javax.json.bind.JsonbBuilder;
@@ -47,7 +47,6 @@ import java.util.Optional;
 import java.util.UUID;
 
 import static java.util.Collections.unmodifiableMap;
-import static org.junit.Assert.assertEquals;
 
 /**
  * Tests adapters to behave correctly.

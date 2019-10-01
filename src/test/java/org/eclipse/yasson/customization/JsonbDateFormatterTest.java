@@ -13,11 +13,13 @@
 
 package org.eclipse.yasson.customization;
 
+import org.junit.jupiter.api.*;
+import static org.junit.jupiter.api.Assertions.*;
+
 import org.eclipse.yasson.customization.model.DateFormatPojo;
 import org.eclipse.yasson.customization.model.DateFormatPojoWithClassLevelFormatter;
 import org.eclipse.yasson.customization.model.TrimmedDatePojo;
 import org.eclipse.yasson.internal.JsonBindingBuilder;
-import org.junit.Test;
 
 import javax.json.bind.Jsonb;
 import javax.json.bind.JsonbBuilder;
@@ -29,7 +31,6 @@ import java.util.Date;
 import java.util.TimeZone;
 
 import static org.eclipse.yasson.YassonProperties.ZERO_TIME_PARSE_DEFAULTING;
-import static org.junit.Assert.assertEquals;
 
 /**
  * Tests customization of date fields via {@link javax.json.bind.annotation.JsonbDateFormat} annotation

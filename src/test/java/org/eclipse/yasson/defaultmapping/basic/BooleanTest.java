@@ -13,16 +13,13 @@
 
 package org.eclipse.yasson.defaultmapping.basic;
 
+import org.junit.jupiter.api.*;
+import static org.junit.jupiter.api.Assertions.*;
+
 import org.eclipse.yasson.defaultmapping.basic.model.BooleanModel;
-import org.junit.Before;
-import org.junit.Rule;
-import org.junit.Test;
-import org.junit.rules.TestName;
 
 import javax.json.bind.Jsonb;
 import javax.json.bind.JsonbBuilder;
-
-import static org.junit.Assert.assertEquals;
 
 /**
  * Tests serialization and deserialization of boolean values.

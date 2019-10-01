@@ -13,16 +13,14 @@
 
 package org.eclipse.yasson.customization.transients;
 
+import org.junit.jupiter.api.*;
+import static org.junit.jupiter.api.Assertions.*;
+
 import org.eclipse.yasson.customization.transients.models.*;
-import org.junit.Assert;
-import org.junit.Before;
-import org.junit.Test;
 
 import javax.json.bind.Jsonb;
 import javax.json.bind.JsonbBuilder;
 import javax.json.bind.JsonbException;
-
-import static org.junit.Assert.*;
 
 /**
  * @author Roman Grigoriadi

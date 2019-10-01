@@ -13,7 +13,8 @@
 
 package org.eclipse.yasson.internal.model.customization.naming;
 
-import org.junit.Test;
+import org.junit.jupiter.api.*;
+import static org.junit.jupiter.api.Assertions.*;
 
 import javax.json.bind.Jsonb;
 import javax.json.bind.JsonbBuilder;
@@ -21,9 +22,6 @@ import javax.json.bind.JsonbConfig;
 import javax.json.bind.config.PropertyNamingStrategy;
 
 import org.eclipse.yasson.internal.model.customization.StrategiesProvider;
-
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertNull;
 
 /**
  * Tests naming strategies.

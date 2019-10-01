@@ -13,7 +13,8 @@
 
 package org.eclipse.yasson.customization;
 
-import org.junit.Test;
+import org.junit.jupiter.api.*;
+import static org.junit.jupiter.api.Assertions.*;
 
 import javax.json.bind.Jsonb;
 import javax.json.bind.JsonbBuilder;
@@ -22,8 +23,6 @@ import javax.json.bind.annotation.JsonbVisibility;
 import javax.json.bind.config.PropertyVisibilityStrategy;
 import java.lang.reflect.Field;
 import java.lang.reflect.Method;
-
-import static org.junit.Assert.assertEquals;
 
 /**
  * Tests custom {@link PropertyVisibilityStrategy}

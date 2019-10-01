@@ -13,12 +13,12 @@
 
 package org.eclipse.yasson.customization;
 
+import org.junit.jupiter.api.*;
+import static org.junit.jupiter.api.Assertions.*;
+
 import org.eclipse.yasson.customization.model.JsonbPropertyName;
 import org.eclipse.yasson.customization.model.JsonbPropertyNameCollision;
 import org.eclipse.yasson.customization.model.JsonbPropertyNillable;
-import org.junit.Assert;
-import org.junit.Before;
-import org.junit.Test;
 
 import javax.json.bind.Jsonb;
 import javax.json.bind.JsonbBuilder;
@@ -26,8 +26,6 @@ import javax.json.bind.JsonbConfig;
 import javax.json.bind.JsonbException;
 import javax.json.bind.annotation.JsonbProperty;
 import javax.json.bind.config.PropertyNamingStrategy;
-
-import static org.junit.Assert.*;
 
 /**
  * Tests parsing of {@link javax.json.bind.annotation.JsonbProperty} test.

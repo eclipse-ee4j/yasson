@@ -1,7 +1,7 @@
 package org.eclipse.yasson.documented;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertNull;
+import org.junit.jupiter.api.*;
+import static org.junit.jupiter.api.Assertions.*;
 
 import java.lang.reflect.Type;
 import java.math.BigDecimal;
@@ -26,8 +26,6 @@ import javax.json.bind.serializer.JsonbSerializer;
 import javax.json.bind.serializer.SerializationContext;
 import javax.json.stream.JsonGenerator;
 import javax.json.stream.JsonParser;
-
-import org.junit.Test;
 
 /**
  * Contains tests from http://json-b.net/docs/user-guide.html

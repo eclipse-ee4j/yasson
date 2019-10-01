@@ -9,8 +9,8 @@
  ******************************************************************************/
 package org.eclipse.yasson.defaultmapping.basic;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertNotNull;
+import org.junit.jupiter.api.*;
+import static org.junit.jupiter.api.Assertions.*;
 
 import java.time.Instant;
 import java.util.HashMap;
@@ -21,7 +21,6 @@ import javax.json.bind.JsonbBuilder;
 import javax.json.bind.annotation.JsonbTransient;
 
 import org.jboss.weld.exceptions.IllegalStateException;
-import org.junit.Test;
 
 /**
  * Tests to verify that read-only properties (properties with no field or setter)

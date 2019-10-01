@@ -13,9 +13,10 @@
 
 package org.eclipse.yasson.customization;
 
+import org.junit.jupiter.api.*;
+import static org.junit.jupiter.api.Assertions.*;
+
 import org.eclipse.yasson.customization.model.*;
-import org.junit.Assert;
-import org.junit.Test;
 
 import javax.json.bind.Jsonb;
 import javax.json.bind.JsonbBuilder;
@@ -27,8 +28,6 @@ import javax.json.bind.annotation.JsonbProperty;
 import java.math.BigDecimal;
 import java.time.LocalDate;
 import java.util.Set;
-
-import static org.junit.Assert.*;
 
 /**
  * @author Roman Grigoriadi

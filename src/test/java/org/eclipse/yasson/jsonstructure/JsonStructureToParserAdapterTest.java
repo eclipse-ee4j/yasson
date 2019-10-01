@@ -1,8 +1,10 @@
 package org.eclipse.yasson.jsonstructure;
 
+import org.junit.jupiter.api.*;
+import static org.junit.jupiter.api.Assertions.*;
+
 import org.eclipse.yasson.TestTypeToken;
 import org.eclipse.yasson.YassonJsonb;
-import org.junit.Test;
 
 import javax.json.JsonArray;
 import javax.json.JsonArrayBuilder;
@@ -15,11 +17,6 @@ import java.math.BigDecimal;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
-
-import static junit.framework.TestCase.assertTrue;
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertNotNull;
-import static org.junit.Assert.assertNull;
 
 public class JsonStructureToParserAdapterTest {
 

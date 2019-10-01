@@ -13,13 +13,13 @@
 
 package org.eclipse.yasson.customization;
 
+import org.junit.jupiter.api.*;
+import static org.junit.jupiter.api.Assertions.*;
+
 import org.eclipse.yasson.customization.model.InheritedAnnotationsPojo;
-import org.junit.Test;
 
 import javax.json.bind.Jsonb;
 import javax.json.bind.JsonbBuilder;
-
-import static org.junit.Assert.assertEquals;
 
 /**
  * @author Roman Grigoriadi

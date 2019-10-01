@@ -1,9 +1,9 @@
 package org.eclipse.yasson.defaultmapping;
 
+import org.junit.jupiter.api.*;
+import static org.junit.jupiter.api.Assertions.*;
+
 import org.eclipse.yasson.serializers.model.Crate;
-import org.junit.After;
-import org.junit.Before;
-import org.junit.Test;
 
 import javax.json.bind.Jsonb;
 import javax.json.bind.JsonbBuilder;

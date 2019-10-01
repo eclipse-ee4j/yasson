@@ -13,10 +13,11 @@
 
 package org.eclipse.yasson.internal.concurrent;
 
+import org.junit.jupiter.api.*;
+import static org.junit.jupiter.api.Assertions.*;
+
 import org.eclipse.yasson.defaultmapping.specific.CustomerTest;
 import org.eclipse.yasson.defaultmapping.specific.model.Customer;
-import org.junit.Before;
-import org.junit.Test;
 
 import javax.json.bind.Jsonb;
 import javax.json.bind.JsonbBuilder;
@@ -28,8 +29,6 @@ import java.lang.reflect.Method;
 import java.util.concurrent.*;
 import java.util.concurrent.atomic.AtomicLong;
 import java.util.logging.Logger;
-
-import static junit.framework.TestCase.assertEquals;
 
 /**
  * Tests consistency along sharing instances of Jsonb with different JsonbConfig between threads.

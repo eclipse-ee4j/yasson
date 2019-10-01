@@ -13,6 +13,8 @@
 
 package org.eclipse.yasson.defaultmapping.specific;
 
+import static org.junit.jupiter.api.Assertions.*;
+
 import org.eclipse.yasson.defaultmapping.specific.model.Address;
 import org.eclipse.yasson.defaultmapping.specific.model.Customer;
 import org.eclipse.yasson.defaultmapping.specific.model.Street;
@@ -21,8 +23,6 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-
-import static org.junit.Assert.assertEquals;
 
 /**
  * @author Roman Grigoriadi

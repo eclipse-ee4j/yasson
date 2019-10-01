@@ -9,13 +9,13 @@
  ******************************************************************************/
 package org.eclipse.yasson.jsonpsubstitution;
 
+import org.junit.jupiter.api.*;
+import static org.junit.jupiter.api.Assertions.*;
+
 import org.eclipse.yasson.Assertions;
 import org.eclipse.yasson.JsonBindingProvider;
 import org.eclipse.yasson.TestTypeToken;
 import org.eclipse.yasson.YassonJsonb;
-import org.junit.Assert;
-import org.junit.Before;
-import org.junit.Test;
 
 import javax.json.bind.JsonbBuilder;
 import javax.json.bind.JsonbException;
@@ -24,9 +24,6 @@ import javax.json.stream.JsonParser;
 import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
 import java.util.List;
-
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertTrue;
 
 public class PreinstantiatedJsonpTest {
 

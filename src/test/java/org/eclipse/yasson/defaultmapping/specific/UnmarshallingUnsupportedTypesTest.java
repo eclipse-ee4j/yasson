@@ -13,13 +13,15 @@
 
 package org.eclipse.yasson.defaultmapping.specific;
 
+import org.junit.jupiter.api.*;
+import static org.junit.jupiter.api.Assertions.*;
+
 import org.eclipse.yasson.TestTypeToken;
 import org.eclipse.yasson.defaultmapping.generics.model.GenericTestClass;
 import org.eclipse.yasson.defaultmapping.specific.model.ClassWithUnsupportedFields;
 import org.eclipse.yasson.defaultmapping.specific.model.CustomUnsupportedInterface;
 import org.eclipse.yasson.defaultmapping.specific.model.SupportedTypes;
 import org.eclipse.yasson.defaultmapping.specific.model.SupportedTypes.NestedPojo;
-import org.junit.Test;
 
 import javax.json.bind.Jsonb;
 import javax.json.bind.JsonbBuilder;
@@ -37,7 +39,6 @@ import java.util.OptionalInt;
 import java.util.OptionalLong;
 
 import static org.eclipse.yasson.YassonProperties.FAIL_ON_UNKNOWN_PROPERTIES;
-import static org.junit.Assert.*;
 
 /**
  * @author Roman Grigoriadi

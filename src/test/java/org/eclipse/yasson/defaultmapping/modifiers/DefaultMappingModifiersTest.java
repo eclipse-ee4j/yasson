@@ -13,20 +13,19 @@
 
 package org.eclipse.yasson.defaultmapping.modifiers;
 
+import org.junit.jupiter.api.*;
+import static org.junit.jupiter.api.Assertions.*;
+
 import org.eclipse.yasson.defaultmapping.modifiers.model.Person;
 import org.eclipse.yasson.defaultmapping.modifiers.model.FieldModifiersClass;
 import org.eclipse.yasson.defaultmapping.modifiers.model.MethodModifiersClass;
 import org.eclipse.yasson.defaultmapping.modifiers.model.PrivateConstructorClass;
 import org.eclipse.yasson.defaultmapping.modifiers.model.ProtectedConstructorClass;
 import org.eclipse.yasson.internal.JsonBindingBuilder;
-import org.junit.Before;
-import org.junit.Test;
 
 import javax.json.bind.Jsonb;
 import javax.json.bind.JsonbBuilder;
 import javax.json.bind.JsonbException;
-
-import static org.junit.Assert.*;
 
 /**
  * Test access modifiers for default mapping.
