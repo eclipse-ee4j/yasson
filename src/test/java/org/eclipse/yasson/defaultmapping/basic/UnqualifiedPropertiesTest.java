@@ -14,8 +14,7 @@ package org.eclipse.yasson.defaultmapping.basic;
 
 import org.junit.jupiter.api.*;
 import static org.junit.jupiter.api.Assertions.*;
-
-import javax.json.bind.JsonbBuilder;
+import static org.eclipse.yasson.Jsonbs.*;
 
 public class UnqualifiedPropertiesTest {
 	
@@ -43,12 +42,11 @@ public class UnqualifiedPropertiesTest {
 	
 	@Test
 	public void testGetWithArgs() {
-	    assertEquals("{\"foo\":\"foo\",\"now\":0}", JsonbBuilder.create().toJson(new Widget()));
+	    assertEquals("{\"foo\":\"foo\",\"now\":0}", defaultJsonb.toJson(new Widget()));
 	}
 	
 	@Test
 	public void testSetWithNoArgs() {
-		assertEquals("{\"foo\":\"foo\",\"now\":1511576115722}", JsonbBuilder.create().toJson(new Widget().setNow()));
+		assertEquals("{\"foo\":\"foo\",\"now\":1511576115722}", defaultJsonb.toJson(new Widget().setNow()));
 	}
-	
 }

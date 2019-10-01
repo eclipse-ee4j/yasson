@@ -21,7 +21,8 @@ public class CollectionsWithJavaBaseTypesTest {
     public void testSimple() {
         JavaBasePropertiesInContainer properties = new JavaBasePropertiesInContainer();
         properties.setNames(Arrays.asList("First", "second", null));
-        for(int i=0; i<3; i++) {
+        
+        for(int i = 0; i < 3; i++) {
             List<Integer> integerList = new ArrayList<>();
             integerList.add(0);
             integerList.add(1);

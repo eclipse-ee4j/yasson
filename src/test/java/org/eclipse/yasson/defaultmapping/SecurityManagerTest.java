@@ -22,14 +22,14 @@ public class SecurityManagerTest {
     static final String classesDir = SecurityManagerTest.class.getProtectionDomain().getCodeSource().getLocation().getFile();
 
     @BeforeAll
-    public void setUp() {
+    public static void setUp() {
         System.setProperty("java.security.policy", classesDir + "test.policy");
         System.setProperty("java.security.debug", "failure");
         System.setSecurityManager(new SecurityManager());
     }
 
     @AfterAll
-    public void tearDown() {
+    public static void tearDown() {
         System.setSecurityManager(null);
     }
 

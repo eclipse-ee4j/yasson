@@ -15,6 +15,7 @@ package org.eclipse.yasson.internal.cdi;
 
 import org.junit.jupiter.api.*;
 import static org.junit.jupiter.api.Assertions.*;
+import static org.eclipse.yasson.Jsonbs.*;
 
 import org.eclipse.yasson.internal.components.JsonbComponentInstanceCreatorFactory;
 
@@ -41,9 +42,7 @@ public class CdiInjectionTest {
         WeldManager weldManager = new WeldManager();
         weldManager.startWeld(CalledMethods.class, CdiTestService.class, HelloService1.class, HelloService2.class);
 
-        Jsonb jsonb = JsonbBuilder.create();
-        final String result = jsonb.toJson(new AdaptedPojo());
-        jsonb.close();
+        final String result = defaultJsonb.toJson(new AdaptedPojo());
         assertEquals("{\"adaptedValue1\":1111,\"adaptedValue2\":1001,\"adaptedValue3\":1010}", result);
 
         //HelloService1 is @ApplicationScoped
@@ -78,8 +77,7 @@ public class CdiInjectionTest {
 
         String result;
         try {
-            Jsonb jsonb = JsonbBuilder.create();
-            result = jsonb.toJson(new AdaptedPojo());
+            result = defaultJsonb.toJson(new AdaptedPojo());
         } finally {
             context.unbind(JsonbComponentInstanceCreatorFactory.BEAN_MANAGER_NAME);
         }
@@ -106,11 +104,9 @@ public class CdiInjectionTest {
         assertEquals("{\"adaptedValue3\":1010}", result);
     }
 
-    private CalledMethods getCalledMethods() {
+    private static CalledMethods getCalledMethods() {
         final BeanManager beanManager = CDI.current().getBeanManager();
         final Bean<?> resolve = beanManager.resolve(beanManager.getBeans(CalledMethods.class));
         return (CalledMethods) beanManager.getReference(resolve, CalledMethods.class, beanManager.createCreationalContext(resolve));
     }
-
-
 }

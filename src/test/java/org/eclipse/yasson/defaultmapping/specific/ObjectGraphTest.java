@@ -15,11 +15,10 @@ package org.eclipse.yasson.defaultmapping.specific;
 
 import org.junit.jupiter.api.*;
 import static org.junit.jupiter.api.Assertions.*;
+import static org.eclipse.yasson.Jsonbs.*;
 
 import org.eclipse.yasson.defaultmapping.specific.model.Customer;
-import org.eclipse.yasson.internal.JsonBindingBuilder;
 
-import javax.json.bind.Jsonb;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -27,7 +26,6 @@ import java.util.Map;
  * @author Roman Grigoriadi
  */
 public class ObjectGraphTest extends CustomerTest {
-
     private static final String EXPECTED = "{\"addresses\":[{\"street\":{\"name\":\"Zoubkova\",\"number\":111},\"town\":\"Prague\"}],\"age\":33,\"friends\":{\"firstFriend\":{\"addresses\":[{\"street\":{\"name\":\"Zoubkova\",\"number\":111},\"town\":\"Prague\"}],\"age\":33,\"integers\":[0,1],\"listOfListsOfIntegers\":[[0,1,2],[0,1,2],[0,1,2]],\"name\":\"Jasons first friend\",\"stringIntegerMap\":{\"first\":1,\"second\":2},\"strings\":[\"green\",\"yellow\"]},\"secondFriend\":{\"addresses\":[{\"street\":{\"name\":\"Zoubkova\",\"number\":111},\"town\":\"Prague\"}],\"age\":33,\"integers\":[0,1],\"listOfListsOfIntegers\":[[0,1,2],[0,1,2],[0,1,2]],\"name\":\"Jasons second friend\",\"stringIntegerMap\":{\"first\":1,\"second\":2},\"strings\":[\"green\",\"yellow\"]}},\"integers\":[0,1],\"listOfListsOfIntegers\":[[0,1,2],[0,1,2],[0,1,2]],\"name\":\"Root Jason Customer\",\"stringIntegerMap\":{\"first\":1,\"second\":2},\"strings\":[\"green\",\"yellow\"]}";
 
     @Test
@@ -39,18 +37,15 @@ public class ObjectGraphTest extends CustomerTest {
         friends.put("secondFriend", createCustomer("Jasons second friend"));
         customer.setFriends(friends);
 
-        Jsonb jsonb = new JsonBindingBuilder().build();
-        assertEquals(EXPECTED, jsonb.toJson(customer));
+        assertEquals(EXPECTED, bindingJsonb.toJson(customer));
     }
 
     @Test
     public void testObjectFromJson() {
-        Jsonb jsonb = new JsonBindingBuilder().build();
-        Customer customer = jsonb.fromJson(EXPECTED, Customer.class);
+        Customer customer = bindingJsonb.fromJson(EXPECTED, Customer.class);
         assertCustomerValues(customer, "Root Jason Customer");
         assertEquals(2, customer.getFriends().size());
         assertCustomerValues(customer.getFriends().get("firstFriend"), "Jasons first friend");
         assertCustomerValues(customer.getFriends().get("secondFriend"), "Jasons second friend");
     }
-
 }

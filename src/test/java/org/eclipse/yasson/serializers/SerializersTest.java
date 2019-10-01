@@ -93,7 +93,6 @@ public class SerializersTest {
         assertEquals("replaced value", result.annotatedType.value);
         assertEquals("overridden value", result.annotatedTypeOverriddenOnProperty.value);
         assertEquals("inside generic", result.annotatedGenericType.value.crateStr);
-
     }
 
     @Test
@@ -106,7 +105,6 @@ public class SerializersTest {
 
         AnnotatedWithSerializerType result = defaultJsonb.fromJson(expected, AnnotatedWithSerializerType.class);
         assertEquals("replaced value", result.value);
-
     }
 
     @Test
@@ -120,7 +118,6 @@ public class SerializersTest {
 
         AnnotatedGenericWithSerializerType<Crate> result = defaultJsonb.fromJson(expected, new AnnotatedGenericWithSerializerType<Crate>(){}.getClass().getGenericSuperclass());
         assertEquals("inside generic", result.value.crateStr);
-
     }
 
     /**
@@ -147,7 +144,6 @@ public class SerializersTest {
         //set by deserializer statically
         assertEquals(new BigDecimal("123"), result.crate.crateBigDec);
         assertEquals("abc", result.crate.crateStr);
-
     }
 
     /**
@@ -198,7 +194,7 @@ public class SerializersTest {
         assertEquals(BigDecimal.TEN, result.crate.crateInner.crateInnerBigDec);
     }
 
-    private Date getExpectedDate() {
+    private static Date getExpectedDate() {
         return new Calendar.Builder().setDate(2015, 4, 14).setTimeOfDay(11, 10, 1).setTimeZone(TimeZone.getTimeZone("Z")).build().getTime();
     }
 
@@ -213,7 +209,6 @@ public class SerializersTest {
 
     @Test
     public void testAnnotations() {
-        final Jsonb jsonb = JsonbBuilder.create();
         BoxWithAnnotations box = new BoxWithAnnotations();
         box.boxStr = "Box string";
         box.secondBoxStr = "Second box string";
@@ -227,9 +222,9 @@ public class SerializersTest {
 
         String expected = "{\"boxStr\":\"Box string\",\"crate\":{\"crateStr\":\"REPLACED crate str\",\"crateInner\":{\"crateInnerBigDec\":10,\"crate_inner_str\":\"Single inner\"},\"crateInnerList\":[{\"crateInnerBigDec\":10,\"crate_inner_str\":\"List inner 0\"},{\"crateInnerBigDec\":10,\"crate_inner_str\":\"List inner 1\"}],\"crateBigDec\":54321,\"date-converted\":\"2015-05-14T11:10:01Z[UTC]\"},\"secondBoxStr\":\"Second box string\"}";
 
-        assertEquals(expected, jsonb.toJson(box));
+        assertEquals(expected, defaultJsonb.toJson(box));
 
-        BoxWithAnnotations result = jsonb.fromJson(expected, BoxWithAnnotations.class);
+        BoxWithAnnotations result = defaultJsonb.fromJson(expected, BoxWithAnnotations.class);
 
         //deserialized by deserializationContext.deserialize(Class c)
         assertEquals(box.crate.crateInner.crateInnerBigDec, result.crate.crateInner.crateInnerBigDec);
@@ -281,17 +276,14 @@ public class SerializersTest {
 
     @Test
     public void testStringField() {
-        Jsonb jsonb = JsonbBuilder.create();
         StringWrapper pojo = new StringWrapper();
         pojo.strField = "abc";
-        final String result = jsonb.toJson(pojo);
+        final String result = defaultJsonb.toJson(pojo);
         assertEquals("{\"strField\":\"   abc\"}", result);
     }
 
     @Test
     public void testContainerSerializer() {
-        Jsonb jsonb = JsonbBuilder.create();
-
         SimpleAnnotatedSerializedArrayContainer container = new SimpleAnnotatedSerializedArrayContainer();
         SimpleContainer instance1 = new SimpleContainer();
         instance1.setInstance("Test String 1");
@@ -303,10 +295,10 @@ public class SerializersTest {
         container.getListInstance().add(new SimpleContainer("Test List 1"));
         container.getListInstance().add(new SimpleContainer("Test List 2"));
 
-        String jsonString = jsonb.toJson(container);
+        String jsonString = defaultJsonb.toJson(container);
         assertEquals("{\"arrayInstance\":[{\"instance\":\"Test String 1\"},{\"instance\":\"Test String 2\"}],\"listInstance\":[{\"instance\":\"Test List 1\"},{\"instance\":\"Test List 2\"}]}", jsonString);
 
-        SimpleAnnotatedSerializedArrayContainer unmarshalledObject = jsonb.fromJson("{\"arrayInstance\":[{\"instance\":\"Test String 1\"},{\"instance\":\"Test String 2\"}],\"listInstance\":[{\"instance\":\"Test List 1\"},{\"instance\":\"Test List 2\"}]}", SimpleAnnotatedSerializedArrayContainer.class);
+        SimpleAnnotatedSerializedArrayContainer unmarshalledObject = defaultJsonb.fromJson("{\"arrayInstance\":[{\"instance\":\"Test String 1\"},{\"instance\":\"Test String 2\"}],\"listInstance\":[{\"instance\":\"Test List 1\"},{\"instance\":\"Test List 2\"}]}", SimpleAnnotatedSerializedArrayContainer.class);
 
         assertEquals("Test String 1", unmarshalledObject.getArrayInstance()[0].getInstance());
         assertEquals("Test String 2", unmarshalledObject.getArrayInstance()[1].getInstance());
@@ -340,13 +332,12 @@ public class SerializersTest {
     @Test
     public void testAuthor() {
         Author author = new Author("Sarah", "Connor");
-        Jsonb jsonb = JsonbBuilder.create();
         String expected = "{\"firstName\":\"S\",\"lastName\":\"Connor\"}";
-        String json = jsonb.toJson(author);
+        String json = defaultJsonb.toJson(author);
 
         assertEquals(expected, json);
 
-        Author result = jsonb.fromJson(expected, Author.class);
+        Author result = defaultJsonb.fromJson(expected, Author.class);
         assertEquals("John", result.getFirstName());
         assertEquals("Connor", result.getLastName());
     }
@@ -396,8 +387,7 @@ public class SerializersTest {
         Object pojo = jsonb.fromJson(json, Object.class);
         assertTrue(pojo instanceof HashMap, "Pojo is not of type HashMap with \"ANY\" strategy");
         // none
-        jsonb = JsonbBuilder.create(new JsonbConfig());
-        pojo = jsonb.fromJson(json, Object.class);
+        pojo = defaultJsonb.fromJson(json, Object.class);
         assertTrue(pojo instanceof HashMap, "Pojo is not of type HashMap with no strategy");
     }
 
@@ -419,10 +409,9 @@ public class SerializersTest {
         assertTrue(pojo instanceof ReverseTreeMap, "Pojo is not of type ReverseTreeMap with no strategy");
         assertEquals("{\"third\":3,\"second\":2,\"first\":1}", jsonb.toJson(pojo));
 
-        jsonb = JsonbBuilder.create(new JsonbConfig());
-        pojo = jsonb.fromJson(json, SortedMap.class);
+        pojo = defaultJsonb.fromJson(json, SortedMap.class);
         assertTrue(pojo instanceof TreeMap, "Pojo is not of type TreeMap with no strategy");
-        assertEquals("{\"first\":1,\"second\":2,\"third\":3}", jsonb.toJson(pojo));
+        assertEquals("{\"first\":1,\"second\":2,\"third\":3}", defaultJsonb.toJson(pojo));
     }
 
     @Test
@@ -443,10 +432,9 @@ public class SerializersTest {
 
     @Test
     public void testSerializeMapWithNulls() {
-        Jsonb jsonb = JsonbBuilder.create(new JsonbConfig().withNullValues(Boolean.TRUE));
-        assertEquals("{\"null\":null}", jsonb.toJson(singletonMap(null, null)));
-        assertEquals("{\"key\":null}", jsonb.toJson(singletonMap("key", null)));
-        assertEquals("{\"null\":\"value\"}", jsonb.toJson(singletonMap(null, "value")));
+        assertEquals("{\"null\":null}", nullableJsonb.toJson(singletonMap(null, null)));
+        assertEquals("{\"key\":null}", nullableJsonb.toJson(singletonMap("key", null)));
+        assertEquals("{\"null\":\"value\"}", nullableJsonb.toJson(singletonMap(null, "value")));
     }
 
     /**
@@ -498,7 +486,7 @@ public class SerializersTest {
         }
     }
 
-    private Box createPojoWithDates() {
+    private static Box createPojoWithDates() {
         Date date = getExpectedDate();
         Box box = createPojo();
         box.crate.date = date;
@@ -506,7 +494,7 @@ public class SerializersTest {
         return box;
     }
 
-    private Box createPojo() {
+    private static Box createPojo() {
         Box box = new Box();
         box.boxStr = "Box string";
         box.crate = new Crate();
@@ -522,12 +510,10 @@ public class SerializersTest {
         return box;
     }
 
-    private CrateInner createCrateInner(String name) {
+    private static CrateInner createCrateInner(String name) {
         final CrateInner crateInner = new CrateInner();
         crateInner.crateInnerStr = name;
         crateInner.crateInnerBigDec = BigDecimal.TEN;
         return crateInner;
     }
-
-
 }

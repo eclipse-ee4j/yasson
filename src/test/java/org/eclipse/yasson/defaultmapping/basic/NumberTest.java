@@ -16,6 +16,7 @@ package org.eclipse.yasson.defaultmapping.basic;
 
 import org.junit.jupiter.api.*;
 import static org.junit.jupiter.api.Assertions.*;
+import static org.eclipse.yasson.Jsonbs.*;
 
 import static org.eclipse.yasson.Assertions.*;
 import org.eclipse.yasson.TestTypeToken;
@@ -26,9 +27,6 @@ import javax.json.Json;
 import javax.json.JsonObject;
 import javax.json.JsonObjectBuilder;
 import javax.json.JsonWriter;
-import javax.json.bind.Jsonb;
-import javax.json.bind.JsonbBuilder;
-import javax.json.bind.JsonbException;
 import javax.json.stream.JsonGenerator;
 
 import java.io.StringWriter;
@@ -43,53 +41,51 @@ import java.util.Map;
  */
 public class NumberTest {
 
-    private Jsonb jsonb = JsonbBuilder.create();
-
     @Test
     public void testSerializeFloat() {
-        final String json = jsonb.toJson(0.35f);
+        final String json = defaultJsonb.toJson(0.35f);
         assertEquals("0.35", json);
 
-        Float result = jsonb.fromJson("0.35", Float.class);
+        Float result = defaultJsonb.fromJson("0.35", Float.class);
         assertEquals((Float) .35f, result);
     }
 
     @Test
     public void testBigDecimalMarshalling() {
-        String jsonString = jsonb.toJson(new BigDecimal("0.10000000000000001"));
+        String jsonString = defaultJsonb.toJson(new BigDecimal("0.10000000000000001"));
         assertEquals("0.10000000000000001", jsonString);
 
-        jsonString = jsonb.toJson(new BigDecimal("0.1000000000000001"));
+        jsonString = defaultJsonb.toJson(new BigDecimal("0.1000000000000001"));
         assertEquals("0.1000000000000001", jsonString);
 
-        BigDecimal result = jsonb.fromJson("0.10000000000000001", BigDecimal.class);
+        BigDecimal result = defaultJsonb.fromJson("0.10000000000000001", BigDecimal.class);
         assertEquals(new BigDecimal("0.10000000000000001"), result);
 
-        result = jsonb.fromJson("0.100000000000000001", BigDecimal.class);
+        result = defaultJsonb.fromJson("0.100000000000000001", BigDecimal.class);
         assertEquals(new BigDecimal("0.100000000000000001"), result);
     }
 
     @Test
     public void testBigDecimalIEEE748() {
-        String jsonString = jsonb.toJson(new BigDecimal("9007199254740991"));
+        String jsonString = defaultJsonb.toJson(new BigDecimal("9007199254740991"));
         assertEquals("9007199254740991", jsonString);
 
-        jsonString = jsonb.toJson(new BigDecimal("9007199254740992"));
+        jsonString = defaultJsonb.toJson(new BigDecimal("9007199254740992"));
         assertEquals("9007199254740992", jsonString);
 
-        jsonString = jsonb.toJson(new BigDecimal("9007199254740991.1"));
+        jsonString = defaultJsonb.toJson(new BigDecimal("9007199254740991.1"));
         assertEquals("9007199254740991.1", jsonString);
 
-        jsonString = jsonb.toJson(new BigDecimal(new BigInteger("1"), -400));
+        jsonString = defaultJsonb.toJson(new BigDecimal(new BigInteger("1"), -400));
         assertEquals(new BigDecimal(new BigInteger("1"), -400).toString(), jsonString);
     }
 
     @Test
     public void testBigIntegerIEEE748() {
-        String jsonString = jsonb.toJson(new BigInteger("9007199254740991"));
+        String jsonString = defaultJsonb.toJson(new BigInteger("9007199254740991"));
         assertEquals("9007199254740991", jsonString);
 
-        jsonString = jsonb.toJson(new BigInteger("9007199254740992"));
+        jsonString = defaultJsonb.toJson(new BigInteger("9007199254740992"));
         assertEquals("9007199254740992", jsonString);
     }
 
@@ -97,72 +93,71 @@ public class NumberTest {
     public void testBigDecimalInNumber() {
         BigDecimalInNumber testValueQuoted = new BigDecimalInNumber() {{setBigDecValue(new BigDecimal("9007199254740992"));}};
         BigDecimalInNumber testValueUnQuoted = new BigDecimalInNumber() {{setBigDecValue(new BigDecimal("9007199254740991"));}};
-        String jsonString = jsonb.toJson(testValueQuoted);
+        String jsonString = defaultJsonb.toJson(testValueQuoted);
         assertEquals("{\"bigDecValue\":9007199254740992}", jsonString);
 
-        jsonString = jsonb.toJson(testValueUnQuoted);
+        jsonString = defaultJsonb.toJson(testValueUnQuoted);
         assertEquals("{\"bigDecValue\":9007199254740991}", jsonString);
 
-        BigDecimalInNumber result = jsonb.fromJson("{\"bigDecValue\":9007199254740992}", BigDecimalInNumber.class);
+        BigDecimalInNumber result = defaultJsonb.fromJson("{\"bigDecValue\":9007199254740992}", BigDecimalInNumber.class);
         assertEquals(testValueQuoted.getBigDecValue(), result.getBigDecValue());
 
-        result = jsonb.fromJson("{\"bigDecValue\":9007199254740991}", BigDecimalInNumber.class);
+        result = defaultJsonb.fromJson("{\"bigDecValue\":9007199254740991}", BigDecimalInNumber.class);
         assertEquals(testValueUnQuoted.getBigDecValue(), result.getBigDecValue());
     }
 
     @Test
     public void testBigDecimalWrappedMarshalling() {
-        String jsonString = jsonb.toJson(new ScalarValueWrapper<>(new BigDecimal("0.1000000000000001")));
+        String jsonString = defaultJsonb.toJson(new ScalarValueWrapper<>(new BigDecimal("0.1000000000000001")));
         assertEquals("{\"value\":0.1000000000000001}", jsonString);
 
-        jsonString = jsonb.toJson(new ScalarValueWrapper<>(new BigDecimal("0.10000000000000001")));
+        jsonString = defaultJsonb.toJson(new ScalarValueWrapper<>(new BigDecimal("0.10000000000000001")));
         assertEquals("{\"value\":0.10000000000000001}", jsonString);
 
-        ScalarValueWrapper<BigDecimal> result = jsonb.fromJson("{\"value\":0.1000000000000001}", new TestTypeToken<ScalarValueWrapper<BigDecimal>>(){}.getType());
+        ScalarValueWrapper<BigDecimal> result = defaultJsonb.fromJson("{\"value\":0.1000000000000001}", new TestTypeToken<ScalarValueWrapper<BigDecimal>>(){}.getType());
         assertEquals(new BigDecimal("0.1000000000000001"), result.getValue());
 
-        result = jsonb.fromJson("{\"value\":0.10000000000000001}", new TestTypeToken<ScalarValueWrapper<BigDecimal>>(){}.getType());
+        result = defaultJsonb.fromJson("{\"value\":0.10000000000000001}", new TestTypeToken<ScalarValueWrapper<BigDecimal>>(){}.getType());
         assertEquals(new BigDecimal("0.10000000000000001"), result.getValue());
     }
 
     @Test
     public void testBigDecimalCastedToNumber() {
-        String jsonString = jsonb.toJson(new Object() { public Number number = new BigDecimal("0.10000000000000001"); });
+        String jsonString = defaultJsonb.toJson(new Object() { public Number number = new BigDecimal("0.10000000000000001"); });
         assertEquals("{\"number\":0.10000000000000001}", jsonString);
 
-        jsonString = jsonb.toJson(new Object() { public Number number = new BigDecimal("0.1000000000000001"); });
+        jsonString = defaultJsonb.toJson(new Object() { public Number number = new BigDecimal("0.1000000000000001"); });
         assertEquals("{\"number\":0.1000000000000001}", jsonString);
     }
 
     @Test
     public void testLongIEEE748() {
-
         // 9007199254740991L
         Long maxJsSafeValue = Double.valueOf(Math.pow(2, 53)).longValue() - 1;
         Long upperJsUnsafeValue = maxJsSafeValue + 1;
 
-        String json = jsonb.toJson(maxJsSafeValue);
+        String json = defaultJsonb.toJson(maxJsSafeValue);
         assertEquals("9007199254740991", json);
-        Long deserialized = jsonb.fromJson(json, Long.class);
+        Long deserialized = defaultJsonb.fromJson(json, Long.class);
         assertEquals(Long.valueOf("9007199254740991"), deserialized);
 
-        json = jsonb.toJson(upperJsUnsafeValue);
+        json = defaultJsonb.toJson(upperJsUnsafeValue);
         assertEquals("9007199254740992", json);
-        deserialized = jsonb.fromJson(json, Long.class);
+        deserialized = defaultJsonb.fromJson(json, Long.class);
         assertEquals(Long.valueOf("9007199254740992"), deserialized);
 
 
         Long minJsSafeValue = Math.negateExact(maxJsSafeValue);
         Long lowerJsUnsafeValue = minJsSafeValue - 1;
 
-        json = jsonb.toJson(minJsSafeValue);
+        json = defaultJsonb.toJson(minJsSafeValue);
         assertEquals("-9007199254740991", json);
-        deserialized = jsonb.fromJson(json, Long.class);
+        deserialized = defaultJsonb.fromJson(json, Long.class);
         assertEquals(Long.valueOf("-9007199254740991"), deserialized);
 
-        json = jsonb.toJson(lowerJsUnsafeValue);
+        json = defaultJsonb.toJson(lowerJsUnsafeValue);
         assertEquals("-9007199254740992", json);
-        deserialized = jsonb.fromJson(json, Long.class);
+        deserialized = defaultJsonb.fromJson(json, Long.class);
         assertEquals(Long.valueOf("-9007199254740992"), deserialized);
     }
 
@@ -223,11 +218,11 @@ public class NumberTest {
     
     @Test
     public void testSerializeInvalidDouble() {
-        shouldFail(() -> jsonb.toJson(Double.POSITIVE_INFINITY));
+        shouldFail(() -> defaultJsonb.toJson(Double.POSITIVE_INFINITY));
 
         NumberContainer obj = new NumberContainer();
         obj.doubleProp = Double.POSITIVE_INFINITY;
-        shouldFail(() -> jsonb.toJson(obj), msg -> msg.contains("doubleProp") && msg.contains("NumberContainer"));
+        shouldFail(() -> defaultJsonb.toJson(obj), msg -> msg.contains("doubleProp") && msg.contains("NumberContainer"));
     }
     
     
@@ -235,16 +230,15 @@ public class NumberTest {
     public void testSerializeInvalidDoubleCollection() {
         NumberContainer obj = new NumberContainer();
         obj.collectionProp = Collections.singleton(Double.POSITIVE_INFINITY);
-        shouldFail(() -> jsonb.toJson(obj),
-                msg -> msg.contains("collectionProp") && msg.contains("NumberContainer"));
+        shouldFail(() -> defaultJsonb.toJson(obj),
+                  msg -> msg.contains("collectionProp") && msg.contains("NumberContainer"));
     }
 
     @Test
     public void testSerializeInvalidDoubleMap() {
         NumberContainer obj = new NumberContainer();
         obj.mapProp = Collections.singletonMap("doubleKey", Double.POSITIVE_INFINITY);
-        shouldFail(() -> jsonb.toJson(obj),
-                msg -> msg.contains("mapProp") && msg.contains("NumberContainer"));
+        shouldFail(() -> defaultJsonb.toJson(obj),
+                  msg -> msg.contains("mapProp") && msg.contains("NumberContainer"));
     }
-
 }

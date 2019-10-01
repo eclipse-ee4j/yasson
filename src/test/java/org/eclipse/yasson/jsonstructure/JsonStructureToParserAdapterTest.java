@@ -2,6 +2,7 @@ package org.eclipse.yasson.jsonstructure;
 
 import org.junit.jupiter.api.*;
 import static org.junit.jupiter.api.Assertions.*;
+import static org.eclipse.yasson.Jsonbs.*;
 
 import org.eclipse.yasson.TestTypeToken;
 import org.eclipse.yasson.YassonJsonb;
@@ -19,9 +20,6 @@ import java.util.List;
 import java.util.Map;
 
 public class JsonStructureToParserAdapterTest {
-
-    private final YassonJsonb jsonb = (YassonJsonb) JsonbBuilder.create();
-
     private final JsonProvider jsonProvider = JsonProvider.provider();
 
     @Test
@@ -31,7 +29,7 @@ public class JsonStructureToParserAdapterTest {
         objectBuilder.add("bigDecimalProperty", new BigDecimal("1.1"));
         objectBuilder.add("longProperty", 10L);
         JsonObject jsonObject = objectBuilder.build();
-        Pojo result = jsonb.fromJsonStructure(jsonObject, Pojo.class);
+        Pojo result = yassonJsonb.fromJsonStructure(jsonObject, Pojo.class);
         assertEquals("value 1", result.getStringProperty());
         assertEquals(new BigDecimal("1.1"), result.getBigDecimalProperty());
         assertEquals(Long.valueOf(10), result.getLongProperty());
@@ -44,7 +42,7 @@ public class JsonStructureToParserAdapterTest {
         objectBuilder.addNull("bigDecimalProperty");
         objectBuilder.add("longProperty", 10L);
         JsonObject jsonObject = objectBuilder.build();
-        Pojo result = jsonb.fromJsonStructure(jsonObject, Pojo.class);
+        Pojo result = yassonJsonb.fromJsonStructure(jsonObject, Pojo.class);
         assertNull(result.getStringProperty());
         assertNull(result.getBigDecimalProperty());
         assertEquals(Long.valueOf(10), result.getLongProperty());
@@ -63,7 +61,7 @@ public class JsonStructureToParserAdapterTest {
         objectBuilder.add("bigDecimalProperty", new BigDecimal("1.1"));
         objectBuilder.add("longProperty", 10L);
         JsonObject jsonObject = objectBuilder.build();
-        Pojo result = jsonb.fromJsonStructure(jsonObject, Pojo.class);
+        Pojo result = yassonJsonb.fromJsonStructure(jsonObject, Pojo.class);
 
         assertEquals("value 1", result.getStringProperty());
         assertEquals(new BigDecimal("1.1"), result.getBigDecimalProperty());
@@ -86,7 +84,7 @@ public class JsonStructureToParserAdapterTest {
         objectBuilder.add("inner", innerBuilder.build());
 
         JsonObject jsonObject = objectBuilder.build();
-        Pojo result = jsonb.fromJsonStructure(jsonObject, Pojo.class);
+        Pojo result = yassonJsonb.fromJsonStructure(jsonObject, Pojo.class);
 
         assertEquals("value 1", result.getStringProperty());
         assertEquals(new BigDecimal("1.1"), result.getBigDecimalProperty());
@@ -100,7 +98,7 @@ public class JsonStructureToParserAdapterTest {
     public void testEmptyJsonObject() {
         JsonObjectBuilder objectBuilder = jsonProvider.createObjectBuilder();
         JsonObject jsonObject = objectBuilder.build();
-        Pojo result = jsonb.fromJsonStructure(jsonObject, Pojo.class);
+        Pojo result = yassonJsonb.fromJsonStructure(jsonObject, Pojo.class);
         assertNull(result.getStringProperty());
         assertNull(result.getBigDecimalProperty());
         assertNull(result.getLongProperty());
@@ -117,7 +115,7 @@ public class JsonStructureToParserAdapterTest {
 
         JsonObject jsonObject = objectBuilder.build();
 
-        Pojo result = jsonb.fromJsonStructure(jsonObject, Pojo.class);
+        Pojo result = yassonJsonb.fromJsonStructure(jsonObject, Pojo.class);
         assertNull(result.getStringProperty());
         assertNull(result.getBigDecimalProperty());
         assertNull(result.getLongProperty());
@@ -132,7 +130,7 @@ public class JsonStructureToParserAdapterTest {
         JsonArrayBuilder arrayBuilder = jsonProvider.createArrayBuilder();
         arrayBuilder.add(BigDecimal.TEN).add("String value").addNull();
         JsonArray jsonArray = arrayBuilder.build();
-        List result = jsonb.fromJsonStructure(jsonArray, ArrayList.class);
+        List result = yassonJsonb.fromJsonStructure(jsonArray, ArrayList.class);
         assertEquals(3, result.size());
         assertEquals(BigDecimal.TEN, result.get(0));
         assertEquals("String value", result.get(1));
@@ -155,7 +153,7 @@ public class JsonStructureToParserAdapterTest {
         pojoBuilder.add("booleans", blnBuilder.build());
 
         JsonObject jsonObject = pojoBuilder.build();
-        Pojo pojo = jsonb.fromJsonStructure(jsonObject, Pojo.class);
+        Pojo pojo = yassonJsonb.fromJsonStructure(jsonObject, Pojo.class);
 
         assertEquals(1, pojo.getBigDecimals().size());
         assertEquals(1, pojo.getStrings().size());
@@ -172,7 +170,7 @@ public class JsonStructureToParserAdapterTest {
 
         JsonArray jsonArray = arrayBuilder.build();
 
-        ArrayList result = jsonb.fromJsonStructure(jsonArray, ArrayList.class);
+        ArrayList result = yassonJsonb.fromJsonStructure(jsonArray, ArrayList.class);
         assertEquals(2, result.size());
         assertEquals(BigDecimal.TEN, result.get(0));
         assertTrue(result.get(1) instanceof List);
@@ -198,7 +196,7 @@ public class JsonStructureToParserAdapterTest {
 
         JsonArray rootArray = arrayBuilder.build();
 
-        List<Object> result = jsonb.fromJsonStructure(rootArray, new TestTypeToken<List<Pojo>>(){}.getType());
+        List<Object> result = yassonJsonb.fromJsonStructure(rootArray, new TestTypeToken<List<Pojo>>(){}.getType());
         assertTrue(result.get(0) instanceof Pojo);
         Pojo pojo = (Pojo) result.get(0);
         assertNotNull(pojo);
@@ -229,7 +227,7 @@ public class JsonStructureToParserAdapterTest {
 
         JsonArray rootArray = arrayBuilder.build();
 
-        List<Object> result = jsonb.fromJsonStructure(rootArray, new TestTypeToken<List<Object>>(){}.getType());
+        List<Object> result = yassonJsonb.fromJsonStructure(rootArray, new TestTypeToken<List<Object>>(){}.getType());
         assertEquals(new BigDecimal("10"), result.get(0));
         assertTrue(result.get(1) instanceof Map);
         Map pojo = (Map) result.get(1);

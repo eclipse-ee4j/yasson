@@ -126,11 +126,10 @@ public class JsonbPropertyTest {
         ConflictingWithUpperCamelStrategy pojo = new ConflictingWithUpperCamelStrategy();
         pojo.setDOI("DOI value");
 
-        Jsonb jsonb = JsonbBuilder.create();
-        String json = jsonb.toJson(pojo);
+        String json = defaultJsonb.toJson(pojo);
         assertEquals("{\"Doi\":\"DOI value\",\"doi\":\"DOI value\"}", json);
 
-        jsonb = JsonbBuilder.create(new JsonbConfig()
+        Jsonb jsonb = JsonbBuilder.create(new JsonbConfig()
                 .withPropertyNamingStrategy(PropertyNamingStrategy.UPPER_CAMEL_CASE));
 
         try {
@@ -184,8 +183,6 @@ public class JsonbPropertyTest {
         }
     }
 
-
-
     public static class ConflictingWithUpperCamelStrategy {
         public String doi;
 
@@ -197,6 +194,4 @@ public class JsonbPropertyTest {
             this.doi = doi;
         }
     }
-
-
 }

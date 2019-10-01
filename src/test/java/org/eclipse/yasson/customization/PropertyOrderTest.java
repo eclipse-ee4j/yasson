@@ -15,6 +15,7 @@ package org.eclipse.yasson.customization;
 
 import org.junit.jupiter.api.*;
 import static org.junit.jupiter.api.Assertions.*;
+import static org.eclipse.yasson.Jsonbs.*;
 
 import org.eclipse.yasson.customization.model.FieldCustomOrder;
 import org.eclipse.yasson.customization.model.FieldCustomOrderWrapper;
@@ -62,11 +63,11 @@ public class PropertyOrderTest {
 
     @Test
     public void testPropertySetCustomOrder() {
-        Jsonb jsonb = JsonbBuilder.create();
         FieldSpecificOrder fieldSpecificOrder = new FieldSpecificOrder();
         String expectedSpecific = "{\"aField\":\"aValue\",\"dField\":\"dValue\",\"bField\":\"bValue\",\"cField\":\"cValue\"}";
-        assertEquals(expectedSpecific, jsonb.toJson(fieldSpecificOrder));
-        jsonb = JsonbBuilder.create(new JsonbConfig().withPropertyOrderStrategy(PropertyOrderStrategy.REVERSE));
+        assertEquals(expectedSpecific, defaultJsonb.toJson(fieldSpecificOrder));
+        
+        Jsonb jsonb = JsonbBuilder.create(new JsonbConfig().withPropertyOrderStrategy(PropertyOrderStrategy.REVERSE));
         expectedSpecific = "{\"aField\":\"aValue\",\"dField\":\"dValue\",\"cField\":\"cValue\",\"bField\":\"bValue\"}";
         assertEquals(expectedSpecific, jsonb.toJson(fieldSpecificOrder));
     }
@@ -98,8 +99,7 @@ public class PropertyOrderTest {
 
     @Test
     public void testJsonbPropertyOrderOnRenamedProperties() {
-        Jsonb jsonb = JsonbBuilder.create();
-        assertEquals("{\"from\":10,\"count\":11}", jsonb.toJson(new Range(10, 11)));
+        assertEquals("{\"from\":10,\"count\":11}", defaultJsonb.toJson(new Range(10, 11)));
     }
 
     @JsonbPropertyOrder(

@@ -15,6 +15,7 @@ package org.eclipse.yasson.adapters;
 
 import org.junit.jupiter.api.*;
 import static org.junit.jupiter.api.Assertions.*;
+import static org.eclipse.yasson.Jsonbs.*;
 
 import org.eclipse.yasson.TestTypeToken;
 import org.eclipse.yasson.adapters.model.AdaptedPojo;
@@ -26,7 +27,6 @@ import org.eclipse.yasson.adapters.model.Crate;
 import org.eclipse.yasson.adapters.model.GenericBox;
 import org.eclipse.yasson.adapters.model.IntegerListToStringAdapter;
 import org.eclipse.yasson.adapters.model.JsonObjectPojo;
-import org.eclipse.yasson.adapters.model.ReturnNullAdapter;
 import org.eclipse.yasson.adapters.model.SupertypeAdapterPojo;
 import org.eclipse.yasson.adapters.model.UUIDContainer;
 import org.eclipse.yasson.defaultmapping.generics.model.ScalarValueWrapper;
@@ -55,7 +55,7 @@ import static java.util.Collections.unmodifiableMap;
  */
 public class AdaptersTest {
 
-    private Jsonb jsonb;
+    //private Jsonb jsonb;
 
     public static class NonGenericPojo {
         public String strValues;
@@ -83,7 +83,7 @@ public class AdaptersTest {
                     }
                 }
         };
-        jsonb = JsonbBuilder.create(new JsonbConfig().setProperty(JsonbConfig.ADAPTERS, adapters));
+        Jsonb jsonb = JsonbBuilder.create(new JsonbConfig().setProperty(JsonbConfig.ADAPTERS, adapters));
 
         AdaptedPojo pojo = new AdaptedPojo();
         Box box = new Box();
@@ -113,7 +113,7 @@ public class AdaptersTest {
                     }
                 }
         };
-        jsonb = JsonbBuilder.create(new JsonbConfig().setProperty(JsonbConfig.ADAPTERS, adapters));
+        Jsonb jsonb = JsonbBuilder.create(new JsonbConfig().setProperty(JsonbConfig.ADAPTERS, adapters));
 
         AdaptedPojo pojo = new AdaptedPojo();
         pojo.intField = 11;
@@ -128,7 +128,7 @@ public class AdaptersTest {
     public void testGenericAdapter() throws Exception {
         JsonbAdapter<?, ?>[] adapters = {new BoxToCrateCompatibleGenericsAdapter<Integer>() {
         }};
-        jsonb = JsonbBuilder.create(new JsonbConfig().setProperty(JsonbConfig.ADAPTERS, adapters));
+        Jsonb jsonb = JsonbBuilder.create(new JsonbConfig().setProperty(JsonbConfig.ADAPTERS, adapters));
 
         AdaptedPojo<Integer> pojo = new AdaptedPojo<>();
         pojo.strField = "POJO_STRING";
@@ -158,7 +158,7 @@ public class AdaptersTest {
     @Test
     public void testPropagatedTypeArgs() throws Exception {
         JsonbAdapter<?, ?>[] adapters = {new BoxToCratePropagatedIntegerStringAdapter()};
-        jsonb = JsonbBuilder.create(new JsonbConfig().setProperty(JsonbConfig.ADAPTERS, adapters));
+        Jsonb jsonb = JsonbBuilder.create(new JsonbConfig().setProperty(JsonbConfig.ADAPTERS, adapters));
 
         AdaptedPojo<Integer> pojo = new AdaptedPojo<>();
         pojo.intBox = new GenericBox<>("INT_BOX_STR", 110);
@@ -188,9 +188,8 @@ public class AdaptersTest {
 
     @Test
     public void testStringToGenericCollectionAdapter() throws Exception {
-
         JsonbAdapter<?, ?>[] adapters = {new IntegerListToStringAdapter()};
-        jsonb = JsonbBuilder.create(new JsonbConfig().setProperty(JsonbConfig.ADAPTERS, adapters));
+        Jsonb jsonb = JsonbBuilder.create(new JsonbConfig().setProperty(JsonbConfig.ADAPTERS, adapters));
 
         AdaptedPojo<List<Integer>> pojo = new AdaptedPojo<>();
         pojo.tVar = Arrays.asList(11, 22, 33);
@@ -216,7 +215,7 @@ public class AdaptersTest {
     public void testAdaptObjectInCollection() throws Exception {
         JsonbAdapter<?, ?>[] adapters = {new BoxToCrateCompatibleGenericsAdapter<Integer>() {
         }};
-        jsonb = JsonbBuilder.create(new JsonbConfig().setProperty(JsonbConfig.ADAPTERS, adapters));
+        Jsonb jsonb = JsonbBuilder.create(new JsonbConfig().setProperty(JsonbConfig.ADAPTERS, adapters));
 
         AdaptedPojo<Integer> pojo = new AdaptedPojo<>();
 
@@ -263,7 +262,7 @@ public class AdaptersTest {
             }
         }
         };
-        jsonb = JsonbBuilder.create(new JsonbConfig().setProperty(JsonbConfig.ADAPTERS, adapters));
+        Jsonb jsonb = JsonbBuilder.create(new JsonbConfig().setProperty(JsonbConfig.ADAPTERS, adapters));
 
         String json = "{\"strValues\":[11,22,33]}";
         final NonGenericPojo object = new NonGenericPojo();
@@ -276,7 +275,7 @@ public class AdaptersTest {
     @Test
     public void testMarshallGenericField() throws Exception {
         JsonbAdapter<?, ?>[] adapters = {new BoxToCratePropagatedIntegerStringAdapter()};
-        jsonb = JsonbBuilder.create(new JsonbConfig().setProperty(JsonbConfig.ADAPTERS, adapters));
+        Jsonb jsonb = JsonbBuilder.create(new JsonbConfig().setProperty(JsonbConfig.ADAPTERS, adapters));
 
         AdaptedPojo<Integer> adaptedPojo = new AdaptedPojo<>();
         adaptedPojo.tBox = new GenericBox<>("tGenBoxStrField", 22);
@@ -304,7 +303,7 @@ public class AdaptersTest {
                 return list;
             }
         }};
-        jsonb = JsonbBuilder.create(new JsonbConfig().setProperty(JsonbConfig.ADAPTERS, adapters));
+        Jsonb jsonb = JsonbBuilder.create(new JsonbConfig().setProperty(JsonbConfig.ADAPTERS, adapters));
 
         AdaptedPojo<List<GenericBox<Double>>> intBoxPojo = new AdaptedPojo<>();
         List<GenericBox<Double>> intBoxList = new ArrayList<>();
@@ -332,7 +331,7 @@ public class AdaptersTest {
                 return new Box(crate.getCrateStrField(), crate.getCrateIntField());
             }
         }};
-        jsonb = JsonbBuilder.create(new JsonbConfig().setProperty(JsonbConfig.ADAPTERS, adapters));
+        Jsonb jsonb = JsonbBuilder.create(new JsonbConfig().setProperty(JsonbConfig.ADAPTERS, adapters));
 
         Box pojo = new Box("BOX_STR", 101);
         String marshalledJson = jsonb.toJson(pojo);
@@ -366,7 +365,7 @@ public class AdaptersTest {
                 return sb.toString();
             }
         }};
-        jsonb = JsonbBuilder.create(new JsonbConfig().setProperty(JsonbConfig.ADAPTERS, adapters));
+        Jsonb jsonb = JsonbBuilder.create(new JsonbConfig().setProperty(JsonbConfig.ADAPTERS, adapters));
 
         AdaptedPojo<Integer> pojo = new AdaptedPojo<>();
         pojo.stringIntegerMap = new HashMap<>();
@@ -397,7 +396,7 @@ public class AdaptersTest {
                 return new Crate(next.getKey(), Integer.parseInt(next.getValue()));
             }
         }};
-        jsonb = JsonbBuilder.create(new JsonbConfig().setProperty(JsonbConfig.ADAPTERS, adapters));
+        Jsonb jsonb = JsonbBuilder.create(new JsonbConfig().setProperty(JsonbConfig.ADAPTERS, adapters));
 
         AdaptedPojo<String> pojo = new AdaptedPojo<>();
         pojo.tMap = new HashMap<>();
@@ -414,14 +413,13 @@ public class AdaptersTest {
 
     @Test
     public void testAdaptJsonObject() {
-        jsonb = JsonbBuilder.create();
         JsonObjectPojo pojo = new JsonObjectPojo();
         pojo.box = new Box("strFieldValue", 110);
 
-        String json = jsonb.toJson(pojo);
+        String json = defaultJsonb.toJson(pojo);
         assertEquals("{\"box\":{\"boxStrField\":\"strFieldValue\",\"boxIntegerField\":110}}", json);
 
-        JsonObjectPojo result = jsonb.fromJson(json, JsonObjectPojo.class);
+        JsonObjectPojo result = defaultJsonb.fromJson(json, JsonObjectPojo.class);
         assertEquals("strFieldValue", result.box.getBoxStrField());
         assertEquals(Integer.valueOf(110), result.box.getBoxIntegerField());
     }
@@ -432,55 +430,50 @@ public class AdaptersTest {
         author.setFirstName("John");
         author.setLastName("Connor");
 
-        Jsonb jsonb = JsonbBuilder.create();
-        String json = jsonb.toJson(author);
+        String json = defaultJsonb.toJson(author);
         assertEquals("{\"firstName\":\"J\",\"lastName\":\"Connor\"}", json);
 
-        Author result = jsonb.fromJson("{\"firstName\":\"J\",\"lastName\":\"Connor\"}", Author.class);
+        Author result = defaultJsonb.fromJson("{\"firstName\":\"J\",\"lastName\":\"Connor\"}", Author.class);
         assertEquals("\"J\"", result.getFirstName());
         assertEquals("Connor", result.getLastName());
     }
 
     @Test
     public void testAdapterReturningNull() {
-        Jsonb jsonb = JsonbBuilder.create(new JsonbConfig().withAdapters(new ReturnNullAdapter()).withNullValues(true));
-
         ScalarValueWrapper<Number> wrapper = new ScalarValueWrapper<>();
         wrapper.setValue(10);
         Type type = new TestTypeToken<ScalarValueWrapper<Number>>() {
         }.getType();
-        String json = jsonb.toJson(wrapper, type);
+        String json = nullableJsonb.toJson(wrapper, type);
 
         assertEquals("{\"value\":null}", json);
 
-        ScalarValueWrapper<Number> result = jsonb.fromJson("{\"value\":null}", type);
+        ScalarValueWrapper<Number> result = nullableJsonb.fromJson("{\"value\":null}", type);
         assertNull(result.getValue());
     }
 
     @Test
     public void testAdaptUUID() {
-        jsonb = JsonbBuilder.create();
         UUIDContainer pojo = new UUIDContainer();
         UUID uuid = UUID.fromString("b329da91-0d96-44b6-b466-56c2458b2877");
         pojo.setUuidClsBased(uuid);
         pojo.setUuidIfcBased(uuid);
 
-        String result = jsonb.toJson(pojo);
+        String result = defaultJsonb.toJson(pojo);
         assertEquals("{\"uuidClsBased\":\"b329da91-0d96-44b6-b466-56c2458b2877\",\"uuidIfcBased\":\"b329da91-0d96-44b6-b466-56c2458b2877\"}", result);
 
-        UUIDContainer uuidContainer = jsonb.fromJson(result, UUIDContainer.class);
+        UUIDContainer uuidContainer = defaultJsonb.fromJson(result, UUIDContainer.class);
         assertEquals(uuid, uuidContainer.getUuidClsBased());
         assertEquals(uuid, uuidContainer.getUuidIfcBased());
     }
 
     @Test
     public void testSupertypeAdapter() {
-        jsonb = JsonbBuilder.create();
         SupertypeAdapterPojo pojo = new SupertypeAdapterPojo();
         pojo.setNumberInteger(10);
         pojo.setSerializableInteger(11);
-        assertEquals("{\"numberInteger\":\"11\",\"serializableInteger\":12}", jsonb.toJson(pojo));
-        pojo = jsonb.fromJson("{\"numberInteger\":\"11\",\"serializableInteger\":12}", SupertypeAdapterPojo.class);
+        assertEquals("{\"numberInteger\":\"11\",\"serializableInteger\":12}", defaultJsonb.toJson(pojo));
+        pojo = defaultJsonb.fromJson("{\"numberInteger\":\"11\",\"serializableInteger\":12}", SupertypeAdapterPojo.class);
         assertEquals(Integer.valueOf(10), pojo.getNumberInteger());
         assertEquals(Integer.valueOf(11), pojo.getSerializableInteger());
     }
@@ -525,9 +518,7 @@ public class AdaptersTest {
     @Test
     public void testOptionalAdapter() {
         ThrowableAdapter adapter = new ThrowableAdapter();
-        jsonb = JsonbBuilder.newBuilder()
-                .withConfig(new JsonbConfig().withAdapters(adapter))
-                .build();
+        Jsonb jsonb = JsonbBuilder.newBuilder().withConfig(new JsonbConfig().withAdapters(adapter)).build();
         
         PropertyTypeMismatch obj = new PropertyTypeMismatch();
         String json = jsonb.toJson(obj);
@@ -561,7 +552,7 @@ public class AdaptersTest {
     public void testDifferentAdapters() {
         ThrowableAdapter throwableAdapter = new ThrowableAdapter();
         InstantAdapter instantAdapter = new InstantAdapter();
-        jsonb = JsonbBuilder.newBuilder()
+        Jsonb jsonb = JsonbBuilder.newBuilder()
                 .withConfig(new JsonbConfig().withAdapters(throwableAdapter, instantAdapter))
                 .build();
         
@@ -575,5 +566,4 @@ public class AdaptersTest {
                 afterJson);
         assertEquals(1, throwableAdapter.callCount);
     }
-    
 }

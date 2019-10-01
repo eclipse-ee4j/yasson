@@ -15,11 +15,10 @@ package org.eclipse.yasson.defaultmapping.specific;
 
 import org.junit.jupiter.api.*;
 import static org.junit.jupiter.api.Assertions.*;
+import static org.eclipse.yasson.Jsonbs.*;
 
 import org.eclipse.yasson.TestTypeToken;
 
-import javax.json.bind.Jsonb;
-import javax.json.bind.JsonbBuilder;
 import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
 import java.io.InputStreamReader;
@@ -34,19 +33,17 @@ import java.util.Map;
  * @author Roman Grigoriadi
  */
 public class JsonStreamsTest {
-
     private static final String CHARSET = "UTF8";
-    private Jsonb jsonb = JsonbBuilder.create();
 
     @Test
     public void testUnmarshall() throws Exception {
 
         String json = "{\"key1\":\"value1\",\"key2\":\"value2\"}";
 
-        Map<String, String> result = jsonb.fromJson(new InputStreamReader(new ByteArrayInputStream(json.getBytes(CHARSET)), Charset.forName(CHARSET)), new TestTypeToken<HashMap<String, String>>(){}.getType());
+        Map<String, String> result = defaultJsonb.fromJson(new InputStreamReader(new ByteArrayInputStream(json.getBytes(CHARSET)), Charset.forName(CHARSET)), new TestTypeToken<HashMap<String, String>>(){}.getType());
         assertMapValues(result);
 
-        result = jsonb.fromJson(new ByteArrayInputStream(json.getBytes(CHARSET)), new TestTypeToken<HashMap<String, String>>() {}.getType());
+        result = defaultJsonb.fromJson(new ByteArrayInputStream(json.getBytes(CHARSET)), new TestTypeToken<HashMap<String, String>>() {}.getType());
         assertMapValues(result);
     }
 
@@ -60,18 +57,18 @@ public class JsonStreamsTest {
         strMap.put("key2", "value2");
 
         ByteArrayOutputStream baos = new ByteArrayOutputStream(len);
-        jsonb.toJson(strMap, baos);
+        defaultJsonb.toJson(strMap, baos);
         assertEquals(expected, baos.toString(CHARSET));
 
         baos = new ByteArrayOutputStream(len);
         OutputStreamWriter writer = new OutputStreamWriter(baos, Charset.forName(CHARSET));
-        jsonb.toJson(strMap, writer);
+        defaultJsonb.toJson(strMap, writer);
         writer.close();
 
         assertEquals(expected, baos.toString(CHARSET));
     }
 
-    private void assertMapValues(Map<String, String> result) {
+    private static void assertMapValues(Map<String, String> result) {
         assertEquals(2, result.size());
         assertEquals("value1", result.get("key1"));
         assertEquals("value2", result.get("key2"));

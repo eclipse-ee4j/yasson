@@ -11,12 +11,11 @@ package org.eclipse.yasson;
 
 import org.junit.jupiter.api.*;
 import static org.junit.jupiter.api.Assertions.*;
+import static org.eclipse.yasson.Jsonbs.*;
 
 import org.eclipse.yasson.internal.cdi.NonCdiAdapter;
 import org.eclipse.yasson.internal.components.JsonbComponentInstanceCreatorFactory;
 
-import javax.json.bind.Jsonb;
-import javax.json.bind.JsonbBuilder;
 import javax.json.bind.annotation.JsonbTypeAdapter;
 
 /**
@@ -35,10 +34,8 @@ public class JavaxNamingExcludedTest {
             //OK, java.naming is not observable
         }
 
-        Jsonb jsonb = JsonbBuilder.create();
-        final String result = jsonb.toJson(new AdaptedPojo());
+        final String result = defaultJsonb.toJson(new AdaptedPojo());
         assertEquals("{\"adaptedValue1\":1111,\"adaptedValue2\":1001,\"adaptedValue3\":1010}", result);
-
     }
 
     public static final class AdaptedPojo {
@@ -50,6 +47,5 @@ public class JavaxNamingExcludedTest {
 
         @JsonbTypeAdapter(NonCdiAdapter.class)
         public String adaptedValue3 = "1010";
-
     }
 }

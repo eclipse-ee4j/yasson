@@ -39,5 +39,4 @@ public class PackagelessClassTest {
         assertEquals(packagelessModel.getIntValue(), 12);
         assertEquals(packagelessModel.getStringValue(), "Hello World!");
     }
-
 }

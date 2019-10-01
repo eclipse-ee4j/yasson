@@ -61,7 +61,5 @@ public class Assertions {
 				fail("Expected to get an exception of " + expectedType + " but instead was " + t.getClass());
 			}
 		}
-		
 	}
-
 }

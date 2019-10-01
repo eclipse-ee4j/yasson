@@ -43,7 +43,7 @@ public class ReflectionUtilsTest {
         assertFalse(ReflectionUtils.isResolvedType(getFieldType("unresolvedWildcardField")));
     }
 
-    private Type getFieldType(String fieldName) {
+    private static Type getFieldType(String fieldName) {
         try {
             Field field = Types.class.getField(fieldName);
             return field.getGenericType();

@@ -32,17 +32,9 @@ import java.util.function.Consumer;
  * @author Roman Grigoriadi
  */
 public class ClassParserTest {
-
-    private ClassParser classParser;
-    private JsonbContext jsonbContext;
-    private AnnotationIntrospector introspector;
-
-    @BeforeAll
-    public void before() {
-        jsonbContext = new JsonbContext(new JsonbConfig(), JsonProvider.provider());
-        classParser = new ClassParser(jsonbContext);
-        introspector = new AnnotationIntrospector(jsonbContext);
-    }
+    private static final JsonbContext jsonbContext = new JsonbContext(new JsonbConfig(), JsonProvider.provider());
+    private static final ClassParser classParser = new ClassParser(jsonbContext);
+    private static final AnnotationIntrospector introspector = new AnnotationIntrospector(jsonbContext);
 
     @Test
     public void testDefaultMappingFieldModifiers() {
@@ -55,7 +47,6 @@ public class ClassParserTest {
         assertFalse(model.getPropertyModel("staticString").isWritable());
         assertFalse(model.getPropertyModel("transientString").isReadable());
         assertFalse(model.getPropertyModel("transientString").isWritable());
-
     }
 
     @Test
@@ -78,5 +69,4 @@ public class ClassParserTest {
         model.getPropertyModel("getterWithoutFieldValue").setValue(object, "ACCEPTED_VALUE");
         assertEquals("ACCEPTED_VALUE", accepted.get());
     }
-
 }

@@ -104,14 +104,14 @@ public class MultiTenancyTest extends CustomerTest {
     /**
      * Thread pool for JSONB processing.
      */
-    private ExecutorService jsonbProcessingThreadPool;
-    private CompletionService<JsonProcessingResult<MarshallerTaskResult>> marshallingCompletion;
-    private CompletionService<JsonProcessingResult<Customer>> unmarshallingCompletion;
+    private static ExecutorService jsonbProcessingThreadPool;
+    private static CompletionService<JsonProcessingResult<MarshallerTaskResult>> marshallingCompletion;
+    private static CompletionService<JsonProcessingResult<Customer>> unmarshallingCompletion;
 
     /**
      * Executor for checking results.
      */
-    private ExecutorService resultCheckService;
+    private static ExecutorService resultCheckService;
 
     /**
      * Jsonb instances configuration initialisation.
@@ -141,7 +141,7 @@ public class MultiTenancyTest extends CustomerTest {
     }
 
     @BeforeAll
-    public void setUp() throws Exception {
+    public static void setUp() throws Exception {
         jsonbProcessingThreadPool = Executors.newFixedThreadPool(THREAD_COUNT);
         marshallingCompletion = new ExecutorCompletionService<>(jsonbProcessingThreadPool);
         unmarshallingCompletion = new ExecutorCompletionService<>(jsonbProcessingThreadPool);
@@ -172,7 +172,7 @@ public class MultiTenancyTest extends CustomerTest {
      * would be stale and results will not match.
      */
     private void submitResultCheckingTasks() {
-        resultCheckService.execute(new ResultChecker<MarshallerTaskResult>(marshallingCompletion) {
+        resultCheckService.execute(new ResultChecker<>(marshallingCompletion) {
             @Override
             protected void checkResult(JsonProcessingResult<MarshallerTaskResult> result) {
                 MarshallerTaskResult marshallerResult = result.getResult();
@@ -183,7 +183,7 @@ public class MultiTenancyTest extends CustomerTest {
             }
         });
 
-        resultCheckService.execute(new ResultChecker<Customer>(unmarshallingCompletion) {
+        resultCheckService.execute(new ResultChecker<>(unmarshallingCompletion) {
             @Override
             protected void checkResult(JsonProcessingResult<Customer> result) {
                 //actual check, unmarshalled json result have all expected values.
@@ -199,7 +199,7 @@ public class MultiTenancyTest extends CustomerTest {
      * Chooses shared jsonb instance, either with default or customized key names
      * and submits marshaller an unmarshaller task for it.
      */
-    private void submitJsonbProcessingTasks() {
+    private static void submitJsonbProcessingTasks() {
         for(int i = 0; i< TOTAL_JOB_COUNT; i+=2) {
             boolean even = (i % 4 == 0);
             ConfigurationType jsonbConfiguration = even ? ConfigurationType.DEFAULT : ConfigurationType.CUSTOMIZED;

@@ -56,7 +56,7 @@ public abstract class CustomerTest {
         assertEquals(Integer.valueOf(2), customer.getStringIntegerMap().get("second"));*/
     }
 
-    protected Customer createCustomer(String customerName) {
+    protected static Customer createCustomer(String customerName) {
         Street street = new Street("Zoubkova", 111);
         Address address = new Address(street, "Prague");
         Customer customer = new Customer(33, customerName);

@@ -26,10 +26,6 @@ import org.eclipse.yasson.customization.model.packagelevelannotations.JsonbNilla
 import org.eclipse.yasson.customization.model.packagelevelannotations.PackageLevelOverriddenWithClassLevel;
 import org.eclipse.yasson.defaultmapping.generics.model.ScalarValueWrapper;
 
-import javax.json.bind.Jsonb;
-import javax.json.bind.JsonbBuilder;
-import javax.json.bind.JsonbConfig;
-
 /**
  * Tests a {@link javax.json.bind.annotation.JsonbNillable} annotation.
  * @author Roman Grigoriadi
@@ -80,11 +76,7 @@ public class JsonbNillableTest {
 
     @Test
     public void testNillableInConfig() {
-        JsonbConfig jsonbConfig = new JsonbConfig().withNullValues(true);
-        Jsonb jsonb = JsonbBuilder.create(jsonbConfig);
-
-        String jsonString = jsonb.toJson(new ScalarValueWrapper<String>(){});
+        String jsonString = nullableJsonb.toJson(new ScalarValueWrapper<String>(){});
         assertEquals("{\"value\":null}", jsonString);
     }
-
 }

@@ -14,11 +14,10 @@ package org.eclipse.yasson.defaultmapping.specific;
 
 import org.junit.jupiter.api.*;
 import static org.junit.jupiter.api.Assertions.*;
+import static org.eclipse.yasson.Jsonbs.*;
 
 import org.eclipse.yasson.defaultmapping.generics.model.ScalarValueWrapper;
-import org.eclipse.yasson.internal.JsonBindingBuilder;
 
-import javax.json.bind.Jsonb;
 import java.math.BigDecimal;
 import java.math.BigInteger;
 import java.net.MalformedURLException;
@@ -34,26 +33,22 @@ import java.net.URL;
 public class SpecificTest {
     @Test
     public void testMarshallBigDecimal() {
-        final Jsonb jsonb = (new JsonBindingBuilder()).build();
-        assertEquals("{\"value\":100}", jsonb.toJson(new ScalarValueWrapper<>(BigDecimal.valueOf(100L))));
-        assertEquals("{\"value\":100.1}", jsonb.toJson(new ScalarValueWrapper<>(BigDecimal.valueOf(100.1D))));
+        assertEquals("{\"value\":100}", bindingJsonb.toJson(new ScalarValueWrapper<>(BigDecimal.valueOf(100L))));
+        assertEquals("{\"value\":100.1}", bindingJsonb.toJson(new ScalarValueWrapper<>(BigDecimal.valueOf(100.1D))));
     }
 
     @Test
     public void testMarshallBigInteger() {
-        final Jsonb jsonb = (new JsonBindingBuilder()).build();
-        assertEquals("{\"value\":100}", jsonb.toJson(new ScalarValueWrapper<>(BigInteger.valueOf(100))));
+        assertEquals("{\"value\":100}", bindingJsonb.toJson(new ScalarValueWrapper<>(BigInteger.valueOf(100))));
     }
 
     @Test
     public void testMarshallUri() throws URISyntaxException {
-        final Jsonb jsonb = (new JsonBindingBuilder()).build();
-        assertEquals("{\"value\":\"http://www.oracle.com\"}", jsonb.toJson(new ScalarValueWrapper<>(new URI("http://www.oracle.com"))));
+        assertEquals("{\"value\":\"http://www.oracle.com\"}", bindingJsonb.toJson(new ScalarValueWrapper<>(new URI("http://www.oracle.com"))));
     }
 
     @Test
     public void testMarshallUrl() throws MalformedURLException {
-        final Jsonb jsonb = (new JsonBindingBuilder()).build();
-        assertEquals("{\"value\":\"http://www.oracle.com\"}", jsonb.toJson(new ScalarValueWrapper<>(new URL("http://www.oracle.com"))));
+        assertEquals("{\"value\":\"http://www.oracle.com\"}", bindingJsonb.toJson(new ScalarValueWrapper<>(new URL("http://www.oracle.com"))));
     }
 }

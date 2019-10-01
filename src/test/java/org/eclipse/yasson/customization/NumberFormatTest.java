@@ -31,12 +31,7 @@ import javax.json.bind.JsonbConfig;
  * @author Roman Grigoriadi
  */
 public class NumberFormatTest {
-    private Jsonb jsonb;
-
-    @BeforeAll
-    public void setUp() {
-        jsonb = JsonbBuilder.create(new JsonbConfig().withLocale(Locale.US));
-    }
+    private static final Jsonb jsonb = JsonbBuilder.create(new JsonbConfig().withLocale(Locale.US));
 
     @Test
     public void testSerialize() {

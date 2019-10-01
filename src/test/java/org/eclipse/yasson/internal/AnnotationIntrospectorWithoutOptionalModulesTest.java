@@ -25,12 +25,10 @@ import javax.json.spi.JsonProvider;
  */
 public class AnnotationIntrospectorWithoutOptionalModulesTest {
 
-    private JsonbContext jsonbContext = new JsonbContext(new JsonbConfig(), JsonProvider.provider());
-
     /**
      * class under test.
      */
-    private AnnotationIntrospector instrospector = new AnnotationIntrospector(jsonbContext);
+    private static final AnnotationIntrospector instrospector = new AnnotationIntrospector(new JsonbContext(new JsonbConfig(), JsonProvider.provider()));
 
     @Test
     public void testNoConstructorPropertiesAnnotationWithoutOptionalModules() {

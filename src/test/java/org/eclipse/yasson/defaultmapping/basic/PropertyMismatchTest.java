@@ -11,13 +11,12 @@ package org.eclipse.yasson.defaultmapping.basic;
 
 import org.junit.jupiter.api.*;
 import static org.junit.jupiter.api.Assertions.*;
+import static org.eclipse.yasson.Jsonbs.*;
 
 import java.time.Instant;
 import java.util.HashMap;
 import java.util.HashSet;
 
-import javax.json.bind.Jsonb;
-import javax.json.bind.JsonbBuilder;
 import javax.json.bind.annotation.JsonbTransient;
 
 import org.jboss.weld.exceptions.IllegalStateException;
@@ -97,7 +96,7 @@ public class PropertyMismatchTest {
                                  "\"dataMap\": { \"foo\": \"bar\" }, " +
                                  "\"dataArray\": [\"foo\"], " +
                                  "\"data\": \"foo\" }";
-        CollectionGetterOnly collection = JsonbBuilder.create().fromJson(jsonCollection, CollectionGetterOnly.class);
+        CollectionGetterOnly collection = defaultJsonb.fromJson(jsonCollection, CollectionGetterOnly.class);
         // Don't need to verify resulting object (except that it is non-null)
         // because if any getters or ctors were called, we would get an ISE
         assertNotNull(collection);
@@ -109,7 +108,7 @@ public class PropertyMismatchTest {
     @Test
     public void testSetterOnly() {
         CollectionSetterOnly obj = new CollectionSetterOnly();
-        String json = JsonbBuilder.create().toJson(obj);
+        String json = defaultJsonb.toJson(obj);
         assertEquals("{}", json);
     }
     
@@ -138,11 +137,10 @@ public class PropertyMismatchTest {
         Instant now = Instant.now();
         obj.setFoo(now);
         
-        Jsonb jsonb = JsonbBuilder.create();
-        String json = jsonb.toJson(obj);
+        String json = defaultJsonb.toJson(obj);
         assertEquals("{\"foo\":" + now.toString().length() + "}", json);
         
-        PropertyTypeMismatch after = jsonb.fromJson("{\"foo\":\"" + now.toString() + "\"}", PropertyTypeMismatch.class);
+        PropertyTypeMismatch after = defaultJsonb.fromJson("{\"foo\":\"" + now.toString() + "\"}", PropertyTypeMismatch.class);
         assertEquals(obj.getFoo(), after.getFoo());
         assertEquals(obj.internalInstantProperty, after.internalInstantProperty);
     }
