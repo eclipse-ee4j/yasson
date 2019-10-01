@@ -2,6 +2,7 @@ package org.eclipse.yasson.defaultmapping.basic;
 
 import org.junit.jupiter.api.*;
 import static org.junit.jupiter.api.Assertions.*;
+import static org.eclipse.yasson.Jsonbs.*;
 
 import org.eclipse.yasson.internal.JsonBindingBuilder;
 import org.eclipse.yasson.internal.properties.MessageKeys;
@@ -20,48 +21,46 @@ public class SingleValueTest {
 
     @Test
     public void testMarshallPrimitives() {
-        final Jsonb jsonb = (new JsonBindingBuilder()).build();
-
         // String
-        assertEquals("\"some_string\"", jsonb.toJson("some_string"));
+        assertEquals("\"some_string\"", bindingJsonb.toJson("some_string"));
 
         // Character
-        assertEquals("\"\uFFFF\"", jsonb.toJson('\uFFFF'));
+        assertEquals("\"\uFFFF\"", bindingJsonb.toJson('\uFFFF'));
 
         // Byte
-        assertEquals("1", jsonb.toJson((byte)1));
+        assertEquals("1", bindingJsonb.toJson((byte)1));
 
         // Short
-        assertEquals("1", jsonb.toJson((short)1));
+        assertEquals("1", bindingJsonb.toJson((short)1));
 
         // Integer
-        assertEquals("1", jsonb.toJson(1));
+        assertEquals("1", bindingJsonb.toJson(1));
 
         // Long
-        assertEquals("5", jsonb.toJson(5L));
+        assertEquals("5", bindingJsonb.toJson(5L));
 
         // Float
-        assertEquals("1.2", jsonb.toJson(1.2f));
+        assertEquals("1.2", bindingJsonb.toJson(1.2f));
 
         // Double
-        assertEquals("1.2", jsonb.toJson(1.2));
+        assertEquals("1.2", bindingJsonb.toJson(1.2));
 
         // BigInteger
-        assertEquals("1", jsonb.toJson(new BigInteger("1")));
+        assertEquals("1", bindingJsonb.toJson(new BigInteger("1")));
 
         // BigDecimal
-        assertEquals("1.2", jsonb.toJson(new BigDecimal("1.2")));
+        assertEquals("1.2", bindingJsonb.toJson(new BigDecimal("1.2")));
 
         // Number
-        assertEquals("1.2", jsonb.toJson(1.2));
+        assertEquals("1.2", bindingJsonb.toJson(1.2));
 
         // Boolean true
-        assertEquals("true", jsonb.toJson(true));
+        assertEquals("true", bindingJsonb.toJson(true));
 
         // Boolean false
-        assertEquals("false", jsonb.toJson(false));
+        assertEquals("false", bindingJsonb.toJson(false));
 
-        assertEquals("1", jsonb.toJson(1));
+        assertEquals("1", bindingJsonb.toJson(1));
 
         // null
         //assertEquals("null", jsonb.toJson(null));
@@ -75,9 +74,9 @@ public class SingleValueTest {
         jsonb = (new JsonBindingBuilder().withConfig(new JsonbConfig().withStrictIJSON(true))).build();
         try {
             jsonb.toJson(5);
-            Assert.fail();
+            fail();
         } catch (JsonbException exception){
-            Assert.assertEquals(Messages.getMessage(MessageKeys.IJSON_ENABLED_SINGLE_VALUE), exception.getMessage());
+            assertEquals(Messages.getMessage(MessageKeys.IJSON_ENABLED_SINGLE_VALUE), exception.getMessage());
         }
     }
 

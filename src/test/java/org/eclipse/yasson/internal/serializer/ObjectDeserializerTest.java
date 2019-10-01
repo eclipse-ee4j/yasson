@@ -2,23 +2,17 @@ package org.eclipse.yasson.internal.serializer;
 
 import org.junit.jupiter.api.*;
 import static org.junit.jupiter.api.Assertions.*;
+import static org.eclipse.yasson.Jsonbs.*;
 
-import javax.json.bind.Jsonb;
-import javax.json.bind.JsonbBuilder;
 import javax.json.bind.JsonbException;
 
 public class ObjectDeserializerTest {
 
-    @Rule
-    public ExpectedException expectedException = ExpectedException.none();
-
     @Test
     public void testGetInstanceExceptionShouldContainClassNameOnMissingConstructor() {
-        expectedException.expect(JsonbException.class);
-        expectedException.expectMessage(DummyDeserializationClass.class.getName());
-
-        Jsonb jsonb = JsonbBuilder.create();
-        jsonb.fromJson("{\"key\":\"value\"}", DummyDeserializationClass.class);
+    	assertThrows(JsonbException.class, 
+    				() -> defaultJsonb.fromJson("{\"key\":\"value\"}", DummyDeserializationClass.class),
+    				DummyDeserializationClass.class::getName);
     }
 
     public static class DummyDeserializationClass {

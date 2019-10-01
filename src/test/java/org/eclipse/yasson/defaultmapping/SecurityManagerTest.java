@@ -1,7 +1,6 @@
 package org.eclipse.yasson.defaultmapping;
 
 import org.junit.jupiter.api.*;
-import static org.junit.jupiter.api.Assertions.*;
 
 import org.eclipse.yasson.serializers.model.Crate;
 
@@ -22,14 +21,14 @@ public class SecurityManagerTest {
 
     static final String classesDir = SecurityManagerTest.class.getProtectionDomain().getCodeSource().getLocation().getFile();
 
-    @Before
+    @BeforeAll
     public void setUp() {
         System.setProperty("java.security.policy", classesDir + "test.policy");
         System.setProperty("java.security.debug", "failure");
         System.setSecurityManager(new SecurityManager());
     }
 
-    @After
+    @AfterAll
     public void tearDown() {
         System.setSecurityManager(null);
     }

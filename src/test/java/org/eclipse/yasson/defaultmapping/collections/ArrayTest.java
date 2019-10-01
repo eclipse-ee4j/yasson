@@ -34,7 +34,7 @@ public class ArrayTest {
 
     private Jsonb jsonb;
 
-    @Before
+    @BeforeAll
     public void before() {
         jsonb = JsonbBuilder.create(new JsonbConfig().withNullValues(Boolean.TRUE));
     }
@@ -150,7 +150,7 @@ public class ArrayTest {
         assertNull(result[1]);
 
         Integer ints[] = new Integer[2];
-        Assert.assertEquals(expected, jsonb.toJson(ints));
+        assertEquals(expected, jsonb.toJson(ints));
     }
 
     @Test

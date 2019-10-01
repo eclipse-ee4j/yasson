@@ -140,7 +140,7 @@ public class MultiTenancyTest extends CustomerTest {
         customizedJsonBinding = JsonbBuilder.create(customizedConfig);
     }
 
-    @Before
+    @BeforeAll
     public void setUp() throws Exception {
         jsonbProcessingThreadPool = Executors.newFixedThreadPool(THREAD_COUNT);
         marshallingCompletion = new ExecutorCompletionService<>(jsonbProcessingThreadPool);

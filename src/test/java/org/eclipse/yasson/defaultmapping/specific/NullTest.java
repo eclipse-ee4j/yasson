@@ -16,13 +16,10 @@ package org.eclipse.yasson.defaultmapping.specific;
 
 import org.junit.jupiter.api.*;
 import static org.junit.jupiter.api.Assertions.*;
+import static org.eclipse.yasson.Jsonbs.*;
 
 import org.eclipse.yasson.TestTypeToken;
 import org.eclipse.yasson.defaultmapping.specific.model.Street;
-import org.eclipse.yasson.internal.JsonBindingBuilder;
-
-import javax.json.bind.Jsonb;
-import javax.json.bind.JsonbBuilder;
 
 import java.util.List;
 import java.util.Map;
@@ -32,18 +29,11 @@ import java.util.Map;
  */
 public class NullTest {
 
-    private Jsonb jsonb;
-
-    @Before
-    public void before() {
-        jsonb = JsonbBuilder.create();
-    }
-
     @Test
     public void testSetsNullIntoFields() {
         String json = "{\"name\":null,\"number\":null}";
 
-        Street result = jsonb.fromJson(json, Street.class);
+        Street result = defaultJsonb.fromJson(json, Street.class);
         //these have default initialization value
         assertNull(result.getName());
         assertNull(result.getNumber());
@@ -51,22 +41,22 @@ public class NullTest {
 
     @Test
     public void testDeserializeNull() {
-        assertNull(jsonb.fromJson("null", Object.class));
+        assertNull(defaultJsonb.fromJson("null", Object.class));
     }
 
     @Test
     public void testDeserializeNullPojo() {
-        assertNull(jsonb.fromJson("null", Street.class));
+        assertNull(defaultJsonb.fromJson("null", Street.class));
     }
 
     @Test
     public void testDeserializeNullList() {
-        assertNull(jsonb.fromJson("null", new TestTypeToken<List<Integer>>() {}.getType()));
+        assertNull(defaultJsonb.fromJson("null", new TestTypeToken<List<Integer>>() {}.getType()));
     }
 
     @Test
     public void testDeserializeNullMap() {
-        assertNull(jsonb.fromJson("null", new TestTypeToken<Map<String, Street>>() {}.getType()));
+        assertNull(defaultJsonb.fromJson("null", new TestTypeToken<Map<String, Street>>() {}.getType()));
     }
 
 }

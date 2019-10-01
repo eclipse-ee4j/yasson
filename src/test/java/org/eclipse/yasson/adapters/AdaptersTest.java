@@ -434,11 +434,11 @@ public class AdaptersTest {
 
         Jsonb jsonb = JsonbBuilder.create();
         String json = jsonb.toJson(author);
-        Assert.assertEquals("{\"firstName\":\"J\",\"lastName\":\"Connor\"}", json);
+        assertEquals("{\"firstName\":\"J\",\"lastName\":\"Connor\"}", json);
 
         Author result = jsonb.fromJson("{\"firstName\":\"J\",\"lastName\":\"Connor\"}", Author.class);
-        Assert.assertEquals("\"J\"", result.getFirstName());
-        Assert.assertEquals("Connor", result.getLastName());
+        assertEquals("\"J\"", result.getFirstName());
+        assertEquals("Connor", result.getLastName());
     }
 
     @Test
@@ -451,10 +451,10 @@ public class AdaptersTest {
         }.getType();
         String json = jsonb.toJson(wrapper, type);
 
-        Assert.assertEquals("{\"value\":null}", json);
+        assertEquals("{\"value\":null}", json);
 
         ScalarValueWrapper<Number> result = jsonb.fromJson("{\"value\":null}", type);
-        Assert.assertNull(result.getValue());
+        assertNull(result.getValue());
     }
 
     @Test
@@ -466,11 +466,11 @@ public class AdaptersTest {
         pojo.setUuidIfcBased(uuid);
 
         String result = jsonb.toJson(pojo);
-        Assert.assertEquals("{\"uuidClsBased\":\"b329da91-0d96-44b6-b466-56c2458b2877\",\"uuidIfcBased\":\"b329da91-0d96-44b6-b466-56c2458b2877\"}", result);
+        assertEquals("{\"uuidClsBased\":\"b329da91-0d96-44b6-b466-56c2458b2877\",\"uuidIfcBased\":\"b329da91-0d96-44b6-b466-56c2458b2877\"}", result);
 
         UUIDContainer uuidContainer = jsonb.fromJson(result, UUIDContainer.class);
-        Assert.assertEquals(uuid, uuidContainer.getUuidClsBased());
-        Assert.assertEquals(uuid, uuidContainer.getUuidIfcBased());
+        assertEquals(uuid, uuidContainer.getUuidClsBased());
+        assertEquals(uuid, uuidContainer.getUuidIfcBased());
     }
 
     @Test
@@ -479,10 +479,10 @@ public class AdaptersTest {
         SupertypeAdapterPojo pojo = new SupertypeAdapterPojo();
         pojo.setNumberInteger(10);
         pojo.setSerializableInteger(11);
-        Assert.assertEquals("{\"numberInteger\":\"11\",\"serializableInteger\":12}", jsonb.toJson(pojo));
+        assertEquals("{\"numberInteger\":\"11\",\"serializableInteger\":12}", jsonb.toJson(pojo));
         pojo = jsonb.fromJson("{\"numberInteger\":\"11\",\"serializableInteger\":12}", SupertypeAdapterPojo.class);
-        Assert.assertEquals(Integer.valueOf(10), pojo.getNumberInteger());
-        Assert.assertEquals(Integer.valueOf(11), pojo.getSerializableInteger());
+        assertEquals(Integer.valueOf(10), pojo.getNumberInteger());
+        assertEquals(Integer.valueOf(11), pojo.getSerializableInteger());
     }
     
     public static class PropertyTypeMismatch {
@@ -532,7 +532,7 @@ public class AdaptersTest {
         PropertyTypeMismatch obj = new PropertyTypeMismatch();
         String json = jsonb.toJson(obj);
         assertEquals("{\"error\":{\"message\":\"foo\",\"type\":\"java.lang.RuntimeException\"}}", json);
-        assertEquals("The user-defined ThrowableAdapter should have been called", 1, adapter.callCount);
+        assertEquals(1, adapter.callCount, "The user-defined ThrowableAdapter should have been called");
     }
     
     public static class InstantAdapter implements JsonbAdapter<Instant, String> {

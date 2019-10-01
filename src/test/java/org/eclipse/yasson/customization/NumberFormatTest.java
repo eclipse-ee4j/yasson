@@ -33,7 +33,7 @@ import javax.json.bind.JsonbConfig;
 public class NumberFormatTest {
     private Jsonb jsonb;
 
-    @Before
+    @BeforeAll
     public void setUp() {
         jsonb = JsonbBuilder.create(new JsonbConfig().withLocale(Locale.US));
     }

@@ -14,9 +14,7 @@ package org.eclipse.yasson.defaultmapping.anonymous;
 
 import org.junit.jupiter.api.*;
 import static org.junit.jupiter.api.Assertions.*;
-
-import javax.json.bind.Jsonb;
-import javax.json.bind.JsonbBuilder;
+import static org.eclipse.yasson.Jsonbs.*;
 
 /**
  * This class contains tests for marshalling/unmarshalling anonymous classes.
@@ -25,16 +23,9 @@ import javax.json.bind.JsonbBuilder;
  */
 public class AnonymousClassTest {
 
-    private Jsonb jsonb;
-
-    @Before
-    public void before() {
-        jsonb = JsonbBuilder.create();
-    }
-
     @Test
     public void testMarshallInnerClass() {
-        assertEquals("{\"anonymousField\":\"anonymousValue\",\"id\":1,\"name\":\"pojoName\"}", jsonb.toJson(new InnerPojo() {
+        assertEquals("{\"anonymousField\":\"anonymousValue\",\"id\":1,\"name\":\"pojoName\"}", defaultJsonb.toJson(new InnerPojo() {
             public String anonymousField = "anonymousValue";
 
             @Override
@@ -51,7 +42,7 @@ public class AnonymousClassTest {
 
     @Test
     public void testMarshallOuterClass() {
-        assertEquals("{\"id\":1,\"anonymousField\":\"anonymousValue\"}", jsonb.toJson(new OuterPojo() {
+        assertEquals("{\"id\":1,\"anonymousField\":\"anonymousValue\"}", defaultJsonb.toJson(new OuterPojo() {
             public String anonymousField = "anonymousValue";
         }));
     }

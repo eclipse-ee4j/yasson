@@ -90,16 +90,16 @@ public class PropertyOrderTest {
         Jsonb jsonb = JsonbBuilder.create(config);
 
         String jsonString = jsonb.toJson(new RenamedPropertiesContainer() {{ setStringInstance("Test String"); setLongInstance(1); }});
-        Assert.assertTrue(jsonString.matches("\\{\\s*\"first\"\\s*\\:\\s*0\\s*,\\s*\"second\"\\s*\\:\\s*\"Test String\"\\s*,\\s*\"third\"\\s*\\:\\s*1\\s*\\}"));
+        assertTrue(jsonString.matches("\\{\\s*\"first\"\\s*\\:\\s*0\\s*,\\s*\"second\"\\s*\\:\\s*\"Test String\"\\s*,\\s*\"third\"\\s*\\:\\s*1\\s*\\}"));
 
         RenamedPropertiesContainer unmarshalledObject = jsonb.fromJson("{ \"first\" : 1, \"second\" : \"Test String\", \"third\" : 1 }", RenamedPropertiesContainer.class);
-        Assert.assertEquals(3, unmarshalledObject.getIntInstance());
+        assertEquals(3, unmarshalledObject.getIntInstance());
     }
 
     @Test
     public void testJsonbPropertyOrderOnRenamedProperties() {
         Jsonb jsonb = JsonbBuilder.create();
-        Assert.assertEquals("{\"from\":10,\"count\":11}", jsonb.toJson(new Range(10, 11)));
+        assertEquals("{\"from\":10,\"count\":11}", jsonb.toJson(new Range(10, 11)));
     }
 
     @JsonbPropertyOrder(

@@ -1,5 +1,7 @@
 package org.eclipse.yasson.internal;
 
+import org.junit.jupiter.api.*;
+
 import static java.lang.annotation.ElementType.CONSTRUCTOR;
 import static java.lang.annotation.ElementType.METHOD;
 import static java.lang.annotation.ElementType.TYPE;
@@ -10,9 +12,7 @@ import java.lang.annotation.Retention;
 import java.lang.annotation.RetentionPolicy;
 import java.lang.annotation.Target;
 
-import org.junit.Ignore;
-
-@Ignore
+@Disabled
 class AnnotationFinderTestFixtures {
 
     public static final String TESTVALUE = "testvalue";
@@ -47,14 +47,14 @@ class AnnotationFinderTestFixtures {
     }
 
     public static class ObjectWithIgnoredMethod {
-        @Ignore
+        @Disabled
         public void annotatedMethod() {
             // empty
         }
     }
 
     public static class ObjectWithDeprecatedAndIgnoredMethod {
-        @Ignore
+    	@Disabled
         @Deprecated
         public void annotatedMethod() {
             // empty
@@ -69,7 +69,7 @@ class AnnotationFinderTestFixtures {
     }
 
     public static class ObjectWithIgnoredAndInheritedDeprecatedMethod {
-        @Ignore
+    	@Disabled
         @AnnotationAnnotatedWithDeprecated
         public void annotatedMethod() {
             // empty

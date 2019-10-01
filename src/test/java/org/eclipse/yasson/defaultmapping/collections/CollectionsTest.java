@@ -17,7 +17,6 @@ import static org.junit.jupiter.api.Assertions.*;
 
 import org.eclipse.yasson.TestTypeToken;
 import org.eclipse.yasson.defaultmapping.generics.model.Circle;
-import org.eclipse.yasson.defaultmapping.generics.model.ScalarValueWrapper;
 
 import javax.json.bind.Jsonb;
 import javax.json.bind.JsonbConfig;
@@ -34,7 +33,7 @@ public class CollectionsTest {
 
     private Jsonb jsonb;
 
-    @Before
+    @BeforeAll
     public void before() {
         jsonb = JsonbBuilder.create(new JsonbConfig().withNullValues(Boolean.TRUE));
     }
@@ -249,12 +248,12 @@ public class CollectionsTest {
         map.put("first", "abc");
         map.put("second", "def");
         final String json = jsonb.toJson(map);
-        Assert.assertEquals("{\"first\":\"abc\",\"second\":\"def\"}", json);
+        assertEquals("{\"first\":\"abc\",\"second\":\"def\"}", json);
 
         NavigableMap<String, String> result = jsonb.fromJson(json, new TestTypeToken<NavigableMap<String, String>>() {}.getType());
-        Assert.assertEquals(TreeMap.class, result.getClass());
-        Assert.assertEquals("abc", result.get("first"));
-        Assert.assertEquals("def", result.get("second"));
+        assertEquals(TreeMap.class, result.getClass());
+        assertEquals("abc", result.get("first"));
+        assertEquals("def", result.get("second"));
     }
 
     @Test
@@ -263,12 +262,12 @@ public class CollectionsTest {
         map.put("first", "abc");
         map.put("second", "def");
         final String json = jsonb.toJson(map);
-        Assert.assertEquals("{\"first\":\"abc\",\"second\":\"def\"}", json);
+        assertEquals("{\"first\":\"abc\",\"second\":\"def\"}", json);
 
         SortedMap<String, String> result = jsonb.fromJson(json, new TestTypeToken<SortedMap<String, String>>() {}.getType());
-        Assert.assertEquals(TreeMap.class, result.getClass());
-        Assert.assertEquals("abc", result.get("first"));
-        Assert.assertEquals("def", result.get("second"));
+        assertEquals(TreeMap.class, result.getClass());
+        assertEquals("abc", result.get("first"));
+        assertEquals("def", result.get("second"));
     }
 
 }

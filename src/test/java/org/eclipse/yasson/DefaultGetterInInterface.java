@@ -14,11 +14,10 @@ package org.eclipse.yasson;
 
 import org.junit.jupiter.api.*;
 import static org.junit.jupiter.api.Assertions.*;
+import static org.eclipse.yasson.Jsonbs.*;
 
 import org.eclipse.yasson.internal.JsonbContext;
 
-import javax.json.bind.Jsonb;
-import javax.json.bind.JsonbBuilder;
 import javax.json.bind.JsonbConfig;
 import javax.json.bind.annotation.JsonbProperty;
 import javax.json.spi.JsonProvider;
@@ -29,13 +28,6 @@ import java.lang.reflect.Method;
  * @author Maxence Laurent
  */
 public class DefaultGetterInInterface {
-
-    private Jsonb jsonb;
-
-    @Before
-    public void before() {
-        jsonb = JsonbBuilder.create();
-    }
 
     public static interface Defaulted {
 
@@ -50,8 +42,8 @@ public class DefaultGetterInInterface {
     @Test
     public void testWithDefault() {
         PojoWithDefault pojo = new PojoWithDefault();
-        String result = jsonb.toJson(pojo);
-        Assert.assertEquals("{\"getterA\":\"valueA\"}", result);
+        String result = defaultJsonb.toJson(pojo);
+        assertEquals("{\"getterA\":\"valueA\"}", result);
     }
 
     public static interface WithGetterI {
@@ -152,6 +144,6 @@ public class DefaultGetterInInterface {
 
     private void assertJson(WithGetterI pojo, String expected){
         assertEquals(expected, pojo.getGetterI());
-        assertEquals("{\"" + expected + "\":\"" + pojo.getGetterI() + "\"}", jsonb.toJson(pojo));
+        assertEquals("{\"" + expected + "\":\"" + pojo.getGetterI() + "\"}", defaultJsonb.toJson(pojo));
     }
 }

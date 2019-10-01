@@ -1,5 +1,7 @@
 package org.eclipse.yasson.internal;
 
+import org.junit.jupiter.api.*;
+
 import javax.json.bind.annotation.JsonbCreator;
 import javax.json.bind.annotation.JsonbProperty;
 
@@ -11,9 +13,7 @@ import java.security.PrivilegedAction;
 import java.util.HashMap;
 import java.util.Map;
 
-import org.junit.Ignore;
-
-@Ignore
+@Disabled
 class AnnotationIntrospectorTestFixtures {
 
     public static interface ProvidesParameterRepresentation {

@@ -1,7 +1,7 @@
 package org.eclipse.yasson.internal;
 
-import org.junit.Assert;
-import org.junit.Test;
+import org.junit.jupiter.api.*;
+import static org.junit.jupiter.api.Assertions.*;
 
 import javax.json.bind.Jsonb;
 import javax.json.bind.JsonbConfig;
@@ -57,13 +57,13 @@ public class CollectionsWithJavaBaseTypesTest {
         })).build();
 
         String expected = "{\"dates\":[\"2020-01-01\",null],\"innerArrayInts\":[[1,null]],\"listOfListsOfIntegers\":[[0,1,null]],\"names\":[\"First\",\"second\",null],\"optionalInts\":[2147483647,null]}";
-        Assert.assertEquals(expected, jsonb.toJson(properties));
+        assertEquals(expected, jsonb.toJson(properties));
 
         JavaBasePropertiesInContainer result = jsonb.fromJson(expected, JavaBasePropertiesInContainer.class);
-        Assert.assertEquals(properties.getNames(), result.getNames());
-        Assert.assertEquals(properties.getOptionalInts(), result.getOptionalInts());
-        Assert.assertEquals(properties.getListOfListsOfIntegers(), result.getListOfListsOfIntegers());
-        Assert.assertArrayEquals(properties.getInnerArrayInts(), result.getInnerArrayInts());
+        assertEquals(properties.getNames(), result.getNames());
+        assertEquals(properties.getOptionalInts(), result.getOptionalInts());
+        assertEquals(properties.getListOfListsOfIntegers(), result.getListOfListsOfIntegers());
+        assertArrayEquals(properties.getInnerArrayInts(), result.getInnerArrayInts());
     }
 
     public static final class JavaBasePropertiesInContainer {

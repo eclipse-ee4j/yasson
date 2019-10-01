@@ -15,6 +15,7 @@ package org.eclipse.yasson.customization;
 
 import org.junit.jupiter.api.*;
 import static org.junit.jupiter.api.Assertions.*;
+import static org.eclipse.yasson.Jsonbs.*;
 
 import org.eclipse.yasson.customization.model.JsonbPropertyName;
 import org.eclipse.yasson.customization.model.JsonbPropertyNameCollision;
@@ -33,13 +34,6 @@ import javax.json.bind.config.PropertyNamingStrategy;
  */
 public class JsonbPropertyTest {
 
-    private Jsonb jsonb;
-
-    @Before
-    public void setUp() throws Exception {
-        jsonb = JsonbBuilder.create();
-    }
-
     @Test
     public void testPropertyName() throws Exception {
 
@@ -49,10 +43,10 @@ public class JsonbPropertyTest {
         pojo.setFieldOverriddenWithMethodAnnot("OVERRIDDEN_GETTER");
 
         assertEquals("{\"fieldAnnotatedNameCustomized\":\"FIELD_ANNOTATED\",\"getterAnnotatedName\":\"METHOD_ANNOTATED\",\"getterOverriddenName\":\"OVERRIDDEN_GETTER\"}",
-                jsonb.toJson(pojo));
+                defaultJsonb.toJson(pojo));
 
         String toUnmarshall = "{\"fieldAnnotatedNameCustomized\":\"FIELD_ANNOTATED\",\"setterOverriddenName\":\"OVERRIDDEN_GETTER\",\"setterAnnotatedName\":\"METHOD_ANNOTATED\"}";
-        JsonbPropertyName result = jsonb.fromJson(toUnmarshall, JsonbPropertyName.class);
+        JsonbPropertyName result = defaultJsonb.fromJson(toUnmarshall, JsonbPropertyName.class);
         assertEquals("FIELD_ANNOTATED", result.getFieldAnnotatedName());
         assertEquals("METHOD_ANNOTATED", result.getMethodAnnotName());
         assertEquals("OVERRIDDEN_GETTER", result.getFieldOverriddenWithMethodAnnot());
@@ -61,13 +55,13 @@ public class JsonbPropertyTest {
     @Test
     public void testNameCollision() {
         JsonbPropertyNameCollision nameCollisionPojo = new JsonbPropertyNameCollision();
-        tryClash(()->jsonb.toJson(nameCollisionPojo));
-        tryClash(()->jsonb.fromJson("{}", JsonbPropertyNameCollision.class));
+        tryClash(() -> defaultJsonb.toJson(nameCollisionPojo));
+        tryClash(() -> defaultJsonb.fromJson("{}", JsonbPropertyNameCollision.class));
     }
 
 
 
-    private void tryClash(Runnable clashCommand) {
+    private static void tryClash(Runnable clashCommand) {
         try {
             clashCommand.run();
             fail();
@@ -80,7 +74,7 @@ public class JsonbPropertyTest {
     @Test
     public void testPropertyNillable() {
         JsonbPropertyNillable pojo = new JsonbPropertyNillable();
-        assertEquals("{\"nullField\":null}", jsonb.toJson(pojo));
+        assertEquals("{\"nullField\":null}", defaultJsonb.toJson(pojo));
     }
 
     /**
@@ -98,11 +92,11 @@ public class JsonbPropertyTest {
         NonConflictingProperties nonConflictingProperties = new NonConflictingProperties();
         nonConflictingProperties.setDOI("DOI value");
 
-        String json = jsonb.toJson(nonConflictingProperties);
-        Assert.assertEquals("{\"doi\":\"DOI value\"}", json);
+        String json = defaultJsonb.toJson(nonConflictingProperties);
+        assertEquals("{\"doi\":\"DOI value\"}", json);
 
-        NonConflictingProperties result = jsonb.fromJson("{\"DOI\":\"DOI value\"}", NonConflictingProperties.class);
-        Assert.assertEquals("DOI value", result.getDOI());
+        NonConflictingProperties result = defaultJsonb.fromJson("{\"DOI\":\"DOI value\"}", NonConflictingProperties.class);
+        assertEquals("DOI value", result.getDOI());
     }
 
     /**
@@ -112,8 +106,7 @@ public class JsonbPropertyTest {
     public void testConflictingProperties() {
         ConflictingProperties conflictingProperties = new ConflictingProperties();
         conflictingProperties.setDOI("DOI value");
-        Jsonb jsonb = JsonbBuilder.create(new JsonbConfig()
-        );
+        Jsonb jsonb = JsonbBuilder.create(new JsonbConfig());
 
         try {
             jsonb.toJson(conflictingProperties);
@@ -135,7 +128,7 @@ public class JsonbPropertyTest {
 
         Jsonb jsonb = JsonbBuilder.create();
         String json = jsonb.toJson(pojo);
-        Assert.assertEquals("{\"Doi\":\"DOI value\",\"doi\":\"DOI value\"}", json);
+        assertEquals("{\"Doi\":\"DOI value\",\"doi\":\"DOI value\"}", json);
 
         jsonb = JsonbBuilder.create(new JsonbConfig()
                 .withPropertyNamingStrategy(PropertyNamingStrategy.UPPER_CAMEL_CASE));

@@ -67,7 +67,7 @@ public class PreinstantiatedJsonpTest {
 
     private YassonJsonb jsonb;
 
-    @Before
+    @BeforeAll
     public void setUp() {
         // Create Jsonb and serialize
         JsonBindingProvider provider = new JsonBindingProvider();
@@ -149,7 +149,7 @@ public class PreinstantiatedJsonpTest {
 
         try {
             jsonb.fromJson(parser, Dog.class);
-            Assert.fail("JsonbException not thrown");
+            fail("JsonbException not thrown");
         } catch (JsonbException e) {
             //OK, parser in inconsistent state
         }
@@ -178,7 +178,7 @@ public class PreinstantiatedJsonpTest {
             return value;
         }, in);
         Wrapper<String> result = jsonb.fromJson(parser, new TestTypeToken<Wrapper<String>>() {}.getType());
-        Assert.assertEquals("Adapted string", result.getValue());
+        assertEquals("Adapted string", result.getValue());
     }
 
     @Test
@@ -189,7 +189,7 @@ public class PreinstantiatedJsonpTest {
         JsonGenerator generator = new SuffixJsonGenerator("Appended value.", out);
         jsonb.toJson(stringWrapper, new TestTypeToken<List<String>>(){}.getType(), generator);
         generator.close();
-        Assert.assertEquals("{\"value\":\"String value\",\"suffix\":\"Appended value.\"}", out.toString());
+        assertEquals("{\"value\":\"String value\",\"suffix\":\"Appended value.\"}", out.toString());
     }
 
 }

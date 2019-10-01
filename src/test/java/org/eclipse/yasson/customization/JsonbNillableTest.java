@@ -15,6 +15,7 @@ package org.eclipse.yasson.customization;
 
 import org.junit.jupiter.api.*;
 import static org.junit.jupiter.api.Assertions.*;
+import static org.eclipse.yasson.Jsonbs.*;
 
 import org.eclipse.yasson.customization.model.JsonbNillableClassSecondLevel;
 import org.eclipse.yasson.customization.model.JsonbNillableOverriddenWithJsonbProperty;
@@ -35,35 +36,28 @@ import javax.json.bind.JsonbConfig;
  */
 public class JsonbNillableTest {
 
-    private Jsonb jsonb;
-
-    @Before
-    public void setUp() throws Exception {
-        jsonb = JsonbBuilder.create();
-    }
-
     @Test
     public void testJsonbNillable() {
         JsonbNillableValue pojo = new JsonbNillableValue();
-        assertEquals("{\"nillableField\":null}", jsonb.toJson(pojo));
+        assertEquals("{\"nillableField\":null}", defaultJsonb.toJson(pojo));
     }
 
     @Test
     public void testJsonbNillableOverriddenWithJsonbProperty() {
         JsonbNillableOverriddenWithJsonbProperty pojo = new JsonbNillableOverriddenWithJsonbProperty();
-        assertEquals("{}", jsonb.toJson(pojo));
+        assertEquals("{}", defaultJsonb.toJson(pojo));
     }
 
     @Test
     public void testPackageLevelNillable() {
         JsonbNillablePackageLevel pojo = new JsonbNillablePackageLevel();
-        assertEquals("{\"packageLevelNillableField\":null}", jsonb.toJson(pojo));
+        assertEquals("{\"packageLevelNillableField\":null}", defaultJsonb.toJson(pojo));
     }
 
     @Test
     public void testPackageLevelOverriddenWithClassLevel() {
         PackageLevelOverriddenWithClassLevel pojo = new PackageLevelOverriddenWithClassLevel();
-        assertEquals("{}", jsonb.toJson(pojo));
+        assertEquals("{}", defaultJsonb.toJson(pojo));
     }
 
     /**
@@ -72,16 +66,16 @@ public class JsonbNillableTest {
     @Test
     public void testNillableInheritFromInterface() throws Exception {
         JsonbNillableClassSecondLevel pojo = new JsonbNillableClassSecondLevel();
-        assertEquals("{\"classNillable\":null}", jsonb.toJson(pojo));
+        assertEquals("{\"classNillable\":null}", defaultJsonb.toJson(pojo));
     }
 
     @Test
     public void testInheritanceOverride() throws Exception {
         JsonbNillableOverridesInterface overridesInterface = new JsonbNillableOverridesInterface();
-        assertEquals("{}", jsonb.toJson(overridesInterface));
+        assertEquals("{}", defaultJsonb.toJson(overridesInterface));
 
         JsonbNillableOverridesClass overridesClass = new JsonbNillableOverridesClass();
-        assertEquals("{}", jsonb.toJson(overridesClass));
+        assertEquals("{}", defaultJsonb.toJson(overridesClass));
     }
 
     @Test
@@ -90,7 +84,7 @@ public class JsonbNillableTest {
         Jsonb jsonb = JsonbBuilder.create(jsonbConfig);
 
         String jsonString = jsonb.toJson(new ScalarValueWrapper<String>(){});
-        Assert.assertEquals("{\"value\":null}", jsonString);
+        assertEquals("{\"value\":null}", jsonString);
     }
 
 }
