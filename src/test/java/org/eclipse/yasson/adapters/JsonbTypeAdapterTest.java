@@ -34,7 +34,7 @@ public class JsonbTypeAdapterTest {
         @Override
         public Box adaptFromJson(String obj) throws Exception {
             String[] strings = obj.split(":");
-            return new Box(strings[0], Integer.parseInt(strings[1]));
+            return new Box(strings[0], Integer.valueOf(strings[1]));
         }
 
         @Override
@@ -62,7 +62,6 @@ public class JsonbTypeAdapterTest {
 
     @Test
     public void testIncompatibleAdapter() throws Exception {
-
         IncompatibleAdapterPojo incompatibleAdapterFieldPojo = new IncompatibleAdapterPojo();
         incompatibleAdapterFieldPojo.str = "STR";
         try {
@@ -72,7 +71,6 @@ public class JsonbTypeAdapterTest {
             assertTrue(e.getMessage().startsWith("Adapter of runtime type class"));
             assertTrue(e.getMessage().contains("does not match property type "));
         }
-
     }
 
     @Test
@@ -89,7 +87,6 @@ public class JsonbTypeAdapterTest {
 
     @Test
     public void testAnnotatedTbox() throws Exception {
-
         AnnotatedPojo pojo = new AnnotatedPojo();
         pojo.box = new Box("STR", 101);
         String marshalledJson = defaultJsonb.toJson(pojo);
@@ -124,5 +121,4 @@ public class JsonbTypeAdapterTest {
         assertEquals("STR", result.getBoxStrField());
         assertEquals(Integer.valueOf(101), result.getBoxIntegerField());
     }
-
 }

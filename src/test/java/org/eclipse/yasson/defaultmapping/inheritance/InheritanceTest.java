@@ -79,7 +79,6 @@ public class InheritanceTest {
 
     @Test
     public void testPropagatedGenericInheritance() throws Exception {
-
         List<String> stringList = new ArrayList<>();
         stringList.add("first");
         stringList.add("second");
@@ -114,7 +113,6 @@ public class InheritanceTest {
 
     @Test
     public void testPropagatedGenericInheritance1() throws Exception {
-
         List<String> stringList = new ArrayList<>();
         stringList.add("first");
         stringList.add("second");
@@ -185,7 +183,6 @@ public class InheritanceTest {
 
     @Test
     public void testInterfaceGenericInheritance() throws Exception {
-
         ImplementsGenericInterfaces<String, Integer> implementsGenericInterfaces = new ImplementsGenericInterfaces<>();
 
         implementsGenericInterfaces.setGenericValue("GENERIC_VALUE");
@@ -214,7 +211,6 @@ public class InheritanceTest {
 
     @Test
     public void testPropOrderPartiallyOverriddenProperty() {
-
         PropertyOrderSecond pojo = new PropertyOrderSecond();
         pojo.setZero("ZERO");
         pojo.setZeroPartiallyOverriddenInFirst("ZERO_PARTIALLY_OVERRIDDEN_IN_FIRST");
@@ -226,5 +222,4 @@ public class InheritanceTest {
         assertEquals("{\"zero\":\"ZERO\",\"zeroPartiallyOverriddenInFirst\":\"ZERO_PARTIALLY_OVERRIDDEN_IN_FIRST\",\"first\":\"FIRST\",\"second\":\"SECOND\",\"zeroOverriddenInSecond\":\"ZERO_OVERRIDDEN_IN_SECOND\"}",
                 result);
     }
-
 }

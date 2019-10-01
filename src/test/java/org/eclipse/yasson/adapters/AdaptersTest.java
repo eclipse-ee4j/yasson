@@ -55,8 +55,6 @@ import static java.util.Collections.unmodifiableMap;
  */
 public class AdaptersTest {
 
-    //private Jsonb jsonb;
-
     public static class NonGenericPojo {
         public String strValues;
         public Box box;
@@ -109,7 +107,7 @@ public class AdaptersTest {
 
                     @Override
                     public Integer adaptFromJson(String s) {
-                        return Integer.parseInt(s);
+                        return Integer.valueOf(s);
                     }
                 }
         };
@@ -152,7 +150,6 @@ public class AdaptersTest {
         assertEquals(22, result.tBox.getX());
         assertEquals("strBoxStr", result.strBox.getStrField());
         assertEquals("44", result.strBox.getX());
-
     }
 
     @Test

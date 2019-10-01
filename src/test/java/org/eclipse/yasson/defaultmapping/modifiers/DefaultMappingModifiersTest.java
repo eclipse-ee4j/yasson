@@ -53,7 +53,6 @@ public class DefaultMappingModifiersTest {
 
         result = defaultJsonb.fromJson(validJson, MethodModifiersClass.class);
         assertEquals("WITHOUT_METHODS", result.publicFieldWithoutMethods);
-
     }
 
     @Test
@@ -83,5 +82,4 @@ public class DefaultMappingModifiersTest {
 
         assertEquals("{\"child\":{\"name\":\"Person 2\"},\"name\":\"Person 1\"}", bindingJsonb.toJson(person));
     }
-
 }
