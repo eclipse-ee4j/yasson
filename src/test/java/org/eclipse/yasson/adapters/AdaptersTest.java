@@ -18,17 +18,7 @@ import static org.junit.jupiter.api.Assertions.*;
 import static org.eclipse.yasson.Jsonbs.*;
 
 import org.eclipse.yasson.TestTypeToken;
-import org.eclipse.yasson.adapters.model.AdaptedPojo;
-import org.eclipse.yasson.adapters.model.Author;
-import org.eclipse.yasson.adapters.model.Box;
-import org.eclipse.yasson.adapters.model.BoxToCrateCompatibleGenericsAdapter;
-import org.eclipse.yasson.adapters.model.BoxToCratePropagatedIntegerStringAdapter;
-import org.eclipse.yasson.adapters.model.Crate;
-import org.eclipse.yasson.adapters.model.GenericBox;
-import org.eclipse.yasson.adapters.model.IntegerListToStringAdapter;
-import org.eclipse.yasson.adapters.model.JsonObjectPojo;
-import org.eclipse.yasson.adapters.model.SupertypeAdapterPojo;
-import org.eclipse.yasson.adapters.model.UUIDContainer;
+import org.eclipse.yasson.adapters.model.*;
 import org.eclipse.yasson.defaultmapping.generics.model.ScalarValueWrapper;
 
 import javax.json.bind.Jsonb;
@@ -437,15 +427,17 @@ public class AdaptersTest {
 
     @Test
     public void testAdapterReturningNull() {
+        Jsonb jsonb = JsonbBuilder.create(new JsonbConfig().withAdapters(new ReturnNullAdapter()).withNullValues(true));
+
         ScalarValueWrapper<Number> wrapper = new ScalarValueWrapper<>();
         wrapper.setValue(10);
         Type type = new TestTypeToken<ScalarValueWrapper<Number>>() {
         }.getType();
-        String json = nullableJsonb.toJson(wrapper, type);
+        String json = jsonb.toJson(wrapper, type);
 
         assertEquals("{\"value\":null}", json);
 
-        ScalarValueWrapper<Number> result = nullableJsonb.fromJson("{\"value\":null}", type);
+        ScalarValueWrapper<Number> result = jsonb.fromJson("{\"value\":null}", type);
         assertNull(result.getValue());
     }
 
