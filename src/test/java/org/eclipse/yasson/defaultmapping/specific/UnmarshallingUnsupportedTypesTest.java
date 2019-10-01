@@ -68,7 +68,7 @@ public class UnmarshallingUnsupportedTypesTest {
             jsonb.fromJson(expected, ClassWithUnsupportedFields.class);
             fail("Should report an error");
         } catch (JsonbException e) {
-            assertTrue(e.getMessage().contains("Can't infer a type"));
+            assertTrue(e.getMessage().contains("Cannot infer a type"));
             assertTrue(e.getMessage().contains("customInterface"));
         }
     }
