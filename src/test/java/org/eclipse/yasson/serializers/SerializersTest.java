@@ -19,16 +19,19 @@ import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNull;
 import static org.junit.Assert.fail;
 
+import java.io.StringReader;
 import java.lang.reflect.Type;
 import java.math.BigDecimal;
 import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.Date;
 import java.util.HashMap;
+import java.util.Map;
 import java.util.SortedMap;
 import java.util.TimeZone;
 import java.util.TreeMap;
 
+import javax.json.Json;
 import javax.json.JsonObject;
 import javax.json.bind.Jsonb;
 import javax.json.bind.JsonbBuilder;
@@ -54,7 +57,6 @@ import org.eclipse.yasson.serializers.model.CrateJsonObjectDeserializer;
 import org.eclipse.yasson.serializers.model.CrateSerializer;
 import org.eclipse.yasson.serializers.model.CrateSerializerWithConversion;
 import org.eclipse.yasson.serializers.model.GenericPropertyPojo;
-import org.eclipse.yasson.serializers.model.GenericPropertyPojoSerializer;
 import org.eclipse.yasson.serializers.model.NumberDeserializer;
 import org.eclipse.yasson.serializers.model.NumberSerializer;
 import org.eclipse.yasson.serializers.model.RecursiveDeserializer;
@@ -450,6 +452,24 @@ public class SerializersTest {
         assertEquals("{\"null\":null}", jsonb.toJson(singletonMap(null, null)));
         assertEquals("{\"key\":null}", jsonb.toJson(singletonMap("key", null)));
         assertEquals("{\"null\":\"value\"}", jsonb.toJson(singletonMap(null, "value")));
+    }
+
+    /**
+     * Test serialization of Map with String keys only.
+     * Map shall be stored as a single JsonObject with keys as object properties names.
+     */
+    @Test
+    public void testSerializeMapToJsonObject() {
+        Map<String, Object> map = new HashMap<>();
+        Jsonb jsonb = JsonbBuilder.create(new JsonbConfig());
+        map.put("name", "John SMith");
+        map.put("age", 35);
+        map.put("married", true);
+        String json = jsonb.toJson(map);
+        JsonObject jobj = Json.createReader(new StringReader(json)).read().asJsonObject();
+        assertEquals("John SMith", jobj.getString("name"));
+        assertEquals(35, jobj.getInt("age"));
+        assertEquals(true, jobj.getBoolean("married"));
     }
 
     @Test

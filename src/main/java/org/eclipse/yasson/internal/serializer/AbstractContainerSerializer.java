@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2016, 2018 Oracle and/or its affiliates. All rights reserved.
+ * Copyright (c) 2016, 2019 Oracle and/or its affiliates. All rights reserved.
  * This program and the accompanying materials are made available under the
  * terms of the Eclipse Public License v1.0 and Eclipse Distribution License v. 1.0
  * which accompanies this distribution.
@@ -13,19 +13,20 @@
 
 package org.eclipse.yasson.internal.serializer;
 
+import java.lang.reflect.ParameterizedType;
+import java.lang.reflect.Type;
+import java.util.Objects;
+import java.util.Optional;
+
+import javax.json.bind.serializer.JsonbSerializer;
+import javax.json.bind.serializer.SerializationContext;
+import javax.json.stream.JsonGenerator;
+
 import org.eclipse.yasson.internal.Marshaller;
 import org.eclipse.yasson.internal.ReflectionUtils;
 import org.eclipse.yasson.internal.model.ClassModel;
 import org.eclipse.yasson.internal.model.customization.ClassCustomizationBuilder;
 import org.eclipse.yasson.internal.model.customization.ContainerCustomization;
-
-import javax.json.bind.serializer.JsonbSerializer;
-import javax.json.bind.serializer.SerializationContext;
-import javax.json.stream.JsonGenerator;
-import java.lang.reflect.ParameterizedType;
-import java.lang.reflect.Type;
-import java.util.Objects;
-import java.util.Optional;
 
 /**
  * Base class for container serializers (list, array, etc.).
@@ -58,38 +59,55 @@ public abstract class AbstractContainerSerializer<T> extends AbstractItem<T> imp
         super(wrapper, runtimeType, classModel);
     }
 
-    @Override
-    public final void serialize(T obj, JsonGenerator generator, SerializationContext ctx) {
-        writeStart(generator);
-        serializeInternal(obj, generator, ctx);
-        writeEnd(generator);
+    /**
+     * Process container before serialization begins.
+     * Does nothing by default.
+     *
+     * @param obj item to be serialized
+     */
+    protected void beforeSerialize(T obj) {
     }
 
-    protected abstract void serializeInternal(T obj, JsonGenerator generator, SerializationContext ctx);
-
     /**
-     * Write start object or start array without a key.
+     * Write start of an object or an array without a key.
      *
-     * @param generator JSON generator.
+     * @param generator JSON format generator
      */
     protected abstract void writeStart(JsonGenerator generator);
 
     /**
-     * Writes end for object or array.
+     * Write start of an object or an array with a key.
      *
-     * @param generator JSON generator.
+     * @param key JSON key name.
+     * @param generator JSON format generator
+     */
+    protected abstract void writeStart(String key, JsonGenerator generator);
+
+    /**
+     * Writes end of an object or an array.
+     *
+     * @param generator JSON format generator
      */
     protected void writeEnd(JsonGenerator generator) {
         generator.writeEnd();
     }
 
     /**
-     * Write start object or start array with key.
+     * Serialize content of provided container.
      *
-     * @param key JSON key name.
-     * @param generator JSON generator.
+     * @param obj container to be serialized
+     * @param generator JSON format generator
+     * @param ctx JSON serialization context
      */
-    protected abstract void writeStart(String key, JsonGenerator generator);
+    protected abstract void serializeInternal(T obj, JsonGenerator generator, SerializationContext ctx);
+
+    @Override
+    public final void serialize(T obj, JsonGenerator generator, SerializationContext ctx) {
+        beforeSerialize(obj);
+        writeStart(generator);
+        serializeInternal(obj, generator, ctx);
+        writeEnd(generator);
+    }
 
     @SuppressWarnings("unchecked")
     protected <X> void serializerCaptor(JsonbSerializer<?> serializer, X object, JsonGenerator generator, SerializationContext ctx) {

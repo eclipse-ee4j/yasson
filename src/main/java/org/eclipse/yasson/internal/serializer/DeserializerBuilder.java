@@ -139,6 +139,9 @@ public class DeserializerBuilder extends AbstractSerializerBuilder<DeserializerB
         if (jsonEvent == JsonParser.Event.START_ARRAY) {
             if (JsonValue.class.isAssignableFrom(rawType)) {
                 return wrapAdapted(adapterInfoOptional, new JsonArrayDeserializer(this));
+            } else if (Map.class.isAssignableFrom(rawType)) {
+                final JsonbDeserializer<?> mapDeserializer = new MapEntriesArrayDeserializer<>(this);
+                return wrapAdapted(adapterInfoOptional, mapDeserializer);
             } else if (rawType.isArray() || getRuntimeType() instanceof GenericArrayType) {
                 deserializer = createArrayItem(rawType.getComponentType());
                 return wrapAdapted(adapterInfoOptional, deserializer);
@@ -152,7 +155,7 @@ public class DeserializerBuilder extends AbstractSerializerBuilder<DeserializerB
             if (JsonValue.class.isAssignableFrom(rawType)) {
                 return wrapAdapted(adapterInfoOptional, new JsonObjectDeserializer(this));
             } else if (Map.class.isAssignableFrom(rawType)) {
-                final JsonbDeserializer<?> mapDeserializer = new MapDeserializer(this);
+                final JsonbDeserializer<?> mapDeserializer = new MapDeserializer<>(this);
                 return wrapAdapted(adapterInfoOptional, mapDeserializer);
             } else if (rawType.isInterface()) {
                 Class<?> mappedType = getInterfaceMappedType(rawType);

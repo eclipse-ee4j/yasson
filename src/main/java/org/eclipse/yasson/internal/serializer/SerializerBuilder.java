@@ -12,21 +12,22 @@
  ******************************************************************************/
 package org.eclipse.yasson.internal.serializer;
 
-import org.eclipse.yasson.internal.ComponentMatcher;
-import org.eclipse.yasson.internal.JsonbContext;
-import org.eclipse.yasson.internal.components.AdapterBinding;
-import org.eclipse.yasson.internal.components.SerializerBinding;
-import org.eclipse.yasson.internal.model.customization.ComponentBoundCustomization;
-
-import javax.json.JsonObject;
-import javax.json.JsonValue;
-import javax.json.bind.config.BinaryDataStrategy;
-import javax.json.bind.serializer.JsonbSerializer;
 import java.lang.reflect.GenericArrayType;
 import java.lang.reflect.Type;
 import java.util.Collection;
 import java.util.Map;
 import java.util.Optional;
+
+import javax.json.JsonObject;
+import javax.json.JsonValue;
+import javax.json.bind.config.BinaryDataStrategy;
+import javax.json.bind.serializer.JsonbSerializer;
+
+import org.eclipse.yasson.internal.ComponentMatcher;
+import org.eclipse.yasson.internal.JsonbContext;
+import org.eclipse.yasson.internal.components.AdapterBinding;
+import org.eclipse.yasson.internal.components.SerializerBinding;
+import org.eclipse.yasson.internal.model.customization.ComponentBoundCustomization;
 
 /**
  * Builder for serializers.
@@ -140,7 +141,7 @@ public class SerializerBuilder extends AbstractSerializerBuilder<SerializerBuild
         } else if (componentType == double.class) {
             return new DoubleArraySerializer(this);
         } else {
-            return new ObjectArraySerializer(this);
+            return new ObjectArraySerializer<>(this);
         }
     }
 
