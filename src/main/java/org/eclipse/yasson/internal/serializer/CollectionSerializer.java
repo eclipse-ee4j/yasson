@@ -35,7 +35,7 @@ public class CollectionSerializer<V> extends AbstractContainerSerializer<Collect
     }
 
     @Override
-    protected void serializeContainer(Collection<V> collection, JsonGenerator generator, SerializationContext ctx) {
+    protected void serializeInternal(Collection<V> collection, JsonGenerator generator, SerializationContext ctx) {
         for (Object item : collection) {
             serializeItem(item, generator, ctx);
         }

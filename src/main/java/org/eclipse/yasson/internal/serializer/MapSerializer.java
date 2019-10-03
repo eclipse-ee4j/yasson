@@ -150,7 +150,7 @@ public class MapSerializer<K,V> extends AbstractContainerSerializer<Map<K,V>> im
      * @param ctx JSON serialization context
      */
     @Override
-    protected void serializeContainer(Map<K,V> obj, JsonGenerator generator, SerializationContext ctx) {
+    protected void serializeInternal(Map<K,V> obj, JsonGenerator generator, SerializationContext ctx) {
         serializer.serializeContainer(obj, generator, ctx);
     }
 

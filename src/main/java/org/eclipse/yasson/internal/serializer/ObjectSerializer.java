@@ -58,7 +58,7 @@ public class ObjectSerializer<T> extends AbstractContainerSerializer<T> {
     }
 
     @Override
-    protected void serializeContainer(T object, JsonGenerator generator, SerializationContext ctx) {
+    protected void serializeInternal(T object, JsonGenerator generator, SerializationContext ctx) {
         final PropertyModel[] allProperties = ((Marshaller) ctx).getMappingContext().getOrCreateClassModel(object.getClass()).getSortedProperties();
         for (PropertyModel model : allProperties) {
             try {

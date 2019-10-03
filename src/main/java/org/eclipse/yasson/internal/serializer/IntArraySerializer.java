@@ -28,7 +28,7 @@ public class IntArraySerializer extends AbstractArraySerializer<int[]> {
     }
 
     @Override
-    protected void serializeContainer(int[] arr, JsonGenerator generator, SerializationContext ctx) {
+    protected void serializeInternal(int[] arr, JsonGenerator generator, SerializationContext ctx) {
         for (int obj : arr) {
             generator.write(obj);
         }

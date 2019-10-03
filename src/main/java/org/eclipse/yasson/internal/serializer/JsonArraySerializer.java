@@ -30,7 +30,7 @@ public class JsonArraySerializer extends AbstractJsonpSerializer<JsonArray> {
     }
 
     @Override
-    protected void serializeContainer(JsonArray obj, JsonGenerator generator, SerializationContext ctx) {
+    protected void serializeInternal(JsonArray obj, JsonGenerator generator, SerializationContext ctx) {
         for (JsonValue value : obj) {
             generator.write(value);
         }

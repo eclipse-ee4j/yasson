@@ -99,13 +99,13 @@ public abstract class AbstractContainerSerializer<T> extends AbstractItem<T> imp
      * @param generator JSON format generator
      * @param ctx JSON serialization context
      */
-    protected abstract void serializeContainer(T obj, JsonGenerator generator, SerializationContext ctx);
+    protected abstract void serializeInternal(T obj, JsonGenerator generator, SerializationContext ctx);
 
     @Override
     public final void serialize(T obj, JsonGenerator generator, SerializationContext ctx) {
         beforeSerialize(obj);
         writeStart(generator);
-        serializeContainer(obj, generator, ctx);
+        serializeInternal(obj, generator, ctx);
         writeEnd(generator);
     }
 
