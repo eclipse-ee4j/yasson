@@ -31,6 +31,7 @@ import java.util.Objects;
 import java.util.Optional;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ConcurrentMap;
+import java.util.function.Function;
 
 /**
  * Searches for a registered components or Serializer for a given type.
@@ -45,15 +46,6 @@ public class ComponentMatcher {
      * Flag for searching for generic serializers and adapters in runtime.
      */
     private volatile boolean genericComponents;
-
-    /**
-     * Supplier for component binging.
-     * @param <T> component binding class
-     */
-    private interface ComponentSupplier<T extends AbstractComponentBinding> {
-
-        T getComponent(ComponentBindings componentBindings);
-    }
 
     private final ConcurrentMap<Type, ComponentBindings> userComponents;
 
@@ -186,9 +178,9 @@ public class ComponentMatcher {
         return Optional.of(customization.getDeserializeAdapterBinding());
     }
 
-    private <T extends AbstractComponentBinding> Optional<T> searchComponentBinding(Type runtimeType, ComponentSupplier<T> supplier) {
+    private <T extends AbstractComponentBinding> Optional<T> searchComponentBinding(Type runtimeType, Function<ComponentBindings, T> supplier) {
         for (ComponentBindings componentBindings : userComponents.values()) {
-            final T component = supplier.getComponent(componentBindings);
+            final T component = supplier.apply(componentBindings);
             if (component != null && matches(runtimeType, componentBindings.getBindingType())) {
                 return Optional.of(component);
             }
