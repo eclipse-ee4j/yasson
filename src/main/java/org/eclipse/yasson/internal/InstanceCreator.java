@@ -20,34 +20,14 @@ import java.util.LinkedList;
 import java.util.Map;
 import java.util.TreeMap;
 import java.util.TreeSet;
+import java.util.function.Supplier;
 
 /**
  * Creates instances for known types, caches constructors of unknown.
  * (Constructors of parsed types are stored in {@link org.eclipse.yasson.internal.model.ClassModel}).
  */
 public class InstanceCreator {
-
-    private interface Creator {
-        Object createInstance();
-    }
-
-    /**
-     * Caches default constructor to create instance.
-     */
-    private static final class ConstructorCreator implements Creator {
-        private final Constructor<?> constructor;
-
-        public ConstructorCreator(Constructor<?> constructor) {
-            this.constructor = constructor;
-        }
-
-        @Override
-        public Object createInstance() {
-            return ReflectionUtils.createNoArgConstructorInstance(constructor);
-        }
-    }
-
-    private final Map<Class, Creator> creators;
+    private final Map<Class<?>, Supplier<?>> creators;
 
     public InstanceCreator() {
         creators = new HashMap<>();
@@ -67,13 +47,17 @@ public class InstanceCreator {
      */
     @SuppressWarnings("unchecked")
     public <T> T createInstance(Class<T> tClass) {
-        Creator creator = creators.get(tClass);
+        Supplier<?> creator = creators.get(tClass);
         //No worries for race conditions here, instance may be replaced during first attempt.
         if (creator == null) {
-            creator = new ConstructorCreator(ReflectionUtils.getDefaultConstructor(tClass, true));
+            creator = createConstructorSupplier(ReflectionUtils.getDefaultConstructor(tClass, true));
             creators.put(tClass, creator);
         }
 
-        return (T) creator.createInstance();
+        return (T) creator.get();
+    }
+    
+    private static Supplier<?> createConstructorSupplier(Constructor<?> constructor){
+    	return () -> ReflectionUtils.createNoArgConstructorInstance(constructor);
     }
 }
