@@ -12,10 +12,9 @@
  ******************************************************************************/
 package org.eclipse.yasson.internal.serializer;
 
-import java.util.Map;
-
 import javax.json.bind.serializer.SerializationContext;
 import javax.json.stream.JsonGenerator;
+import java.util.Map;
 
 /**
  * Serialize {@link Map} with {@link String} keys as JSON Object:
@@ -77,8 +76,14 @@ public class MapToObjectSerializer<K,V> implements MapSerializer.Delegate<K,V> {
      */
     @Override
     public void serializeContainer(Map<K,V> obj, JsonGenerator generator, SerializationContext ctx) {
-        for (Map.Entry<?,?> entry : obj.entrySet()) {
-            final String keyString = String.valueOf(entry.getKey());
+        for (Map.Entry<K,V> entry : obj.entrySet()) {
+            final String keyString;
+            K key = entry.getKey();
+            if (key instanceof Enum<?>) {
+                keyString = ((Enum<?>) key).name();
+            } else {
+                keyString = String.valueOf(key);
+            }
             final Object value = entry.getValue();
             if (value == null) {
                 if (serializer.isNullable()) {
