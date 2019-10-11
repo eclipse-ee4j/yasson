@@ -33,6 +33,12 @@ public class RecursionTest {
     private static final RecursiveObject OBJECT = RecursiveObject.construct(5);
     private static final String OBJECT_STRING = "{\"child\":{\"child\":{\"child\":{\"child\":{\"child\":{\"id\":1}}}}}}";
 
+    private static final String[][][][] ARRAY = new String[1][1][1][1];
+    static {
+        ARRAY[0][0][0][0] = "Hello World";
+    }
+    private static final String ARRAY_STRING = "[[[[\"Hello World\"]]]]";
+
     private final Jsonb jsonb = (new JsonBindingBuilder()).build();
 
     @Test
@@ -43,6 +49,16 @@ public class RecursionTest {
     @Test
     public void testRecursiveObjectDeserialisation() throws IOException {
         assertEquals(OBJECT, jsonb.fromJson(OBJECT_STRING, RecursiveObject.class));
+    }
+
+    @Test
+    public void testRecursiveArraySerialisation() throws IOException {
+        assertEquals(ARRAY_STRING, jsonb.toJson(ARRAY));
+    }
+
+    @Test
+    public void testRecursiveArrayDeserialisation() throws IOException {
+        assertEquals(ARRAY, jsonb.fromJson(ARRAY_STRING, String[][][][].class));
     }
 
 }
