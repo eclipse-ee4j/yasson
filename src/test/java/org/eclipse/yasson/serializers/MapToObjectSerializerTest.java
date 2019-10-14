@@ -12,12 +12,14 @@
  ******************************************************************************/
 package org.eclipse.yasson.serializers;
 
-import org.junit.Assert;
-import org.junit.Test;
-
 import javax.json.bind.Jsonb;
 import javax.json.bind.JsonbBuilder;
 import javax.json.bind.JsonbConfig;
+
+import org.junit.jupiter.api.Test;
+
+import static org.junit.jupiter.api.Assertions.assertTrue;
+
 import java.util.EnumMap;
 import java.util.Map;
 
@@ -53,7 +55,7 @@ public class MapToObjectSerializerTest {
         map.put(TestEnum.TWO, "value2");
         String json = jsonb.toJson(map);
         for (TestEnum e : TestEnum.values()) {
-            Assert.assertTrue("Enumeration not well serialized", json.contains(e.name()));
+            assertTrue(json.contains(e.name()), "Enumeration not well serialized");
         }
     }
 }
