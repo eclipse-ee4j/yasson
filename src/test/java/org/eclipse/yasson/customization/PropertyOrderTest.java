@@ -13,14 +13,16 @@
 
 package org.eclipse.yasson.customization;
 
+import org.junit.jupiter.api.*;
+import static org.junit.jupiter.api.Assertions.*;
+import static org.eclipse.yasson.Jsonbs.*;
+
 import org.eclipse.yasson.customization.model.FieldCustomOrder;
 import org.eclipse.yasson.customization.model.FieldCustomOrderWrapper;
 import org.eclipse.yasson.customization.model.FieldOrder;
 import org.eclipse.yasson.customization.model.FieldOrderNameAnnotation;
 import org.eclipse.yasson.customization.model.FieldSpecificOrder;
 import org.eclipse.yasson.customization.model.RenamedPropertiesContainer;
-import org.junit.Assert;
-import org.junit.Test;
 
 import javax.json.bind.Jsonb;
 import javax.json.bind.JsonbBuilder;
@@ -29,8 +31,6 @@ import javax.json.bind.annotation.JsonbCreator;
 import javax.json.bind.annotation.JsonbProperty;
 import javax.json.bind.annotation.JsonbPropertyOrder;
 import javax.json.bind.config.PropertyOrderStrategy;
-
-import static org.junit.Assert.assertEquals;
 
 /**
  * @author Roman Grigoriadi
@@ -63,11 +63,11 @@ public class PropertyOrderTest {
 
     @Test
     public void testPropertySetCustomOrder() {
-        Jsonb jsonb = JsonbBuilder.create();
         FieldSpecificOrder fieldSpecificOrder = new FieldSpecificOrder();
         String expectedSpecific = "{\"aField\":\"aValue\",\"dField\":\"dValue\",\"bField\":\"bValue\",\"cField\":\"cValue\"}";
-        assertEquals(expectedSpecific, jsonb.toJson(fieldSpecificOrder));
-        jsonb = JsonbBuilder.create(new JsonbConfig().withPropertyOrderStrategy(PropertyOrderStrategy.REVERSE));
+        assertEquals(expectedSpecific, defaultJsonb.toJson(fieldSpecificOrder));
+        
+        Jsonb jsonb = JsonbBuilder.create(new JsonbConfig().withPropertyOrderStrategy(PropertyOrderStrategy.REVERSE));
         expectedSpecific = "{\"aField\":\"aValue\",\"dField\":\"dValue\",\"cField\":\"cValue\",\"bField\":\"bValue\"}";
         assertEquals(expectedSpecific, jsonb.toJson(fieldSpecificOrder));
     }
@@ -91,16 +91,15 @@ public class PropertyOrderTest {
         Jsonb jsonb = JsonbBuilder.create(config);
 
         String jsonString = jsonb.toJson(new RenamedPropertiesContainer() {{ setStringInstance("Test String"); setLongInstance(1); }});
-        Assert.assertTrue(jsonString.matches("\\{\\s*\"first\"\\s*\\:\\s*0\\s*,\\s*\"second\"\\s*\\:\\s*\"Test String\"\\s*,\\s*\"third\"\\s*\\:\\s*1\\s*\\}"));
+        assertTrue(jsonString.matches("\\{\\s*\"first\"\\s*\\:\\s*0\\s*,\\s*\"second\"\\s*\\:\\s*\"Test String\"\\s*,\\s*\"third\"\\s*\\:\\s*1\\s*\\}"));
 
         RenamedPropertiesContainer unmarshalledObject = jsonb.fromJson("{ \"first\" : 1, \"second\" : \"Test String\", \"third\" : 1 }", RenamedPropertiesContainer.class);
-        Assert.assertEquals(3, unmarshalledObject.getIntInstance());
+        assertEquals(3, unmarshalledObject.getIntInstance());
     }
 
     @Test
     public void testJsonbPropertyOrderOnRenamedProperties() {
-        Jsonb jsonb = JsonbBuilder.create();
-        Assert.assertEquals("{\"from\":10,\"count\":11}", jsonb.toJson(new Range(10, 11)));
+        assertEquals("{\"from\":10,\"count\":11}", defaultJsonb.toJson(new Range(10, 11)));
     }
 
     @JsonbPropertyOrder(

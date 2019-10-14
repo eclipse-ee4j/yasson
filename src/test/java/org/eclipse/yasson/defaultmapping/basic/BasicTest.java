@@ -12,16 +12,14 @@
  ******************************************************************************/
 package org.eclipse.yasson.defaultmapping.basic;
 
-import org.eclipse.yasson.internal.JsonBindingBuilder;
-import org.junit.Test;
+import org.junit.jupiter.api.*;
+import static org.junit.jupiter.api.Assertions.*;
+import static org.eclipse.yasson.Jsonbs.*;
 
-import javax.json.bind.Jsonb;
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.io.StringWriter;
 import java.io.Writer;
-
-import static org.junit.Assert.assertEquals;
 
 /**
  * Default mapping primitives tests.
@@ -32,33 +30,27 @@ public class BasicTest {
 
     @Test
     public void testMarshallEscapedString() {
-        final Jsonb jsonb = (new JsonBindingBuilder()).build();
-        assertEquals("[\" \\\\ \\\" / \\f\\b\\r\\n\\t 9\"]", jsonb.toJson(new String[] {" \\ \" / \f\b\r\n\t \u0039"}));
+        assertEquals("[\" \\\\ \\\" / \\f\\b\\r\\n\\t 9\"]", bindingJsonb.toJson(new String[] {" \\ \" / \f\b\r\n\t \u0039"}));
     }
 
     @Test
     public void testMarshallWriter() {
-        final Jsonb jsonb = (new JsonBindingBuilder()).build();
         Writer writer = new StringWriter();
-        jsonb.toJson(new Long[]{5L}, writer);
+        bindingJsonb.toJson(new Long[]{5L}, writer);
         assertEquals("[5]", writer.toString());
     }
 
     @Test
     public void testMarshallOutputStream() throws IOException {
-        final Jsonb jsonb = (new JsonBindingBuilder()).build();
-
         try (final ByteArrayOutputStream baos = new ByteArrayOutputStream()) {
-            jsonb.toJson(new Long[]{5L}, baos);
+        	bindingJsonb.toJson(new Long[]{5L}, baos);
             assertEquals("[5]", baos.toString("UTF-8"));
         }
     }
 
     @Test
     public void testObjectSerialization() {
-        Jsonb jsonb = (new JsonBindingBuilder()).build();
-        final String val =  jsonb.toJson(new Object());
+        final String val = bindingJsonb.toJson(new Object());
         assertEquals("{}", val);
     }
-
 }

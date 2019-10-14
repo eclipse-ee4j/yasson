@@ -1,7 +1,10 @@
 package org.eclipse.yasson.jsonstructure;
 
+import org.junit.jupiter.api.*;
+import static org.junit.jupiter.api.Assertions.*;
+import static org.eclipse.yasson.Jsonbs.*;
+
 import org.eclipse.yasson.YassonJsonb;
-import org.junit.Test;
 
 import javax.json.JsonArray;
 import javax.json.JsonNumber;
@@ -15,12 +18,7 @@ import java.math.BigDecimal;
 import java.util.ArrayList;
 import java.util.List;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertTrue;
-
 public class JsonGeneratorToStructureAdapterTest {
-
-    private final YassonJsonb jsonb = (YassonJsonb) JsonbBuilder.create();
 
     @Test
     public void testSimplePojo() {
@@ -29,7 +27,7 @@ public class JsonGeneratorToStructureAdapterTest {
         pojo.setLongProperty(10L);
         pojo.setStringProperty("String value");
 
-        JsonObject result = (JsonObject) jsonb.toJsonStructure(pojo);
+        JsonObject result = (JsonObject) yassonJsonb.toJsonStructure(pojo);
 
         assertEquals("String value", getString(result.get("stringProperty")));
         JsonValue bigDecimalProperty = result.get("bigDecimalProperty");
@@ -50,7 +48,7 @@ public class JsonGeneratorToStructureAdapterTest {
         pojo.getInner().setInnerFirst("First");
         pojo.getInner().setInnerSecond("Second");
 
-        JsonObject result = (JsonObject) jsonb.toJsonStructure(pojo, Pojo.class);
+        JsonObject result = (JsonObject) yassonJsonb.toJsonStructure(pojo, Pojo.class);
         assertEquals("String value", getString(result.get("stringProperty")));
         JsonValue bigDecimalProperty = result.get("bigDecimalProperty");
         assertTrue(bigDecimalProperty instanceof JsonNumber);
@@ -63,7 +61,6 @@ public class JsonGeneratorToStructureAdapterTest {
         assertEquals(JsonValue.ValueType.OBJECT, inner.getValueType());
         assertEquals("First", ((JsonObject)inner).getString("innerFirst"));
         assertEquals("Second", ((JsonObject)inner).getString("innerSecond"));
-
     }
 
     @Test
@@ -75,7 +72,7 @@ public class JsonGeneratorToStructureAdapterTest {
         objList.add(Boolean.TRUE);
         objList.add(null);
 
-        JsonArray result = (JsonArray) jsonb.toJsonStructure(objList);
+        JsonArray result = (JsonArray) yassonJsonb.toJsonStructure(objList);
         assertEquals("First", result.getString(0));
         assertEquals(10L, result.getJsonNumber(1).longValueExact());
         assertEquals(BigDecimal.ONE, result.getJsonNumber(2).bigDecimalValue());
@@ -93,7 +90,7 @@ public class JsonGeneratorToStructureAdapterTest {
         pojo.getBigDecimals().add(BigDecimal.TEN);
         pojo.getBooleans().add(Boolean.TRUE);
 
-        JsonObject result = (JsonObject) jsonb.toJsonStructure(pojo);
+        JsonObject result = (JsonObject) yassonJsonb.toJsonStructure(pojo);
         assertEquals(JsonValue.ValueType.ARRAY, result.get("strings").getValueType());
         assertEquals(JsonValue.ValueType.ARRAY, result.get("bigDecimals").getValueType());
         assertEquals(JsonValue.ValueType.ARRAY, result.get("booleans").getValueType());
@@ -113,7 +110,7 @@ public class JsonGeneratorToStructureAdapterTest {
         inner.add(null);
         outer.add(inner);
 
-        JsonArray result = (JsonArray) jsonb.toJsonStructure(outer);
+        JsonArray result = (JsonArray) yassonJsonb.toJsonStructure(outer);
         assertEquals(JsonValue.ValueType.ARRAY, result.get(0).getValueType());
         JsonArray resultInner = result.getJsonArray(0);
 
@@ -141,7 +138,7 @@ public class JsonGeneratorToStructureAdapterTest {
         assertEquals("Second value", ((JsonString) inner.get("second")).getString());
     }
 
-    private String getString(JsonValue value) {
+    private static String getString(JsonValue value) {
         if (value instanceof JsonString) {
             return ((JsonString) value).getString();
         }

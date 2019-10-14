@@ -12,21 +12,20 @@
  ******************************************************************************/
 package org.eclipse.yasson.defaultmapping.typeConvertors;
 
+import org.junit.jupiter.api.*;
+import static org.junit.jupiter.api.Assertions.*;
+import static org.eclipse.yasson.Jsonbs.*;
+
 import org.eclipse.yasson.TestTypeToken;
 import org.eclipse.yasson.defaultmapping.generics.model.ScalarValueWrapper;
 import org.eclipse.yasson.defaultmapping.typeConvertors.model.ByteArrayWrapper;
 import org.eclipse.yasson.internal.JsonBindingBuilder;
-import org.junit.Test;
 
 import javax.json.bind.Jsonb;
-import javax.json.bind.JsonbBuilder;
 import javax.json.bind.JsonbConfig;
 import javax.json.bind.config.BinaryDataStrategy;
 import java.util.Base64;
 import java.util.UUID;
-
-import static org.junit.Assert.assertArrayEquals;
-import static org.junit.Assert.assertEquals;
 
 /**
  * This class contains Converter tests
@@ -35,22 +34,18 @@ import static org.junit.Assert.assertEquals;
  */
 public class DefaultSerializersTest {
 
-    private final Jsonb jsonb = JsonbBuilder.create();
-
     @Test
     public void testCharacter() {
         final String json = "{\"value\":\"\uFFFF\"}";
-        assertEquals(json, jsonb.toJson(new ScalarValueWrapper<>('\uFFFF')));
-        ScalarValueWrapper<Character> result = jsonb.fromJson(json, new TestTypeToken<ScalarValueWrapper<Character>>(){}.getType());
+        assertEquals(json, defaultJsonb.toJson(new ScalarValueWrapper<>('\uFFFF')));
+        ScalarValueWrapper<Character> result = defaultJsonb.fromJson(json, new TestTypeToken<ScalarValueWrapper<Character>>(){}.getType());
         assertEquals((Character)'\uFFFF', result.getValue());
     }
 
     @Test
     public void testByteArray() {
         byte[] array = {1, 2, 3};
-        final Jsonb jsonb = (new JsonBindingBuilder()).build();
-
-        assertEquals("[1,2,3]", jsonb.toJson(array));
+        assertEquals("[1,2,3]", bindingJsonb.toJson(array));
     }
 
     @Test
@@ -116,10 +111,9 @@ public class DefaultSerializersTest {
 
     @Test
     public void testUUID() {
-        Jsonb jsonb = JsonbBuilder.create();
         UUID uuid = UUID.randomUUID();
-        String json = jsonb.toJson(uuid);
-        UUID result = jsonb.fromJson(json, UUID.class);
+        String json = defaultJsonb.toJson(uuid);
+        UUID result = defaultJsonb.fromJson(json, UUID.class);
         assertEquals(uuid, result);
     }
 }

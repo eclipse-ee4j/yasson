@@ -1,9 +1,8 @@
 package org.eclipse.yasson.defaultmapping;
 
+import org.junit.jupiter.api.*;
+
 import org.eclipse.yasson.serializers.model.Crate;
-import org.junit.After;
-import org.junit.Before;
-import org.junit.Test;
 
 import javax.json.bind.Jsonb;
 import javax.json.bind.JsonbBuilder;
@@ -22,15 +21,15 @@ public class SecurityManagerTest {
 
     static final String classesDir = SecurityManagerTest.class.getProtectionDomain().getCodeSource().getLocation().getFile();
 
-    @Before
-    public void setUp() {
+    @BeforeAll
+    public static void setUp() {
         System.setProperty("java.security.policy", classesDir + "test.policy");
         System.setProperty("java.security.debug", "failure");
         System.setSecurityManager(new SecurityManager());
     }
 
-    @After
-    public void tearDown() {
+    @AfterAll
+    public static void tearDown() {
         System.setSecurityManager(null);
     }
 

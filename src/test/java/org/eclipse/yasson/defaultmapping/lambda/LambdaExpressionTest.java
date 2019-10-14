@@ -1,11 +1,8 @@
 package org.eclipse.yasson.defaultmapping.lambda;
 
-import org.junit.Before;
-import org.junit.Test;
-import org.junit.Assert;
-
-import javax.json.bind.Jsonb;
-import javax.json.bind.JsonbBuilder;
+import org.junit.jupiter.api.*;
+import static org.junit.jupiter.api.Assertions.*;
+import static org.eclipse.yasson.Jsonbs.*;
 
 /**
  * Test marshalling objects generated using lambda expressions.
@@ -15,19 +12,12 @@ import javax.json.bind.JsonbBuilder;
  */
 public class LambdaExpressionTest {
 
-    private Jsonb jsonb;
-
-    @Before
-    public void before() {
-        jsonb = JsonbBuilder.create();
-    }
-
     @Test
     public void testMarshallFunctionalInterface() {
         String name = "WALL-E";
         Addressable control = new Robot(name);
         Addressable lambda = () -> name;
-        Assert.assertEquals(jsonb.toJson(control), jsonb.toJson(lambda));
+        assertEquals(defaultJsonb.toJson(control), defaultJsonb.toJson(lambda));
     }
 
     @Test
@@ -35,6 +25,6 @@ public class LambdaExpressionTest {
         String name = "Cheshire";
         Pet control = new Cat(name);
         Pet lambda = () -> name;
-        Assert.assertEquals(jsonb.toJson(control), jsonb.toJson(lambda));
+        assertEquals(defaultJsonb.toJson(control), defaultJsonb.toJson(lambda));
     }
 }

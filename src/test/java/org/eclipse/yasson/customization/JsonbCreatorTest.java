@@ -13,12 +13,12 @@
 
 package org.eclipse.yasson.customization;
 
-import org.eclipse.yasson.customization.model.*;
-import org.junit.Assert;
-import org.junit.Test;
+import org.junit.jupiter.api.*;
+import static org.junit.jupiter.api.Assertions.*;
+import static org.eclipse.yasson.Jsonbs.*;
 
-import javax.json.bind.Jsonb;
-import javax.json.bind.JsonbBuilder;
+import org.eclipse.yasson.customization.model.*;
+
 import javax.json.bind.JsonbException;
 import javax.json.bind.annotation.JsonbCreator;
 import javax.json.bind.annotation.JsonbDateFormat;
@@ -28,8 +28,6 @@ import java.math.BigDecimal;
 import java.time.LocalDate;
 import java.util.Set;
 
-import static org.junit.Assert.*;
-
 /**
  * @author Roman Grigoriadi
  */
@@ -38,8 +36,7 @@ public class JsonbCreatorTest {
     @Test
     public void testRootConstructor() {
         String json = "{\"str1\":\"abc\",\"str2\":\"def\",\"bigDec\":25}";
-        final Jsonb jsonb = JsonbBuilder.create();
-        CreatorConstructorPojo pojo = jsonb.fromJson(json, CreatorConstructorPojo.class);
+        CreatorConstructorPojo pojo = defaultJsonb.fromJson(json, CreatorConstructorPojo.class);
         assertEquals("abc", pojo.str1);
         assertEquals("def", pojo.str2);
         assertEquals(new BigDecimal("25"), pojo.bigDec);
@@ -48,8 +45,7 @@ public class JsonbCreatorTest {
     @Test
     public void testRootFactoryMethod() {
         String json = "{\"par1\":\"abc\",\"par2\":\"def\",\"bigDec\":25}";
-        final Jsonb jsonb = JsonbBuilder.create();
-        CreatorFactoryMethodPojo pojo = jsonb.fromJson(json, CreatorFactoryMethodPojo.class);
+        CreatorFactoryMethodPojo pojo = defaultJsonb.fromJson(json, CreatorFactoryMethodPojo.class);
         assertEquals("abc", pojo.str1);
         assertEquals("def", pojo.str2);
         assertEquals(new BigDecimal("25"), pojo.bigDec);
@@ -58,8 +54,7 @@ public class JsonbCreatorTest {
     @Test
     public void testRootCreatorWithInnerCreator() {
         String json = "{\"str1\":\"abc\",\"str2\":\"def\",\"bigDec\":25, \"innerFactoryCreator\":{\"par1\":\"inn1\",\"par2\":\"inn2\",\"bigDec\":11}}";
-        final Jsonb jsonb = JsonbBuilder.create();
-        CreatorConstructorPojo pojo = jsonb.fromJson(json, CreatorConstructorPojo.class);
+        CreatorConstructorPojo pojo = defaultJsonb.fromJson(json, CreatorConstructorPojo.class);
         assertEquals("abc", pojo.str1);
         assertEquals("def", pojo.str2);
         assertEquals(new BigDecimal("25"), pojo.bigDec);
@@ -72,7 +67,7 @@ public class JsonbCreatorTest {
     @Test
     public void testIncompatibleFactoryMethodReturnType() {
         try {
-            JsonbBuilder.create().fromJson("{\"s1\":\"abc\"}", CreatorIncompatibleTypePojo.class);
+        	defaultJsonb.fromJson("{\"s1\":\"abc\"}", CreatorIncompatibleTypePojo.class);
             fail();
         } catch (JsonbException e) {
             assertTrue(e.getMessage().startsWith("Return type of creator"));
@@ -82,75 +77,73 @@ public class JsonbCreatorTest {
     @Test
     public void testMultipleCreatorsError() {
         try {
-            JsonbBuilder.create().fromJson("{\"s1\":\"abc\"}", CreatorMultipleDeclarationErrorPojo.class);
+        	defaultJsonb.fromJson("{\"s1\":\"abc\"}", CreatorMultipleDeclarationErrorPojo.class);
             fail();
         } catch (JsonbException e) {
             assertTrue(e.getMessage().startsWith("More than one @JsonbCreator"));
         }
     }
 
-    @Test(expected = JsonbException.class)
+    @Test
     public void testCreatorWithoutJsonbParameters1() {
         //arg2 is missing in json document
-        JsonbBuilder.create().fromJson("{\"arg0\":\"abc\", \"s2\":\"def\"}", CreatorWithoutJsonbProperty1.class);
+    	assertThrows(JsonbException.class, () -> defaultJsonb.fromJson("{\"arg0\":\"abc\", \"s2\":\"def\"}", CreatorWithoutJsonbProperty1.class));
     }
 
     @Test
     public void testCreatorWithoutJavabeanProperty() {
-        final CreatorWithoutJavabeanProperty result = JsonbBuilder.create().fromJson("{\"s1\":\"abc\", \"s2\":\"def\"}", CreatorWithoutJavabeanProperty.class);
-        Assert.assertEquals("abcdef", result.getStrField());
+        final CreatorWithoutJavabeanProperty result = defaultJsonb.fromJson("{\"s1\":\"abc\", \"s2\":\"def\"}", CreatorWithoutJavabeanProperty.class);
+        assertEquals("abcdef", result.getStrField());
 
     }
 
-    @Test(expected = JsonbException.class)
+    @Test
     public void testPackagePrivateCreator() {
-        final CreatorPackagePrivateConstructor result = JsonbBuilder.create().fromJson(
-                "{\"strVal\":\"abc\", \"intVal\":5}", CreatorPackagePrivateConstructor.class);
+    	assertThrows(JsonbException.class, () -> defaultJsonb.fromJson("{\"strVal\":\"abc\", \"intVal\":5}", CreatorPackagePrivateConstructor.class));
     }
 
     @Test
     public void testLocalizedConstructor() {
         String json = "{\"localDate\":\"05-09-2017\"}";
-        DateConstructor result = JsonbBuilder.create().fromJson(json, DateConstructor.class);
-        Assert.assertEquals(LocalDate.of(2017, 9, 5), result.localDate);
+        DateConstructor result = defaultJsonb.fromJson(json, DateConstructor.class);
+        assertEquals(LocalDate.of(2017, 9, 5), result.localDate);
     }
 
     @Test
     public void testLocalizedConstructorMergedWithProperty() {
         String json = "{\"localDate\":\"05-09-2017\"}";
-        DateConstructorMergedWithProperty result = JsonbBuilder.create().fromJson(json, DateConstructorMergedWithProperty.class);
-        Assert.assertEquals(LocalDate.of(2017, 9, 5), result.localDate);
+        DateConstructorMergedWithProperty result = defaultJsonb.fromJson(json, DateConstructorMergedWithProperty.class);
+        assertEquals(LocalDate.of(2017, 9, 5), result.localDate);
     }
 
     @Test
     public void testLocalizedFactoryParameter() {
         String json = "{\"number\":\"10.000\"}";
-        FactoryNumberParam result = JsonbBuilder.create().fromJson(json, FactoryNumberParam.class);
-        Assert.assertEquals(BigDecimal.TEN, result.number);
+        FactoryNumberParam result = defaultJsonb.fromJson(json, FactoryNumberParam.class);
+        assertEquals(BigDecimal.TEN, result.number);
     }
 
     @Test
     public void testLocalizedFactoryParameterMergedWithProperty() {
         String json = "{\"number\":\"10.000\"}";
-        FactoryNumberParamMergedWithProperty result = JsonbBuilder.create().fromJson(json, FactoryNumberParamMergedWithProperty.class);
-        Assert.assertEquals(BigDecimal.TEN, result.number);
+        FactoryNumberParamMergedWithProperty result = defaultJsonb.fromJson(json, FactoryNumberParamMergedWithProperty.class);
+        assertEquals(BigDecimal.TEN, result.number);
     }
 
     @Test
     public void testCorrectCreatorParameterNames() {
         String json = "{\"string\":\"someText\", \"someParam\":null }";
-        ParameterNameTester result = JsonbBuilder.create().fromJson(json, ParameterNameTester.class);
-        Assert.assertEquals("someText", result.name);
-        Assert.assertNull(result.secondParam);
+        ParameterNameTester result = defaultJsonb.fromJson(json, ParameterNameTester.class);
+        assertEquals("someText", result.name);
+        assertNull(result.secondParam);
     }
 
     @Test
     public void testGenericCreatorParameter() throws Exception {
         final String json = "{\"persons\": [{\"name\": \"name1\"}]}";
-        Jsonb jsonb = JsonbBuilder.create();
-        Persons persons = jsonb.fromJson(json, Persons.class);
-        Assert.assertEquals(1, persons.hiddenPersons.size());
-        Assert.assertEquals("name1", persons.hiddenPersons.iterator().next().getName());
+        Persons persons = defaultJsonb.fromJson(json, Persons.class);
+        assertEquals(1, persons.hiddenPersons.size());
+        assertEquals("name1", persons.hiddenPersons.iterator().next().getName());
     }
 
     public static final class Persons {

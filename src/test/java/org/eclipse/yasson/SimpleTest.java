@@ -12,19 +12,31 @@
  ******************************************************************************/
 package org.eclipse.yasson;
 
-import org.eclipse.yasson.internal.JsonBindingBuilder;
-import org.junit.Test;
-
-import javax.json.bind.Jsonb;
-import javax.json.bind.JsonbBuilder;
-
-import static org.junit.Assert.assertEquals;
+import org.junit.jupiter.api.*;
+import static org.junit.jupiter.api.Assertions.*;
+import static org.eclipse.yasson.Jsonbs.*;
 
 /**
  * @author Roman Grigoriadi
  */
 public class SimpleTest {
 
+    @Test
+    public void testSimpleSerialize() {
+        final StringWrapper wrapper = new StringWrapper();
+        wrapper.setValue("abc");
+        bindingJsonb.toJson(wrapper);
+        final String val = bindingJsonb.toJson(wrapper);
+        assertEquals("{\"value\":\"abc\"}", val);
+    }
+
+    @Test
+    public void testSimpleDeserializer() {
+        final StringWrapper stringWrapper = defaultJsonb.fromJson("{\"value\":\"abc\"}", StringWrapper.class);
+        assertEquals("abc", stringWrapper.getValue());
+    }
+    
+    
     public static class StringWrapper {
         public String value;
 
@@ -35,24 +47,5 @@ public class SimpleTest {
         public void setValue(String value) {
             this.value = value;
         }
-    }
-
-
-    Jsonb jsonb = JsonbBuilder.create();
-
-    @Test
-    public void testSimpleSerialize() {
-        Jsonb jsonb = (new JsonBindingBuilder()).build();
-        final StringWrapper wrapper = new StringWrapper();
-        wrapper.setValue("abc");
-        jsonb.toJson(wrapper);
-        final String val = jsonb.toJson(wrapper);
-        assertEquals("{\"value\":\"abc\"}", val);
-    }
-
-    @Test
-    public void testSimpleDeserializer() {
-        final StringWrapper stringWrapper = jsonb.fromJson("{\"value\":\"abc\"}", StringWrapper.class);
-        assertEquals("abc", stringWrapper.getValue());
     }
 }

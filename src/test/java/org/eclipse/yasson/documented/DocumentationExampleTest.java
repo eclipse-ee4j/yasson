@@ -1,7 +1,8 @@
 package org.eclipse.yasson.documented;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertNull;
+import org.junit.jupiter.api.*;
+import static org.junit.jupiter.api.Assertions.*;
+import static org.eclipse.yasson.Jsonbs.*;
 
 import java.lang.reflect.Type;
 import java.math.BigDecimal;
@@ -27,8 +28,6 @@ import javax.json.bind.serializer.SerializationContext;
 import javax.json.stream.JsonGenerator;
 import javax.json.stream.JsonParser;
 
-import org.junit.Test;
-
 /**
  * Contains tests from http://json-b.net/docs/user-guide.html
  */
@@ -49,12 +48,11 @@ public class DocumentationExampleTest {
         dog.bitable = false;
 
         // Create Jsonb and serialize
-        Jsonb jsonb = JsonbBuilder.create();
-        String result = jsonb.toJson(dog);
+        String result = defaultJsonb.toJson(dog);
         assertEquals("{\"age\":4,\"bitable\":false,\"name\":\"Falco\"}", result);
 
         // Deserialize back
-        dog = jsonb.fromJson("{\"name\":\"Falco\",\"age\":4,\"bites\":false}", Dog.class);
+        dog = defaultJsonb.fromJson("{\"name\":\"Falco\",\"age\":4,\"bites\":false}", Dog.class);
         assertEquals("Falco", dog.name);
         assertEquals(4, dog.age);
         assertEquals(false, dog.bitable);
@@ -76,8 +74,7 @@ public class DocumentationExampleTest {
         dogs.add(cassidy);
 
         // Create Jsonb and serialize
-        Jsonb jsonb = JsonbBuilder.create();
-        String result = jsonb.toJson(dogs);
+        String result = defaultJsonb.toJson(dogs);
         assertEquals(
                 "[{\"age\":4,\"bitable\":false,\"name\":\"Falco\"},{\"age\":5,\"bitable\":false,\"name\":\"Cassidy\"}]",
                 result);
@@ -85,7 +82,7 @@ public class DocumentationExampleTest {
         // We can also deserialize back into a raw collection, but since there is no way
         // to infer a type here,
         // the result will be a list of java.util.Map instances with string keys.
-        dogs = jsonb.fromJson(result, ArrayList.class);
+        dogs = defaultJsonb.fromJson(result, ArrayList.class);
         assertEquals(2, dogs.size());
         assertEquals("Falco", ((Map) dogs.get(0)).get("name"));
         assertEquals("Cassidy", ((Map) dogs.get(1)).get("name"));
@@ -110,14 +107,13 @@ public class DocumentationExampleTest {
         dogs.add(cassidy);
 
         // Create Jsonb and serialize
-        Jsonb jsonb = JsonbBuilder.create();
-        String result = jsonb.toJson(dogs);
+        String result = defaultJsonb.toJson(dogs);
         assertEquals(
                 "[{\"age\":4,\"bitable\":false,\"name\":\"Falco\"},{\"age\":5,\"bitable\":false,\"name\":\"Cassidy\"}]",
                 result);
 
         // Deserialize back
-        dogs = jsonb.fromJson(result, new ArrayList<Dog>() {
+        dogs = defaultJsonb.fromJson(result, new ArrayList<Dog>() {
         }.getClass().getGenericSuperclass());
         assertEquals(2, dogs.size());
         assertEquals("Falco", dogs.get(0).name);
@@ -130,14 +126,8 @@ public class DocumentationExampleTest {
         pojo.name = "Falco";
         pojo.age = 4;
 
-        // Create custom configuration with formatted output
-        JsonbConfig config = new JsonbConfig().withFormatting(true);
-
-        // Create Jsonb with custom configuration
-        Jsonb jsonb = JsonbBuilder.create(config);
-
         // Use it!
-        String result = jsonb.toJson(pojo);
+        String result = formattingJsonb.toJson(pojo);
         assertEquals("\n" + 
                 "{\n" + 
                 "    \"age\": 4,\n" + 
@@ -157,8 +147,8 @@ public class DocumentationExampleTest {
         Person1 p = new Person1();
         p.name = "Jason Bourne";
         p.profession = "Super Agent";
-        Jsonb jsonb = JsonbBuilder.create(new JsonbConfig().withFormatting(true));
-        String result = jsonb.toJson(p);
+        
+        String result = formattingJsonb.toJson(p);
         assertEquals("\n" +
                 "{\n" + 
                 "    \"person-name\": \"Jason Bourne\",\n" + 
@@ -193,8 +183,8 @@ public class DocumentationExampleTest {
         Person2 p = new Person2();
         p.name = "Jason Bourne";
         p.profession = "Super Agent";
-        Jsonb jsonb = JsonbBuilder.create(new JsonbConfig().withFormatting(true));
-        String result = jsonb.toJson(p);
+        
+        String result = formattingJsonb.toJson(p);
         assertEquals("\n" +
                 "{\n" + 
                 "    \"person-name\": \"Jason Bourne\",\n" + 
@@ -220,12 +210,11 @@ public class DocumentationExampleTest {
     public void testChangingPropertyNames3() {
         Person3 p = new Person3();
         p.name = "Jason Bourne";
-        Jsonb jsonb = JsonbBuilder.create();
-        String result = jsonb.toJson(p);
+        String result = defaultJsonb.toJson(p);
         assertEquals("{\"name-to-write\":\"Jason Bourne\"}", result);
         
         String json = "{\"name-to-read\":\"Jason Bourne\"}";
-        Person3 after = jsonb.fromJson(json, Person3.class);
+        Person3 after = defaultJsonb.fromJson(json, Person3.class);
         assertEquals("Jason Bourne", after.name);
     }
     
@@ -255,12 +244,11 @@ public class DocumentationExampleTest {
         Person4 p = new Person4();
         p.name = "Jason Bourne";
         p.profession = "Super Agent";
-        Jsonb jsonb = JsonbBuilder.create();
-        String result = jsonb.toJson(p);
+        String result = defaultJsonb.toJson(p);
         assertEquals("{\"profession\":\"Super Agent\"}", result);
         
         String json = "{\"profession\":\"Super Agent\"}";
-        Person4 after = jsonb.fromJson(json, Person4.class);
+        Person4 after = defaultJsonb.fromJson(json, Person4.class);
         assertEquals("Super Agent", after.profession);
         assertNull(after.name);
     }
@@ -288,8 +276,7 @@ public class DocumentationExampleTest {
     @Test
     public void testNullHandling1() {
         Person5 p = new Person5();
-        Jsonb jsonb = JsonbBuilder.create();
-        String result = jsonb.toJson(p);
+        String result = defaultJsonb.toJson(p);
         assertEquals("{\"name\":null,\"profession\":null}", result);
     }
     
@@ -317,8 +304,7 @@ public class DocumentationExampleTest {
     @Test
     public void testNullHandling2() {
         Person6 p = new Person6();
-        Jsonb jsonb = JsonbBuilder.create();
-        String result = jsonb.toJson(p);
+        String result = defaultJsonb.toJson(p);
         assertEquals("{\"name\":null}", result);
     }
     
@@ -330,8 +316,7 @@ public class DocumentationExampleTest {
     @Test
     public void testNullHandling3() {
         Person p = new Person();
-        Jsonb jsonb = JsonbBuilder.create(new JsonbConfig().withNullValues(true));
-        String result = jsonb.toJson(p);
+        String result = nullableJsonb.toJson(p);
         assertEquals("{\"name\":null,\"profession\":null}", result);
     }
     
@@ -347,8 +332,7 @@ public class DocumentationExampleTest {
     
     @Test
     public void testCustomInstantiation() {
-        Jsonb jsonb = JsonbBuilder.create();
-        Person8 p = jsonb.fromJson("{\"name\":\"Jason Bourne\"}", Person8.class);
+        Person8 p = defaultJsonb.fromJson("{\"name\":\"Jason Bourne\"}", Person8.class);
         assertEquals("Jason Bourne", p.name);
     }
     
@@ -368,11 +352,10 @@ public class DocumentationExampleTest {
         p.name = "Jason Bourne";
         p.birthDate = LocalDate.of(1999, 8, 7);
         p.salary = new BigDecimal("123.45678");
-        Jsonb jsonb = JsonbBuilder.create();
-        String json = jsonb.toJson(p);
+        String json = defaultJsonb.toJson(p);
         assertEquals("{\"birthDate\":\"07.08.1999\",\"name\":\"Jason Bourne\",\"salary\":\"123.46\"}", json);
         
-        Person9 after = jsonb.fromJson("{\"birthDate\":\"07.08.1999\",\"name\":\"Jason Bourne\",\"salary\":\"123.46\"}", Person9.class);
+        Person9 after = defaultJsonb.fromJson("{\"birthDate\":\"07.08.1999\",\"name\":\"Jason Bourne\",\"salary\":\"123.46\"}", Person9.class);
         assertEquals(p.name, after.name);
         assertEquals(p.birthDate, after.birthDate);
         assertEquals(new BigDecimal("123.46"), after.salary);
@@ -476,9 +459,6 @@ public class DocumentationExampleTest {
     
     @Test
     public void testAdapters1() {
-        // Create Jsonb with default configuration
-        Jsonb jsonb = JsonbBuilder.create();
-
         // Create customer
         Customer customer = new Customer();
 
@@ -488,7 +468,7 @@ public class DocumentationExampleTest {
         customer.setPosition("Super Agent");
 
         // Serialize
-        String json = jsonb.toJson(customer);
+        String json = defaultJsonb.toJson(customer);
         assertEquals("{\"id\":1,\"name\":\"Jason Bourne\",\"organization\":\"Super Agents\",\"position\":\"Super Agent\"}", json);
     }
     

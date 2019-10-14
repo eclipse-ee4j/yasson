@@ -13,12 +13,12 @@
 
 package org.eclipse.yasson.serializers.model;
 
+import static org.junit.jupiter.api.Assertions.*;
+
 import javax.json.bind.serializer.DeserializationContext;
 import javax.json.bind.serializer.JsonbDeserializer;
 import javax.json.stream.JsonParser;
 import javax.json.stream.JsonParser.Event;
-
-import static org.junit.Assert.assertEquals;
 
 import java.lang.reflect.ParameterizedType;
 import java.lang.reflect.Type;

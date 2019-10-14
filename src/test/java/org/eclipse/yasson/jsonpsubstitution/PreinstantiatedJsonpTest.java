@@ -9,24 +9,19 @@
  ******************************************************************************/
 package org.eclipse.yasson.jsonpsubstitution;
 
-import org.eclipse.yasson.Assertions;
-import org.eclipse.yasson.JsonBindingProvider;
-import org.eclipse.yasson.TestTypeToken;
-import org.eclipse.yasson.YassonJsonb;
-import org.junit.Assert;
-import org.junit.Before;
-import org.junit.Test;
+import org.junit.jupiter.api.*;
+import static org.junit.jupiter.api.Assertions.*;
+import static org.eclipse.yasson.Jsonbs.*;
 
-import javax.json.bind.JsonbBuilder;
+import org.eclipse.yasson.Assertions;
+import org.eclipse.yasson.TestTypeToken;
+
 import javax.json.bind.JsonbException;
 import javax.json.stream.JsonGenerator;
 import javax.json.stream.JsonParser;
 import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
 import java.util.List;
-
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertTrue;
 
 public class PreinstantiatedJsonpTest {
 
@@ -68,21 +63,11 @@ public class PreinstantiatedJsonpTest {
 
     private Dog dog = new Dog("Falco", 4);
 
-    private YassonJsonb jsonb;
-
-    @Before
-    public void setUp() {
-        // Create Jsonb and serialize
-        JsonBindingProvider provider = new JsonBindingProvider();
-        JsonbBuilder builder = provider.create();
-        jsonb = (YassonJsonb) builder.build();
-    }
-
     @Test
     public void testPreinstantiatedJsonGeneratorAndParser() {
         ByteArrayOutputStream out = new ByteArrayOutputStream();
         JsonGenerator generator = new SuffixJsonGenerator("Best dog ever!", out);
-        jsonb.toJson(dog, generator);
+        bindingYassonJsonb.toJson(dog, generator);
         generator.close();
 
         assertEquals(EXPECTED_JSON, new String(out.toByteArray()));
@@ -94,7 +79,7 @@ public class PreinstantiatedJsonpTest {
             }
             return value;
         }, in);
-        Dog result = jsonb.fromJson(parser, Dog.class);
+        Dog result = bindingYassonJsonb.fromJson(parser, Dog.class);
 
         assertEquals("Falco, a best dog ever!", result.name);
         assertEquals(4, result.age);
@@ -114,7 +99,7 @@ public class PreinstantiatedJsonpTest {
         parser.next(); //START_OBJECT
         parser.next(); //"instance" KEY
 
-        Dog result = jsonb.fromJson(parser, Dog.class);
+        Dog result = bindingYassonJsonb.fromJson(parser, Dog.class);
 
         parser.next(); //END_OJBECT
 
@@ -130,7 +115,7 @@ public class PreinstantiatedJsonpTest {
 
         generator.writeStartObject();
         generator.writeKey("instance");
-        jsonb.toJson(dog, generator);
+        bindingYassonJsonb.toJson(dog, generator);
         generator.writeEnd();
         generator.close();
 
@@ -151,8 +136,8 @@ public class PreinstantiatedJsonpTest {
         //should be advanced further
 
         try {
-            jsonb.fromJson(parser, Dog.class);
-            Assert.fail("JsonbException not thrown");
+        	bindingYassonJsonb.fromJson(parser, Dog.class);
+            fail("JsonbException not thrown");
         } catch (JsonbException e) {
             //OK, parser in inconsistent state
         }
@@ -166,7 +151,7 @@ public class PreinstantiatedJsonpTest {
         generator.writeStartObject();
         //key not written
 
-        Assertions.shouldFail(() -> jsonb.toJson(dog, generator));
+        Assertions.shouldFail(() -> bindingYassonJsonb.toJson(dog, generator));
     }
 
     @Test
@@ -180,8 +165,8 @@ public class PreinstantiatedJsonpTest {
             }
             return value;
         }, in);
-        Wrapper<String> result = jsonb.fromJson(parser, new TestTypeToken<Wrapper<String>>() {}.getType());
-        Assert.assertEquals("Adapted string", result.getValue());
+        Wrapper<String> result = bindingYassonJsonb.fromJson(parser, new TestTypeToken<Wrapper<String>>() {}.getType());
+        assertEquals("Adapted string", result.getValue());
     }
 
     @Test
@@ -190,9 +175,8 @@ public class PreinstantiatedJsonpTest {
         stringWrapper.setValue("String value");
         ByteArrayOutputStream out = new ByteArrayOutputStream();
         JsonGenerator generator = new SuffixJsonGenerator("Appended value.", out);
-        jsonb.toJson(stringWrapper, new TestTypeToken<List<String>>(){}.getType(), generator);
+        bindingYassonJsonb.toJson(stringWrapper, new TestTypeToken<List<String>>(){}.getType(), generator);
         generator.close();
-        Assert.assertEquals("{\"value\":\"String value\",\"suffix\":\"Appended value.\"}", out.toString());
+        assertEquals("{\"value\":\"String value\",\"suffix\":\"Appended value.\"}", out.toString());
     }
-
 }

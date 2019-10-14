@@ -12,6 +12,10 @@
  ******************************************************************************/
 package org.eclipse.yasson.defaultmapping.dates;
 
+import org.junit.jupiter.api.*;
+import static org.junit.jupiter.api.Assertions.*;
+import static org.eclipse.yasson.Jsonbs.*;
+
 import org.eclipse.yasson.TestTypeToken;
 import org.eclipse.yasson.defaultmapping.dates.model.CalendarPojo;
 import org.eclipse.yasson.defaultmapping.dates.model.ClassLevelDateAnnotation;
@@ -27,8 +31,6 @@ import org.eclipse.yasson.defaultmapping.dates.model.ZonedDateTimePojo;
 import org.eclipse.yasson.defaultmapping.generics.model.ScalarValueWrapper;
 import org.eclipse.yasson.internal.JsonBindingBuilder;
 import org.eclipse.yasson.internal.serializer.SqlDateTypeDeserializer;
-import org.junit.Assert;
-import org.junit.Test;
 
 import javax.json.bind.Jsonb;
 import javax.json.bind.JsonbBuilder;
@@ -67,17 +69,12 @@ import java.util.Map;
 import java.util.SimpleTimeZone;
 import java.util.TimeZone;
 
-import static org.junit.Assert.assertEquals;
-
 /**
  * This class contains tests for marshalling/unmarshalling dates.
  *
  * @author Dmitry Kornilov
  */
 public class DatesTest {
-
-    private final Jsonb jsonb = (new JsonBindingBuilder()).build();
-
     private static LocalDate localDate = LocalDate.of(2018, 1, 31);
 
     @SuppressWarnings("serial")
@@ -98,46 +95,38 @@ public class DatesTest {
     public void testSqlTimestamp() {
         Timestamp expectedTimestamp = Timestamp.from(Instant.now());
 
-        Jsonb jsonb = new JsonBindingBuilder().build();
-        String json = jsonb.toJson(expectedTimestamp);
+        String json = bindingJsonb.toJson(expectedTimestamp);
 
-        Timestamp timestamp = jsonb.fromJson(json, Timestamp.class);
+        Timestamp timestamp = bindingJsonb.fromJson(json, Timestamp.class);
         assertEquals(expectedTimestamp, timestamp);
     }
 
     @Test
     public void testMarshallSqlDate() {
-        Jsonb jsonb = new JsonBindingBuilder().build();
-        String jsonString = jsonb.toJson(new SqlDateObj());
-        Assert.assertEquals("{\"sqlDate\":\"2018-01-31Z\",\"utilDate\":\"2018-01-31Z\"}", jsonString);
+        String jsonString = bindingJsonb.toJson(new SqlDateObj());
+        assertEquals("{\"sqlDate\":\"2018-01-31Z\",\"utilDate\":\"2018-01-31Z\"}", jsonString);
     }
 
     @Test
     public void testUnmarshallSqlDate() {
-        JsonBindingBuilder builder = new JsonBindingBuilder();
-        Jsonb json = builder.build();
-        SqlDateObj result = json.fromJson("{\"sqlDate\":\"2018-01-31Z\",\"utilDate\":\"2018-01-31Z\"}", SqlDateObj.class);
+        SqlDateObj result = bindingJsonb.fromJson("{\"sqlDate\":\"2018-01-31Z\",\"utilDate\":\"2018-01-31Z\"}", SqlDateObj.class);
         long expectedUtcMillis = localDate.atStartOfDay(ZoneId.of("UTC")).toInstant().toEpochMilli();
-        Assert.assertEquals(new java.sql.Date(expectedUtcMillis), result.sqlDate);
-        Assert.assertEquals(new java.sql.Date(expectedUtcMillis), result.utilDate);
+        assertEquals(new java.sql.Date(expectedUtcMillis), result.sqlDate);
+        assertEquals(new java.sql.Date(expectedUtcMillis), result.utilDate);
     }
 
     @Test
     public void testMarshallLocalDate() {
-        JsonBindingBuilder builder = new JsonBindingBuilder();
-        Jsonb json = builder.build();
-        String jsonString = json.toJson(new LocalDateObj());
+        String jsonString = bindingJsonb.toJson(new LocalDateObj());
         if (jsonString.contains("T")) {
-            Assert.fail("JSON contains time for a non Date that doesn't include time");
+            fail("JSON contains time for a non Date that doesn't include time");
         }
     }
 
     @Test
     public void testUnmarshallLocalDate() {
-        JsonBindingBuilder builder = new JsonBindingBuilder();
-        Jsonb json = builder.build();
-        LocalDateObj localDateObj = json.fromJson("{\"date\":\"2018-01-31\"}", LocalDateObj.class);
-        Assert.assertEquals(localDate, localDateObj.date);
+        LocalDateObj localDateObj = bindingJsonb.fromJson("{\"date\":\"2018-01-31\"}", LocalDateObj.class);
+        assertEquals(localDate, localDateObj.date);
     }
 
     @Test
@@ -155,9 +144,9 @@ public class DatesTest {
         final String expected = "{\"defaultFormatted\":\"2015-03-04T00:00:00Z[UTC]\"," +
                 "\"millisFormatted\":\"" + parsedDate.getTime()+ "\"," +
                 "\"customDate\":\"00:00:00 | 04-03-2015\"}";
-        assertEquals(expected, jsonb.toJson(pojo));
+        assertEquals(expected, bindingJsonb.toJson(pojo));
 
-        final DatePojo result = jsonb.fromJson(expected, DatePojo.class);
+        final DatePojo result = bindingJsonb.fromJson(expected, DatePojo.class);
         assertEquals(parsedDate, result.customDate);
         assertEquals(parsedDate, result.defaultFormatted);
         assertEquals(parsedDate, result.millisFormatted);
@@ -170,7 +159,7 @@ public class DatesTest {
         final Date parsedDate = sdf.parse("2018-11-02T00:00:00+01:00");
     	
     	String jsonDateWithZone = "{\"dateWithZone\":\"2018-11-02T00:00:00+01:00\"}";
-    	final DateWithZonePojo result = jsonb.fromJson(jsonDateWithZone, DateWithZonePojo.class);
+    	final DateWithZonePojo result = bindingJsonb.fromJson(jsonDateWithZone, DateWithZonePojo.class);
     	
     	assertEquals(parsedDate, result.dateWithZone);
     }
@@ -182,7 +171,7 @@ public class DatesTest {
         final Date parsedDate = sdf.parse("2018-11-02T00:00:00+01:00");
     	
     	String jsonDateWithZone = "{\"dateWithZone\":\"2018-11-02T00:00:00+01:00[Europe/Berlin]\"}";
-    	final DateWithZonePojo result = jsonb.fromJson(jsonDateWithZone, DateWithZonePojo.class);
+    	final DateWithZonePojo result = bindingJsonb.fromJson(jsonDateWithZone, DateWithZonePojo.class);
     	
     	assertEquals(parsedDate, result.dateWithZone);
     }
@@ -204,10 +193,10 @@ public class DatesTest {
         final String expected = "{\"defaultFormatted\":\"2015-04-03T11:11:10+02:00[Europe/Prague]\"," +
                 "\"millisFormatted\":\"1428052270000\"," +
                 "\"customCalendar\":\"11:11:10 | 03-04-2015, +0200\"}";
-        assertEquals(expected, jsonb.toJson(calendarPojo));
+        assertEquals(expected, bindingJsonb.toJson(calendarPojo));
 
         // marshal to ISO_DATE_TIME
-        final CalendarPojo result = jsonb.fromJson(expected, CalendarPojo.class);
+        final CalendarPojo result = bindingJsonb.fromJson(expected, CalendarPojo.class);
         assertEquals(timeCalendar.getTime(), result.customCalendar.getTime());
         assertEquals(timeCalendar.getTime(), result.millisFormatted.getTime());
         assertEquals(timeCalendar.getTime(), result.defaultFormatted.getTime());
@@ -215,14 +204,14 @@ public class DatesTest {
 
     @Test
     public void testCalendarWithoutTime() {
-        ScalarValueWrapper<Calendar> result = jsonb.fromJson("{\"value\":\"2015-04-03+01:00\"}", new TestTypeToken<ScalarValueWrapper<Calendar>>(){}.getType());
-        Assert.assertEquals(2015, result.getValue().get(Calendar.YEAR));
-        Assert.assertEquals(3, result.getValue().get(Calendar.MONTH));
-        Assert.assertEquals(3, result.getValue().get(Calendar.DAY_OF_MONTH));
-        Assert.assertEquals(0, result.getValue().get(Calendar.HOUR_OF_DAY));
-        Assert.assertEquals(0, result.getValue().get(Calendar.MINUTE));
-        Assert.assertEquals(0, result.getValue().get(Calendar.SECOND));
-        Assert.assertEquals("GMT+01:00", result.getValue().getTimeZone().toZoneId().toString());
+        ScalarValueWrapper<Calendar> result = bindingJsonb.fromJson("{\"value\":\"2015-04-03+01:00\"}", new TestTypeToken<ScalarValueWrapper<Calendar>>(){}.getType());
+        assertEquals(2015, result.getValue().get(Calendar.YEAR));
+        assertEquals(3, result.getValue().get(Calendar.MONTH));
+        assertEquals(3, result.getValue().get(Calendar.DAY_OF_MONTH));
+        assertEquals(0, result.getValue().get(Calendar.HOUR_OF_DAY));
+        assertEquals(0, result.getValue().get(Calendar.MINUTE));
+        assertEquals(0, result.getValue().get(Calendar.SECOND));
+        assertEquals("GMT+01:00", result.getValue().getTimeZone().toZoneId().toString());
     }
 
     @Test
@@ -243,10 +232,10 @@ public class DatesTest {
         final String expected = "{\"defaultFormatted\":\"2015-04-03T10:10:10+02:00[" + zoneId + "]\"," +
                 "\"millisFormatted\":\"" + cal.getTimeInMillis() +
                 "\",\"customCalendar\":\"10:10:10 | 03-04-2015, +0200\"}";
-        assertEquals(expected, jsonb.toJson(calendarPojo));
+        assertEquals(expected, bindingJsonb.toJson(calendarPojo));
 
         // marshal to ISO_DATE_TIME
-        final CalendarPojo result = jsonb.fromJson(expected, CalendarPojo.class);
+        final CalendarPojo result = bindingJsonb.fromJson(expected, CalendarPojo.class);
         assertEquals(cal.getTime(), result.customCalendar.getTime());
         assertEquals(cal.getTime(), result.millisFormatted.getTime());
         assertEquals(cal.getTime(), result.defaultFormatted.getTime());
@@ -260,19 +249,19 @@ public class DatesTest {
         cal.setTimeZone(TimeZone.getTimeZone("UTC"));
 
         // marshal to ISO_DATE
-        assertEquals("{\"value\":\"2015-04-03Z\"}", jsonb.toJson(new ScalarValueWrapper<>(cal)));
+        assertEquals("{\"value\":\"2015-04-03Z\"}", bindingJsonb.toJson(new ScalarValueWrapper<>(cal)));
 
         // marshal to ISO_DATE_TIME
         final Calendar dateTimeGregorianCalendar = new Calendar.Builder().setDate(2015, 3, 3)
                 .setTimeZone(TimeZone.getTimeZone("Europe/Prague"))
                 .build();
-        assertEquals("{\"value\":\"2015-04-03T00:00:00+02:00[Europe/Prague]\"}", jsonb.toJson(new ScalarValueWrapper<>(dateTimeGregorianCalendar)));
+        assertEquals("{\"value\":\"2015-04-03T00:00:00+02:00[Europe/Prague]\"}", bindingJsonb.toJson(new ScalarValueWrapper<>(dateTimeGregorianCalendar)));
     }
 
     @Test
     public void testMarshalTimeZone() {
-        assertEquals("{\"value\":\"Europe/Prague\"}", jsonb.toJson(new ScalarValueWrapper<>(TimeZone.getTimeZone("Europe/Prague"))));
-        assertEquals("{\"value\":\"Europe/Prague\"}", jsonb.toJson(new ScalarValueWrapper<>(SimpleTimeZone.getTimeZone("Europe/Prague"))));
+        assertEquals("{\"value\":\"Europe/Prague\"}", bindingJsonb.toJson(new ScalarValueWrapper<>(TimeZone.getTimeZone("Europe/Prague"))));
+        assertEquals("{\"value\":\"Europe/Prague\"}", bindingJsonb.toJson(new ScalarValueWrapper<>(SimpleTimeZone.getTimeZone("Europe/Prague"))));
     }
 
     @Test
@@ -283,9 +272,9 @@ public class DatesTest {
         final String expected = "{\"defaultFormatted\":\"2015-03-03T23:00:00Z\"," +
                 "\"millisFormatted\":\"1425423600000\"," +
                 "\"instant\":\"23:00:00 | 03-03-2015\"}";
-        assertEquals(expected, jsonb.toJson(instantPojo));
+        assertEquals(expected, bindingJsonb.toJson(instantPojo));
 
-        InstantPojo result = jsonb.fromJson(expected, InstantPojo.class);
+        InstantPojo result = bindingJsonb.fromJson(expected, InstantPojo.class);
         assertEquals(instant, result.defaultFormatted);
         assertEquals(instant, result.millisFormatted);
         assertEquals(instant, result.instant);
@@ -293,14 +282,14 @@ public class DatesTest {
 
     @Test
     public void testMarshalDuration() {
-        assertEquals("{\"value\":\"PT5H4M\"}", jsonb.toJson(new ScalarValueWrapper<>(Duration.ofHours(5).plusMinutes(4))));
+        assertEquals("{\"value\":\"PT5H4M\"}", bindingJsonb.toJson(new ScalarValueWrapper<>(Duration.ofHours(5).plusMinutes(4))));
     }
 
     @Test
     public void testMarshalPeriod() {
         final Period period = Period.between(LocalDate.of(1960, Month.JANUARY, 1), LocalDate.of(1970, Month.JANUARY, 1));
         final ScalarValueWrapper<Period> value = new ScalarValueWrapper<>(period);
-        assertEquals("{\"value\":\"P10Y\"}", jsonb.toJson(value));
+        assertEquals("{\"value\":\"P10Y\"}", bindingJsonb.toJson(value));
     }
 
     @Test
@@ -314,9 +303,9 @@ public class DatesTest {
         final String expected = "{\"defaultFormatted\":\"2015-04-10\"," +
                 "\"millisFormatted\":\"" + millis + "\"," +
                 "\"customLocalDate\":\"10-04-2015\"}";
-        assertEquals(expected, jsonb.toJson(pojo));
+        assertEquals(expected, bindingJsonb.toJson(pojo));
 
-        final LocalDatePojo result = jsonb.fromJson(expected, LocalDatePojo.class);
+        final LocalDatePojo result = bindingJsonb.fromJson(expected, LocalDatePojo.class);
         assertEquals(localDate, result.customLocalDate);
         assertEquals(localDate, result.millisFormatted);
         assertEquals(localDate, result.defaultFormatted);
@@ -362,9 +351,9 @@ public class DatesTest {
         final String expected = "{\"defaultFormatted\":\"2015-02-16T13:21:00\"," +
                 "\"millisFormatted\":\"" + millis + "\"," +
                 "\"customLocalDate\":\"16-02-2015--00:21:13\"}";
-        assertEquals(expected, jsonb.toJson(pojo));
+        assertEquals(expected, bindingJsonb.toJson(pojo));
 
-        final LocalDateTimePojo result = jsonb.fromJson(expected, LocalDateTimePojo.class);
+        final LocalDateTimePojo result = bindingJsonb.fromJson(expected, LocalDateTimePojo.class);
         assertEquals(dateTime, result.defaultFormatted);
         assertEquals(dateTime, result.millisFormatted);
         assertEquals(dateTime, result.customLocalDate);
@@ -377,9 +366,9 @@ public class DatesTest {
         pojo.setValue(dateTime);
 
         final String expected = "{\"value\":\"2015-02-16T13:21:00\"}";
-        assertEquals(expected, jsonb.toJson(pojo));
+        assertEquals(expected, bindingJsonb.toJson(pojo));
 
-        final ScalarValueWrapper<LocalDateTime> result = jsonb.fromJson(expected, new TestTypeToken<ScalarValueWrapper<LocalDateTime>>(){}.getType());
+        final ScalarValueWrapper<LocalDateTime> result = bindingJsonb.fromJson(expected, new TestTypeToken<ScalarValueWrapper<LocalDateTime>>(){}.getType());
         assertEquals(dateTime, result.getValue());
     }
 
@@ -391,12 +380,12 @@ public class DatesTest {
         pojo.setValue(dateTime);
 
         final String expected = "{\"value\":\"2015-02-16T13:21:00\"}";
-        assertEquals(expected, jsonb.toJson(pojo));
+        assertEquals(expected, bindingJsonb.toJson(pojo));
 
         final Jsonb jsonbCustom = JsonbBuilder.create(new JsonbConfig().withDateFormat(JsonbDateFormat.TIME_IN_MILLIS, Locale.FRENCH));
         assertEquals("{\"value\":\"" + millis + "\"}", jsonbCustom.toJson(pojo));
 
-        ScalarValueWrapper<LocalDateTime> result = this.jsonb.fromJson(expected, new TestTypeToken<ScalarValueWrapper<LocalDateTime>>(){}.getType());
+        ScalarValueWrapper<LocalDateTime> result = bindingJsonb.fromJson(expected, new TestTypeToken<ScalarValueWrapper<LocalDateTime>>(){}.getType());
         assertEquals(dateTime, result.getValue());
 
         result = jsonbCustom.fromJson("{\"value\":\"" + millis + "\"}", new TestTypeToken<ScalarValueWrapper<LocalDateTime>>(){}.getType());
@@ -412,26 +401,26 @@ public class DatesTest {
         final String expected = "{\"defaultFormatted\":\"2015-02-16T13:21:00+06:00[" + zone + "]\"," +
                 "\"millisFormatted\":\"" + dateTime.toInstant().toEpochMilli() + "\"," +
                 "\"customZonedDate\":\"+06" + zone + " | 16-02-2015--00:21:13\"}";
-        assertEquals(expected, jsonb.toJson(pojo));
+        assertEquals(expected, bindingJsonb.toJson(pojo));
 
-        final ZonedDateTimePojo result = jsonb.fromJson(expected, ZonedDateTimePojo.class);
+        final ZonedDateTimePojo result = bindingJsonb.fromJson(expected, ZonedDateTimePojo.class);
         assertEquals(dateTime, result.defaultFormatted);
         assertEquals(dateTime, result.customZonedDate);
 
         // time zone and seconds omitted
-        final ZonedDateTimePojo result1 = jsonb.fromJson("{\"defaultFormatted\":\"2015-02-16T13:21+06:00\"}", ZonedDateTimePojo.class);
+        final ZonedDateTimePojo result1 = bindingJsonb.fromJson("{\"defaultFormatted\":\"2015-02-16T13:21+06:00\"}", ZonedDateTimePojo.class);
         assertEquals(dateTime.getHour(), result1.defaultFormatted.getHour());
         assertEquals(dateTime.getOffset(), result1.defaultFormatted.getOffset());
     }
 
     @Test
     public void testMarshalZoneId() {
-        assertEquals("{\"value\":\"Europe/Prague\"}", jsonb.toJson(new ScalarValueWrapper<>(ZoneId.of("Europe/Prague"))));
+        assertEquals("{\"value\":\"Europe/Prague\"}", bindingJsonb.toJson(new ScalarValueWrapper<>(ZoneId.of("Europe/Prague"))));
     }
 
     @Test
     public void testMarshalZoneOffset() {
-        assertEquals("{\"value\":\"+02:00\"}", jsonb.toJson(new ScalarValueWrapper<>(ZoneOffset.of("+02:00"))));
+        assertEquals("{\"value\":\"+02:00\"}", bindingJsonb.toJson(new ScalarValueWrapper<>(ZoneOffset.of("+02:00"))));
     }
 
     @Test
@@ -442,9 +431,9 @@ public class DatesTest {
         final String expected = "{\"defaultFormatted\":\"2015-02-16T13:21:00+05:00\"," +
                 "\"millisFormatted\":\"1424074860000\"," +
                 "\"offsetDateTime\":\"+0500 16-02-2015--00:21:13\"}";
-        assertEquals(expected, jsonb.toJson(pojo));
+        assertEquals(expected, bindingJsonb.toJson(pojo));
 
-        final OffsetDateTimePojo result = jsonb.fromJson(expected, OffsetDateTimePojo.class);
+        final OffsetDateTimePojo result = bindingJsonb.fromJson(expected, OffsetDateTimePojo.class);
         assertEquals(dateTime, result.defaultFormatted);
         assertEquals(dateTime, result.offsetDateTime);
     }
@@ -481,9 +470,9 @@ public class DatesTest {
                 "\"calendar\":\"+06 ALMT ven. avril 03-04-2015 11:11:10\"," +
                 "\"defaultZoned\":\"2015-04-03T13:21:00+06:00[Asia/Almaty]\"," +
                 "\"zonedDateTime\":\"+06 ALMT ven. avril 03-04-2015 13:21:00\"}";
-        assertEquals(expected, jsonb.toJson(pojo));
+        assertEquals(expected, bindingJsonb.toJson(pojo));
 
-        final ClassLevelDateAnnotation result = jsonb.fromJson(expected, ClassLevelDateAnnotation.class);
+        final ClassLevelDateAnnotation result = bindingJsonb.fromJson(expected, ClassLevelDateAnnotation.class);
         assertEquals(pojo.date, result.date);
         assertEquals(pojo.localDateTime, result.localDateTime);
         assertEquals(pojo.calendar.getTime(), result.calendar.getTime());
@@ -515,18 +504,18 @@ public class DatesTest {
 
         DateTimeFormatter formatter = DateTimeFormatter.ofPattern(format);
         final Instant instant = Instant.from(formatter.withLocale(locale).parse("lun. 93 avr. 2017 16:51:12 CEST"));
-        Assert.assertEquals(instant, result.getValue().toInstant());
+        assertEquals(instant, result.getValue().toInstant());
     }
 
     @Test
     public void testSimpleTimeZone() {
-        String json = jsonb.toJson(new ScalarValueWrapper<>(new SimpleTimeZone(0, "America/Los_Angeles")));
-        Assert.assertEquals("{\"value\":\"America/Los_Angeles\"}", json);
+        String json = bindingJsonb.toJson(new ScalarValueWrapper<>(new SimpleTimeZone(0, "America/Los_Angeles")));
+        assertEquals("{\"value\":\"America/Los_Angeles\"}", json);
 
-        ScalarValueWrapper<TimeZone> result = jsonb.fromJson(json, new TestTypeToken<ScalarValueWrapper<TimeZone>>() {
+        ScalarValueWrapper<TimeZone> result = bindingJsonb.fromJson(json, new TestTypeToken<ScalarValueWrapper<TimeZone>>() {
         }.getType());
-        Assert.assertEquals("America/Los_Angeles", result.getValue().getID());
-        Assert.assertEquals(LocalDateTime.now().atZone(ZoneId.of("America/Los_Angeles")).getOffset().getTotalSeconds() * 1000,
+        assertEquals("America/Los_Angeles", result.getValue().getID());
+        assertEquals(LocalDateTime.now().atZone(ZoneId.of("America/Los_Angeles")).getOffset().getTotalSeconds() * 1000,
                 result.getValue().getOffset(System.currentTimeMillis()));
     }
 
@@ -546,14 +535,14 @@ public class DatesTest {
 
         String json = jsonb.toJson(pojo);
 
-        Assert.assertEquals("{\"dateMap\":{\"first\":\"2017\"},\"localDate\":\"2017\"}", json);
+        assertEquals("{\"dateMap\":{\"first\":\"2017\"},\"localDate\":\"2017\"}", json);
 
         config = new JsonbConfig()
                 .withDateFormat("dd.MM.yyyy", Locale.ENGLISH);
         jsonb = JsonbBuilder.create(config);
         DateInMapPojo result = jsonb.fromJson("{\"dateMap\":{\"first\":\"01.01.2017\"},\"localDate\":\"01.01.2017\"}", DateInMapPojo.class);
-        Assert.assertEquals(LocalDate.of(2017,1,1), result.localDate);
-        Assert.assertEquals(LocalDate.of(2017,1,1), result.dateMap.get("first"));
+        assertEquals(LocalDate.of(2017,1,1), result.localDate);
+        assertEquals(LocalDate.of(2017,1,1), result.dateMap.get("first"));
     }
 
     @Test
@@ -567,10 +556,10 @@ public class DatesTest {
         final XMLGregorianCalendar xmlGregorianCalendar = DatatypeFactory.newInstance()
                 .newXMLGregorianCalendar((GregorianCalendar) calendar);
 
-        String serialized = jsonb.toJson(xmlGregorianCalendar);
+        String serialized = bindingJsonb.toJson(xmlGregorianCalendar);
 
         assertEquals("\"2015-04-03T11:11:10+02:00[GMT+02:00]\"", serialized);
-        assertEquals(xmlGregorianCalendar, jsonb.fromJson(serialized, XMLGregorianCalendar.class));
+        assertEquals(xmlGregorianCalendar, bindingJsonb.fromJson(serialized, XMLGregorianCalendar.class));
     }
 
 

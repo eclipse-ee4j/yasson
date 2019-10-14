@@ -12,10 +12,8 @@
  ******************************************************************************/
 package org.eclipse.yasson.serializers;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertNotNull;
-import static org.junit.Assert.assertTrue;
-import static org.junit.Assert.fail;
+import org.junit.jupiter.api.*;
+import static org.junit.jupiter.api.Assertions.*;
 
 import java.io.StringReader;
 import java.lang.reflect.ParameterizedType;
@@ -36,7 +34,6 @@ import javax.json.bind.JsonbConfig;
 
 import org.eclipse.yasson.serializers.model.Pokemon;
 import org.eclipse.yasson.serializers.model.Trainer;
-import org.junit.Test;
 
 /**
  * Test various use-cases with {@code Map} serializer and de-serializer which

@@ -10,12 +10,10 @@
  * Contributors:
  *     Ehsan Zaery Moghaddam (zaerymoghaddam@gmail.com) - initial implementation
  ******************************************************************************/
-import org.junit.Test;
 
-import javax.json.bind.Jsonb;
-import javax.json.bind.JsonbBuilder;
-
-import static org.junit.Assert.assertEquals;
+import org.junit.jupiter.api.*;
+import static org.junit.jupiter.api.Assertions.*;
+import static org.eclipse.yasson.Jsonbs.*;
 
 /**
  * Tests the serialization/deserialization of a class that has no package.
@@ -23,14 +21,13 @@ import static org.junit.Assert.assertEquals;
  * @author Ehsan Zaery Moghaddam (zaerymoghaddam@gmail.com)
  */
 public class PackagelessClassTest {
-    private Jsonb jsonb = JsonbBuilder.create();
 
     @Test
     public void testSerialization() throws Exception {
         PackagelessModel packagelessClass = new PackagelessModel(12, "Hello World!");
 
         String expected = "{\"intValue\":12,\"stringValue\":\"Hello World!\"}";
-        assertEquals(expected, jsonb.toJson(packagelessClass));
+        assertEquals(expected, defaultJsonb.toJson(packagelessClass));
     }
 
     @Test
@@ -38,9 +35,8 @@ public class PackagelessClassTest {
         PackagelessModel packagelessClass = new PackagelessModel(12, "Hello World!");
 
         String input = "{\"intValue\":12,\"stringValue\":\"Hello World!\"}";
-        PackagelessModel packagelessModel = jsonb.fromJson(input, PackagelessModel.class);
+        PackagelessModel packagelessModel = defaultJsonb.fromJson(input, PackagelessModel.class);
         assertEquals(packagelessModel.getIntValue(), 12);
         assertEquals(packagelessModel.getStringValue(), "Hello World!");
     }
-
 }

@@ -13,19 +13,18 @@
 
 package org.eclipse.yasson.internal;
 
+import org.junit.jupiter.api.*;
+import static org.junit.jupiter.api.Assertions.*;
+
 import org.eclipse.yasson.defaultmapping.modifiers.model.FieldModifiersClass;
 import org.eclipse.yasson.defaultmapping.modifiers.model.MethodModifiersClass;
 import org.eclipse.yasson.internal.model.ClassModel;
 import org.eclipse.yasson.internal.model.JsonbAnnotatedElement;
-import org.junit.Before;
-import org.junit.Test;
 
 import javax.json.bind.JsonbConfig;
 import javax.json.spi.JsonProvider;
 import java.util.concurrent.atomic.AtomicReference;
 import java.util.function.Consumer;
-
-import static org.junit.Assert.*;
 
 /**
  * Test for ClassParser component.
@@ -33,19 +32,9 @@ import static org.junit.Assert.*;
  * @author Roman Grigoriadi
  */
 public class ClassParserTest {
-
-    private ClassParser classParser;
-
-    private JsonbContext jsonbContext;
-
-    private AnnotationIntrospector introspector;
-
-    @Before
-    public void before() {
-        jsonbContext = new JsonbContext(new JsonbConfig(), JsonProvider.provider());
-        classParser = new ClassParser(jsonbContext);
-        introspector = new AnnotationIntrospector(jsonbContext);
-    }
+    private static final JsonbContext jsonbContext = new JsonbContext(new JsonbConfig(), JsonProvider.provider());
+    private static final ClassParser classParser = new ClassParser(jsonbContext);
+    private static final AnnotationIntrospector introspector = new AnnotationIntrospector(jsonbContext);
 
     @Test
     public void testDefaultMappingFieldModifiers() {
@@ -58,7 +47,6 @@ public class ClassParserTest {
         assertFalse(model.getPropertyModel("staticString").isWritable());
         assertFalse(model.getPropertyModel("transientString").isReadable());
         assertFalse(model.getPropertyModel("transientString").isWritable());
-
     }
 
     @Test
@@ -81,5 +69,4 @@ public class ClassParserTest {
         model.getPropertyModel("getterWithoutFieldValue").setValue(object, "ACCEPTED_VALUE");
         assertEquals("ACCEPTED_VALUE", accepted.get());
     }
-
 }
