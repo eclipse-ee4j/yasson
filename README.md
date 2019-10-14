@@ -7,9 +7,9 @@ Binding ([JSR-367](https://jcp.org/en/jsr/detail?id=367)).
 
 # <a name="Latest_News"></a>Latest News
 
-## December 28, 2018 - Yasson 1.0.3 Final Release ##
+## September 06, 2019 - Yasson 1.0.5 Final Release ##
 
-The [1.0.3 release](https://github.com/eclipse-ee4j/yasson/releases)
+The [1.0.5 release](https://github.com/eclipse-ee4j/yasson/releases)
 is the latest release of the Eclipse Yasson project.
 
 # <a name="Links"></a>Links #
