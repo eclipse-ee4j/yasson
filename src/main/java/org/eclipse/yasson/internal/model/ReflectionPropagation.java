@@ -12,11 +12,10 @@
  ******************************************************************************/
 package org.eclipse.yasson.internal.model;
 
-import org.eclipse.yasson.internal.JsonbContext;
-
-import javax.json.bind.config.PropertyVisibilityStrategy;
-import java.lang.reflect.Field;
-import java.lang.reflect.Method;
+import java.lang.reflect.*;
+import java.util.*;
+import javax.json.bind.*;
+import javax.json.bind.config.*;
 
 /**
  * @author Roman Grigoriadi
@@ -36,9 +35,11 @@ public class ReflectionPropagation extends PropertyValuePropagation {
      */
     @Override
     protected void acceptMethod(Method method, OperationMode mode) {
+    	Objects.requireNonNull(method);
+    	
         switch (mode) {
             case GET:
-                getValueCommand = new GetFromGetter(method);
+                getValueCommand = method::invoke;
                 break;
             case SET:
                 setValueCommand = new SetWithSetter(method);
@@ -52,9 +53,11 @@ public class ReflectionPropagation extends PropertyValuePropagation {
      */
     @Override
     protected void acceptField(Field field, OperationMode mode) {
+    	Objects.requireNonNull(field);
+    	
         switch (mode) {
             case GET:
-                getValueCommand = new GetFromField(field);
+                getValueCommand = field::get;
                 break;
             case SET:
                 setValueCommand = new SetWithField(field);
@@ -68,8 +71,21 @@ public class ReflectionPropagation extends PropertyValuePropagation {
         setValueCommand.setValue(object, value);
     }
 
+    /**
+     * Get a value with reflection on {@link java.lang.reflect.Field field} or {@link java.lang.reflect.Method getter}.
+     *
+     * @param object object to invoke get value on, not null.
+     * @throws JsonbException if reflection fails.
+     * @return value
+     */
     @Override
     Object getValue(Object object) {
-        return getValueCommand.getValue(object);
+    	Objects.requireNonNull(object);
+    	
+        try {
+            return getValueCommand.getValue(object);
+        } catch (InvocationTargetException | IllegalAccessException e) {
+            throw new JsonbException("Error getting value on: " + object, e);
+        }
     }
 }
