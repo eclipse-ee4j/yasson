@@ -99,30 +99,32 @@ public class PropertyOrderTest {
 
     @Test
     public void testJsonbPropertyOrderOnRenamedProperties() {
-        assertEquals("{\"from\":10,\"count\":11}", defaultJsonb.toJson(new Range(10, 11)));
+        assertEquals("{\"c\":11,\"d\":10,\"aExtra\":\"extra\"}", defaultJsonb.toJson(new Range(10, 11)));
     }
-
-    @JsonbPropertyOrder(
-            {
-                    "fromIndex",
-                    "numberOfItems"
-            }
-    )
+    
+    // By default, this object would use A-X ordering with property order:
+    // anExtraProp, propA, propB
+    // But with JsonbPropertyOrder we will put props 'propB' and 'propA' first, and leftovers will go at the end, resulting in:
+    // propB, propA, anExtraProp
+    @JsonbPropertyOrder({"propB","propA"})
     public class Range {
 
-        @JsonbProperty("from")
-        public final int fromIndex;
+        @JsonbProperty("d")
+        public final int propA;
 
-        @JsonbProperty("count")
-        public final int numberOfItems;
+        @JsonbProperty("c")
+        public final int propB;
+        
+        @JsonbProperty("aExtra")
+        public final String anExtraProp = "extra";
 
         @JsonbCreator
         public Range(
-                @JsonbProperty("from") int fromIndex,
-                @JsonbProperty("count") int numberOfItems
+                @JsonbProperty("d") int propA,
+                @JsonbProperty("c") int propB
         ) {
-            this.fromIndex = fromIndex;
-            this. numberOfItems = numberOfItems;
+            this.propA = propA;
+            this. propB = propB;
         }
     }
 }
