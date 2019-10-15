@@ -12,19 +12,22 @@
  ******************************************************************************/
 package org.eclipse.yasson.internal.model;
 
-import org.eclipse.yasson.internal.ReflectionUtils;
-import org.eclipse.yasson.internal.model.customization.StrategiesProvider;
-import org.eclipse.yasson.internal.model.customization.ClassCustomization;
+import java.lang.reflect.Constructor;
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.List;
+import java.util.Map;
+import java.util.Objects;
+import java.util.stream.Collectors;
 
 import javax.json.bind.config.PropertyNamingStrategy;
-import java.lang.reflect.Constructor;
-import java.util.*;
-import java.util.stream.Collectors;
+
+import org.eclipse.yasson.internal.ReflectionUtils;
+import org.eclipse.yasson.internal.model.customization.ClassCustomization;
+import org.eclipse.yasson.internal.model.customization.StrategiesProvider;
 
 /**
  * A model for Java class.
- *
- * @author Dmitry Kornilov
  */
 public class ClassModel {
 
@@ -61,12 +64,15 @@ public class ClassModel {
     /**
      * Create instance of class model.
      *
-     * @param clazz Class to model.
-     * @param customization Customization of the class parsed from annotations.
-     * @param parentClassModel Class model of parent class.
+     * @param clazz                  Class to model.
+     * @param customization          Customization of the class parsed from annotations.
+     * @param parentClassModel       Class model of parent class.
      * @param propertyNamingStrategy Property naming strategy.
      */
-    public ClassModel(Class<?> clazz, ClassCustomization customization, ClassModel parentClassModel, PropertyNamingStrategy propertyNamingStrategy) {
+    public ClassModel(Class<?> clazz,
+                      ClassCustomization customization,
+                      ClassModel parentClassModel,
+                      PropertyNamingStrategy propertyNamingStrategy) {
         this.clazz = clazz;
         this.classCustomization = customization;
         this.parentClassModel = parentClassModel;
@@ -145,6 +151,7 @@ public class ClassModel {
 
     /**
      * Class model of parent class if present.
+     *
      * @return class model of a parent
      */
     public ClassModel getParentClassModel() {
@@ -153,6 +160,7 @@ public class ClassModel {
 
     /**
      * Get sorted class properties copy, combination of field and its getter / setter, javabeans alike.
+     *
      * @return sorted class properties.
      */
     public PropertyModel[] getSortedProperties() {
@@ -165,12 +173,13 @@ public class ClassModel {
      * @param parsedProperties class properties
      */
     public void setProperties(List<PropertyModel> parsedProperties) {
-        sortedProperties = parsedProperties.toArray(new PropertyModel[]{});
+        sortedProperties = parsedProperties.toArray(new PropertyModel[] {});
         this.properties = parsedProperties.stream().collect(Collectors.toMap(PropertyModel::getPropertyName, (mod) -> mod));
     }
 
     /**
      * Get class properties copy, combination of field and its getter / setter, javabeans alike.
+     *
      * @return class properties.
      */
     public Map<String, PropertyModel> getProperties() {
@@ -179,6 +188,7 @@ public class ClassModel {
 
     /**
      * Default no argument constructor of the class used for deserialization.
+     *
      * @return default constructor
      */
     public Constructor<?> getDefaultConstructor() {

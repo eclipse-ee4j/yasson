@@ -17,8 +17,6 @@ import javax.json.stream.JsonParser;
 
 /**
  * Jsonb parsing helper methods on top of JSON-P parser.
- *
- * @author Roman Grigoriadi
  */
 public interface JsonbParser extends JsonParser {
 

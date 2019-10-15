@@ -9,6 +9,7 @@
  *
  * Contributors:
  * Roman Grigoriadi
+ * David Kral
  * Sebastien Rius
  ******************************************************************************/
 package org.eclipse.yasson.internal.serializer;
@@ -33,9 +34,9 @@ import org.eclipse.yasson.internal.Unmarshaller;
  * According to JSON specification object can have only string keys, given that maps could only be parsed
  * from JSON objects, implementation is bound to String type.
  *
- * @author Roman Grigoriadi
+ * @param <T> map type
  */
-public class MapDeserializer<T extends Map<?,?>> extends AbstractContainerDeserializer<T> implements EmbeddedItem {
+public class MapDeserializer<T extends Map<?, ?>> extends AbstractContainerDeserializer<T> implements EmbeddedItem {
 
     /**
      * Type of value in the map. (Keys must always be Strings, because of JSON spec)
@@ -49,11 +50,11 @@ public class MapDeserializer<T extends Map<?,?>> extends AbstractContainerDeseri
      *
      * @param builder {@link DeserializerBuilder} used to build this instance
      */
-    @SuppressWarnings({ "unchecked", "rawtypes" })
+    @SuppressWarnings({"unchecked", "rawtypes"})
     protected MapDeserializer(DeserializerBuilder builder) {
         super(builder);
-        mapValueRuntimeType = getRuntimeType() instanceof ParameterizedType ?
-                ReflectionUtils.resolveType(this, ((ParameterizedType) getRuntimeType()).getActualTypeArguments()[1])
+        mapValueRuntimeType = getRuntimeType() instanceof ParameterizedType
+                ? ReflectionUtils.resolveType(this, ((ParameterizedType) getRuntimeType()).getActualTypeArguments()[1])
                 : Object.class;
 
         this.instance = createInstance(builder);
@@ -62,7 +63,8 @@ public class MapDeserializer<T extends Map<?,?>> extends AbstractContainerDeseri
     @SuppressWarnings("unchecked")
     private T createInstance(DeserializerBuilder builder) {
         Class<?> rawType = ReflectionUtils.getRawType(getRuntimeType());
-        return rawType.isInterface() ? (T) getMapImpl(rawType, builder)
+        return rawType.isInterface()
+                ? (T) getMapImpl(rawType, builder)
                 : (T) builder.getJsonbContext().getInstanceCreator().createInstance(rawType);
     }
 
@@ -70,9 +72,9 @@ public class MapDeserializer<T extends Map<?,?>> extends AbstractContainerDeseri
         // SortedMap, NavigableMap
         if (SortedMap.class.isAssignableFrom(ifcType)) {
             Class<?> defaultMapImplType = builder.getJsonbContext().getConfigProperties().getDefaultMapImplType();
-            return SortedMap.class.isAssignableFrom(defaultMapImplType) ?
-                    (Map) builder.getJsonbContext().getInstanceCreator().createInstance(defaultMapImplType) :
-                    new TreeMap<>();
+            return SortedMap.class.isAssignableFrom(defaultMapImplType)
+                    ? (Map) builder.getJsonbContext().getInstanceCreator().createInstance(defaultMapImplType)
+                    : new TreeMap<>();
         }
         return new HashMap<>();
     }
@@ -84,7 +86,7 @@ public class MapDeserializer<T extends Map<?,?>> extends AbstractContainerDeseri
 
     @Override
     public void appendResult(Object result) {
-        appendCaptor(parserContext.getLastKeyName(), convertNullToOptionalEmpty(mapValueRuntimeType, result));
+        appendCaptor(getParserContext().getLastKeyName(), convertNullToOptionalEmpty(mapValueRuntimeType, result));
     }
 
     @SuppressWarnings("unchecked")

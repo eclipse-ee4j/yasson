@@ -27,27 +27,43 @@ import javax.json.stream.JsonGenerator;
  *     }, ...
  * ]
  * </pre>
+ *
  * @param <K> {@link Map} key type to serialize
  * @param <V> {@link Map} value type to serialize
  */
-public class MapToEntriesArraySerializer<K,V> implements MapSerializer.Delegate<K,V> {
+public class MapToEntriesArraySerializer<K, V> implements MapSerializer.Delegate<K, V> {
 
-    /** Default {@code JsonObject} property name for map entry key. */
+    /**
+     * Default {@code JsonObject} property name for map entry key.
+     */
     private static final String DEFAULT_KEY_ENTRY_NAME = "key";
 
-    /** Default {@code JsonObject} property name for map entry value. */
+    /**
+     * Default {@code JsonObject} property name for map entry value.
+     */
     private static final String DEFAULT_VALUE_ENTRY_NAME = "value";
 
-    /** Reference to {@link Map} serialization entry point. Contains serialization setup information. */
-    private final MapSerializer<K,V> serializer;
+    /**
+     * Reference to {@link Map} serialization entry point. Contains serialization setup information.
+     */
+    private final MapSerializer<K, V> serializer;
 
-    /** {@code JsonObject} property name for map entry key. */
+    /**
+     * {@code JsonObject} property name for map entry key.
+     */
     private final String keyEntryName;
 
-    /** {@code JsonObject} property name for map entry value. */
+    /**
+     * {@code JsonObject} property name for map entry value.
+     */
     private final String valueEntryName;
 
-    protected MapToEntriesArraySerializer(MapSerializer<K,V> serializer) {
+    /**
+     * Creates new map to entries array serializer.
+     *
+     * @param serializer map serializer
+     */
+    protected MapToEntriesArraySerializer(MapSerializer<K, V> serializer) {
         this.serializer = serializer;
         this.keyEntryName = DEFAULT_KEY_ENTRY_NAME;
         this.valueEntryName = DEFAULT_VALUE_ENTRY_NAME;
@@ -64,11 +80,11 @@ public class MapToEntriesArraySerializer<K,V> implements MapSerializer.Delegate<
         generator.writeStartArray();
     }
 
-   /**
+    /**
      * Write start of {@link Map} serialization.
      * Opens {@code JsonArray} block.
      *
-     * @param key JSON key name
+     * @param key       JSON key name
      * @param generator JSON format generator
      */
     @Override
@@ -81,13 +97,13 @@ public class MapToEntriesArraySerializer<K,V> implements MapSerializer.Delegate<
      * Content of provided {@link Map} is written into {@code JsonArray} of {@code JsonObject}s representing individual
      * map entries.
      *
-     * @param obj {@link Map} to be serialized
+     * @param obj       {@link Map} to be serialized
      * @param generator JSON format generator
-     * @param ctx JSON serialization context
+     * @param ctx       JSON serialization context
      */
     @Override
-    public void serializeContainer(Map<K,V> obj, JsonGenerator generator, SerializationContext ctx) {
-        obj.forEach((key,value) -> {
+    public void serializeContainer(Map<K, V> obj, JsonGenerator generator, SerializationContext ctx) {
+        obj.forEach((key, value) -> {
             generator.writeStartObject();
             generator.writeKey(keyEntryName);
             serializer.serializeItem(key, generator, ctx);

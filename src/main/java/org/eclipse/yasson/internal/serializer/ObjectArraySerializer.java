@@ -9,6 +9,7 @@
  *
  * Contributors:
  * Roman Grigoriadi
+ * David Kral
  ******************************************************************************/
 
 package org.eclipse.yasson.internal.serializer;
@@ -18,11 +19,16 @@ import javax.json.stream.JsonGenerator;
 
 /**
  * Serializer for arrays of arbitrary objects.
- * 
- * @author Roman Grigoriadi
+ *
+ * @param <T> object type
  */
 public class ObjectArraySerializer<T> extends AbstractArraySerializer<T[]> {
 
+    /**
+     * Creates new Object array serializer.
+     *
+     * @param builder serialization builder
+     */
     protected ObjectArraySerializer(SerializerBuilder builder) {
         super(builder);
     }

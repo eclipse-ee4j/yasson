@@ -13,21 +13,17 @@
 
 package org.eclipse.yasson.internal;
 
-import org.eclipse.yasson.internal.JsonbParser;
-import org.eclipse.yasson.internal.JsonbRiParser;
+import java.math.BigDecimal;
+import java.util.Map;
+import java.util.stream.Stream;
 
 import javax.json.JsonArray;
 import javax.json.JsonObject;
 import javax.json.JsonValue;
 import javax.json.stream.JsonLocation;
-import java.math.BigDecimal;
-import java.util.Map;
-import java.util.stream.Stream;
 
 /**
  * Decorator for JSONP parser. Adds some checks for parser cursor manipulation methods.
- *
- * @author Roman Grigoriadi
  */
 public class UserDeserializerParser implements JsonbParser {
 
@@ -40,6 +36,7 @@ public class UserDeserializerParser implements JsonbParser {
 
     /**
      * Constructs an instance with parser and context.
+     *
      * @param parser jsonb parser to decorate
      */
     public UserDeserializerParser(JsonbParser parser) {
@@ -149,7 +146,6 @@ public class UserDeserializerParser implements JsonbParser {
     public void skipJsonStructure() {
         jsonbParser.skipJsonStructure();
     }
-
 
     @Override
     public JsonObject getObject() {

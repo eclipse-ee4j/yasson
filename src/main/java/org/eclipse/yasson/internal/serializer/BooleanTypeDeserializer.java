@@ -9,26 +9,24 @@
  *
  * Contributors:
  * Roman Grigoriadi
+ * David Kral
  ******************************************************************************/
 
 package org.eclipse.yasson.internal.serializer;
+
+import java.lang.reflect.Type;
+
+import javax.json.bind.JsonbException;
+import javax.json.bind.serializer.DeserializationContext;
+import javax.json.stream.JsonParser;
 
 import org.eclipse.yasson.internal.JsonbParser;
 import org.eclipse.yasson.internal.model.customization.Customization;
 import org.eclipse.yasson.internal.properties.MessageKeys;
 import org.eclipse.yasson.internal.properties.Messages;
 
-import javax.json.JsonValue;
-import javax.json.bind.JsonbException;
-import javax.json.bind.serializer.DeserializationContext;
-import javax.json.stream.JsonParser;
-import java.lang.reflect.Type;
-import java.util.NoSuchElementException;
-
 /**
  * Deserializer for {@link Boolean} type.
- *
- * @author David Kral
  */
 public class BooleanTypeDeserializer extends AbstractValueTypeDeserializer<Boolean> {
 
@@ -45,14 +43,14 @@ public class BooleanTypeDeserializer extends AbstractValueTypeDeserializer<Boole
     public Boolean deserialize(JsonParser parser, DeserializationContext ctx, Type rtType) {
         JsonParser.Event event = ((JsonbParser) parser).moveToValue();
         switch (event) {
-            case VALUE_TRUE:
-                return Boolean.TRUE;
-            case VALUE_FALSE:
-                return Boolean.FALSE;
-            case VALUE_STRING:
-                return Boolean.parseBoolean(parser.getString());
-            default:
-                throw new JsonbException(Messages.getMessage(MessageKeys.INTERNAL_ERROR, "Unknown JSON value: " + event));
+        case VALUE_TRUE:
+            return Boolean.TRUE;
+        case VALUE_FALSE:
+            return Boolean.FALSE;
+        case VALUE_STRING:
+            return Boolean.parseBoolean(parser.getString());
+        default:
+            throw new JsonbException(Messages.getMessage(MessageKeys.INTERNAL_ERROR, "Unknown JSON value: " + event));
         }
     }
 

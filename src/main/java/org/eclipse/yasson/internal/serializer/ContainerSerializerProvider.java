@@ -9,17 +9,16 @@
  *
  * Contributors:
  * Roman Grigoriadi
+ * David Kral
  ******************************************************************************/
 package org.eclipse.yasson.internal.serializer;
 
-import org.eclipse.yasson.internal.model.JsonbPropertyInfo;
-
 import javax.json.bind.serializer.JsonbSerializer;
+
+import org.eclipse.yasson.internal.model.JsonbPropertyInfo;
 
 /**
  * Provides container serializer instance.
- *
- * @author Roman Grigoriadi
  */
 public interface ContainerSerializerProvider {
 

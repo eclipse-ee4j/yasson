@@ -9,23 +9,23 @@
  *
  * Contributors:
  * Roman Grigoriadi
+ * David Kral
  ******************************************************************************/
 
 package org.eclipse.yasson.internal.serializer;
+
+import java.lang.reflect.Type;
+import java.math.BigDecimal;
+
+import javax.json.bind.JsonbException;
 
 import org.eclipse.yasson.internal.Unmarshaller;
 import org.eclipse.yasson.internal.model.customization.Customization;
 import org.eclipse.yasson.internal.properties.MessageKeys;
 import org.eclipse.yasson.internal.properties.Messages;
 
-import javax.json.bind.JsonbException;
-import java.lang.reflect.Type;
-import java.math.BigDecimal;
-
 /**
  * Deserializer for {@link BigDecimal} type.
- *
- * @author David Kral
  */
 public class BigDecimalTypeDeserializer extends AbstractNumberDeserializer<BigDecimal> {
 
@@ -47,7 +47,7 @@ public class BigDecimalTypeDeserializer extends AbstractNumberDeserializer<BigDe
                         return new BigDecimal(jsonValue);
                     } catch (NumberFormatException e) {
                         throw new JsonbException(Messages.getMessage(MessageKeys.DESERIALIZE_VALUE_ERROR,
-                                BigDecimal.class));
+                                                                     BigDecimal.class));
                     }
                 });
     }

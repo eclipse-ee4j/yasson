@@ -13,16 +13,15 @@
  ******************************************************************************/
 package org.eclipse.yasson.internal;
 
+import java.util.Optional;
+
 import javax.json.bind.Jsonb;
 import javax.json.bind.JsonbBuilder;
 import javax.json.bind.JsonbConfig;
 import javax.json.spi.JsonProvider;
-import java.util.Optional;
 
 /**
  * JsonbBuilder implementation.
- *
- * @author Dmitry Kornilov
  */
 public class JsonBindingBuilder implements JsonbBuilder {
     private JsonbConfig config = new JsonbConfig();

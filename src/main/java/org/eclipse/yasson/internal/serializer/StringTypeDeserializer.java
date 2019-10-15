@@ -9,24 +9,24 @@
  *
  * Contributors:
  * Roman Grigoriadi
+ * David Kral
  ******************************************************************************/
 
 package org.eclipse.yasson.internal.serializer;
+
+import java.io.UnsupportedEncodingException;
+import java.lang.reflect.Type;
+
+import javax.json.bind.JsonbConfig;
+import javax.json.bind.JsonbException;
 
 import org.eclipse.yasson.internal.Unmarshaller;
 import org.eclipse.yasson.internal.model.customization.Customization;
 import org.eclipse.yasson.internal.properties.MessageKeys;
 import org.eclipse.yasson.internal.properties.Messages;
 
-import javax.json.bind.JsonbConfig;
-import javax.json.bind.JsonbException;
-import java.io.UnsupportedEncodingException;
-import java.lang.reflect.Type;
-
 /**
  * Deserializer for {@link String} type.
- * 
- * @author Roman Grigoriadi
  */
 public class StringTypeDeserializer extends AbstractValueTypeDeserializer<String> {
 

@@ -12,15 +12,13 @@
  ******************************************************************************/
 package org.eclipse.yasson;
 
-import org.eclipse.yasson.internal.JsonBindingBuilder;
-
 import javax.json.bind.JsonbBuilder;
 import javax.json.bind.spi.JsonbProvider;
 
+import org.eclipse.yasson.internal.JsonBindingBuilder;
+
 /**
  * JsonbProvider implementation.
- *
- * @author Dmitry Kornilov
  */
 public class JsonBindingProvider extends JsonbProvider {
 

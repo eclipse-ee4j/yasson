@@ -10,6 +10,10 @@
  ******************************************************************************/
 package org.eclipse.yasson.internal.jsonstructure;
 
+import java.math.BigDecimal;
+import java.util.ArrayDeque;
+import java.util.Deque;
+
 import javax.json.JsonArray;
 import javax.json.JsonNumber;
 import javax.json.JsonObject;
@@ -18,9 +22,6 @@ import javax.json.JsonValue;
 import javax.json.bind.JsonbException;
 import javax.json.stream.JsonLocation;
 import javax.json.stream.JsonParser;
-import java.math.BigDecimal;
-import java.util.ArrayDeque;
-import java.util.Deque;
 
 /**
  * Adapter for {@link JsonParser}, that reads a {@link JsonStructure} content tree instead of JSON text.
@@ -35,6 +36,11 @@ public class JsonStructureToParserAdapter implements JsonParser {
 
     private final JsonStructure rootStructure;
 
+    /**
+     * Creates new {@link JsonStructure} parser.
+     *
+     * @param structure json structure
+     */
     public JsonStructureToParserAdapter(JsonStructure structure) {
         this.rootStructure = structure;
     }
@@ -66,8 +72,6 @@ public class JsonStructureToParserAdapter implements JsonParser {
         }
         return next;
     }
-
-
 
     @Override
     public String getString() {

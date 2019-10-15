@@ -9,6 +9,7 @@
  *
  * Contributors:
  * Roman Grigoriadi
+ * David Kral
  ******************************************************************************/
 
 package org.eclipse.yasson.internal.serializer;
@@ -20,11 +21,14 @@ import javax.json.stream.JsonGenerator;
 
 /**
  * Serializer for arrays of floats.
- *
- * @author Roman Grigoriadi
  */
 public class FloatArraySerializer extends AbstractArraySerializer<float[]> {
 
+    /**
+     * Creates new instance of float array serializer.
+     *
+     * @param builder serializer builder
+     */
     protected FloatArraySerializer(SerializerBuilder builder) {
         super(builder);
     }

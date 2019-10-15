@@ -12,30 +12,29 @@
  ******************************************************************************/
 package org.eclipse.yasson.internal.model.customization;
 
+import javax.json.bind.config.PropertyVisibilityStrategy;
+
 import org.eclipse.yasson.internal.model.JsonbCreator;
-import org.eclipse.yasson.internal.model.Property;
 import org.eclipse.yasson.internal.serializer.JsonbDateFormatter;
 import org.eclipse.yasson.internal.serializer.JsonbNumberFormatter;
 
-import javax.json.bind.config.PropertyVisibilityStrategy;
-
 /**
  * The customization builder that would be used to build an instance of {@link ClassCustomization} to ensure its immutability.
- *
- * @author Ehsan Zaery Moghaddam (zaerymoghaddam@gmail.com)
  */
 public class ClassCustomizationBuilder extends CustomizationBuilder {
 
     private JsonbCreator jsonbCreator;
 
     /**
-     * The class level number formatter that would be used by default for all number properties that don't have a dedicated number formatter
+     * The class level number formatter that would be used by default for all number properties that don't have a dedicated
+     * number formatter
      * annotation.
      */
     private JsonbNumberFormatter numberFormatter;
 
     /**
-     * The class level date formatter that would be used by default for all date properties that don't have a dedicated date formatter annotation.
+     * The class level date formatter that would be used by default for all date properties that don't have a dedicated date
+     * formatter annotation.
      */
     private JsonbDateFormatter dateFormatter;
 
@@ -54,18 +53,22 @@ public class ClassCustomizationBuilder extends CustomizationBuilder {
     }
 
     /**
-     * Returns the default number formatter instance that would be used for all number properties that don't have a dedicated number formatter.
+     * Returns the default number formatter instance that would be used for all number properties that don't have a dedicated
+     * number formatter.
      *
-     * @return the default number formatter instance that would be used for all number properties that don't have a dedicated number formatter
+     * @return the default number formatter instance that would be used for all number properties that don't have a dedicated
+     * number formatter
      */
     public JsonbNumberFormatter getNumberFormatter() {
         return numberFormatter;
     }
 
     /**
-     * Sets the default number formatter instance that would be used for all number properties that don't have a dedicated number formatter.
+     * Sets the default number formatter instance that would be used for all number properties that don't have a dedicated
+     * number formatter.
      *
-     * @param numberFormatter the default number formatter instance that would be used for all number properties that don't have a dedicated number
+     * @param numberFormatter the default number formatter instance that would be used for all number properties that don't
+     *                        have a dedicated number
      *                        formatter.
      */
     public void setNumberFormatter(JsonbNumberFormatter numberFormatter) {
@@ -110,7 +113,8 @@ public class ClassCustomizationBuilder extends CustomizationBuilder {
 
     /**
      * Property visibility strategy for given class.
-     * @return
+     *
+     * @return property visibility strategy
      */
     public PropertyVisibilityStrategy getPropertyVisibilityStrategy() {
         return propertyVisibilityStrategy;
@@ -118,6 +122,7 @@ public class ClassCustomizationBuilder extends CustomizationBuilder {
 
     /**
      * Sets custom property visibility strategy.
+     *
      * @param propertyVisibilityStrategy strategy
      */
     public void setPropertyVisibilityStrategy(PropertyVisibilityStrategy propertyVisibilityStrategy) {

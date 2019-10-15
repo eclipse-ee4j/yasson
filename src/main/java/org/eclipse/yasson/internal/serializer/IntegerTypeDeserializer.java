@@ -9,22 +9,22 @@
  *
  * Contributors:
  * Roman Grigoriadi
+ * David Kral
  ******************************************************************************/
 
 package org.eclipse.yasson.internal.serializer;
+
+import java.lang.reflect.Type;
+
+import javax.json.bind.JsonbException;
 
 import org.eclipse.yasson.internal.Unmarshaller;
 import org.eclipse.yasson.internal.model.customization.Customization;
 import org.eclipse.yasson.internal.properties.MessageKeys;
 import org.eclipse.yasson.internal.properties.Messages;
 
-import javax.json.bind.JsonbException;
-import java.lang.reflect.Type;
-
 /**
  * Deserializer for {@link Integer} type.
- *
- * @author Roman Grigoriadi
  */
 public class IntegerTypeDeserializer extends AbstractNumberDeserializer<Integer> {
 
@@ -46,7 +46,7 @@ public class IntegerTypeDeserializer extends AbstractNumberDeserializer<Integer>
                         return Integer.parseInt(jsonValue);
                     } catch (NumberFormatException e) {
                         throw new JsonbException(Messages.getMessage(MessageKeys.DESERIALIZE_VALUE_ERROR,
-                                Integer.class));
+                                                                     Integer.class));
                     }
                 });
     }

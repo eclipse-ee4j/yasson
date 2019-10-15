@@ -9,13 +9,10 @@
  *
  * Contributors:
  * Roman Grigoriadi
+ * David Kral
  ******************************************************************************/
 
 package org.eclipse.yasson.internal.serializer;
-
-import org.eclipse.yasson.internal.model.customization.Customization;
-import org.eclipse.yasson.internal.properties.MessageKeys;
-import org.eclipse.yasson.internal.properties.Messages;
 
 import java.time.Instant;
 import java.time.ZonedDateTime;
@@ -23,13 +20,16 @@ import java.time.format.DateTimeFormatter;
 import java.util.Locale;
 import java.util.logging.Logger;
 
+import org.eclipse.yasson.internal.model.customization.Customization;
+import org.eclipse.yasson.internal.properties.MessageKeys;
+import org.eclipse.yasson.internal.properties.Messages;
+
 /**
  * Deserializer for {@link ZonedDateTime} type.
- *
- * @author David Kral
  */
 public class ZonedDateTimeTypeDeserializer extends AbstractDateTimeDeserializer<ZonedDateTime> {
-    private static final Logger log = Logger.getLogger(ZonedDateTimeTypeDeserializer.class.getName());
+
+    private static final Logger LOGGER = Logger.getLogger(ZonedDateTimeTypeDeserializer.class.getName());
 
     /**
      * Creates an instance.
@@ -46,7 +46,7 @@ public class ZonedDateTimeTypeDeserializer extends AbstractDateTimeDeserializer<
      */
     @Override
     protected ZonedDateTime fromInstant(Instant instant) {
-        log.warning(Messages.getMessage(MessageKeys.OFFSET_DATE_TIME_FROM_MILLIS, ZonedDateTime.class.getSimpleName(), UTC));
+        LOGGER.warning(Messages.getMessage(MessageKeys.OFFSET_DATE_TIME_FROM_MILLIS, ZonedDateTime.class.getSimpleName(), UTC));
         return ZonedDateTime.ofInstant(instant, UTC);
     }
 

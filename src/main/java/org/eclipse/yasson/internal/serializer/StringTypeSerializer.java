@@ -9,9 +9,16 @@
  *
  * Contributors:
  * Roman Grigoriadi
+ * David Kral
  ******************************************************************************/
 
 package org.eclipse.yasson.internal.serializer;
+
+import java.io.UnsupportedEncodingException;
+
+import javax.json.bind.JsonbConfig;
+import javax.json.bind.JsonbException;
+import javax.json.stream.JsonGenerator;
 
 import org.eclipse.yasson.internal.JsonbContext;
 import org.eclipse.yasson.internal.Marshaller;
@@ -19,15 +26,8 @@ import org.eclipse.yasson.internal.model.customization.Customization;
 import org.eclipse.yasson.internal.properties.MessageKeys;
 import org.eclipse.yasson.internal.properties.Messages;
 
-import javax.json.bind.JsonbConfig;
-import javax.json.bind.JsonbException;
-import javax.json.stream.JsonGenerator;
-import java.io.UnsupportedEncodingException;
-
 /**
  * Serializer for {@link String} type.
- * 
- * @author Roman Grigoriadi
  */
 public class StringTypeSerializer extends AbstractValueTypeSerializer<String> {
 

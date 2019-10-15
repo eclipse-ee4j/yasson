@@ -13,7 +13,6 @@
 
 package org.eclipse.yasson.internal.model;
 
-import javax.json.bind.config.PropertyVisibilityStrategy;
 import java.lang.reflect.AccessibleObject;
 import java.lang.reflect.Field;
 import java.lang.reflect.Method;
@@ -22,10 +21,10 @@ import java.security.AccessController;
 import java.security.PrivilegedAction;
 import java.util.function.Function;
 
+import javax.json.bind.config.PropertyVisibilityStrategy;
+
 /**
  * Abstract class for getting / setting value into the property.
- *
- * @author Roman Grigoriadi
  */
 public abstract class PropertyValuePropagation {
 
@@ -41,18 +40,25 @@ public abstract class PropertyValuePropagation {
      * Mode of property propagation get or set.
      */
     public enum OperationMode {
-        GET, SET
+        /**
+         * Get property operation.
+         */
+        GET,
+        /**
+         * Set property operation.
+         */
+        SET
     }
 
     /**
-     * Property can be written (unmarshalled from json)
+     * Property can be written (unmarshalled from json).
      */
-    protected boolean writable;
+    private boolean writable;
 
     /**
-     * Property can be read (marshalled to json)
+     * Property can be read (marshalled to json).
      */
-    protected boolean readable;
+    private boolean readable;
 
     private final boolean getterVisible;
 
@@ -62,6 +68,7 @@ public abstract class PropertyValuePropagation {
      * Construct a property propagation.
      *
      * @param property Provided property.
+     * @param strategy Visibility strategy
      */
     protected PropertyValuePropagation(Property property, PropertyVisibilityStrategy strategy) {
         this.field = property.getField();
@@ -93,7 +100,8 @@ public abstract class PropertyValuePropagation {
 
     private void initWritable(Field field, Method setter) {
 
-        final boolean fieldWritable = field == null || (field.getModifiers() & (Modifier.TRANSIENT | Modifier.STATIC | Modifier.FINAL)) == 0;
+        final boolean fieldWritable =
+                field == null || (field.getModifiers() & (Modifier.TRANSIENT | Modifier.STATIC | Modifier.FINAL)) == 0;
         if (!fieldWritable) {
             writable = false;
             return;
@@ -133,7 +141,9 @@ public abstract class PropertyValuePropagation {
 
         Boolean accessible = isVisible(strategy -> strategy.isVisible(method), field, method);
         //overridden by strategy, anonymous class, or lambda
-        if (accessible && (!Modifier.isPublic(method.getModifiers()) || method.getDeclaringClass().isAnonymousClass() || method.getDeclaringClass().isSynthetic())) {
+        if (accessible && (
+                !Modifier.isPublic(method.getModifiers()) || method.getDeclaringClass().isAnonymousClass() || method
+                        .getDeclaringClass().isSynthetic())) {
             overrideAccessible(method);
         }
         return accessible;
@@ -154,22 +164,24 @@ public abstract class PropertyValuePropagation {
      * @return Optional with result of visibility check, or empty optional if no strategy is found
      */
     private Boolean isVisible(Function<PropertyVisibilityStrategy, Boolean> visibilityCheckFunction, Field field, Method method) {
-        return propertyVisibilityStrategy != null ?
-                visibilityCheckFunction.apply(propertyVisibilityStrategy)
+        return propertyVisibilityStrategy != null
+                ? visibilityCheckFunction.apply(propertyVisibilityStrategy)
                 : visibilityCheckFunction.apply(new DefaultVisibilityStrategy(field, method));
     }
 
     /**
      * Accept a {@link Method} to use value propagation.
+     *
      * @param method method
-     * @param mode read or write
+     * @param mode   read or write
      */
     protected abstract void acceptMethod(Method method, OperationMode mode);
 
     /**
      * Accept a {@link Field} to use for value propagation.
+     *
      * @param field field
-     * @param mode mod
+     * @param mode  mod
      */
     protected abstract void acceptField(Field field, OperationMode mode);
 
@@ -177,7 +189,7 @@ public abstract class PropertyValuePropagation {
      * Set a value to a field. Based on policy invokes a setter or sets directly to a field.
      *
      * @param object object to set value in
-     * @param value value to set, null is valid
+     * @param value  value to set, null is valid
      */
     abstract void setValue(Object object, Object value);
 
@@ -190,6 +202,7 @@ public abstract class PropertyValuePropagation {
 
     /**
      * Property is writable. Based on access policy and java field modifiers.
+     *
      * @return true if can be deserialized from JSON
      */
     public boolean isWritable() {
@@ -198,6 +211,7 @@ public abstract class PropertyValuePropagation {
 
     /**
      * Property is readable. Based on access policy and java field modifiers.
+     *
      * @return true if can be serialized to JSON
      */
     public boolean isReadable() {
@@ -245,7 +259,7 @@ public abstract class PropertyValuePropagation {
 
         private final Method method;
 
-        public DefaultVisibilityStrategy(Field field, Method method) {
+        DefaultVisibilityStrategy(Field field, Method method) {
             this.field = field;
             this.method = method;
         }

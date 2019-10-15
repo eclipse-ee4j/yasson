@@ -9,20 +9,20 @@
  *
  * Contributors:
  * Roman Grigoriadi
+ * David Kral
  ******************************************************************************/
 
 package org.eclipse.yasson.internal.serializer;
 
+import java.time.ZoneOffset;
+
+import javax.json.stream.JsonGenerator;
+
 import org.eclipse.yasson.internal.Marshaller;
 import org.eclipse.yasson.internal.model.customization.Customization;
 
-import javax.json.stream.JsonGenerator;
-import java.time.ZoneOffset;
-
 /**
  * Serializer for {@link ZoneOffset} type.
- * 
- * @author David Kral
  */
 public class ZoneOffsetTypeSerializer extends AbstractValueTypeSerializer<ZoneOffset> {
 

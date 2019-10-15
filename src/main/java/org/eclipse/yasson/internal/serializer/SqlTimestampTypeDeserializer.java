@@ -13,8 +13,6 @@
 
 package org.eclipse.yasson.internal.serializer;
 
-import org.eclipse.yasson.internal.model.customization.Customization;
-
 import java.sql.Timestamp;
 import java.time.Instant;
 import java.time.LocalDateTime;
@@ -22,6 +20,8 @@ import java.time.ZoneId;
 import java.time.format.DateTimeFormatter;
 import java.time.temporal.TemporalAccessor;
 import java.util.Locale;
+
+import org.eclipse.yasson.internal.model.customization.Customization;
 
 /**
  * Deserializer for {@link java.sql.Timestamp} type.
@@ -67,5 +67,5 @@ public class SqlTimestampTypeDeserializer extends AbstractDateTimeDeserializer<T
         LocalDateTime local = LocalDateTime.from(parsed);
         return local.atZone(ZoneId.of("UTC")).toInstant();
     }
-    
+
 }

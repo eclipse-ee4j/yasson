@@ -9,6 +9,7 @@
  *
  * Contributors:
  * Roman Grigoriadi
+ * David Kral
  ******************************************************************************/
 
 package org.eclipse.yasson.internal.serializer;
@@ -18,11 +19,14 @@ import javax.json.stream.JsonGenerator;
 
 /**
  * Serializer for arrays of ints.
- *
- * @author Roman Grigoriadi
  */
 public class IntArraySerializer extends AbstractArraySerializer<int[]> {
 
+    /**
+     * Creates new instance of int array serializer.
+     *
+     * @param builder serializer builder
+     */
     protected IntArraySerializer(SerializerBuilder builder) {
         super(builder);
     }

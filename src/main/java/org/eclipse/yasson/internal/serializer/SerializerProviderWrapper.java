@@ -14,8 +14,6 @@ package org.eclipse.yasson.internal.serializer;
 
 /**
  * Wraps serializer and deserializer providers.
- *
- * @author Roman Grigoriadi
  */
 public class SerializerProviderWrapper {
 
@@ -25,7 +23,7 @@ public class SerializerProviderWrapper {
     /**
      * Creates a new instance.
      *
-     * @param serializerProvider Serializer provider.
+     * @param serializerProvider   Serializer provider.
      * @param deserializerProvider Deserializer provider.
      */
     public SerializerProviderWrapper(ISerializerProvider serializerProvider, IDeserializerProvider deserializerProvider) {

@@ -4,8 +4,6 @@ import java.lang.reflect.InvocationTargetException;
 
 /**
  * Wrapper for setting a value on javabean property.
- *
- * @author Roman Grigoriadi
  */
 @FunctionalInterface
 interface SetValueCommand {

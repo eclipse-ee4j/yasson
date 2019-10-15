@@ -22,7 +22,7 @@ public interface ComponentBoundCustomization {
      * @return Adapter wrapper class with resolved generic information.
      */
     AdapterBinding getSerializeAdapterBinding();
-    
+
     /**
      * @return Adapter wrapper class with resolved generic information.
      */

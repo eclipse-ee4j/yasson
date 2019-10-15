@@ -9,18 +9,17 @@
  *
  * Contributors:
  * Roman Grigoriadi
+ * David Kral
  ******************************************************************************/
 
 package org.eclipse.yasson.internal.serializer;
 
-import org.eclipse.yasson.internal.model.customization.Customization;
-
 import javax.json.stream.JsonGenerator;
+
+import org.eclipse.yasson.internal.model.customization.Customization;
 
 /**
  * Serializer for {@link Double} type.
- *
- * @author David Kral
  */
 public class DoubleTypeSerializer extends AbstractNumberSerializer<Double> {
 

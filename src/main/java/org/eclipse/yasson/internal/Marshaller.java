@@ -9,44 +9,43 @@
  * http://www.eclipse.org/org/documents/edl-v10.php.
  * <p>
  * Contributors:
- *     Dmitry Kornilov - initial implementation
+ * Dmitry Kornilov - initial implementation
+ * Roman Grigoriadi
  ******************************************************************************/
 package org.eclipse.yasson.internal;
 
-import org.eclipse.yasson.internal.model.ClassModel;
-import org.eclipse.yasson.internal.properties.MessageKeys;
-import org.eclipse.yasson.internal.properties.Messages;
-import org.eclipse.yasson.internal.serializer.AbstractValueTypeSerializer;
-import org.eclipse.yasson.internal.serializer.ContainerSerializerProvider;
-import org.eclipse.yasson.internal.serializer.DefaultSerializers;
-import org.eclipse.yasson.internal.serializer.SerializerBuilder;
-import org.eclipse.yasson.internal.model.JsonbPropertyInfo;
+import java.lang.reflect.Type;
+import java.util.Objects;
+import java.util.logging.Logger;
 
 import javax.json.bind.JsonbException;
 import javax.json.bind.serializer.JsonbSerializer;
 import javax.json.bind.serializer.SerializationContext;
 import javax.json.stream.JsonGenerationException;
 import javax.json.stream.JsonGenerator;
-import java.lang.reflect.Type;
-import java.util.Objects;
-import java.util.logging.Logger;
+
+import org.eclipse.yasson.internal.model.ClassModel;
+import org.eclipse.yasson.internal.model.JsonbPropertyInfo;
+import org.eclipse.yasson.internal.properties.MessageKeys;
+import org.eclipse.yasson.internal.properties.Messages;
+import org.eclipse.yasson.internal.serializer.AbstractValueTypeSerializer;
+import org.eclipse.yasson.internal.serializer.ContainerSerializerProvider;
+import org.eclipse.yasson.internal.serializer.DefaultSerializers;
+import org.eclipse.yasson.internal.serializer.SerializerBuilder;
 
 /**
  * JSONB marshaller. Created each time marshalling operation called.
- *
- * @author Dmitry Kornilov
- * @author Roman Grigoriadi
  */
 public class Marshaller extends ProcessingContext implements SerializationContext {
 
-    private static final Logger logger = Logger.getLogger(Marshaller.class.getName());
+    private static final Logger LOGGER = Logger.getLogger(Marshaller.class.getName());
 
     private final Type runtimeType;
 
     /**
      * Creates Marshaller for generation to String.
      *
-     * @param jsonbContext Current context.
+     * @param jsonbContext    Current context.
      * @param rootRuntimeType Type of root object.
      */
     public Marshaller(JsonbContext jsonbContext, Type rootRuntimeType) {
@@ -67,18 +66,18 @@ public class Marshaller extends ProcessingContext implements SerializationContex
     /**
      * Marshals given object to provided Writer or OutputStream.
      *
-     * @param object object to marshall
+     * @param object        object to marshall
      * @param jsonGenerator generator to use
-     * @param close if generator should be closed
+     * @param close         if generator should be closed
      */
     public void marshall(Object object, JsonGenerator jsonGenerator, boolean close) {
         try {
             serializeRoot(object, jsonGenerator);
         } catch (JsonbException e) {
-            logger.severe(e.getMessage());
+            LOGGER.severe(e.getMessage());
             throw e;
         } catch (Exception e) {
-            logger.severe(e.getMessage());
+            LOGGER.severe(e.getMessage());
             throw new JsonbException(Messages.getMessage(MessageKeys.INTERNAL_ERROR, e.getMessage()), e);
         } finally {
             try {
@@ -86,7 +85,7 @@ public class Marshaller extends ProcessingContext implements SerializationContex
                     jsonGenerator.close();
                 }
             } catch (JsonGenerationException jge) {
-                logger.severe(jge.getMessage());
+                LOGGER.severe(jge.getMessage());
             }
         }
     }
@@ -95,22 +94,22 @@ public class Marshaller extends ProcessingContext implements SerializationContex
      * Marshals given object to provided Writer or OutputStream.
      * Closes the generator on completion.
      *
-     * @param object object to marshall
+     * @param object        object to marshall
      * @param jsonGenerator generator to use
      */
     public void marshall(Object object, JsonGenerator jsonGenerator) {
-        marshall(object,jsonGenerator,true);
+        marshall(object, jsonGenerator, true);
     }
 
     /**
      * Marshals given object to provided Writer or OutputStream.
      * Leaves generator open for further interaction after completion.
      *
-     * @param object object to marshall
+     * @param object        object to marshall
      * @param jsonGenerator generator to use
      */
     public void marshallWithoutClose(Object object, JsonGenerator jsonGenerator) {
-        marshall(object,jsonGenerator,false);
+        marshall(object, jsonGenerator, false);
     }
 
     @Override
@@ -130,8 +129,8 @@ public class Marshaller extends ProcessingContext implements SerializationContex
     /**
      * Serializes root element.
      *
-     * @param <T> Root type
-     * @param root Root.
+     * @param <T>       Root type
+     * @param root      Root.
      * @param generator JSON generator.
      */
     @SuppressWarnings("unchecked")
@@ -141,8 +140,8 @@ public class Marshaller extends ProcessingContext implements SerializationContex
             return;
         }
         final JsonbSerializer<T> rootSerializer = (JsonbSerializer<T>) getRootSerializer(root.getClass());
-        if (jsonbContext.getConfigProperties().isStrictIJson() &&
-                rootSerializer instanceof AbstractValueTypeSerializer) {
+        if (getJsonbContext().getConfigProperties().isStrictIJson()
+                && rootSerializer instanceof AbstractValueTypeSerializer) {
             throw new JsonbException(Messages.getMessage(MessageKeys.IJSON_ENABLED_SINGLE_VALUE));
         }
         rootSerializer.serialize(root, generator, this);
@@ -153,9 +152,9 @@ public class Marshaller extends ProcessingContext implements SerializationContex
         if (serializerProvider != null) {
             return serializerProvider
                     .provideSerializer(new JsonbPropertyInfo()
-                            .withRuntimeType(runtimeType));
+                                               .withRuntimeType(runtimeType));
         }
-        SerializerBuilder serializerBuilder = new SerializerBuilder(jsonbContext)
+        SerializerBuilder serializerBuilder = new SerializerBuilder(getJsonbContext())
                 .withObjectClass(rootClazz)
                 .withType(runtimeType);
 

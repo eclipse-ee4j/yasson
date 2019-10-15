@@ -15,7 +15,16 @@ public class CreatorCustomization extends CustomizationBase {
 
     private PropertyModel propertyModel;
 
-    public CreatorCustomization(CustomizationBuilder customization, JsonbNumberFormatter numberFormatter, JsonbDateFormatter dateFormatter) {
+    /**
+     * Creates new creator customization instance.
+     *
+     * @param customization   builder of the customization
+     * @param numberFormatter number formatter
+     * @param dateFormatter   date formatter
+     */
+    public CreatorCustomization(CustomizationBuilder customization,
+                                JsonbNumberFormatter numberFormatter,
+                                JsonbDateFormatter dateFormatter) {
         super(customization);
         this.numberFormatter = numberFormatter;
         this.dateFormatter = dateFormatter;
@@ -58,6 +67,7 @@ public class CreatorCustomization extends CustomizationBase {
 
     /**
      * Set property referenced model.
+     *
      * @param propertyModel referenced property model
      */
     public void setPropertyModel(PropertyModel propertyModel) {

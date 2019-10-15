@@ -9,21 +9,20 @@
  *
  * Contributors:
  * Roman Grigoriadi
+ * David Kral
  ******************************************************************************/
 
 package org.eclipse.yasson.internal.serializer;
 
+import java.net.URL;
+
+import javax.json.stream.JsonGenerator;
 
 import org.eclipse.yasson.internal.Marshaller;
 import org.eclipse.yasson.internal.model.customization.Customization;
 
-import javax.json.stream.JsonGenerator;
-import java.net.URL;
-
 /**
  * Serializer for {@link URL} type.
- * 
- * @author David Kral
  */
 public class URLTypeSerializer extends AbstractValueTypeSerializer<URL> {
 

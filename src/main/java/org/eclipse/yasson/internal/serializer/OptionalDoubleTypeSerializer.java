@@ -10,22 +10,22 @@
  *
  * Contributors:
  * Roman Grigoriadi
+ * David Kral
  ******************************************************************************/
 
 package org.eclipse.yasson.internal.serializer;
 
-import org.eclipse.yasson.internal.Marshaller;
-import org.eclipse.yasson.internal.model.customization.Customization;
+import java.util.OptionalDouble;
 
 import javax.json.stream.JsonGenerator;
-import java.util.OptionalDouble;
+
+import org.eclipse.yasson.internal.Marshaller;
+import org.eclipse.yasson.internal.model.customization.Customization;
 
 import static org.eclipse.yasson.internal.serializer.OptionalObjectSerializer.handleEmpty;
 
 /**
  * Serializer for {@link OptionalDouble} type.
- * 
- * @author David Kral
  */
 public class OptionalDoubleTypeSerializer extends AbstractValueTypeSerializer<OptionalDouble> {
 
@@ -40,7 +40,7 @@ public class OptionalDoubleTypeSerializer extends AbstractValueTypeSerializer<Op
 
     @Override
     protected void serialize(OptionalDouble obj, JsonGenerator generator, Marshaller marshaller) {
-        if (!handleEmpty(obj, OptionalDouble::isPresent, customization, generator, marshaller)) {
+        if (!handleEmpty(obj, OptionalDouble::isPresent, getCustomization(), generator, marshaller)) {
             generator.write(obj.getAsDouble());
         }
     }

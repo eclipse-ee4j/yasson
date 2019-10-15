@@ -12,16 +12,15 @@
  ******************************************************************************/
 package org.eclipse.yasson.internal.model;
 
-import javax.json.bind.JsonbException;
 import java.lang.reflect.Field;
 import java.lang.reflect.Method;
 import java.lang.reflect.Type;
 
+import javax.json.bind.JsonbException;
+
 /**
  * Property of a class, field, getter and setter methods (javabean alike).
  * Used during class model initialization, than dereferenced.
- *
- * @author Roman Grigoriadi
  */
 public class Property {
 
@@ -37,7 +36,8 @@ public class Property {
 
     /**
      * Create instance of property.
-     * @param name not null
+     *
+     * @param name                not null
      * @param declaringClassModel Class model for a class declaring property.
      */
     public Property(String name, JsonbAnnotatedElement<Class<?>> declaringClassModel) {
@@ -55,7 +55,7 @@ public class Property {
     }
 
     /**
-     * {@link Field} representing property if any
+     * {@link Field} representing property if any.
      *
      * @return field if present
      */
@@ -114,6 +114,7 @@ public class Property {
     /**
      * Class element with annotation under construction for declaring class of this property.
      * This ClassModel is not fully initialized yet.
+     *
      * @return ClassModel
      */
     public JsonbAnnotatedElement<Class<?>> getDeclaringClassElement() {
@@ -137,14 +138,14 @@ public class Property {
         throw new JsonbException("Empty property: " + name);
     }
 
-    public Type getGetterType() {
+    Type getGetterType() {
         if (getGetter() != null) {
             return getGetter().getGenericReturnType();
         }
         return null;
     }
 
-    public Type getSetterType() {
+    Type getSetterType() {
         Type[] genericParameterTypes = getSetter().getGenericParameterTypes();
         if (genericParameterTypes.length != 1) {
             throw new JsonbException("Invalid count of arguments for setter: " + getSetter());
@@ -154,6 +155,7 @@ public class Property {
 
     /**
      * Element with field and its annotations.
+     *
      * @return field with annotations
      */
     public JsonbAnnotatedElement<Field> getFieldElement() {
@@ -162,6 +164,7 @@ public class Property {
 
     /**
      * Element with getter and its annotations.
+     *
      * @return getter with annotations
      */
     public JsonbAnnotatedElement<Method> getGetterElement() {
@@ -170,6 +173,7 @@ public class Property {
 
     /**
      * Element with setter and its annotations.
+     *
      * @return setter with annotations
      */
     public JsonbAnnotatedElement<Method> getSetterElement() {

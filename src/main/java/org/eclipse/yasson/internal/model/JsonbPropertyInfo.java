@@ -12,15 +12,13 @@
  ******************************************************************************/
 package org.eclipse.yasson.internal.model;
 
+import java.lang.reflect.Type;
+
 import org.eclipse.yasson.internal.JsonbContext;
 import org.eclipse.yasson.internal.serializer.CurrentItem;
 
-import java.lang.reflect.Type;
-
 /**
  * Wrapper for metadata of serialized property.
- *
- * @author Roman Grigoriadi
  */
 public class JsonbPropertyInfo {
 

@@ -13,6 +13,21 @@
  ******************************************************************************/
 package org.eclipse.yasson.internal;
 
+import java.lang.annotation.Annotation;
+import java.lang.reflect.Field;
+import java.lang.reflect.Method;
+import java.lang.reflect.Modifier;
+import java.security.AccessController;
+import java.security.PrivilegedAction;
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+import java.util.Objects;
+import java.util.stream.Collectors;
+
+import javax.json.bind.JsonbException;
+
 import org.eclipse.yasson.internal.model.ClassModel;
 import org.eclipse.yasson.internal.model.CreatorModel;
 import org.eclipse.yasson.internal.model.JsonbAnnotatedElement;
@@ -24,34 +39,16 @@ import org.eclipse.yasson.internal.model.customization.CreatorCustomization;
 import org.eclipse.yasson.internal.properties.MessageKeys;
 import org.eclipse.yasson.internal.properties.Messages;
 
-import javax.json.bind.JsonbException;
-import javax.json.bind.config.PropertyVisibilityStrategy;
-import java.lang.annotation.Annotation;
-import java.lang.reflect.Field;
-import java.lang.reflect.Method;
-import java.lang.reflect.Modifier;
-import java.security.AccessController;
-import java.security.PrivilegedAction;
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-import java.util.stream.Collectors;
-import java.util.Objects;
-
-
 /**
  * Created a class internal model.
- *
- * @author Dmitry Kornilov
  */
 class ClassParser {
 
-    public static final String IS_PREFIX = "is";
+    private static final String IS_PREFIX = "is";
 
-    public static final String GET_PREFIX = "get";
+    private static final String GET_PREFIX = "get";
 
-    public static final String SET_PREFIX = "set";
+    private static final String SET_PREFIX = "set";
 
     private final JsonbContext jsonbContext;
 
@@ -62,7 +59,7 @@ class ClassParser {
     /**
      * Parse class fields and getters setters. Merge to java bean like properties.
      */
-    public void parseProperties(ClassModel classModel, JsonbAnnotatedElement<Class<?>> classElement) {
+    void parseProperties(ClassModel classModel, JsonbAnnotatedElement<Class<?>> classElement) {
 
         final Map<String, Property> classProperties = new HashMap<>();
         parseFields(classElement, classProperties);
@@ -82,30 +79,33 @@ class ClassParser {
         unsortedMerged.addAll(classPropertyModels);
         checkPropertyNameClash(unsortedMerged, classModel.getType());
 
-
         List<PropertyModel> sortedPropertyModels = new ArrayList<>();
         sortedPropertyModels.addAll(sortedParentProperties);
         sortedPropertyModels.addAll(jsonbContext.getConfigProperties().getPropertyOrdering()
-                .orderProperties(classPropertyModels, classModel));
+                                            .orderProperties(classPropertyModels, classModel));
 
         //reference property to creator parameter by name to merge configuration in runtime
         JsonbCreator creator = classModel.getClassCustomization().getCreator();
         if (creator != null) {
-            sortedPropertyModels.forEach((propertyModel -> {
-                for (CreatorModel creatorModel : creator.getParams()) {
-                    if (creatorModel.getName().equals(propertyModel.getPropertyName())) {
-                        CreatorCustomization customization = (CreatorCustomization) creatorModel.getCustomization();
-                        customization.setPropertyModel(propertyModel);
-                    }
-                }
-            }));
+            sortedPropertyModels.forEach((
+                                                 propertyModel -> {
+                                                     for (CreatorModel creatorModel : creator.getParams()) {
+                                                         if (creatorModel.getName().equals(propertyModel.getPropertyName())) {
+                                                             CreatorCustomization customization =
+                                                                     (CreatorCustomization) creatorModel
+                                                                             .getCustomization();
+                                                             customization.setPropertyModel(propertyModel);
+                                                         }
+                                                     }
+                                                 }));
         }
 
         classModel.setProperties(sortedPropertyModels);
 
     }
 
-    private void parseClassAndInterfaceMethods(JsonbAnnotatedElement<Class<?>> classElement, Map<String, Property> classProperties) {
+    private void parseClassAndInterfaceMethods(JsonbAnnotatedElement<Class<?>> classElement,
+                                               Map<String, Property> classProperties) {
         Class<?> concreteClass = classElement.getElement();
         parseMethods(concreteClass, classElement, classProperties);
         for (Class<?> ifc : jsonbContext.getAnnotationIntrospector().collectInterfaces(concreteClass)) {
@@ -113,7 +113,9 @@ class ClassParser {
         }
     }
 
-    private void parseIfaceMethodAnnotations(Class<?> ifc, JsonbAnnotatedElement<Class<?>> classElement, Map<String, Property> classProperties) {
+    private void parseIfaceMethodAnnotations(Class<?> ifc,
+                                             JsonbAnnotatedElement<Class<?>> classElement,
+                                             Map<String, Property> classProperties) {
         Method[] declaredMethods = AccessController.doPrivileged((PrivilegedAction<Method[]>) ifc::getDeclaredMethods);
         for (Method method : declaredMethods) {
             final String methodName = method.getName();
@@ -158,7 +160,10 @@ class ClassParser {
         }
     }
 
-    private Property registerMethod(String propertyName, Method method, JsonbAnnotatedElement<Class<?>> classElement, Map<String, Property> classProperties) {
+    private Property registerMethod(String propertyName,
+                                    Method method,
+                                    JsonbAnnotatedElement<Class<?>> classElement,
+                                    Map<String, Property> classProperties) {
         Property property = classProperties.computeIfAbsent(propertyName, n -> new Property(n, classElement));
         if (isSetter(method)) {
             property.setSetter(method);
@@ -169,7 +174,9 @@ class ClassParser {
         return property;
     }
 
-    private void parseMethods(Class<?> clazz, JsonbAnnotatedElement<Class<?>> classElement, Map<String, Property> classProperties) {
+    private void parseMethods(Class<?> clazz,
+                              JsonbAnnotatedElement<Class<?>> classElement,
+                              Map<String, Property> classProperties) {
         Method[] declaredMethods = AccessController.doPrivileged((PrivilegedAction<Method[]>) clazz::getDeclaredMethods);
         for (Method method : declaredMethods) {
             String name = method.getName();
@@ -182,23 +189,26 @@ class ClassParser {
             Property property = registerMethod(propertyName, method, classElement, classProperties);
         }
     }
-    
+
     /**
      * Filter out certain methods that get forcibly added to some classes.
      * For example the public groovy.lang.MetaClass X.getMetaClass() method from Groovy classes
      */
     private boolean isSpecialCaseMethod(Class<?> clazz, Method m) {
-        if (!Modifier.isPublic(m.getModifiers()) || Modifier.isStatic(m.getModifiers()) || m.isSynthetic())
+        if (!Modifier.isPublic(m.getModifiers()) || Modifier.isStatic(m.getModifiers()) || m.isSynthetic()) {
             return false;
+        }
         // Groovy objects will have public groovy.lang.MetaClass X.getMetaClass()
         // which causes an infinite loop in serialization
-        if (m.getName().equals("getMetaClass") && 
-                m.getReturnType().getCanonicalName().equals("groovy.lang.MetaClass"))
+        if (m.getName().equals("getMetaClass")
+                && m.getReturnType().getCanonicalName().equals("groovy.lang.MetaClass")) {
             return true;
+        }
         // WELD proxy objects will have 'public org.jboss.weld
-        if (m.getName().equals("getMetadata") && 
-                m.getReturnType().getCanonicalName().equals("org.jboss.weld.proxy.WeldClientProxy$Metadata"))
+        if (m.getName().equals("getMetadata")
+                && m.getReturnType().getCanonicalName().equals("org.jboss.weld.proxy.WeldClientProxy$Metadata")) {
             return true;
+        }
         return false;
     }
 
@@ -220,11 +230,12 @@ class ClassParser {
             //methods named get() or set()
             return name;
         }
-        if (name.length() > 1 && Character.isUpperCase(name.charAt(1)) &&
-                Character.isUpperCase(name.charAt(0))){
+        if (name.length() > 1
+                && Character.isUpperCase(name.charAt(1))
+                && Character.isUpperCase(name.charAt(0))) {
             return name;
         }
-        char chars[] = name.toCharArray();
+        char[] chars = name.toCharArray();
         chars[0] = Character.toLowerCase(chars[0]);
         return new String(chars);
     }
@@ -252,13 +263,15 @@ class ClassParser {
         for (PropertyModel collectedPropertyModel : collectedProperties) {
             for (PropertyModel checkedPropertyModel : checkedProperties) {
 
-                if ((checkedPropertyModel.getReadName().equals(collectedPropertyModel.getReadName())
-                        && checkedPropertyModel.isReadable() && collectedPropertyModel.isReadable()) ||
-                        (checkedPropertyModel.getWriteName().equals(collectedPropertyModel.getWriteName()))
-                                && checkedPropertyModel.isWritable() && collectedPropertyModel.isWritable()) {
+                if ((
+                        checkedPropertyModel.getReadName().equals(collectedPropertyModel.getReadName())
+                                && checkedPropertyModel.isReadable() && collectedPropertyModel.isReadable())
+                        || (checkedPropertyModel.getWriteName().equals(collectedPropertyModel.getWriteName()))
+                        && checkedPropertyModel.isWritable() && collectedPropertyModel.isWritable()) {
                     throw new JsonbException(Messages.getMessage(MessageKeys.PROPERTY_NAME_CLASH,
-                            checkedPropertyModel.getPropertyName(), collectedPropertyModel.getPropertyName(),
-                            cls.getName()));
+                                                                 checkedPropertyModel.getPropertyName(),
+                                                                 collectedPropertyModel.getPropertyName(),
+                                                                 cls.getName()));
                 }
             }
             checkedProperties.add(collectedPropertyModel);
@@ -275,7 +288,9 @@ class ClassParser {
      * <p>
      * Such property is sorted based on where its getter or field is located.
      */
-    private List<PropertyModel> getSortedParentProperties(ClassModel classModel, JsonbAnnotatedElement<Class<?>> classElement, Map<String, Property> classProperties) {
+    private List<PropertyModel> getSortedParentProperties(ClassModel classModel,
+                                                          JsonbAnnotatedElement<Class<?>> classElement,
+                                                          Map<String, Property> classProperties) {
         List<PropertyModel> sortedProperties = new ArrayList<>();
         //Pull properties from parent
         if (classModel.getParentClassModel() != null) {
@@ -287,7 +302,9 @@ class ClassParser {
                 } else {
                     //merge
                     final Property merged = mergeProperty(current, parentProp, classElement);
-                    ReflectionPropagation propagation = new ReflectionPropagation(current, classModel.getClassCustomization().getPropertyVisibilityStrategy());
+                    ReflectionPropagation propagation = new ReflectionPropagation(current,
+                                                                                  classModel.getClassCustomization()
+                                                                                          .getPropertyVisibilityStrategy());
                     if (propagation.isReadable()) {
                         classProperties.replace(current.getName(), merged);
                     } else {
@@ -322,17 +339,19 @@ class ClassParser {
      * @return effective method to register as getter or setter
      */
     private Method selectMostSpecificNonDefaultMethod(Method current, Method parent) {
-        return (current != null ? (parent != null && current.isDefault()
-                && !parent.isDefault() ? parent : current) : parent);
+        return (
+                current != null ? (
+                        parent != null && current.isDefault()
+                                && !parent.isDefault() ? parent : current) : parent);
     }
 
     private Property mergeProperty(Property current, PropertyModel parentProp, JsonbAnnotatedElement<Class<?>> classElement) {
         Field field = current.getField() != null
                 ? current.getField() : parentProp.getPropagation().getField();
         Method getter = selectMostSpecificNonDefaultMethod(current.getGetter(),
-                parentProp.getPropagation().getGetter());
+                                                           parentProp.getPropagation().getGetter());
         Method setter = selectMostSpecificNonDefaultMethod(current.getSetter(),
-                parentProp.getPropagation().getSetter());
+                                                           parentProp.getPropagation().getSetter());
 
         Property merged = new Property(parentProp.getPropertyName(), classElement);
         if (field != null) {

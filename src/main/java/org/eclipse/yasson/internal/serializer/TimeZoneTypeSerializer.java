@@ -9,20 +9,20 @@
  *
  * Contributors:
  * Roman Grigoriadi
+ * David Kral
  ******************************************************************************/
 
 package org.eclipse.yasson.internal.serializer;
 
+import java.util.TimeZone;
+
+import javax.json.stream.JsonGenerator;
+
 import org.eclipse.yasson.internal.Marshaller;
 import org.eclipse.yasson.internal.model.customization.Customization;
 
-import javax.json.stream.JsonGenerator;
-import java.util.TimeZone;
-
 /**
  * Serializer for {@link TimeZone} type.
- * 
- * @author David Kral
  */
 public class TimeZoneTypeSerializer extends AbstractValueTypeSerializer<TimeZone> {
 

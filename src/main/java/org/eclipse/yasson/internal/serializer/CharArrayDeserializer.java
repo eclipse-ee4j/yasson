@@ -9,24 +9,28 @@
  *
  * Contributors:
  * Roman Grigoriadi
+ * David Kral
  ******************************************************************************/
 
 package org.eclipse.yasson.internal.serializer;
 
-import org.eclipse.yasson.internal.Unmarshaller;
-
 import java.util.ArrayList;
 import java.util.List;
 
+import org.eclipse.yasson.internal.Unmarshaller;
+
 /**
  * Array unmarshaller item implementation for char.
- *
- * @author Bernd Zeitler
  */
 public class CharArrayDeserializer extends AbstractArrayDeserializer<char[]> {
 
     private final List<Character> items = new ArrayList<>();
 
+    /**
+     * Creates new instance of char array deserializer.
+     *
+     * @param builder deserializer builder
+     */
     protected CharArrayDeserializer(DeserializerBuilder builder) {
         super(builder);
     }
@@ -40,7 +44,7 @@ public class CharArrayDeserializer extends AbstractArrayDeserializer<char[]> {
     public char[] getInstance(Unmarshaller unmarshaller) {
         final int size = items.size();
         final char[] charArray = new char[size];
-        for(int i=0; i<size; i++) {
+        for (int i = 0; i < size; i++) {
             charArray[i] = items.get(i);
         }
         return charArray;

@@ -9,21 +9,19 @@
  *
  * Contributors:
  * Roman Grigoriadi
+ * David Kral
  ******************************************************************************/
 
 package org.eclipse.yasson.internal.serializer;
 
+import java.lang.reflect.Type;
+import java.net.URI;
 
 import org.eclipse.yasson.internal.Unmarshaller;
 import org.eclipse.yasson.internal.model.customization.Customization;
 
-import java.lang.reflect.Type;
-import java.net.URI;
-
 /**
  * Deserializer for {@link URI} type.
- * 
- * @author David Kral
  */
 public class URITypeDeserializer extends AbstractValueTypeDeserializer<URI> {
 

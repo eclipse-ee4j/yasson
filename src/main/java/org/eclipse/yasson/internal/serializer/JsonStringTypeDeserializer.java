@@ -9,22 +9,22 @@
  *
  * Contributors:
  * Roman Grigoriadi
+ * David Kral
  ******************************************************************************/
 
 package org.eclipse.yasson.internal.serializer;
 
-import org.eclipse.yasson.internal.Unmarshaller;
-import org.eclipse.yasson.internal.model.customization.Customization;
+import java.lang.reflect.Type;
 
 import javax.json.JsonBuilderFactory;
 import javax.json.JsonObject;
 import javax.json.JsonString;
-import java.lang.reflect.Type;
+
+import org.eclipse.yasson.internal.Unmarshaller;
+import org.eclipse.yasson.internal.model.customization.Customization;
 
 /**
  * Deserializer for {@link JsonString} type.
- * 
- * @author David Kral
  */
 public class JsonStringTypeDeserializer extends AbstractValueTypeDeserializer<JsonString> {
 

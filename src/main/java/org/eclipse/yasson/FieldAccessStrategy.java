@@ -1,12 +1,12 @@
 package org.eclipse.yasson;
 
-import javax.json.bind.config.PropertyVisibilityStrategy;
 import java.lang.reflect.Field;
 import java.lang.reflect.Method;
 
+import javax.json.bind.config.PropertyVisibilityStrategy;
+
 /**
  * <p>Strategy that can be used to force always using fields instead of getters setters for getting / setting value.</p>
- *
  * <p>Suggested approach is to use default visibility strategy, which will use public getters / setters, or field
  * if it is public.</p>
  *

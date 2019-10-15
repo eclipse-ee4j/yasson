@@ -9,19 +9,20 @@
  *
  * Contributors:
  * Roman Grigoriadi
+ * David Kral
  ******************************************************************************/
 package org.eclipse.yasson.internal.serializer;
-
-import org.eclipse.yasson.internal.Unmarshaller;
 
 import java.lang.reflect.Array;
 import java.util.ArrayList;
 import java.util.List;
 
+import org.eclipse.yasson.internal.Unmarshaller;
+
 /**
  * Item for handling arrays of objects.
  *
- * @author Roman Grigoriadi
+ * @param <T> object type
  */
 public class ObjectArrayDeserializer<T> extends AbstractArrayDeserializer<T[]> {
 
@@ -29,6 +30,11 @@ public class ObjectArrayDeserializer<T> extends AbstractArrayDeserializer<T[]> {
 
     private T[] arrayInstance;
 
+    /**
+     * Creates new instance of object array deserializer.
+     *
+     * @param builder deserializer builder
+     */
     protected ObjectArrayDeserializer(DeserializerBuilder builder) {
         super(builder);
     }
@@ -42,7 +48,7 @@ public class ObjectArrayDeserializer<T> extends AbstractArrayDeserializer<T[]> {
     @Override
     public T[] getInstance(Unmarshaller unmarshaller) {
         if (arrayInstance == null || arrayInstance.length != items.size()) {
-            arrayInstance = (T[]) Array.newInstance(componentClass, items.size());
+            arrayInstance = (T[]) Array.newInstance(getComponentClass(), items.size());
         }
         return items.toArray(arrayInstance);
     }

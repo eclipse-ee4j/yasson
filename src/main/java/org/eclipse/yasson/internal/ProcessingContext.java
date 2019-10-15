@@ -19,12 +19,10 @@ import java.util.Set;
 /**
  * Jsonb processing (serializing/deserializing) context.
  * Instance is thread bound (in contrast to {@link JsonbContext}.
- *
- * @author Roman Grigoriadi
  */
 public abstract class ProcessingContext {
 
-    protected final JsonbContext jsonbContext;
+    private final JsonbContext jsonbContext;
 
     /**
      * Used to avoid StackOverflowError, when adapted / serialized object
@@ -59,11 +57,22 @@ public abstract class ProcessingContext {
         return getJsonbContext().getMappingContext();
     }
 
-
+    /**
+     * Adds currently processed object to the {@link Set}.
+     *
+     * @param object processed object
+     * @return if object was added
+     */
     public boolean addProcessedObject(Object object) {
         return this.currentlyProcessedObjects.add(object);
     }
 
+    /**
+     * Removes processed object from the {@link Set}.
+     *
+     * @param object processed object
+     * @return if object was removed
+     */
     public boolean removeProcessedObject(Object object) {
         return currentlyProcessedObjects.remove(object);
     }

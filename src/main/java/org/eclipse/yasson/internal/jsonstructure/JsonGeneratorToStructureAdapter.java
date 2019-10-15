@@ -10,18 +10,19 @@
  ******************************************************************************/
 package org.eclipse.yasson.internal.jsonstructure;
 
-import org.eclipse.yasson.internal.properties.MessageKeys;
-import org.eclipse.yasson.internal.properties.Messages;
+import java.math.BigDecimal;
+import java.math.BigInteger;
+import java.util.ArrayDeque;
+import java.util.Deque;
 
 import javax.json.JsonStructure;
 import javax.json.JsonValue;
 import javax.json.bind.JsonbException;
 import javax.json.spi.JsonProvider;
 import javax.json.stream.JsonGenerator;
-import java.math.BigDecimal;
-import java.math.BigInteger;
-import java.util.ArrayDeque;
-import java.util.Deque;
+
+import org.eclipse.yasson.internal.properties.MessageKeys;
+import org.eclipse.yasson.internal.properties.Messages;
 
 /**
  * Adapter for {@link JsonGenerator}, that builds a {@link JsonStructure} content tree instead of JSON text.
@@ -133,7 +134,7 @@ public class JsonGeneratorToStructureAdapter implements JsonGenerator {
         if (!(current instanceof JsonObjectBuilder)) {
             throw new JsonbException(Messages.getMessage(
                     MessageKeys.INTERNAL_ERROR, "Can't write key [" + keyName + "] into " + current.getClass()
-            + "because "+current.getClass() + " is not an instance of "+ JsonObjectBuilder.class));
+                            + "because " + current.getClass() + " is not an instance of " + JsonObjectBuilder.class));
         }
         return (JsonObjectBuilder) current;
     }
@@ -222,6 +223,7 @@ public class JsonGeneratorToStructureAdapter implements JsonGenerator {
 
     /**
      * Root structure wrapping all data.
+     *
      * @return root JsonStructure.
      */
     public JsonStructure getRootStructure() {

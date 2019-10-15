@@ -9,13 +9,9 @@
  * <p>
  * Contributors:
  * Dmitry Kornilov - initial implementation
+ * Roman Grigoriadi
  ******************************************************************************/
 package org.eclipse.yasson.internal;
-
-import org.eclipse.yasson.internal.model.ClassModel;
-import org.eclipse.yasson.internal.model.JsonbAnnotatedElement;
-import org.eclipse.yasson.internal.model.customization.ClassCustomization;
-import org.eclipse.yasson.internal.serializer.ContainerSerializerProvider;
 
 import java.util.ArrayDeque;
 import java.util.Deque;
@@ -23,14 +19,16 @@ import java.util.Objects;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.function.Function;
 
+import org.eclipse.yasson.internal.model.ClassModel;
+import org.eclipse.yasson.internal.model.JsonbAnnotatedElement;
+import org.eclipse.yasson.internal.model.customization.ClassCustomization;
+import org.eclipse.yasson.internal.serializer.ContainerSerializerProvider;
+
 /**
  * JSONB mappingContext. Created once per {@link javax.json.bind.Jsonb} instance. Represents a global scope.
  * Holds internal model.
  *
  * Thread safe.
- *
- * @author Dmitry Kornilov
- * @author Roman Grigoriadi
  */
 public class MappingContext {
     private final JsonbContext jsonbContext;
@@ -64,10 +62,10 @@ public class MappingContext {
         if (classModel != null) {
             return classModel;
         }
-        
+
         Deque<Class<?>> newClassModels = new ArrayDeque<>();
         for (Class<?> classToParse = clazz; classToParse != Object.class; classToParse = classToParse.getSuperclass()) {
-            if (classToParse == null){
+            if (classToParse == null) {
                 break;
             }
             newClassModels.push(classToParse);
@@ -79,16 +77,22 @@ public class MappingContext {
         ClassModel parentClassModel = null;
         while (!newClassModels.isEmpty()) {
             Class<?> toParse = newClassModels.pop();
-            parentClassModel = classes.computeIfAbsent(toParse, createParseClassModelFunction(parentClassModel, classParser, jsonbContext));
+            parentClassModel = classes
+                    .computeIfAbsent(toParse, createParseClassModelFunction(parentClassModel, classParser, jsonbContext));
         }
         return classes.get(clazz);
     }
 
-    private static Function<Class<?>, ClassModel> createParseClassModelFunction(ClassModel parentClassModel, ClassParser classParser, JsonbContext jsonbContext){
+    private static Function<Class<?>, ClassModel> createParseClassModelFunction(ClassModel parentClassModel,
+                                                                                ClassParser classParser,
+                                                                                JsonbContext jsonbContext) {
         return aClass -> {
             JsonbAnnotatedElement<Class<?>> clsElement = jsonbContext.getAnnotationIntrospector().collectAnnotations(aClass);
             ClassCustomization customization = jsonbContext.getAnnotationIntrospector().introspectCustomization(clsElement);
-            ClassModel newClassModel = new ClassModel(aClass, customization, parentClassModel, jsonbContext.getConfigProperties().getPropertyNamingStrategy());
+            ClassModel newClassModel = new ClassModel(aClass,
+                                                      customization,
+                                                      parentClassModel,
+                                                      jsonbContext.getConfigProperties().getPropertyNamingStrategy());
             classParser.parseProperties(newClassModel, clsElement);
             return newClassModel;
         };
@@ -117,7 +121,7 @@ public class MappingContext {
     /**
      * Adds given serializer provider for given class.
      *
-     * @param clazz Class to add serializer provider for.
+     * @param clazz              Class to add serializer provider for.
      * @param serializerProvider Serializer provider to add.
      */
     public void addSerializerProvider(Class<?> clazz, ContainerSerializerProvider serializerProvider) {

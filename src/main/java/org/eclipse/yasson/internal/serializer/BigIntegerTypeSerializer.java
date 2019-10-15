@@ -9,19 +9,19 @@
  *
  * Contributors:
  * Roman Grigoriadi
+ * David Kral
  ******************************************************************************/
 
 package org.eclipse.yasson.internal.serializer;
 
-import org.eclipse.yasson.internal.model.customization.Customization;
+import java.math.BigInteger;
 
 import javax.json.stream.JsonGenerator;
-import java.math.BigInteger;
+
+import org.eclipse.yasson.internal.model.customization.Customization;
 
 /**
  * Serializer for {@link BigInteger} type.
- *
- * @author David Kral
  */
 public class BigIntegerTypeSerializer extends AbstractNumberSerializer<BigInteger> {
 

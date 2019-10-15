@@ -9,6 +9,7 @@
  *
  * Contributors:
  * Roman Grigoriadi
+ * David Kral
  ******************************************************************************/
 
 package org.eclipse.yasson.internal.serializer;
@@ -17,14 +18,13 @@ import org.eclipse.yasson.internal.model.customization.Customization;
 
 /**
  * Creates instance of deserializer.
- *
- * @author Roman Grigoriadi
  */
 @FunctionalInterface
 public interface IDeserializerProvider {
 
     /**
      * Provides new instance of deserializer.
+     *
      * @param customization model customization
      * @return deserializer
      */

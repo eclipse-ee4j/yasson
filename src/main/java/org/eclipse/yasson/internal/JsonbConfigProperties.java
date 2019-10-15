@@ -14,24 +14,6 @@
  ******************************************************************************/
 package org.eclipse.yasson.internal;
 
-import org.eclipse.yasson.YassonProperties;
-import org.eclipse.yasson.internal.model.ReverseTreeMap;
-import org.eclipse.yasson.internal.model.PropertyModel;
-import org.eclipse.yasson.internal.model.customization.PropertyOrdering;
-import org.eclipse.yasson.internal.model.customization.StrategiesProvider;
-import org.eclipse.yasson.internal.properties.MessageKeys;
-import org.eclipse.yasson.internal.properties.Messages;
-import org.eclipse.yasson.internal.serializer.JsonbDateFormatter;
-import org.eclipse.yasson.internal.serializer.NullSerializer;
-
-import javax.json.bind.JsonbConfig;
-import javax.json.bind.JsonbException;
-import javax.json.bind.annotation.JsonbDateFormat;
-import javax.json.bind.config.BinaryDataStrategy;
-import javax.json.bind.config.PropertyNamingStrategy;
-import javax.json.bind.config.PropertyOrderStrategy;
-import javax.json.bind.config.PropertyVisibilityStrategy;
-import javax.json.bind.serializer.JsonbSerializer;
 import java.time.format.DateTimeFormatter;
 import java.time.format.DateTimeFormatterBuilder;
 import java.time.temporal.ChronoField;
@@ -44,10 +26,27 @@ import java.util.Optional;
 import java.util.TreeMap;
 import java.util.function.Consumer;
 
+import javax.json.bind.JsonbConfig;
+import javax.json.bind.JsonbException;
+import javax.json.bind.annotation.JsonbDateFormat;
+import javax.json.bind.config.BinaryDataStrategy;
+import javax.json.bind.config.PropertyNamingStrategy;
+import javax.json.bind.config.PropertyOrderStrategy;
+import javax.json.bind.config.PropertyVisibilityStrategy;
+import javax.json.bind.serializer.JsonbSerializer;
+
+import org.eclipse.yasson.YassonProperties;
+import org.eclipse.yasson.internal.model.PropertyModel;
+import org.eclipse.yasson.internal.model.ReverseTreeMap;
+import org.eclipse.yasson.internal.model.customization.PropertyOrdering;
+import org.eclipse.yasson.internal.model.customization.StrategiesProvider;
+import org.eclipse.yasson.internal.properties.MessageKeys;
+import org.eclipse.yasson.internal.properties.Messages;
+import org.eclipse.yasson.internal.serializer.JsonbDateFormatter;
+import org.eclipse.yasson.internal.serializer.NullSerializer;
+
 /**
  * Resolved properties from JSONB config.
- *
- * @author Roman Grigoriadi
  */
 public class JsonbConfigProperties {
 
@@ -79,6 +78,11 @@ public class JsonbConfigProperties {
 
     private final JsonbSerializer<Object> nullSerializer;
 
+    /**
+     * Creates new resolved JSONB config.
+     *
+     * @param jsonbConfig jsonb config
+     */
     public JsonbConfigProperties(JsonbConfig jsonbConfig) {
         this.jsonbConfig = jsonbConfig;
         this.binaryDataStrategy = initBinaryDataStrategy();
@@ -96,17 +100,16 @@ public class JsonbConfigProperties {
         this.nullSerializer = initNullSerializer();
     }
 
-
     private Class<?> initDefaultMapImplType() {
         Optional<String> os = getPropertyOrderStrategy();
         if (os.isPresent()) {
             switch (os.get()) {
-                case PropertyOrderStrategy.LEXICOGRAPHICAL:
-                    return TreeMap.class;
-                case PropertyOrderStrategy.REVERSE:
-                    return ReverseTreeMap.class;
-                default:
-                    return HashMap.class;
+            case PropertyOrderStrategy.LEXICOGRAPHICAL:
+                return TreeMap.class;
+            case PropertyOrderStrategy.REVERSE:
+                return ReverseTreeMap.class;
+            default:
+                return HashMap.class;
             }
         }
         return HashMap.class;
@@ -117,14 +120,16 @@ public class JsonbConfigProperties {
     }
 
     @SuppressWarnings("unchecked")
-    private Map<Class<?>,Class<?>> initUserTypeMapping() {
+    private Map<Class<?>, Class<?>> initUserTypeMapping() {
         Optional<Object> property = jsonbConfig.getProperty(YassonProperties.USER_TYPE_MAPPING);
         if (!property.isPresent()) {
             return Collections.emptyMap();
         }
         Object result = property.get();
         if (!(result instanceof Map)) {
-            throw new JsonbException(Messages.getMessage(MessageKeys.JSONB_CONFIG_PROPERTY_INVALID_TYPE, YassonProperties.USER_TYPE_MAPPING, Map.class.getSimpleName()));
+            throw new JsonbException(Messages.getMessage(MessageKeys.JSONB_CONFIG_PROPERTY_INVALID_TYPE,
+                                                         YassonProperties.USER_TYPE_MAPPING,
+                                                         Map.class.getSimpleName()));
         }
         return (Map<Class<?>, Class<?>>) result;
     }
@@ -149,7 +154,9 @@ public class JsonbConfigProperties {
         final Optional<Object> formatProperty = jsonbConfig.getProperty(JsonbConfig.DATE_FORMAT);
         return formatProperty.map(f -> {
             if (!(f instanceof String)) {
-                throw new JsonbException(Messages.getMessage(MessageKeys.JSONB_CONFIG_PROPERTY_INVALID_TYPE, JsonbConfig.DATE_FORMAT, String.class.getSimpleName()));
+                throw new JsonbException(Messages.getMessage(MessageKeys.JSONB_CONFIG_PROPERTY_INVALID_TYPE,
+                                                             JsonbConfig.DATE_FORMAT,
+                                                             String.class.getSimpleName()));
             }
             return (String) f;
         }).orElse(JsonbDateFormat.DEFAULT_FORMAT);
@@ -157,9 +164,10 @@ public class JsonbConfigProperties {
 
     private Consumer<List<PropertyModel>> initOrderStrategy() {
         Optional<String> strategy = getPropertyOrderStrategy();
-        
+
         return strategy.map(StrategiesProvider::getOrderingFunction)
-        			   .orElseGet(() -> StrategiesProvider.getOrderingFunction(PropertyOrderStrategy.LEXICOGRAPHICAL));  //default by spec
+                .orElseGet(() -> StrategiesProvider
+                        .getOrderingFunction(PropertyOrderStrategy.LEXICOGRAPHICAL));  //default by spec
     }
 
     private Optional<String> getPropertyOrderStrategy() {
@@ -169,13 +177,13 @@ public class JsonbConfigProperties {
             if (!(strategy instanceof String)) {
                 throw new JsonbException(Messages.getMessage(MessageKeys.PROPERTY_ORDER, strategy));
             }
-            switch ((String)strategy) {
-                case PropertyOrderStrategy.LEXICOGRAPHICAL:
-                case PropertyOrderStrategy.REVERSE:
-                case PropertyOrderStrategy.ANY:
-                    return Optional.of((String) strategy);
-                default:
-                    throw new JsonbException(Messages.getMessage(MessageKeys.PROPERTY_ORDER, strategy));
+            switch ((String) strategy) {
+            case PropertyOrderStrategy.LEXICOGRAPHICAL:
+            case PropertyOrderStrategy.REVERSE:
+            case PropertyOrderStrategy.ANY:
+                return Optional.of((String) strategy);
+            default:
+                throw new JsonbException(Messages.getMessage(MessageKeys.PROPERTY_ORDER, strategy));
             }
         }
         return Optional.empty();
@@ -209,7 +217,7 @@ public class JsonbConfigProperties {
     }
 
     private String initBinaryDataStrategy() {
-        final Optional<Boolean> iJson = jsonbConfig.getProperty(JsonbConfig.STRICT_IJSON).map((obj->(Boolean)obj));
+        final Optional<Boolean> iJson = jsonbConfig.getProperty(JsonbConfig.STRICT_IJSON).map((obj -> (Boolean) obj));
         if (iJson.isPresent() && iJson.get()) {
             return BinaryDataStrategy.BASE_64_URL;
         }
@@ -232,7 +240,8 @@ public class JsonbConfigProperties {
         }
         Object nullSerializer = property.get();
         if (!(nullSerializer instanceof JsonbSerializer)) {
-            throw new JsonbException("YassonConfig.NULL_ROOT_SERIALIZER must be instance of " + JsonbSerializer.class + "<Object>");
+            throw new JsonbException("YassonConfig.NULL_ROOT_SERIALIZER must be instance of " + JsonbSerializer.class
+                                             + "<Object>");
         }
         return (JsonbSerializer<Object>) nullSerializer;
     }
@@ -252,9 +261,8 @@ public class JsonbConfigProperties {
      * If false, {@link JsonbException} is not thrown for deserialization, when json key
      * cannot be mapped to class property.
      *
-     * @return
-     *      {@link JsonbException} is risen on unknown property. Default is true even if
-     *      not set in json config.
+     * @return {@link JsonbException} is risen on unknown property. Default is true even if
+     * not set in json config.
      */
     public boolean getConfigFailOnUnknownProperties() {
         return failOnUnknownProperties;
@@ -265,7 +273,9 @@ public class JsonbConfigProperties {
         if (property.isPresent()) {
             final Object result = property.get();
             if (!(result instanceof Boolean)) {
-                throw new JsonbException(Messages.getMessage(MessageKeys.JSONB_CONFIG_PROPERTY_INVALID_TYPE, propertyName, Boolean.class.getSimpleName()));
+                throw new JsonbException(Messages.getMessage(MessageKeys.JSONB_CONFIG_PROPERTY_INVALID_TYPE,
+                                                             propertyName,
+                                                             Boolean.class.getSimpleName()));
             }
             return (boolean) result;
         }
@@ -277,7 +287,7 @@ public class JsonbConfigProperties {
      *
      * @return Binary data strategy.
      */
-    public  String getBinaryDataStrategy() {
+    public String getBinaryDataStrategy() {
         return binaryDataStrategy;
     }
 
@@ -301,9 +311,11 @@ public class JsonbConfigProperties {
      */
     private Locale initConfigLocale() {
         final Optional<Object> localeProperty = jsonbConfig.getProperty(JsonbConfig.LOCALE);
-        return  localeProperty.map(loc -> {
+        return localeProperty.map(loc -> {
             if (!(loc instanceof Locale)) {
-                throw new JsonbException(Messages.getMessage(MessageKeys.JSONB_CONFIG_PROPERTY_INVALID_TYPE, JsonbConfig.LOCALE, Locale.class.getSimpleName()));
+                throw new JsonbException(Messages.getMessage(MessageKeys.JSONB_CONFIG_PROPERTY_INVALID_TYPE,
+                                                             JsonbConfig.LOCALE,
+                                                             Locale.class.getSimpleName()));
             }
             return (Locale) loc;
         }).orElseGet(Locale::getDefault);
@@ -384,6 +396,7 @@ public class JsonbConfigProperties {
 
     /**
      * Default {@link java.util.Map} implementation to use, based on order strategy.
+     *
      * @return map impl type
      */
     public Class<?> getDefaultMapImplType() {

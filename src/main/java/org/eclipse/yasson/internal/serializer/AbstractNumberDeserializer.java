@@ -9,25 +9,26 @@
  *
  * Contributors:
  * Roman Grigoriadi
+ * David Kral
  ******************************************************************************/
 
 package org.eclipse.yasson.internal.serializer;
+
+import java.text.DecimalFormat;
+import java.text.NumberFormat;
+import java.text.ParseException;
+import java.util.Optional;
+
+import javax.json.bind.JsonbException;
 
 import org.eclipse.yasson.internal.JsonbContext;
 import org.eclipse.yasson.internal.model.customization.Customization;
 import org.eclipse.yasson.internal.properties.MessageKeys;
 import org.eclipse.yasson.internal.properties.Messages;
 
-import javax.json.bind.JsonbException;
-import java.text.DecimalFormat;
-import java.text.NumberFormat;
-import java.text.ParseException;
-import java.util.Optional;
-
 /**
  * Common serializer for numbers, using number format.
  *
- * @author Roman Grigoriadi
  * @param <T> Type to deserialize.
  */
 public abstract class AbstractNumberDeserializer<T extends Number> extends AbstractValueTypeDeserializer<T> {
@@ -42,6 +43,14 @@ public abstract class AbstractNumberDeserializer<T extends Number> extends Abstr
         super(clazz, customization);
     }
 
+    /**
+     * Returns formatted number value.
+     *
+     * @param jsonValue    value to be formatted
+     * @param integerOnly  format only integer
+     * @param jsonbContext context
+     * @return formatted number value
+     */
     protected final Optional<Number> deserializeFormatted(String jsonValue, boolean integerOnly, JsonbContext jsonbContext) {
         if (getCustomization() == null || getCustomization().getDeserializeNumberFormatter() == null) {
             return Optional.empty();
@@ -49,8 +58,9 @@ public abstract class AbstractNumberDeserializer<T extends Number> extends Abstr
 
         final JsonbNumberFormatter numberFormat = getCustomization().getDeserializeNumberFormatter();
         //consider synchronizing on format instance or per thread cache.
-        final NumberFormat format = NumberFormat.getInstance(jsonbContext.getConfigProperties().getLocale(numberFormat.getLocale()));
-        ((DecimalFormat)format).applyPattern(numberFormat.getFormat());
+        final NumberFormat format = NumberFormat
+                .getInstance(jsonbContext.getConfigProperties().getLocale(numberFormat.getLocale()));
+        ((DecimalFormat) format).applyPattern(numberFormat.getFormat());
         format.setParseIntegerOnly(integerOnly);
         try {
             return Optional.of(format.parse(jsonValue));

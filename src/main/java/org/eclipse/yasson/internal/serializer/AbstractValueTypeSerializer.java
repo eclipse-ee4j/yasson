@@ -9,25 +9,26 @@
  *
  * Contributors:
  * Roman Grigoriadi
+ * David Kral
  ******************************************************************************/
 
 package org.eclipse.yasson.internal.serializer;
-
-import org.eclipse.yasson.internal.Marshaller;
-import org.eclipse.yasson.internal.model.customization.Customization;
 
 import javax.json.bind.serializer.JsonbSerializer;
 import javax.json.bind.serializer.SerializationContext;
 import javax.json.stream.JsonGenerator;
 
+import org.eclipse.yasson.internal.Marshaller;
+import org.eclipse.yasson.internal.model.customization.Customization;
+
 /**
  * Common type for all supported type serializers.
  *
- * @author Roman Grigoriadi
+ * @param <T> value type
  */
 public abstract class AbstractValueTypeSerializer<T> implements JsonbSerializer<T> {
 
-    protected final Customization customization;
+    private final Customization customization;
 
     /**
      * Creates a new instance.
@@ -41,9 +42,9 @@ public abstract class AbstractValueTypeSerializer<T> implements JsonbSerializer<
     /**
      * Serializes an object to JSON.
      *
-     * @param obj Object to serialize.
+     * @param obj       Object to serialize.
      * @param generator JSON generator to use.
-     * @param ctx JSON-B mapper context.
+     * @param ctx       JSON-B mapper context.
      */
     @Override
     public void serialize(T obj, JsonGenerator generator, SerializationContext ctx) {
@@ -51,5 +52,21 @@ public abstract class AbstractValueTypeSerializer<T> implements JsonbSerializer<
         serialize(obj, generator, marshaller);
     }
 
+    /**
+     * Serializes an object to JSON.
+     *
+     * @param obj        Object to serialize.
+     * @param generator  JSON generator to use.
+     * @param marshaller Marshaller.
+     */
     protected abstract void serialize(T obj, JsonGenerator generator, Marshaller marshaller);
+
+    /**
+     * Returns value type customization.
+     *
+     * @return customization
+     */
+    public Customization getCustomization() {
+        return customization;
+    }
 }

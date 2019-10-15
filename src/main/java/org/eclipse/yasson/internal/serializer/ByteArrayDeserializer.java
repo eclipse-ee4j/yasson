@@ -9,24 +9,28 @@
  *
  * Contributors:
  * Roman Grigoriadi
+ * David Kral
  ******************************************************************************/
 
 package org.eclipse.yasson.internal.serializer;
 
-import org.eclipse.yasson.internal.Unmarshaller;
-
 import java.util.ArrayList;
 import java.util.List;
 
+import org.eclipse.yasson.internal.Unmarshaller;
+
 /**
  * Array unmarshaller item implementation for small int.
- *
- * @author Roman Grigoriadi
  */
 public class ByteArrayDeserializer extends AbstractArrayDeserializer<byte[]> {
 
     private final List<Byte> items = new ArrayList<>();
 
+    /**
+     * Creates new instance of byte array deserializer.
+     *
+     * @param builder deserializer builder
+     */
     protected ByteArrayDeserializer(DeserializerBuilder builder) {
         super(builder);
     }
@@ -40,7 +44,7 @@ public class ByteArrayDeserializer extends AbstractArrayDeserializer<byte[]> {
     public byte[] getInstance(Unmarshaller unmarshaller) {
         final int size = items.size();
         final byte[] byteArray = new byte[size];
-        for(int i=0; i<size; i++) {
+        for (int i = 0; i < size; i++) {
             byteArray[i] = items.get(i);
         }
         return byteArray;

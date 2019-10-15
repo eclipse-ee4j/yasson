@@ -10,25 +10,25 @@
  *
  * Contributors:
  * Roman Grigoriadi
+ * David Kral
  * Patrik Dudits
  ******************************************************************************/
 package org.eclipse.yasson.internal.serializer;
+
+import java.lang.reflect.ParameterizedType;
+import java.lang.reflect.Type;
+import java.util.Optional;
+
+import javax.json.bind.serializer.DeserializationContext;
+import javax.json.bind.serializer.JsonbDeserializer;
+import javax.json.stream.JsonParser;
 
 import org.eclipse.yasson.internal.JsonbContext;
 import org.eclipse.yasson.internal.JsonbParser;
 import org.eclipse.yasson.internal.ProcessingContext;
 
-import javax.json.bind.serializer.DeserializationContext;
-import javax.json.bind.serializer.JsonbDeserializer;
-import javax.json.stream.JsonParser;
-import java.lang.reflect.ParameterizedType;
-import java.lang.reflect.Type;
-import java.util.Optional;
-
 /**
  * Deserialize optional object.
- *
- * @author Roman Grigoriadi
  */
 public class OptionalObjectDeserializer implements JsonbDeserializer<Optional<?>> {
 
@@ -36,6 +36,11 @@ public class OptionalObjectDeserializer implements JsonbDeserializer<Optional<?>
 
     private final Type optionalValueType;
 
+    /**
+     * Creates new optional object deserializer.
+     *
+     * @param deserializerBuilder deserializer builder
+     */
     public OptionalObjectDeserializer(DeserializerBuilder deserializerBuilder) {
         this.wrapper = deserializerBuilder.getWrapper();
         this.optionalValueType = resolveOptionalType(deserializerBuilder.getRuntimeType());
@@ -52,7 +57,6 @@ public class OptionalObjectDeserializer implements JsonbDeserializer<Optional<?>
                 .withWrapper(wrapper).withJsonValueType(lastEvent).build();
         return Optional.of(deserializer.deserialize(parser, ctx, optionalValueType));
     }
-
 
     private Type resolveOptionalType(Type runtimeType) {
         if (runtimeType instanceof ParameterizedType) {

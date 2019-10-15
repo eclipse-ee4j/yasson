@@ -9,16 +9,11 @@
  *
  * Contributors:
  * Roman Grigoriadi
+ * David Kral
  ******************************************************************************/
 
 package org.eclipse.yasson.internal.serializer;
 
-import org.eclipse.yasson.internal.Unmarshaller;
-import org.eclipse.yasson.internal.model.customization.Customization;
-import org.eclipse.yasson.internal.properties.MessageKeys;
-import org.eclipse.yasson.internal.properties.Messages;
-
-import javax.json.bind.JsonbException;
 import java.lang.reflect.Type;
 import java.time.LocalDateTime;
 import java.time.ZoneId;
@@ -27,10 +22,15 @@ import java.time.zone.ZoneRulesException;
 import java.util.SimpleTimeZone;
 import java.util.TimeZone;
 
+import javax.json.bind.JsonbException;
+
+import org.eclipse.yasson.internal.Unmarshaller;
+import org.eclipse.yasson.internal.model.customization.Customization;
+import org.eclipse.yasson.internal.properties.MessageKeys;
+import org.eclipse.yasson.internal.properties.Messages;
+
 /**
  * Deserializer for {@link TimeZone} type.
- * 
- * @author David Kral
  */
 public class TimeZoneTypeDeserializer extends AbstractValueTypeDeserializer<TimeZone> {
 

@@ -13,24 +13,23 @@
 
 package org.eclipse.yasson.internal.model;
 
-import org.eclipse.yasson.internal.properties.MessageKeys;
-import org.eclipse.yasson.internal.properties.Messages;
-
-import javax.json.bind.JsonbException;
 import java.lang.annotation.Annotation;
 import java.lang.reflect.AnnotatedElement;
 import java.util.Collection;
 import java.util.HashMap;
 import java.util.Map;
 
+import javax.json.bind.JsonbException;
+
+import org.eclipse.yasson.internal.properties.MessageKeys;
+import org.eclipse.yasson.internal.properties.Messages;
+
 /**
  * Element wrapper containing merged annotation from class, superclasses and interfaces.
- *
- * @author Roman Grigoriadi
  */
 public class JsonbAnnotated implements AnnotatedElement {
 
-    protected final Map<Class<? extends Annotation>, Annotation> annotations;
+    private final Map<Class<? extends Annotation>, Annotation> annotations;
 
     /**
      * Creates a new instance.
@@ -71,7 +70,8 @@ public class JsonbAnnotated implements AnnotatedElement {
      */
     public void putAnnotation(Annotation annotation) {
         if (annotations.containsKey(annotation.annotationType())) {
-            throw new JsonbException(Messages.getMessage(MessageKeys.INTERNAL_ERROR, "Annotation already present: " + annotation));
+            throw new JsonbException(Messages.getMessage(MessageKeys.INTERNAL_ERROR,
+                                                         "Annotation already present: " + annotation));
         }
         annotations.put(annotation.annotationType(), annotation);
     }

@@ -9,13 +9,12 @@
  *
  * Contributors:
  * Roman Grigoriadi
+ * David Kral
  ******************************************************************************/
 package org.eclipse.yasson.internal.serializer;
 
 /**
  * Tagging interface for embedded object items, such as List, Maps or Arrays.
- *
- * @author Roman Grigoriadi
  */
 public interface EmbeddedItem {
 

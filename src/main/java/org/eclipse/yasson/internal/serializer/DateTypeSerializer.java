@@ -9,23 +9,25 @@
  *
  * Contributors:
  * Roman Grigoriadi
+ * David Kral
+ * David Kral
  ******************************************************************************/
 
 package org.eclipse.yasson.internal.serializer;
 
-import org.eclipse.yasson.internal.model.customization.Customization;
-
 import java.time.format.DateTimeFormatter;
 import java.util.Date;
+
+import org.eclipse.yasson.internal.model.customization.Customization;
 
 /**
  * Serializer for {@link Date} type.
  *
- * @author David Kral
+ * @param <T> date type
  */
 public class DateTypeSerializer<T extends Date> extends AbstractDateTypeSerializer<T> {
 
-    private DateTimeFormatter DEFAULT_FORMATTER = DateTimeFormatter.ISO_DATE_TIME.withZone(UTC);
+    private static final DateTimeFormatter DEFAULT_FORMATTER = DateTimeFormatter.ISO_DATE_TIME.withZone(UTC);
 
     /**
      * Creates a new instance.
@@ -35,7 +37,6 @@ public class DateTypeSerializer<T extends Date> extends AbstractDateTypeSerializ
     public DateTypeSerializer(Customization customization) {
         super(customization);
     }
-
 
     protected DateTimeFormatter getDefaultFormatter() {
         return DEFAULT_FORMATTER;

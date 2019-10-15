@@ -13,18 +13,22 @@
  ******************************************************************************/
 package org.eclipse.yasson.internal.model.customization;
 
-import org.eclipse.yasson.internal.model.ClassModel;
-import org.eclipse.yasson.internal.model.PropertyModel;
-import java.util.*;
-import java.util.function.*;
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+import java.util.Objects;
+import java.util.function.Consumer;
+
 import javax.json.bind.JsonbConfig;
 import javax.json.bind.config.PropertyOrderStrategy;
+
+import org.eclipse.yasson.internal.model.ClassModel;
+import org.eclipse.yasson.internal.model.PropertyModel;
 
 /**
  * Order properties in bean object. {@link javax.json.bind.annotation.JsonbPropertyOrder} have always precedence.
  * If configured with {@link JsonbConfig} provided property order strategy will be used.
- *
- * @author Roman Grigoriadi
  */
 public class PropertyOrdering {
 

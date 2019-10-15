@@ -9,18 +9,17 @@
  *
  * Contributors:
  * Roman Grigoriadi
+ * David Kral
  ******************************************************************************/
 
 package org.eclipse.yasson.internal.serializer;
 
-import org.eclipse.yasson.internal.model.customization.Customization;
-
 import javax.json.stream.JsonGenerator;
+
+import org.eclipse.yasson.internal.model.customization.Customization;
 
 /**
  * Serializer for {@link Long} type.
- * 
- * @author David Kral
  */
 public class LongTypeSerializer extends AbstractNumberSerializer<Long> {
 

@@ -13,12 +13,6 @@
 
 package org.eclipse.yasson.internal;
 
-import org.eclipse.yasson.internal.components.JsonbComponentInstanceCreatorFactory;
-import org.eclipse.yasson.spi.JsonbComponentInstanceCreator;
-
-import javax.json.bind.JsonbConfig;
-import javax.json.spi.JsonProvider;
-
 import java.security.AccessController;
 import java.security.PrivilegedAction;
 import java.util.ArrayList;
@@ -28,14 +22,18 @@ import java.util.Objects;
 import java.util.ServiceLoader;
 import java.util.logging.Logger;
 
+import javax.json.bind.JsonbConfig;
+import javax.json.spi.JsonProvider;
+
+import org.eclipse.yasson.internal.components.JsonbComponentInstanceCreatorFactory;
+import org.eclipse.yasson.spi.JsonbComponentInstanceCreator;
+
 /**
  * Jsonb context holding central components and configuration of jsonb runtime. Scoped to instance of Jsonb runtime.
- *
- * @author Roman Grigoriadi
  */
 public class JsonbContext {
-    
-    private static final Logger log = Logger.getLogger(JsonbContext.class.getName());
+
+    private static final Logger LOGGER = Logger.getLogger(JsonbContext.class.getName());
 
     private final JsonbConfig jsonbConfig;
 
@@ -56,14 +54,14 @@ public class JsonbContext {
     /**
      * Creates and initialize context.
      *
-     * @param jsonbConfig jsonb jsonbConfig not null
+     * @param jsonbConfig  jsonb jsonbConfig not null
      * @param jsonProvider provider of JSONP
      */
     public JsonbContext(JsonbConfig jsonbConfig, JsonProvider jsonProvider) {
         Objects.requireNonNull(jsonbConfig);
         this.jsonbConfig = jsonbConfig;
         this.mappingContext = new MappingContext(this);
-        this.instanceCreator = new InstanceCreator();
+        this.instanceCreator = InstanceCreator.getSingleton();
         this.componentInstanceCreator = initComponentInstanceCreator(instanceCreator);
         this.componentMatcher = new ComponentMatcher(this);
         this.annotationIntrospector = new AnnotationIntrospector(this);
@@ -88,7 +86,6 @@ public class JsonbContext {
     public MappingContext getMappingContext() {
         return mappingContext;
     }
-
 
     /**
      * Gets JSONP provider.
@@ -126,14 +123,13 @@ public class JsonbContext {
         return annotationIntrospector;
     }
 
-
     public JsonbConfigProperties getConfigProperties() {
         return configProperties;
     }
 
-
     /**
      * Returns component for creating instances of non-parsed types.
+     *
      * @return InstanceCreator
      */
     public InstanceCreator getInstanceCreator() {
@@ -154,7 +150,7 @@ public class JsonbContext {
         }
         creators.sort(Comparator.comparingInt(JsonbComponentInstanceCreator::getPriority).reversed());
         JsonbComponentInstanceCreator creator = creators.get(0);
-        log.finest("Component instance creator:" + creator.getClass());
+        LOGGER.finest("Component instance creator:" + creator.getClass());
         return creator;
     }
 

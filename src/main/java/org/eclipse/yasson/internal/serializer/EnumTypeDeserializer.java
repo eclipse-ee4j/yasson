@@ -9,19 +9,18 @@
  *
  * Contributors:
  * Roman Grigoriadi
+ * David Kral
  ******************************************************************************/
 
 package org.eclipse.yasson.internal.serializer;
 
+import java.lang.reflect.Type;
+
 import org.eclipse.yasson.internal.Unmarshaller;
 import org.eclipse.yasson.internal.model.customization.Customization;
 
-import java.lang.reflect.Type;
-
 /**
  * Deserializer for {@link Enum} type.
- *
- * @author David Kral
  */
 public class EnumTypeDeserializer extends AbstractValueTypeDeserializer<Enum> {
 

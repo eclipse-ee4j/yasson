@@ -12,19 +12,18 @@
  ******************************************************************************/
 package org.eclipse.yasson.internal.model;
 
-import org.eclipse.yasson.internal.AnnotationIntrospector;
-import org.eclipse.yasson.internal.JsonbContext;
-import org.eclipse.yasson.internal.model.customization.*;
-import org.eclipse.yasson.internal.serializer.JsonbDateFormatter;
-import org.eclipse.yasson.internal.serializer.JsonbNumberFormatter;
-
 import java.lang.reflect.Parameter;
 import java.lang.reflect.Type;
 
+import org.eclipse.yasson.internal.AnnotationIntrospector;
+import org.eclipse.yasson.internal.JsonbContext;
+import org.eclipse.yasson.internal.model.customization.ClassCustomizationBuilder;
+import org.eclipse.yasson.internal.model.customization.CreatorCustomization;
+import org.eclipse.yasson.internal.serializer.JsonbDateFormatter;
+import org.eclipse.yasson.internal.serializer.JsonbNumberFormatter;
+
 /**
  * Parameter for creator constructor / method model.
- *
- * @author Roman Grigoriadi
  */
 public class CreatorModel {
 
@@ -37,9 +36,9 @@ public class CreatorModel {
     /**
      * Creates a new instance.
      *
-     * @param name Parameter name
+     * @param name      Parameter name
      * @param parameter constructor parameter
-     * @param context jsonb context
+     * @param context   jsonb context
      */
     public CreatorModel(String name, Parameter parameter, JsonbContext context) {
         this.name = name;
@@ -48,7 +47,8 @@ public class CreatorModel {
         AnnotationIntrospector annotationIntrospector = context.getAnnotationIntrospector();
 
         JsonbAnnotatedElement<Parameter> annotated = new JsonbAnnotatedElement<>(parameter);
-        JsonbNumberFormatter constructorNumberFormatter = context.getAnnotationIntrospector().getConstructorNumberFormatter(annotated);
+        JsonbNumberFormatter constructorNumberFormatter = context.getAnnotationIntrospector()
+                .getConstructorNumberFormatter(annotated);
         JsonbDateFormatter constructorDateFormatter = context.getAnnotationIntrospector().getConstructorDateFormatter(annotated);
         final JsonbAnnotatedElement<Class<?>> clsElement = annotationIntrospector.collectAnnotations(parameter.getType());
         final ClassCustomizationBuilder builder = new ClassCustomizationBuilder();

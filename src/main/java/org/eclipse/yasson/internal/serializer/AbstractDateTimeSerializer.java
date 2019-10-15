@@ -9,31 +9,35 @@
  *
  * Contributors:
  * Roman Grigoriadi
+ * David Kral
  ******************************************************************************/
 
 package org.eclipse.yasson.internal.serializer;
 
-import org.eclipse.yasson.internal.JsonbContext;
-import org.eclipse.yasson.internal.Marshaller;
-import org.eclipse.yasson.internal.model.customization.Customization;
-
-import javax.json.bind.annotation.JsonbDateFormat;
-import javax.json.bind.serializer.SerializationContext;
-import javax.json.stream.JsonGenerator;
 import java.time.Instant;
 import java.time.ZoneId;
 import java.time.format.DateTimeFormatter;
 import java.time.temporal.TemporalAccessor;
 import java.util.Locale;
 
+import javax.json.bind.annotation.JsonbDateFormat;
+import javax.json.bind.serializer.SerializationContext;
+import javax.json.stream.JsonGenerator;
+
+import org.eclipse.yasson.internal.JsonbContext;
+import org.eclipse.yasson.internal.Marshaller;
+import org.eclipse.yasson.internal.model.customization.Customization;
+
 /**
  * Abstract class for converting date objects.
  *
- * @author Roman Grigoriadi
  * @param <T> Type to serialize.
  */
 public abstract class AbstractDateTimeSerializer<T> extends AbstractValueTypeSerializer<T> {
 
+    /**
+     * Default zone id.
+     */
     public static final ZoneId UTC = ZoneId.of("UTC");
 
     /**
@@ -55,8 +59,8 @@ public abstract class AbstractDateTimeSerializer<T> extends AbstractValueTypeSer
     /**
      * Converts to JSON string.
      *
-     * @param object Object to convert.
-     * @param formatter Formatter to use.
+     * @param object       Object to convert.
+     * @param formatter    Formatter to use.
      * @param jsonbContext JSON-B context.
      * @return JSON representation of given object.
      */
@@ -66,7 +70,8 @@ public abstract class AbstractDateTimeSerializer<T> extends AbstractValueTypeSer
         } else if (formatter.getDateTimeFormatter() != null) {
             return formatWithFormatter(object, formatter.getDateTimeFormatter());
         } else {
-            DateTimeFormatter configDateTimeFormatter = jsonbContext.getConfigProperties().getConfigDateFormatter().getDateTimeFormatter();
+            DateTimeFormatter configDateTimeFormatter = jsonbContext.getConfigProperties().getConfigDateFormatter()
+                    .getDateTimeFormatter();
             if (configDateTimeFormatter != null) {
                 return formatWithFormatter(object, configDateTimeFormatter);
             }
@@ -77,7 +82,14 @@ public abstract class AbstractDateTimeSerializer<T> extends AbstractValueTypeSer
         return formatDefault(object, jsonbContext.getConfigProperties().getLocale(formatter.getLocale()));
     }
 
+    /**
+     * Returns registered serialization jsonb date formatter.
+     *
+     * @param context context
+     * @return jsonb formatter
+     */
     protected JsonbDateFormatter getJsonbDateFormatter(JsonbContext context) {
+        Customization customization = getCustomization();
         if (customization != null && customization.getSerializeDateFormatter() != null) {
             return customization.getSerializeDateFormatter();
         }
@@ -91,8 +103,9 @@ public abstract class AbstractDateTimeSerializer<T> extends AbstractValueTypeSer
      * @return zoned formatter
      */
     protected DateTimeFormatter getZonedFormatter(DateTimeFormatter formatter) {
-        return formatter.getZone() != null ?
-                formatter : formatter.withZone(UTC);
+        return formatter.getZone() != null
+                ? formatter
+                : formatter.withZone(UTC);
     }
 
     /**
@@ -119,15 +132,16 @@ public abstract class AbstractDateTimeSerializer<T> extends AbstractValueTypeSer
      * Format with default formatter for a given {@link java.time} date object.
      * Different default formatter for each date object type is used.
      *
-     * @param value date object
+     * @param value  date object
      * @param locale locale from annotation / default not null
      * @return formatted date obj as string
      */
     protected abstract String formatDefault(T value, Locale locale);
 
     /**
-     * Format date object with given formatter
-     * @param value date object to format
+     * Format date object with given formatter.
+     *
+     * @param value     date object to format
      * @param formatter formatter to format with
      * @return formatted result
      */

@@ -9,19 +9,10 @@
  *
  * Contributors:
  * Roman Grigoriadi
+ * David Kral
  ******************************************************************************/
 package org.eclipse.yasson.internal.serializer;
 
-import org.eclipse.yasson.internal.*;
-import org.eclipse.yasson.internal.properties.MessageKeys;
-import org.eclipse.yasson.internal.properties.Messages;
-import org.eclipse.yasson.internal.model.CreatorModel;
-import org.eclipse.yasson.internal.model.JsonbCreator;
-import org.eclipse.yasson.internal.model.PropertyModel;
-
-import javax.json.bind.JsonbException;
-import javax.json.bind.serializer.JsonbDeserializer;
-import javax.json.stream.JsonParser;
 import java.lang.reflect.Constructor;
 import java.lang.reflect.Type;
 import java.util.ArrayList;
@@ -29,10 +20,25 @@ import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 
+import javax.json.bind.JsonbException;
+import javax.json.bind.serializer.JsonbDeserializer;
+import javax.json.stream.JsonParser;
+
+import org.eclipse.yasson.internal.JsonbContext;
+import org.eclipse.yasson.internal.JsonbParser;
+import org.eclipse.yasson.internal.JsonbRiParser;
+import org.eclipse.yasson.internal.ReflectionUtils;
+import org.eclipse.yasson.internal.Unmarshaller;
+import org.eclipse.yasson.internal.model.CreatorModel;
+import org.eclipse.yasson.internal.model.JsonbCreator;
+import org.eclipse.yasson.internal.model.PropertyModel;
+import org.eclipse.yasson.internal.properties.MessageKeys;
+import org.eclipse.yasson.internal.properties.Messages;
+
 /**
  * Item for handling all types of unknown objects by reflection, parsing their fields, according to json key name.
  *
- * @author Roman Grigoriadi
+ * @param <T> object type
  */
 class ObjectDeserializer<T> extends AbstractContainerDeserializer<T> {
 
@@ -44,7 +50,7 @@ class ObjectDeserializer<T> extends AbstractContainerDeserializer<T> {
         private final String jsonKeyName;
         private final PropertyModel propertyModel;
 
-        public LastPropertyModel(String jsonKeyName, PropertyModel propertyModel) {
+        LastPropertyModel(String jsonKeyName, PropertyModel propertyModel) {
             this.jsonKeyName = jsonKeyName;
             this.propertyModel = propertyModel;
         }
@@ -66,6 +72,7 @@ class ObjectDeserializer<T> extends AbstractContainerDeserializer<T> {
 
     /**
      * Creates instance of an item.
+     *
      * @param builder builder to build from
      */
     protected ObjectDeserializer(DeserializerBuilder builder) {
@@ -109,17 +116,16 @@ class ObjectDeserializer<T> extends AbstractContainerDeserializer<T> {
         return instance;
     }
 
-
     /**
-     * Creates instance with custom jsonb creator (parameterized constructor or factory method)
+     * Creates instance with custom jsonb creator (parameterized constructor or factory method).
      */
     private T createInstance(Class<T> rawType, JsonbCreator creator) {
         final T instance;
         final List<Object> paramValues = new ArrayList<>();
-        for(CreatorModel param : creator.getParams()) {
+        for (CreatorModel param : creator.getParams()) {
             final ValueWrapper valueWrapper = values.get(param.getName());
             //required by spec
-            if (valueWrapper == null){
+            if (valueWrapper == null) {
                 throw new JsonbException(Messages.getMessage(MessageKeys.JSONB_CREATOR_MISSING_PROPERTY, param.getName()));
             }
             paramValues.add(valueWrapper.getValue());
@@ -140,7 +146,8 @@ class ObjectDeserializer<T> extends AbstractContainerDeserializer<T> {
         if (model == null) {
             return;
         }
-        values.put(model.getReadName(), new ValueWrapper(model, convertNullToOptionalEmpty(model.getPropertyDeserializationType(), result)));
+        values.put(model.getReadName(),
+                   new ValueWrapper(model, convertNullToOptionalEmpty(model.getPropertyDeserializationType(), result)));
     }
 
     @Override
@@ -149,7 +156,7 @@ class ObjectDeserializer<T> extends AbstractContainerDeserializer<T> {
         final JsonbCreator creator = getClassModel().getClassCustomization().getCreator();
         //first check jsonb creator param, since it can be different from property name
         if (creator != null) {
-            final CreatorModel param = creator.findByName(parserContext.getLastKeyName());
+            final CreatorModel param = creator.findByName(getParserContext().getLastKeyName());
             if (param != null) {
                 final JsonbDeserializer<?> deserializer = newUnmarshallerItemBuilder(context.getJsonbContext())
                         .withType(param.getType())
@@ -183,7 +190,9 @@ class ObjectDeserializer<T> extends AbstractContainerDeserializer<T> {
      */
     private void skipJsonProperty(JsonbParser parser, JsonbContext jsonbContext) {
         if (jsonbContext.getConfigProperties().getConfigFailOnUnknownProperties()) {
-            throw new JsonbException(Messages.getMessage(MessageKeys.UNKNOWN_JSON_PROPERTY, parserContext.getLastKeyName(), getRuntimeType()));
+            throw new JsonbException(Messages.getMessage(MessageKeys.UNKNOWN_JSON_PROPERTY,
+                                                         getParserContext().getLastKeyName(),
+                                                         getRuntimeType()));
         }
         parser.skipJsonStructure();
     }
@@ -195,7 +204,7 @@ class ObjectDeserializer<T> extends AbstractContainerDeserializer<T> {
     }
 
     protected PropertyModel getModel() {
-        final String lastKeyName = parserContext.getLastKeyName();
+        final String lastKeyName = getParserContext().getLastKeyName();
         if (lastPropertyModel != null && lastPropertyModel.getJsonKeyName().equals(lastKeyName)) {
             return lastPropertyModel.getPropertyModel();
         }
@@ -209,13 +218,13 @@ class ObjectDeserializer<T> extends AbstractContainerDeserializer<T> {
         private final PropertyModel propertyModel;
         private final Object value;
 
-        public ValueWrapper(CreatorModel creator, Object value) {
+        ValueWrapper(CreatorModel creator, Object value) {
             this.creatorModel = creator;
             this.value = value;
             propertyModel = null;
         }
 
-        public ValueWrapper(PropertyModel propertyModel, Object value) {
+        ValueWrapper(PropertyModel propertyModel, Object value) {
             this.propertyModel = propertyModel;
             this.value = value;
             creatorModel = null;

@@ -12,8 +12,6 @@
  ******************************************************************************/
 package org.eclipse.yasson.internal.model;
 
-import javax.json.bind.config.PropertyVisibilityStrategy;
-import javax.json.bind.JsonbException;
 
 import java.lang.reflect.Field;
 import java.lang.reflect.Method;
@@ -21,8 +19,11 @@ import java.lang.reflect.InvocationTargetException;
 import java.lang.IllegalAccessException;
 import java.util.Objects;
 
+import javax.json.bind.config.PropertyVisibilityStrategy;
+import javax.json.bind.JsonbException;
+
 /**
- * @author Roman Grigoriadi
+ * Property value propagation by reflection.
  */
 public class ReflectionPropagation extends PropertyValuePropagation {
 
@@ -30,6 +31,12 @@ public class ReflectionPropagation extends PropertyValuePropagation {
 
     private SetValueCommand setValueCommand;
 
+    /**
+     * Creates new instance of reflection propagation.
+     *
+     * @param property target property
+     * @param strategy visibility strategy
+     */
     public ReflectionPropagation(Property property, PropertyVisibilityStrategy strategy) {
         super(property, strategy);
     }
@@ -40,7 +47,7 @@ public class ReflectionPropagation extends PropertyValuePropagation {
     @Override
     protected void acceptMethod(Method method, OperationMode mode) {
     	Objects.requireNonNull(method);
-    	
+
         switch (mode) {
             case GET:
                 getValueCommand = method::invoke;
@@ -58,7 +65,7 @@ public class ReflectionPropagation extends PropertyValuePropagation {
     @Override
     protected void acceptField(Field field, OperationMode mode) {
     	Objects.requireNonNull(field);
-    	
+
         switch (mode) {
             case GET:
                 getValueCommand = field::get;
@@ -80,7 +87,7 @@ public class ReflectionPropagation extends PropertyValuePropagation {
     @Override
     void setValue(Object object, Object value) {
     	Objects.requireNonNull(object);
-    	
+
         try {
         	setValueCommand.setValue(object, value);
         } catch (InvocationTargetException | IllegalAccessException e) {
@@ -98,7 +105,7 @@ public class ReflectionPropagation extends PropertyValuePropagation {
     @Override
     Object getValue(Object object) {
     	Objects.requireNonNull(object);
-    	
+
         try {
             return getValueCommand.getValue(object);
         } catch (InvocationTargetException | IllegalAccessException e) {

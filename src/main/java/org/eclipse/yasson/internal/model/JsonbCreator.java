@@ -13,19 +13,18 @@
 
 package org.eclipse.yasson.internal.model;
 
-import org.eclipse.yasson.internal.properties.MessageKeys;
-import org.eclipse.yasson.internal.properties.Messages;
-
-import javax.json.bind.JsonbException;
 import java.lang.reflect.Constructor;
 import java.lang.reflect.Executable;
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 
+import javax.json.bind.JsonbException;
+
+import org.eclipse.yasson.internal.properties.MessageKeys;
+import org.eclipse.yasson.internal.properties.Messages;
+
 /**
  * Object holding reference to Constructor / Method for custom object creation.
- *
- * @author Roman Grigoriadi
  */
 public class JsonbCreator {
 
@@ -36,7 +35,7 @@ public class JsonbCreator {
     /**
      * Creates a new instance.
      *
-     * @param executable Executable.
+     * @param executable    Executable.
      * @param creatorModels Parameters.
      */
     public JsonbCreator(Executable executable, CreatorModel[] creatorModels) {
@@ -48,8 +47,8 @@ public class JsonbCreator {
      * Create instance by either constructor or factory method, with provided parameter values and a Class to call on.
      *
      * @param params parameters to be passed into constructor / factory method
-     * @param on class to call onto
-     * @param <T> Type of class / instance
+     * @param on     class to call onto
+     * @param <T>    Type of class / instance
      * @return instance
      */
     @SuppressWarnings("unchecked")

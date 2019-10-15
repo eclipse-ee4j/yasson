@@ -9,52 +9,56 @@
  *
  * Contributors:
  * Roman Grigoriadi
+ * David Kral
  ******************************************************************************/
 
 package org.eclipse.yasson.internal.serializer;
+
+import java.lang.reflect.Type;
+import java.util.Objects;
 
 import org.eclipse.yasson.internal.JsonbContext;
 import org.eclipse.yasson.internal.model.ClassModel;
 import org.eclipse.yasson.internal.model.customization.Customization;
 
-import java.lang.reflect.Type;
-import java.util.Objects;
-
 /**
  * Base class for serializer builders.
  *
- * @author Roman Grigoriadi
+ * @param <T> serialization builder type
  */
 public class AbstractSerializerBuilder<T extends AbstractSerializerBuilder> {
 
     /**
      * Not null with an exception of a root item.
      */
-    protected CurrentItem<?> wrapper;
+    private CurrentItem<?> wrapper;
 
     /**
      * In case of unknown object genericType.
      * Null for embedded objects such as collections, or known conversion types.
      */
-    protected ClassModel classModel;
+    private ClassModel classModel;
 
     /**
      * Runtime type resolved after expanding type variables and wildcards.
      */
-    protected Type runtimeType;
+    private Type runtimeType;
 
     /**
      * Type is used when field model is not present.
      * In case of root, or embedded objects such as collections.
      */
-    protected Type genericType;
+    private Type genericType;
 
     /**
-     * Class customization
+     * Class customization.
      */
-    protected Customization customization;
+    private Customization customization;
 
-    protected final JsonbContext jsonbContext;
+    /**
+     * Jsonb context.
+     */
+    private final JsonbContext jsonbContext;
 
     /**
      * Crates a builder.
@@ -79,7 +83,7 @@ public class AbstractSerializerBuilder<T extends AbstractSerializerBuilder> {
     }
 
     /**
-     * Customization of the class
+     * Customization of the class.
      *
      * @param customization Class customization
      * @return Builder instance for call chaining.
@@ -87,6 +91,30 @@ public class AbstractSerializerBuilder<T extends AbstractSerializerBuilder> {
     @SuppressWarnings("unchecked")
     public T withCustomization(Customization customization) {
         this.customization = customization;
+        return (T) this;
+    }
+
+    /**
+     * Class model for this item.
+     *
+     * @param classModel class model
+     * @return Builder instance for call chaining.
+     */
+    @SuppressWarnings("unchecked")
+    public T withClassModel(ClassModel classModel) {
+        this.classModel = classModel;
+        return (T) this;
+    }
+
+    /**
+     * Runtime type for this item.
+     *
+     * @param runtimeType runtime type
+     * @return Builder instance for call chaining.
+     */
+    @SuppressWarnings("unchecked")
+    public T withRuntimeType(Type runtimeType) {
+        this.runtimeType = runtimeType;
         return (T) this;
     }
 
@@ -124,7 +152,8 @@ public class AbstractSerializerBuilder<T extends AbstractSerializerBuilder> {
     }
 
     /**
-     * Resolved runtime type for instance in case of {@link java.lang.reflect.TypeVariable} or {@link java.lang.reflect.WildcardType}
+     * Resolved runtime type for instance in case of {@link java.lang.reflect.TypeVariable} or
+     * {@link java.lang.reflect.WildcardType}.
      * Otherwise provided type in type field, or type of field model.
      *
      * @return runtime type
@@ -155,7 +184,21 @@ public class AbstractSerializerBuilder<T extends AbstractSerializerBuilder> {
         return jsonbContext;
     }
 
+    /**
+     * Type customization.
+     *
+     * @return customization
+     */
     public Customization getCustomization() {
         return customization;
+    }
+
+    /**
+     * Generic type of the item.
+     *
+     * @return generic type
+     */
+    public Type getGenericType() {
+        return genericType;
     }
 }

@@ -20,8 +20,6 @@ import java.util.Objects;
 
 /**
  * {@link ParameterizedType} implementation containing array of resolved TypeVariable type args.
- *
- * @author Roman Grigoriadi
  */
 public class ResolvedParameterizedType implements ParameterizedType {
 
@@ -38,7 +36,7 @@ public class ResolvedParameterizedType implements ParameterizedType {
     /**
      * Creates a new instance.
      *
-     * @param original Original type.
+     * @param original         Original type.
      * @param resolvedTypeArgs Resolved type arguments.
      */
     public ResolvedParameterizedType(ParameterizedType original, Type[] resolvedTypeArgs) {
@@ -47,7 +45,7 @@ public class ResolvedParameterizedType implements ParameterizedType {
     }
 
     /**
-     * Type arguments with resolved TypeVariables
+     * Type arguments with resolved TypeVariables.
      *
      * @return type args
      */
@@ -82,8 +80,12 @@ public class ResolvedParameterizedType implements ParameterizedType {
 
     @Override
     public boolean equals(Object o) {
-        if (this == o) return true;
-        if (o == null || !(o instanceof ParameterizedType)) return false;
+        if (this == o) {
+            return true;
+        }
+        if (o == null || !(o instanceof ParameterizedType)) {
+            return false;
+        }
         final ParameterizedType that = (ParameterizedType) o;
         return this.getRawType().equals(that.getRawType())
                 && Objects.equals(this.getOwnerType(), that.getOwnerType())
@@ -92,8 +94,8 @@ public class ResolvedParameterizedType implements ParameterizedType {
 
     @Override
     public int hashCode() {
-        return Arrays.hashCode(resolvedTypeArgs) ^
-                (getOwnerType() == null ? 0 : getOwnerType().hashCode() ) ^
-                (getRawType() == null   ? 0 : getRawType().hashCode() );
+        return Arrays.hashCode(resolvedTypeArgs)
+                ^ (getOwnerType() == null ? 0 : getOwnerType().hashCode())
+                ^ (getRawType() == null ? 0 : getRawType().hashCode());
     }
 }
