@@ -1,15 +1,15 @@
-/*******************************************************************************
+/*
  * Copyright (c) 2016, 2019 Oracle and/or its affiliates. All rights reserved.
+ *
  * This program and the accompanying materials are made available under the
- * terms of the Eclipse Public License v1.0 and Eclipse Distribution License v. 1.0
- * which accompanies this distribution.
- * The Eclipse Public License is available at http://www.eclipse.org/legal/epl-v10.html
- * and the Eclipse Distribution License is available at
+ * terms of the Eclipse Public License v. 2.0 which is available at
+ * http://www.eclipse.org/legal/epl-2.0,
+ * or the Eclipse Distribution License v. 1.0 which is available at
  * http://www.eclipse.org/org/documents/edl-v10.php.
  *
- * Contributors:
- * Roman Grigoriadi
- ******************************************************************************/
+ * SPDX-License-Identifier: EPL-2.0 OR BSD-3-Clause
+ */
+
 package org.eclipse.yasson.internal.model;
 
 import java.lang.annotation.Annotation;
@@ -30,7 +30,7 @@ import org.eclipse.yasson.internal.properties.Messages;
 public class JsonbAnnotatedElement<T extends AnnotatedElement> {
 
     private final Map<Class<? extends Annotation>, Annotation> annotations = new HashMap<>(4);
-    
+
     private final T element;
 
     /**
@@ -42,7 +42,7 @@ public class JsonbAnnotatedElement<T extends AnnotatedElement> {
         for (Annotation ann : element.getAnnotations()) {
             annotations.put(ann.annotationType(), ann);
         }
-        
+
         this.element = element;
     }
 
@@ -54,7 +54,7 @@ public class JsonbAnnotatedElement<T extends AnnotatedElement> {
     public T getElement() {
         return element;
     }
-    
+
     /**
      * Get an annotation by type.
      * @param <AT> Type of annotation
@@ -64,11 +64,11 @@ public class JsonbAnnotatedElement<T extends AnnotatedElement> {
     public <AT extends Annotation> AT getAnnotation(Class<AT> annotationClass) {
         return annotationClass.cast(annotations.get(annotationClass));
     }
-    
+
     public Annotation[] getAnnotations() {
         return annotations.values().toArray(new Annotation[0]);
     }
-    
+
     /**
      * Adds annotation.
      *
