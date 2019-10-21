@@ -1,9 +1,0 @@
-org.eclipse.yasson
-org.eclipse.yasson.internal
-org.eclipse.yasson.internal.components
-org.eclipse.yasson.internal.jsonstructure
-org.eclipse.yasson.internal.model
-org.eclipse.yasson.internal.model.customization
-org.eclipse.yasson.internal.properties
-org.eclipse.yasson.internal.serializer
-org.eclipse.yasson.spi
