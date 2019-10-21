@@ -12,11 +12,14 @@
  ******************************************************************************/
 package org.eclipse.yasson.internal.model;
 
-import org.eclipse.yasson.internal.JsonbContext;
-
 import javax.json.bind.config.PropertyVisibilityStrategy;
+import javax.json.bind.JsonbException;
+
 import java.lang.reflect.Field;
 import java.lang.reflect.Method;
+import java.lang.reflect.InvocationTargetException;
+import java.lang.IllegalAccessException;
+import java.util.Objects;
 
 /**
  * @author Roman Grigoriadi
@@ -36,12 +39,14 @@ public class ReflectionPropagation extends PropertyValuePropagation {
      */
     @Override
     protected void acceptMethod(Method method, OperationMode mode) {
+    	Objects.requireNonNull(method);
+    	
         switch (mode) {
             case GET:
-                getValueCommand = new GetFromGetter(method);
+                getValueCommand = method::invoke;
                 break;
             case SET:
-                setValueCommand = new SetWithSetter(method);
+                setValueCommand = method::invoke;
                 break;
             default: throw new IllegalStateException("Unknown mode");
         }
@@ -52,24 +57,52 @@ public class ReflectionPropagation extends PropertyValuePropagation {
      */
     @Override
     protected void acceptField(Field field, OperationMode mode) {
+    	Objects.requireNonNull(field);
+    	
         switch (mode) {
             case GET:
-                getValueCommand = new GetFromField(field);
+                getValueCommand = field::get;
                 break;
             case SET:
-                setValueCommand = new SetWithField(field);
+                setValueCommand = field::set;
                 break;
             default: throw new IllegalStateException("Unknown mode");
         }
     }
 
+    /**
+     * Sets a value with reflection on {@link java.lang.reflect.Field field} or {@link java.lang.reflect.Method setter}.
+     *
+     * @param object object to invoke set value on, not null.
+     * @param value object to be set, nullable.
+     * @throws JsonbException if reflection fails.
+     */
     @Override
     void setValue(Object object, Object value) {
-        setValueCommand.setValue(object, value);
+    	Objects.requireNonNull(object);
+    	
+        try {
+        	setValueCommand.setValue(object, value);
+        } catch (InvocationTargetException | IllegalAccessException e) {
+            throw new JsonbException("Error getting value on: " + object, e);
+        }
     }
 
+    /**
+     * Get a value with reflection on {@link java.lang.reflect.Field field} or {@link java.lang.reflect.Method getter}.
+     *
+     * @param object object to invoke get value on, not null.
+     * @throws JsonbException if reflection fails.
+     * @return value
+     */
     @Override
     Object getValue(Object object) {
-        return getValueCommand.getValue(object);
+    	Objects.requireNonNull(object);
+    	
+        try {
+            return getValueCommand.getValue(object);
+        } catch (InvocationTargetException | IllegalAccessException e) {
+            throw new JsonbException("Error getting value on: " + object, e);
+        }
     }
 }
