@@ -39,7 +39,6 @@ public interface YassonJsonb extends javax.json.bind.Jsonb {
      * @param <T>        Type of the content tree's root object.
      * @return the newly created root object of the java content tree
      * @throws JsonbException       If any unexpected error(s) occur(s) during deserialization.
-     * @throws NullPointerException If any of the parameters is {@code null}.
      */
     <T> T fromJson(JsonParser jsonParser, Class<T> type) throws JsonbException;
 
@@ -53,7 +52,6 @@ public interface YassonJsonb extends javax.json.bind.Jsonb {
      * @param <T>         Type of the content tree's root object.
      * @return the newly created root object of the java content tree
      * @throws JsonbException       If any unexpected error(s) occur(s) during deserialization.
-     * @throws NullPointerException If any of the parameters is {@code null}.
      */
     <T> T fromJson(JsonParser jsonParser, Type runtimeType) throws JsonbException;
 
@@ -66,7 +64,6 @@ public interface YassonJsonb extends javax.json.bind.Jsonb {
      * @param <T>           Type of the content tree's root object.
      * @return the newly created root object of the java content tree
      * @throws JsonbException       If any unexpected error(s) occur(s) during conversion.
-     * @throws NullPointerException If any of the parameters is {@code null}.
      */
     <T> T fromJsonStructure(JsonStructure jsonStructure, Class<T> type) throws JsonbException;
 
@@ -79,7 +76,6 @@ public interface YassonJsonb extends javax.json.bind.Jsonb {
      * @param <T>           Type of the content tree's root object.
      * @return the newly created root object of the java content tree
      * @throws JsonbException       If any unexpected error(s) occur(s) during deserialization.
-     * @throws NullPointerException If any of the parameters is {@code null}.
      */
     <T> T fromJsonStructure(JsonStructure jsonStructure, Type runtimeType) throws JsonbException;
 
@@ -92,7 +88,6 @@ public interface YassonJsonb extends javax.json.bind.Jsonb {
      *                      on a completion for further interaction.
      * @throws JsonbException       If any unexpected problem occurs during the
      *                              serialization.
-     * @throws NullPointerException If any of the parameters is {@code null}.
      * @since JSON Binding 1.0
      */
     void toJson(Object object, JsonGenerator jsonGenerator) throws JsonbException;
@@ -107,7 +102,6 @@ public interface YassonJsonb extends javax.json.bind.Jsonb {
      *                      on a completion for further interaction.
      * @throws JsonbException       If any unexpected problem occurs during the
      *                              serialization.
-     * @throws NullPointerException If any of the parameters is {@code null}.
      * @since JSON Binding 1.0
      */
     void toJson(Object object, Type runtimeType, JsonGenerator jsonGenerator) throws JsonbException;
@@ -119,7 +113,6 @@ public interface YassonJsonb extends javax.json.bind.Jsonb {
      * @return The {@link JsonStructure} serialized from java content tree.
      * @throws JsonbException       If any unexpected problem occurs during the
      *                              serialization.
-     * @throws NullPointerException If any of the parameters is {@code null}.
      * @since JSON Binding 1.0
      */
     JsonStructure toJsonStructure(Object object) throws JsonbException;
@@ -132,7 +125,6 @@ public interface YassonJsonb extends javax.json.bind.Jsonb {
      * @return The {@link JsonStructure} serialized from java content tree.
      * @throws JsonbException       If any unexpected problem occurs during the
      *                              serialization.
-     * @throws NullPointerException If any of the parameters is {@code null}.
      * @since JSON Binding 1.0
      */
     JsonStructure toJsonStructure(Object object, Type runtimeType) throws JsonbException;

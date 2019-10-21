@@ -12,15 +12,13 @@
  ******************************************************************************/
 package org.eclipse.yasson.internal.model;
 
-
 import java.lang.reflect.Field;
-import java.lang.reflect.Method;
 import java.lang.reflect.InvocationTargetException;
-import java.lang.IllegalAccessException;
+import java.lang.reflect.Method;
 import java.util.Objects;
 
-import javax.json.bind.config.PropertyVisibilityStrategy;
 import javax.json.bind.JsonbException;
+import javax.json.bind.config.PropertyVisibilityStrategy;
 
 /**
  * Property value propagation by reflection.
@@ -46,16 +44,17 @@ public class ReflectionPropagation extends PropertyValuePropagation {
      */
     @Override
     protected void acceptMethod(Method method, OperationMode mode) {
-    	Objects.requireNonNull(method);
+        Objects.requireNonNull(method);
 
         switch (mode) {
-            case GET:
-                getValueCommand = method::invoke;
-                break;
-            case SET:
-                setValueCommand = method::invoke;
-                break;
-            default: throw new IllegalStateException("Unknown mode");
+        case GET:
+            getValueCommand = method::invoke;
+            break;
+        case SET:
+            setValueCommand = method::invoke;
+            break;
+        default:
+            throw new IllegalStateException("Unknown mode");
         }
     }
 
@@ -64,16 +63,17 @@ public class ReflectionPropagation extends PropertyValuePropagation {
      */
     @Override
     protected void acceptField(Field field, OperationMode mode) {
-    	Objects.requireNonNull(field);
+        Objects.requireNonNull(field);
 
         switch (mode) {
-            case GET:
-                getValueCommand = field::get;
-                break;
-            case SET:
-                setValueCommand = field::set;
-                break;
-            default: throw new IllegalStateException("Unknown mode");
+        case GET:
+            getValueCommand = field::get;
+            break;
+        case SET:
+            setValueCommand = field::set;
+            break;
+        default:
+            throw new IllegalStateException("Unknown mode");
         }
     }
 
@@ -81,15 +81,15 @@ public class ReflectionPropagation extends PropertyValuePropagation {
      * Sets a value with reflection on {@link java.lang.reflect.Field field} or {@link java.lang.reflect.Method setter}.
      *
      * @param object object to invoke set value on, not null.
-     * @param value object to be set, nullable.
+     * @param value  object to be set, nullable.
      * @throws JsonbException if reflection fails.
      */
     @Override
     void setValue(Object object, Object value) {
-    	Objects.requireNonNull(object);
+        Objects.requireNonNull(object);
 
         try {
-        	setValueCommand.setValue(object, value);
+            setValueCommand.setValue(object, value);
         } catch (InvocationTargetException | IllegalAccessException e) {
             throw new JsonbException("Error getting value on: " + object, e);
         }
@@ -99,12 +99,12 @@ public class ReflectionPropagation extends PropertyValuePropagation {
      * Get a value with reflection on {@link java.lang.reflect.Field field} or {@link java.lang.reflect.Method getter}.
      *
      * @param object object to invoke get value on, not null.
-     * @throws JsonbException if reflection fails.
      * @return value
+     * @throws JsonbException if reflection fails.
      */
     @Override
     Object getValue(Object object) {
-    	Objects.requireNonNull(object);
+        Objects.requireNonNull(object);
 
         try {
             return getValueCommand.getValue(object);

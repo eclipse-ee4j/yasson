@@ -657,7 +657,6 @@ public class AnnotationIntrospector {
      * Finds annotations incompatible with {@link JsonbTransient} annotation.
      *
      * @param target target to check
-     * @throws JsonbException If incompatible annotation is found.
      */
     @SuppressWarnings("unchecked")
     public void checkTransientIncompatible(JsonbAnnotatedElement<?> target) {
