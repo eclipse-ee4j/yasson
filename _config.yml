@@ -6,7 +6,7 @@ description: [Yasson is a Java framework which provides a standard binding layer
 links:
   source: https://github.com/eclipse-ee4j/yasson
   #docs: documentation
-  javadocs: docs/api/?overview-summary.html
+  javadocs: https://www.javadoc.io/doc/org.eclipse/yasson/1.0.5
   download: https://github.com/eclipse-ee4j/yasson/releases
   mailinglist: https://accounts.eclipse.org/mailing-list/yasson-dev
   #faq: FAQ
