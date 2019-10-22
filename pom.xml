@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <!--
- Copyright (c) 2016, 2018 Oracle and/or its affiliates. All rights reserved.
+ Copyright (c) 2016, 2019 Oracle and/or its affiliates. All rights reserved.
  This program and the accompanying materials are made available under the
  terms of the Eclipse Public License v1.0 and Eclipse Distribution License v. 1.0
  which accompanies this distribution.
@@ -26,6 +26,61 @@
 
     <description>Eclipse Yasson. Reference implementation of JSR-367 (JSON-B).</description>
     <url>https://projects.eclipse.org/projects/ee4j.yasson</url>
+    
+    <properties>
+        <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
+        <jakarta.json.version>1.1.6</jakarta.json.version>
+        <jakarta.json.bind.version>1.0.2</jakarta.json.bind.version>
+        <netbeans.hint.jdkPlatform>JDK_9</netbeans.hint.jdkPlatform>
+    </properties>
+    
+    <dependencies>
+        <!-- Compile dependencies -->
+        <dependency>
+            <groupId>jakarta.json.bind</groupId>
+            <artifactId>jakarta.json.bind-api</artifactId>
+            <version>${jakarta.json.bind.version}</version>
+        </dependency>
+        <dependency>
+            <groupId>jakarta.json</groupId>
+            <artifactId>jakarta.json-api</artifactId>
+            <version>${jakarta.json.version}</version>
+        </dependency>
+        <dependency>
+            <groupId>org.glassfish</groupId>
+            <artifactId>jakarta.json</artifactId>
+            <version>${jakarta.json.version}</version>
+            <classifier>module</classifier>
+            <scope>compile</scope>
+            <optional>true</optional>
+        </dependency>
+        <!-- Test/Provided dependencies -->
+        <dependency>
+            <groupId>jakarta.enterprise</groupId>
+            <artifactId>jakarta.enterprise.cdi-api</artifactId>
+            <version>2.0.2</version>
+            <optional>true</optional>
+            <scope>provided</scope>
+        </dependency>
+        <dependency>
+            <groupId>org.jboss.weld.se</groupId>
+            <artifactId>weld-se</artifactId>
+            <version>2.4.3.Final</version>
+            <scope>test</scope>
+        </dependency>
+        <dependency>
+            <groupId>org.junit.jupiter</groupId>
+            <artifactId>junit-jupiter-api</artifactId>
+            <version>5.5.2</version>
+            <scope>test</scope>
+        </dependency>
+        <dependency>
+            <groupId>org.junit.jupiter</groupId>
+            <artifactId>junit-jupiter-engine</artifactId>
+            <version>5.5.2</version>
+            <scope>test</scope>
+        </dependency>
+    </dependencies>
 
     <organization>
         <name>Oracle Corporation</name>
@@ -107,21 +162,6 @@
             <timezone>CST</timezone>
         </developer>
     </developers>
-
-    <properties>
-        <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
-        <jakarta.json.version>1.1.5</jakarta.json.version>
-        <javax.json.bind.version>1.0.1</javax.json.bind.version>
-        <netbeans.hint.jdkPlatform>JDK_9</netbeans.hint.jdkPlatform>
-    </properties>
-
-    <!-- TODO: Remove this once JakartaEE 8 artifacts are officially released -->
-    <repositories>
-        <repository>
-            <id>staging</id>
-            <url>https://oss.sonatype.org/content/repositories/staging/</url>
-        </repository>
-    </repositories>
 
     <profiles>
         <profile>
@@ -486,86 +526,6 @@
             </plugin>
         </plugins>
     </build>
-
-    <dependencyManagement>
-        <dependencies>
-            <dependency>
-                <groupId>jakarta.json.bind</groupId>
-                <artifactId>jakarta.json.bind-api</artifactId>
-                <version>${javax.json.bind.version}</version>
-            </dependency>
-            <dependency>
-                <groupId>jakarta.json</groupId>
-                <artifactId>jakarta.json-api</artifactId>
-                <version>${jakarta.json.version}</version>
-            </dependency>
-            <dependency>
-                <groupId>javax.enterprise</groupId>
-                <artifactId>cdi-api</artifactId>
-                <version>2.0</version>
-                <optional>true</optional>
-                <scope>provided</scope>
-            </dependency>
-            <dependency>
-                <groupId>org.glassfish</groupId>
-                <artifactId>jakarta.json</artifactId>
-                <version>${jakarta.json.version}</version>
-                <classifier>module</classifier>
-                <scope>compile</scope>
-                <optional>true</optional>
-            </dependency>
-            <dependency>
-                <groupId>org.jboss.weld.se</groupId>
-                <artifactId>weld-se</artifactId>
-                <version>2.4.3.Final</version>
-                <scope>test</scope>
-            </dependency>
-            <dependency>
-			    <groupId>org.junit.jupiter</groupId>
-			    <artifactId>junit-jupiter-api</artifactId>
-			    <version>5.5.2</version>
-			    <scope>test</scope>
-			</dependency>
-			<dependency>
-			    <groupId>org.junit.jupiter</groupId>
-			    <artifactId>junit-jupiter-engine</artifactId>
-			    <version>5.5.2</version>
-			    <scope>test</scope>
-			</dependency>
-        </dependencies>
-    </dependencyManagement>
-
-    <dependencies>
-        <dependency>
-            <groupId>jakarta.json.bind</groupId>
-            <artifactId>jakarta.json.bind-api</artifactId>
-        </dependency>
-        <dependency>
-            <groupId>jakarta.json</groupId>
-            <artifactId>jakarta.json-api</artifactId>
-        </dependency>
-        <dependency>
-            <groupId>javax.enterprise</groupId>
-            <artifactId>cdi-api</artifactId>
-        </dependency>
-        <dependency>
-            <groupId>org.glassfish</groupId>
-            <artifactId>jakarta.json</artifactId>
-            <classifier>module</classifier>
-        </dependency>
-        <dependency>
-            <groupId>org.jboss.weld.se</groupId>
-            <artifactId>weld-se</artifactId>
-        </dependency>
-        <dependency>
-            <groupId>org.junit.jupiter</groupId>
-            <artifactId>junit-jupiter-api</artifactId>
-        </dependency>
-        <dependency>
-            <groupId>org.junit.jupiter</groupId>
-            <artifactId>junit-jupiter-engine</artifactId>
-        </dependency>
-    </dependencies>
 
     <reporting>
         <plugins>

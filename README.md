@@ -2,6 +2,7 @@
 
 [![Maven Central](https://img.shields.io/maven-central/v/org.eclipse/yasson.svg?label=Maven%20Central)](http://search.maven.org/#search%7Cga%7C1%7Cg%3A%22org.eclipse%22%20a%3A%22yasson%22)
 [![Sonatype Nexus (Snapshots)](https://img.shields.io/nexus/s/https/oss.sonatype.org/org.eclipse/yasson.svg)](https://oss.sonatype.org/content/repositories/snapshots/org/eclipse/yasson/)
+[![Gitter](https://badges.gitter.im/eclipse/yasson.svg)](https://gitter.im/eclipse/yasson)
 [![Javadocs](https://www.javadoc.io/badge/org.eclipse/yasson.svg)](https://www.javadoc.io/doc/org.eclipse/yasson)
 [![Build Status](https://travis-ci.org/eclipse-ee4j/yasson.svg?branch=master)](https://travis-ci.org/eclipse-ee4j/yasson)
 [![License](https://img.shields.io/badge/License-EPL%201.0-green.svg)](https://opensource.org/licenses/EPL-1.0)
@@ -29,6 +30,14 @@ Jsonb jsonb = JsonbBuilder.create(config);
 // Use it!
 String result = jsonb.toJson(someObject);
 ```
+
+## Questions?
+
+Something not working right? Have an idea for an enhancement? Get in touch with the Yasson community in the following ways:
+
+- [Gitter](https://gitter.im/eclipse/yasson): a free instant-messaging platform (similar to Slack) that anyone can join.
+- [Stackoverflow](https://stackoverflow.com/questions/tagged/yasson): As a quesiton tagged `[jsonb-api]` and `[yasson]`
+- [Github Issues](https://github.com/eclipse-ee4j/yasson/issues/new): Open issues for enhancement ideas or bug reports
 
 ## Licenses
 - [Eclipse Distribution License 1.0 (BSD)](https://projects.eclipse.org/content/eclipse-distribution-license-1.0-bsd)
