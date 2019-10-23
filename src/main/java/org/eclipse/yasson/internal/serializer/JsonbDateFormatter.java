@@ -9,26 +9,32 @@
  *
  * Contributors:
  * Roman Grigoriadi
+ * David Kral
  ******************************************************************************/
 
 package org.eclipse.yasson.internal.serializer;
 
-import javax.json.bind.annotation.JsonbDateFormat;
 import java.time.format.DateTimeFormatter;
 import java.time.format.DateTimeFormatterBuilder;
 import java.util.Locale;
 
-import static java.time.temporal.ChronoField.*;
+import javax.json.bind.annotation.JsonbDateFormat;
+
+import static java.time.temporal.ChronoField.HOUR_OF_DAY;
+import static java.time.temporal.ChronoField.MINUTE_OF_HOUR;
+import static java.time.temporal.ChronoField.SECOND_OF_MINUTE;
 
 /**
  * Formatter wrapper for different types of dates.
- *
- * @author Roman Grigoriadi
  */
 public class JsonbDateFormatter {
 
-    private static final JsonbDateFormatter DEFAULT = new JsonbDateFormatter(JsonbDateFormat.DEFAULT_FORMAT, Locale.getDefault().toLanguageTag());
+    private static final JsonbDateFormatter DEFAULT = new JsonbDateFormatter(JsonbDateFormat.DEFAULT_FORMAT,
+                                                                             Locale.getDefault().toLanguageTag());
 
+    /**
+     * Default I-JSON date time formatter.
+     */
     public static final DateTimeFormatter IJSON_DATE_FORMATTER = new DateTimeFormatterBuilder()
             .parseCaseInsensitive()
             .append(DateTimeFormatter.ISO_LOCAL_DATE)
@@ -52,8 +58,8 @@ public class JsonbDateFormatter {
      * Creates an instance with cached {@link DateTimeFormatter}, format and locale.
      *
      * @param dateTimeFormatter Reused time formatter.
-     * @param format Format in string.
-     * @param locale Locale in string.
+     * @param format            Format in string.
+     * @param locale            Locale in string.
      */
     public JsonbDateFormatter(DateTimeFormatter dateTimeFormatter, String format, String locale) {
         this.dateTimeFormatter = dateTimeFormatter;

@@ -9,23 +9,27 @@
  *
  * Contributors:
  * Roman Grigoriadi
+ * David Kral
  ******************************************************************************/
 
 package org.eclipse.yasson.internal.serializer;
 
-import org.eclipse.yasson.internal.Unmarshaller;
-
 import java.util.ArrayList;
 import java.util.List;
 
+import org.eclipse.yasson.internal.Unmarshaller;
+
 /**
  * Array unmarshaller item implementation for small float.
- *
- * @author Roman Grigoriadi
  */
 public class FloatArrayDeserializer extends AbstractArrayDeserializer<float[]> {
     private final List<Float> items = new ArrayList<>();
 
+    /**
+     * Creates new instance of float array deserializer.
+     *
+     * @param builder deserializer builder
+     */
     protected FloatArrayDeserializer(DeserializerBuilder builder) {
         super(builder);
     }
@@ -39,7 +43,7 @@ public class FloatArrayDeserializer extends AbstractArrayDeserializer<float[]> {
     public float[] getInstance(Unmarshaller unmarshaller) {
         final int size = items.size();
         final float[] floatArray = new float[size];
-        for(int i=0; i<size; i++) {
+        for (int i = 0; i < size; i++) {
             floatArray[i] = items.get(i);
         }
         return floatArray;

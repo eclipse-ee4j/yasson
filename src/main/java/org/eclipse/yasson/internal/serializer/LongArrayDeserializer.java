@@ -9,24 +9,28 @@
  *
  * Contributors:
  * Roman Grigoriadi
+ * David Kral
  ******************************************************************************/
 
 package org.eclipse.yasson.internal.serializer;
 
-import org.eclipse.yasson.internal.Unmarshaller;
-
 import java.util.ArrayList;
 import java.util.List;
 
+import org.eclipse.yasson.internal.Unmarshaller;
+
 /**
  * Array unmarshaller item implementation for small long.
- *
- * @author Roman Grigoriadi
  */
 public class LongArrayDeserializer extends AbstractArrayDeserializer<long[]> {
 
     private final List<Long> items = new ArrayList<>();
 
+    /**
+     * Creates new array of long array deserializer.
+     *
+     * @param builder deserializer builder
+     */
     protected LongArrayDeserializer(DeserializerBuilder builder) {
         super(builder);
     }
@@ -40,7 +44,7 @@ public class LongArrayDeserializer extends AbstractArrayDeserializer<long[]> {
     public long[] getInstance(Unmarshaller unmarshaller) {
         final int size = items.size();
         final long[] longArray = new long[size];
-        for(int i=0; i<size; i++) {
+        for (int i = 0; i < size; i++) {
             longArray[i] = items.get(i);
         }
         return longArray;

@@ -9,24 +9,34 @@
  *
  * Contributors:
  * Roman Grigoriadi
+ * David Kral
  ******************************************************************************/
 package org.eclipse.yasson.internal.serializer;
+
+import java.lang.reflect.ParameterizedType;
+import java.lang.reflect.Type;
+import java.util.ArrayDeque;
+import java.util.ArrayList;
+import java.util.Collection;
+import java.util.EnumSet;
+import java.util.HashSet;
+import java.util.LinkedList;
+import java.util.List;
+import java.util.Queue;
+import java.util.Set;
+import java.util.SortedSet;
+import java.util.TreeSet;
+
+import javax.json.bind.serializer.JsonbDeserializer;
+import javax.json.stream.JsonParser;
 
 import org.eclipse.yasson.internal.JsonbParser;
 import org.eclipse.yasson.internal.JsonbRiParser;
 import org.eclipse.yasson.internal.ReflectionUtils;
 import org.eclipse.yasson.internal.Unmarshaller;
 
-import javax.json.bind.serializer.JsonbDeserializer;
-import javax.json.stream.JsonParser;
-import java.lang.reflect.ParameterizedType;
-import java.lang.reflect.Type;
-import java.util.*;
-
 /**
- * Item implementation for {@link java.util.List} fields
- *
- * @author Roman Grigoriadi
+ * Item implementation for {@link java.util.List} fields.
  */
 class CollectionDeserializer<T extends Collection<?>> extends AbstractContainerDeserializer<T> implements EmbeddedItem {
 
@@ -42,8 +52,8 @@ class CollectionDeserializer<T extends Collection<?>> extends AbstractContainerD
      */
     protected CollectionDeserializer(DeserializerBuilder builder) {
         super(builder);
-        collectionValueType = getRuntimeType() instanceof ParameterizedType ?
-                ReflectionUtils.resolveType(this, ((ParameterizedType) getRuntimeType()).getActualTypeArguments()[0])
+        collectionValueType = getRuntimeType() instanceof ParameterizedType
+                ? ReflectionUtils.resolveType(this, ((ParameterizedType) getRuntimeType()).getActualTypeArguments()[0])
                 : Object.class;
 
         instance = createInstance(builder);
@@ -55,7 +65,9 @@ class CollectionDeserializer<T extends Collection<?>> extends AbstractContainerD
 
         if (rawType.isInterface()) {
             final T x = createInterfaceInstance(rawType);
-            if (x != null) return x;
+            if (x != null) {
+                return x;
+            }
         } else if (EnumSet.class.isAssignableFrom(rawType)) {
             return (T) EnumSet.noneOf((Class<Enum>) collectionValueType);
         }

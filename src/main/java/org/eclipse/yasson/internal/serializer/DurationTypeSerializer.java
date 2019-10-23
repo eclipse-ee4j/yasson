@@ -9,20 +9,20 @@
  *
  * Contributors:
  * Roman Grigoriadi
+ * David Kral
  ******************************************************************************/
 
 package org.eclipse.yasson.internal.serializer;
 
+import java.time.Duration;
+
+import javax.json.stream.JsonGenerator;
+
 import org.eclipse.yasson.internal.Marshaller;
 import org.eclipse.yasson.internal.model.customization.Customization;
 
-import javax.json.stream.JsonGenerator;
-import java.time.Duration;
-
 /**
  * Serializer for {@link Duration} type.
- *
- * @author David Kral
  */
 public class DurationTypeSerializer extends AbstractValueTypeSerializer<Duration> {
 

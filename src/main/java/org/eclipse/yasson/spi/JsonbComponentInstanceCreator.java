@@ -17,30 +17,30 @@ import java.io.Closeable;
 
 /**
  * Creates instances of JsonbComponents such as JsonbAdapter.
- * 
+ *
  * <p>
  * Yasson attempts to load the implementations using {@link java.util.ServiceLoader} first. If there are multiple
  * implementations found the service provider with the highest priority is used. If there are no service providers found the
  * default implementation is used.
  * </p>
- * 
- * @author Roman Grigoriadi
  */
 public interface JsonbComponentInstanceCreator extends Closeable {
-    
-    static final int DEFAULT_PRIORITY = 0;
 
     /**
-     * Returns instance of JsonbComponent for desired class
+     * Default component priority.
+     */
+    int DEFAULT_PRIORITY = 0;
+
+    /**
+     * Returns instance of JsonbComponent for desired class.
      *
-     * @param <T> Jsonb component type
+     * @param <T>            Jsonb component type
      * @param componentClass component class
      * @return component instance
      */
     <T> T getOrCreateComponent(Class<T> componentClass);
-    
+
     /**
-     * 
      * @return the priority of the component
      */
     default int getPriority() {

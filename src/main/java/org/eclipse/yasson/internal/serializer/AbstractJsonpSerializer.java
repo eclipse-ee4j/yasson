@@ -9,6 +9,7 @@
  *
  * Contributors:
  * Roman Grigoriadi
+ * David Kral
  ******************************************************************************/
 
 package org.eclipse.yasson.internal.serializer;
@@ -18,12 +19,17 @@ import javax.json.JsonValue;
 /**
  * Common serializer functionality.
  *
- * @author Roman Grigoriadi
  * @param <T> Type to serialize.
  */
 public abstract class AbstractJsonpSerializer<T extends JsonValue> extends AbstractContainerSerializer<T> {
 
+    /**
+     * Creates new instance of jsonp serializer.
+     *
+     * @param builder serializer builder
+     */
     protected AbstractJsonpSerializer(SerializerBuilder builder) {
         super(builder);
     }
+
 }

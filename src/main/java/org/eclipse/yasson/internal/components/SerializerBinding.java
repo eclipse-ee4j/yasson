@@ -13,13 +13,14 @@
 
 package org.eclipse.yasson.internal.components;
 
-import javax.json.bind.serializer.JsonbSerializer;
 import java.lang.reflect.Type;
+
+import javax.json.bind.serializer.JsonbSerializer;
 
 /**
  * Binding for user Serializer component.
  *
- * @author Roman Grigoriadi
+ * @param <T> type of jsonb serializer
  */
 public class SerializerBinding<T> extends AbstractComponentBinding {
 
@@ -28,7 +29,7 @@ public class SerializerBinding<T> extends AbstractComponentBinding {
     /**
      * Creates a new instance.
      *
-     * @param bindingType Generic type argument of serializer. Not null.
+     * @param bindingType     Generic type argument of serializer. Not null.
      * @param jsonbSerializer Serializer. Can be null.
      */
     public SerializerBinding(Type bindingType, JsonbSerializer<T> jsonbSerializer) {

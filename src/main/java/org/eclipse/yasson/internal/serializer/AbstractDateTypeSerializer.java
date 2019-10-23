@@ -9,11 +9,10 @@
  *
  * Contributors:
  * Roman Grigoriadi
+ * David Kral
  ******************************************************************************/
 
 package org.eclipse.yasson.internal.serializer;
-
-import org.eclipse.yasson.internal.model.customization.Customization;
 
 import java.time.Instant;
 import java.time.format.DateTimeFormatter;
@@ -21,9 +20,12 @@ import java.time.temporal.TemporalAccessor;
 import java.util.Date;
 import java.util.Locale;
 
+import org.eclipse.yasson.internal.model.customization.Customization;
+
 /**
  * Common serializer for {@link Date} and {@link java.sql.Date} types.
  *
+ * @param <T> date type
  */
 public abstract class AbstractDateTypeSerializer<T extends Date> extends AbstractDateTimeSerializer<T> {
 
@@ -66,5 +68,10 @@ public abstract class AbstractDateTypeSerializer<T extends Date> extends Abstrac
         return toInstant(object);
     }
 
+    /**
+     * Returns default {@link DateTimeFormatter}.
+     *
+     * @return date time formatter
+     */
     protected abstract DateTimeFormatter getDefaultFormatter();
 }

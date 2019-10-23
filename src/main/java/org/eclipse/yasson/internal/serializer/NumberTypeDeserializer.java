@@ -9,20 +9,19 @@
  *
  * Contributors:
  * Roman Grigoriadi
+ * David Kral
  ******************************************************************************/
 
 package org.eclipse.yasson.internal.serializer;
 
-import org.eclipse.yasson.internal.Unmarshaller;
-import org.eclipse.yasson.internal.model.customization.Customization;
-
 import java.lang.reflect.Type;
 import java.math.BigDecimal;
 
+import org.eclipse.yasson.internal.Unmarshaller;
+import org.eclipse.yasson.internal.model.customization.Customization;
+
 /**
  * Deserializer for {@link Number} type.
- * 
- * @author David Kral
  */
 public class NumberTypeDeserializer extends AbstractValueTypeDeserializer<Number> {
 

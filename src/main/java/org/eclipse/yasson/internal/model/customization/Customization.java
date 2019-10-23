@@ -12,9 +12,6 @@
  ******************************************************************************/
 package org.eclipse.yasson.internal.model.customization;
 
-import org.eclipse.yasson.internal.components.AdapterBinding;
-import org.eclipse.yasson.internal.components.DeserializerBinding;
-import org.eclipse.yasson.internal.components.SerializerBinding;
 import org.eclipse.yasson.internal.serializer.JsonbDateFormatter;
 import org.eclipse.yasson.internal.serializer.JsonbNumberFormatter;
 
@@ -22,13 +19,12 @@ import org.eclipse.yasson.internal.serializer.JsonbNumberFormatter;
  * Customization configuration for class or field.
  * Configuration parsed from annotation is put here.
  * Immutable.
- *
- * @author Roman Grigoriadi
  */
 public interface Customization {
 
     /**
-     * Number formatter for formatting numbers during serialization process. It could be the same formatter instance used for deserialization
+     * Number formatter for formatting numbers during serialization process. It could be the same formatter instance used for
+     * deserialization
      * (returned by {@link #getDeserializeNumberFormatter()}
      *
      * @return number formatter
@@ -36,7 +32,8 @@ public interface Customization {
     JsonbNumberFormatter getSerializeNumberFormatter();
 
     /**
-     * Number formatter for formatting numbers during deserialization process. It could be the same formatter instance used for serialization
+     * Number formatter for formatting numbers during deserialization process. It could be the same formatter instance used for
+     * serialization
      * (returned by {@link #getSerializeNumberFormatter()}
      *
      * @return number formatter
@@ -44,8 +41,10 @@ public interface Customization {
     JsonbNumberFormatter getDeserializeNumberFormatter();
 
     /**
-     * Date formatter for formatting date values during serialization process. It could be the same formatter instance used for deserialization
-     * (returned by {@link #getDeserializeDateFormatter()}. If not set, defaulted to <code>javax.json.bind.annotation.JsonbDateFormat.DEFAULT_FORMAT.
+     * Date formatter for formatting date values during serialization process. It could be the same formatter instance used for
+     * deserialization
+     * (returned by {@link #getDeserializeDateFormatter()}. If not set, defaulted to <code>javax.json.bind.annotation
+     * .JsonbDateFormat.DEFAULT_FORMAT.
      * </code>
      *
      * @return date formatter
@@ -53,8 +52,10 @@ public interface Customization {
     JsonbDateFormatter getSerializeDateFormatter();
 
     /**
-     * Date formatter for formatting date values during deserialization process. It could be the same formatter instance used for serialization
-     * (returned by {@link #getSerializeDateFormatter()}. If not set, defaulted to <code>javax.json.bind.annotation.JsonbDateFormat.DEFAULT_FORMAT.
+     * Date formatter for formatting date values during deserialization process. It could be the same formatter instance used
+     * for serialization
+     * (returned by {@link #getSerializeDateFormatter()}. If not set, defaulted to <code>javax.json.bind.annotation
+     * .JsonbDateFormat.DEFAULT_FORMAT.
      * </code>
      *
      * @return date formatter

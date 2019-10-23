@@ -13,21 +13,20 @@
 
 package org.eclipse.yasson.internal.serializer;
 
+import javax.json.bind.JsonbException;
+import javax.json.bind.serializer.JsonbSerializer;
+import javax.json.bind.serializer.SerializationContext;
+import javax.json.stream.JsonGenerator;
+
 import org.eclipse.yasson.internal.Marshaller;
 import org.eclipse.yasson.internal.ProcessingContext;
 import org.eclipse.yasson.internal.model.ClassModel;
 import org.eclipse.yasson.internal.properties.MessageKeys;
 import org.eclipse.yasson.internal.properties.Messages;
 
-import javax.json.bind.JsonbException;
-import javax.json.bind.serializer.JsonbSerializer;
-import javax.json.bind.serializer.SerializationContext;
-import javax.json.stream.JsonGenerator;
-
 /**
  * Serializes an object with user defined serializer.
  *
- * @author Roman Grigoriadi
  * @param <T> type of serializer
  */
 public class UserSerializerSerializer<T> implements JsonbSerializer<T> {
@@ -39,7 +38,7 @@ public class UserSerializerSerializer<T> implements JsonbSerializer<T> {
     /**
      * Create instance of current item with its builder.
      *
-     * @param classModel model
+     * @param classModel     model
      * @param userSerializer user serializer
      */
     public UserSerializerSerializer(ClassModel classModel, JsonbSerializer<T> userSerializer) {

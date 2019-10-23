@@ -9,19 +9,11 @@
  *
  * Contributors:
  * Roman Grigoriadi
+ * David Kral
  ******************************************************************************/
 
 package org.eclipse.yasson.internal.serializer;
 
-import org.eclipse.yasson.internal.JsonbContext;
-import org.eclipse.yasson.internal.Unmarshaller;
-import org.eclipse.yasson.internal.model.ClassModel;
-import org.eclipse.yasson.internal.model.customization.Customization;
-import org.eclipse.yasson.internal.properties.MessageKeys;
-import org.eclipse.yasson.internal.properties.Messages;
-
-import javax.json.bind.JsonbException;
-import javax.json.bind.annotation.JsonbDateFormat;
 import java.lang.reflect.Type;
 import java.time.DateTimeException;
 import java.time.Instant;
@@ -29,19 +21,31 @@ import java.time.ZoneId;
 import java.time.format.DateTimeFormatter;
 import java.util.Locale;
 
+import javax.json.bind.JsonbException;
+import javax.json.bind.annotation.JsonbDateFormat;
+
+import org.eclipse.yasson.internal.JsonbContext;
+import org.eclipse.yasson.internal.Unmarshaller;
+import org.eclipse.yasson.internal.model.customization.Customization;
+import org.eclipse.yasson.internal.properties.MessageKeys;
+import org.eclipse.yasson.internal.properties.Messages;
+
 /**
  * Abstract class for converting date objects from {@link java.time}.
  *
- * @author Roman Grigoriadi
+ * @param <T> date type
  */
 public abstract class AbstractDateTimeDeserializer<T> extends AbstractValueTypeDeserializer<T> {
 
+    /**
+     * Default zone id.
+     */
     public static final ZoneId UTC = ZoneId.of("UTC");
 
     /**
      * Creates an instance.
      *
-     * @param clazz Class to create deserializer for.
+     * @param clazz         Class to create deserializer for.
      * @param customization Model customization.
      */
     public AbstractDateTimeDeserializer(Class<T> clazz, Customization customization) {
@@ -56,7 +60,8 @@ public abstract class AbstractDateTimeDeserializer<T> extends AbstractValueTypeD
         } else if (formatter.getDateTimeFormatter() != null) {
             return parseWithFormatterInternal(jsonValue, formatter.getDateTimeFormatter());
         } else {
-            DateTimeFormatter configDateTimeFormatter = unmarshaller.getJsonbContext().getConfigProperties().getConfigDateFormatter().getDateTimeFormatter();
+            DateTimeFormatter configDateTimeFormatter = unmarshaller.getJsonbContext().getConfigProperties()
+                    .getConfigDateFormatter().getDateTimeFormatter();
             if (configDateTimeFormatter != null) {
                 return parseWithFormatterInternal(jsonValue, configDateTimeFormatter);
             }
@@ -72,6 +77,12 @@ public abstract class AbstractDateTimeDeserializer<T> extends AbstractValueTypeD
         }
     }
 
+    /**
+     * Returns registered deserialization jsonb date formatter.
+     *
+     * @param context context
+     * @return date formatter
+     */
     protected JsonbDateFormatter getJsonbDateFormatter(JsonbContext context) {
         if (getCustomization() != null && getCustomization().getDeserializeDateFormatter() != null) {
             return getCustomization().getDeserializeDateFormatter();
@@ -86,8 +97,9 @@ public abstract class AbstractDateTimeDeserializer<T> extends AbstractValueTypeD
      * @return zoned formatter
      */
     protected DateTimeFormatter getZonedFormatter(DateTimeFormatter formatter) {
-        return formatter.getZone() != null ?
-                formatter : formatter.withZone(UTC);
+        return formatter.getZone() != null
+                ? formatter
+                : formatter.withZone(UTC);
     }
 
     /**
@@ -104,7 +116,7 @@ public abstract class AbstractDateTimeDeserializer<T> extends AbstractValueTypeD
      * Different default formatter for each date object type is used.
      *
      * @param jsonValue string value to parse from
-     * @param locale annotated locale or default
+     * @param locale    annotated locale or default
      * @return parsed date object
      */
     protected abstract T parseDefault(String jsonValue, Locale locale);

@@ -13,14 +13,12 @@
 
 package org.eclipse.yasson.internal.serializer;
 
-import org.eclipse.yasson.internal.model.customization.Customization;
-
 import javax.json.stream.JsonGenerator;
+
+import org.eclipse.yasson.internal.model.customization.Customization;
 
 /**
  * Serializer for {@link Short} type.
- * 
- * @author David Kral
  */
 public class ShortTypeSerializer extends AbstractNumberSerializer<Short> {
 

@@ -9,25 +9,24 @@
  *
  * Contributors:
  * Roman Grigoriadi
+ * David Kral
  ******************************************************************************/
 
 package org.eclipse.yasson.internal.serializer;
 
-import org.eclipse.yasson.internal.model.customization.Customization;
-import org.eclipse.yasson.internal.properties.MessageKeys;
-import org.eclipse.yasson.internal.properties.Messages;
-
-import javax.json.bind.JsonbException;
 import java.time.Instant;
 import java.time.OffsetTime;
 import java.time.format.DateTimeFormatter;
 import java.util.Locale;
 
+import javax.json.bind.JsonbException;
+
+import org.eclipse.yasson.internal.model.customization.Customization;
+import org.eclipse.yasson.internal.properties.MessageKeys;
+import org.eclipse.yasson.internal.properties.Messages;
+
 /**
  * Serializer for {@link OffsetTime} type.
- *
- * @author David Kral
- * @author Roman Grigoriadi
  */
 public class OffsetTimeTypeSerializer extends AbstractDateTimeSerializer<OffsetTime> {
 

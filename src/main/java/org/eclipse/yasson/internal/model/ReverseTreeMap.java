@@ -16,15 +16,15 @@ import java.util.Comparator;
 import java.util.TreeMap;
 
 /**
- * TreeMap with a reverse ordering by default
- * 
- * @author Sebastien Rius
- * 
+ * TreeMap with a reverse ordering by default.
+ *
+ * @param <K> comparable key
+ * @param <V> value
  */
 public class ReverseTreeMap<K extends Comparable<? super K>, V> extends TreeMap<K, V> {
 
     /**
-     * Default constructor of a TreeMap with reverse order
+     * Default constructor of a TreeMap with reverse order.
      */
     public ReverseTreeMap() {
         super(Comparator.reverseOrder());

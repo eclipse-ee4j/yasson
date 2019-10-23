@@ -9,6 +9,7 @@
  *
  * Contributors:
  * Roman Grigoriadi
+ * David Kral
  ******************************************************************************/
 
 package org.eclipse.yasson.internal.serializer;
@@ -19,7 +20,7 @@ import org.eclipse.yasson.internal.model.ClassModel;
 /**
  * Currently processing item.
  *
- * @author Roman Grigoriadi
+ * @param <T> item type
  */
 public interface CurrentItem<T> extends RuntimeTypeInfo {
 

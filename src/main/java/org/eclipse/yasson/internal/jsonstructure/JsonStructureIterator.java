@@ -10,14 +10,15 @@
  ******************************************************************************/
 package org.eclipse.yasson.internal.jsonstructure;
 
-import org.eclipse.yasson.internal.properties.MessageKeys;
-import org.eclipse.yasson.internal.properties.Messages;
+import java.util.Iterator;
 
 import javax.json.JsonString;
 import javax.json.JsonValue;
 import javax.json.bind.JsonbException;
 import javax.json.stream.JsonParser;
-import java.util.Iterator;
+
+import org.eclipse.yasson.internal.properties.MessageKeys;
+import org.eclipse.yasson.internal.properties.Messages;
 
 /**
  * Iterates over {@link javax.json.JsonStructure}.
@@ -26,6 +27,7 @@ abstract class JsonStructureIterator implements Iterator<JsonParser.Event> {
 
     /**
      * Get current {@link JsonValue}, that the parser is pointing on.
+     *
      * @return JsonValue result.
      */
     abstract JsonValue getValue();
@@ -40,6 +42,7 @@ abstract class JsonStructureIterator implements Iterator<JsonParser.Event> {
 
     /**
      * Check the type of current  {@link JsonValue} and return a string representing a value.
+     *
      * @return String value for current JsonValue
      */
     String getString() {
@@ -53,25 +56,27 @@ abstract class JsonStructureIterator implements Iterator<JsonParser.Event> {
 
     /**
      * Convert {@link JsonValue} type to {@link JsonParser.Event}.
+     *
      * @param value JsonValue
      * @return JsonParser event
      */
     JsonParser.Event getValueEvent(JsonValue value) {
         switch (value.getValueType()) {
-            case NUMBER:
-                return JsonParser.Event.VALUE_NUMBER;
-            case STRING:
-            case TRUE:
-            case FALSE:
-                return JsonParser.Event.VALUE_STRING;
-            case OBJECT:
-                return JsonParser.Event.START_OBJECT;
-            case ARRAY:
-                return JsonParser.Event.START_ARRAY;
-            case NULL:
-                return JsonParser.Event.VALUE_NULL;
-                default:
-                    throw new JsonbException(Messages.getMessage(MessageKeys.INTERNAL_ERROR, "unknown json value: " + value.getValueType()));
+        case NUMBER:
+            return JsonParser.Event.VALUE_NUMBER;
+        case STRING:
+        case TRUE:
+        case FALSE:
+            return JsonParser.Event.VALUE_STRING;
+        case OBJECT:
+            return JsonParser.Event.START_OBJECT;
+        case ARRAY:
+            return JsonParser.Event.START_ARRAY;
+        case NULL:
+            return JsonParser.Event.VALUE_NULL;
+        default:
+            throw new JsonbException(Messages.getMessage(MessageKeys.INTERNAL_ERROR,
+                                                         "unknown json value: " + value.getValueType()));
         }
 
     }

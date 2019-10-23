@@ -17,6 +17,9 @@ import javax.json.bind.serializer.JsonbSerializer;
 import javax.json.bind.serializer.SerializationContext;
 import javax.json.stream.JsonGenerator;
 
+/**
+ * Serializer of null value.
+ */
 public class NullSerializer implements JsonbSerializer<Object> {
     @Override
     public void serialize(Object obj, JsonGenerator generator, SerializationContext ctx) {

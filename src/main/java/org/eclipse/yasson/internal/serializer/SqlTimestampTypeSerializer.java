@@ -13,19 +13,22 @@
 
 package org.eclipse.yasson.internal.serializer;
 
-import org.eclipse.yasson.internal.model.customization.Customization;
-
 import java.sql.Timestamp;
 import java.time.Instant;
 import java.time.format.DateTimeFormatter;
 import java.util.Locale;
+
+import org.eclipse.yasson.internal.model.customization.Customization;
 
 /**
  * Serializer for {@link java.sql.Timestamp} type.
  */
 public class SqlTimestampTypeSerializer extends AbstractDateTimeSerializer<Timestamp> {
 
-    public static DateTimeFormatter DEFAULT_FORMATTER = DateTimeFormatter.ISO_DATE_TIME.withZone(UTC);
+    /**
+     * Default Yasson {@link java.time.format.DateTimeFormatter}.
+     */
+    public static final DateTimeFormatter DEFAULT_FORMATTER = DateTimeFormatter.ISO_DATE_TIME.withZone(UTC);
 
     /**
      * Creates a new instance.
@@ -41,8 +44,8 @@ public class SqlTimestampTypeSerializer extends AbstractDateTimeSerializer<Times
         return value.toInstant();
     }
 
-	@Override
-	protected String formatDefault(Timestamp value, Locale locale) {
-		return DEFAULT_FORMATTER.withLocale(locale).format(toInstant(value));
-	}
+    @Override
+    protected String formatDefault(Timestamp value, Locale locale) {
+        return DEFAULT_FORMATTER.withLocale(locale).format(toInstant(value));
+    }
 }

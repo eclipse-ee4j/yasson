@@ -10,15 +10,16 @@
  ******************************************************************************/
 package org.eclipse.yasson.internal.jsonstructure;
 
-import org.eclipse.yasson.internal.properties.MessageKeys;
-import org.eclipse.yasson.internal.properties.Messages;
+import java.util.Iterator;
 
 import javax.json.JsonArray;
 import javax.json.JsonString;
 import javax.json.JsonValue;
 import javax.json.bind.JsonbException;
 import javax.json.stream.JsonParser;
-import java.util.Iterator;
+
+import org.eclipse.yasson.internal.properties.MessageKeys;
+import org.eclipse.yasson.internal.properties.Messages;
 
 /**
  * Iterates over {@link JsonArray}.
@@ -29,12 +30,18 @@ public class JsonArrayIterator extends JsonStructureIterator {
 
     private JsonValue currentValue;
 
+    /**
+     * Creates new array iterator.
+     *
+     * @param jsonArray json array
+     */
     public JsonArrayIterator(JsonArray jsonArray) {
         this.valueIterator = jsonArray.iterator();
     }
 
     /**
-     * After {@link JsonParser.Event} END_ARRAY is returned from next() iterator is removed from the stack
+     * After {@link JsonParser.Event} END_ARRAY is returned from next() iterator is removed from the stack.
+     *
      * @return always true
      */
     @Override
@@ -58,7 +65,8 @@ public class JsonArrayIterator extends JsonStructureIterator {
 
     @Override
     JsonbException createIncompatibleValueError() {
-        return new JsonbException(Messages.getMessage(MessageKeys.NUMBER_INCOMPATIBLE_VALUE_TYPE_ARRAY, getValue().getValueType()));
+        return new JsonbException(Messages.getMessage(MessageKeys.NUMBER_INCOMPATIBLE_VALUE_TYPE_ARRAY,
+                                                      getValue().getValueType()));
     }
 
     @Override

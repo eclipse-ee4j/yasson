@@ -9,9 +9,16 @@
  *
  * Contributors:
  * Roman Grigoriadi
+ * David Kral
  ******************************************************************************/
 
 package org.eclipse.yasson.internal.serializer;
+
+import java.lang.reflect.GenericArrayType;
+import java.util.List;
+
+import javax.json.bind.serializer.JsonbDeserializer;
+import javax.json.stream.JsonParser;
 
 import org.eclipse.yasson.internal.JsonbParser;
 import org.eclipse.yasson.internal.JsonbRiParser;
@@ -19,29 +26,29 @@ import org.eclipse.yasson.internal.ReflectionUtils;
 import org.eclipse.yasson.internal.Unmarshaller;
 import org.eclipse.yasson.internal.model.ClassModel;
 
-import javax.json.bind.serializer.JsonbDeserializer;
-import javax.json.stream.JsonParser;
-import java.lang.reflect.GenericArrayType;
-import java.util.List;
-
 /**
  * Common array unmarshalling item implementation.
  *
- * @author Roman Grigoriadi
+ * @param <T> array type
  */
 public abstract class AbstractArrayDeserializer<T> extends AbstractContainerDeserializer<T> implements EmbeddedItem {
 
     /**
      * Runtime type class of an array.
      */
-    protected final Class<?> componentClass;
+    private final Class<?> componentClass;
+    private final ClassModel componentClassModel;
 
-    protected final ClassModel componentClassModel;
-
-    protected AbstractArrayDeserializer(DeserializerBuilder builder) {
+    /**
+     * Creates new class instance.
+     *
+     * @param builder deserializer builder
+     */
+    AbstractArrayDeserializer(DeserializerBuilder builder) {
         super(builder);
         if (getRuntimeType() instanceof GenericArrayType) {
-            componentClass = ReflectionUtils.resolveRawType(this, ((GenericArrayType) getRuntimeType()).getGenericComponentType());
+            componentClass = ReflectionUtils
+                    .resolveRawType(this, ((GenericArrayType) getRuntimeType()).getGenericComponentType());
         } else {
             componentClass = ReflectionUtils.getRawType(getRuntimeType()).getComponentType();
         }
@@ -50,6 +57,15 @@ public abstract class AbstractArrayDeserializer<T> extends AbstractContainerDese
         } else {
             componentClassModel = null;
         }
+    }
+
+    /**
+     * Returns component class.
+     *
+     * @return component class
+     */
+    Class<?> getComponentClass() {
+        return componentClass;
     }
 
     @Override
@@ -69,6 +85,11 @@ public abstract class AbstractArrayDeserializer<T> extends AbstractContainerDese
         appendResult(deserializer.deserialize(parser, context, componentClass));
     }
 
+    /**
+     * Returns list of deserialized items.
+     *
+     * @return list of items
+     */
     protected abstract List<?> getItems();
 
     @Override

@@ -9,19 +9,18 @@
  *
  * Contributors:
  * Roman Grigoriadi
+ * David Kral
  ******************************************************************************/
 
 package org.eclipse.yasson.internal.serializer;
 
+import javax.json.JsonObject;
+
 import org.eclipse.yasson.internal.JsonbParser;
 import org.eclipse.yasson.internal.Unmarshaller;
 
-import javax.json.JsonObject;
-
 /**
  * Item for JsonObject.
- *
- * @author Roman Grigoriadi
  */
 public class JsonObjectDeserializer extends AbstractJsonpDeserializer<JsonObject> {
 
@@ -40,7 +39,6 @@ public class JsonObjectDeserializer extends AbstractJsonpDeserializer<JsonObject
     protected JsonObjectDeserializer(DeserializerBuilder builder) {
         super(builder);
     }
-
 
     @Override
     public JsonObject getInstance(Unmarshaller unmarshaller) {

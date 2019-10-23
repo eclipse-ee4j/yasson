@@ -9,11 +9,10 @@
  *
  * Contributors:
  * Roman Grigoriadi
+ * David Kral
  ******************************************************************************/
 
 package org.eclipse.yasson.internal.serializer;
-
-import org.eclipse.yasson.internal.model.customization.Customization;
 
 import java.time.Instant;
 import java.time.LocalDateTime;
@@ -21,10 +20,10 @@ import java.time.ZonedDateTime;
 import java.time.format.DateTimeFormatter;
 import java.util.Locale;
 
+import org.eclipse.yasson.internal.model.customization.Customization;
+
 /**
  * Serializer for {@link LocalDateTime} type.
- * 
- * @author David Kral
  */
 public class LocalDateTimeTypeSerializer extends AbstractDateTimeSerializer<LocalDateTime> {
 
@@ -41,7 +40,6 @@ public class LocalDateTimeTypeSerializer extends AbstractDateTimeSerializer<Loca
     protected Instant toInstant(LocalDateTime value) {
         return value.atZone(UTC).toInstant();
     }
-
 
     @Override
     protected String formatDefault(LocalDateTime value, Locale locale) {

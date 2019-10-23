@@ -9,6 +9,7 @@
  *
  * Contributors:
  * Roman Grigoriadi
+ * David Kral
  ******************************************************************************/
 
 package org.eclipse.yasson.internal.serializer;
@@ -18,11 +19,14 @@ import javax.json.stream.JsonGenerator;
 
 /**
  * Serializer for arrays of longs.
- * 
- * @author Roman Grigoriadi
  */
 public class LongArraySerializer extends AbstractArraySerializer<long[]> {
 
+    /**
+     * Creates new array of long array serializer.
+     *
+     * @param builder serializer builder
+     */
     protected LongArraySerializer(SerializerBuilder builder) {
         super(builder);
     }

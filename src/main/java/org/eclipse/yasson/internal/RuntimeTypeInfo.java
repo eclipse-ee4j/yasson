@@ -17,8 +17,6 @@ import java.lang.reflect.Type;
 
 /**
  * Holds runtime type info of the class. Used for generic type resolution, especially during unmarshalling.
- *
- * @author Roman Grigoriadi
  */
 public interface RuntimeTypeInfo {
 
@@ -30,7 +28,8 @@ public interface RuntimeTypeInfo {
     RuntimeTypeInfo getWrapper();
 
     /**
-     * Returns a runtime type. It can be a class, {@link java.lang.reflect.ParameterizedType} or {@link java.lang.reflect.TypeVariable}.
+     * Returns a runtime type. It can be a class, {@link java.lang.reflect.ParameterizedType} or
+     * {@link java.lang.reflect.TypeVariable}.
      *
      * @return Runtime type or null if not defined.
      */

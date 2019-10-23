@@ -12,6 +12,12 @@
  ******************************************************************************/
 package org.eclipse.yasson.internal;
 
+import java.lang.reflect.Type;
+import java.util.logging.Logger;
+
+import javax.json.bind.JsonbException;
+import javax.json.bind.serializer.DeserializationContext;
+import javax.json.stream.JsonParser;
 
 import org.eclipse.yasson.internal.model.ClassModel;
 import org.eclipse.yasson.internal.properties.MessageKeys;
@@ -19,21 +25,13 @@ import org.eclipse.yasson.internal.properties.Messages;
 import org.eclipse.yasson.internal.serializer.DefaultSerializers;
 import org.eclipse.yasson.internal.serializer.DeserializerBuilder;
 
-import javax.json.bind.JsonbException;
-import javax.json.bind.serializer.DeserializationContext;
-import javax.json.stream.JsonParser;
-import java.lang.reflect.Type;
-import java.util.logging.Logger;
-
 /**
  * JSONB unmarshaller.
  * Uses {@link JsonParser} to navigate through json string.
- *
- * @author Roman Grigoriadi
  */
 public class Unmarshaller extends ProcessingContext implements DeserializationContext {
 
-    private static final Logger logger = Logger.getLogger(Unmarshaller.class.getName());
+    private static final Logger LOGGER = Logger.getLogger(Unmarshaller.class.getName());
 
     /**
      * Creates instance of unmarshaller.
@@ -57,7 +55,7 @@ public class Unmarshaller extends ProcessingContext implements DeserializationCo
     @SuppressWarnings("unchecked")
     private <T> T deserializeItem(Type type, JsonParser parser) {
         try {
-            DeserializerBuilder deserializerBuilder = new DeserializerBuilder(jsonbContext)
+            DeserializerBuilder deserializerBuilder = new DeserializerBuilder(getJsonbContext())
                     .withType(type).withJsonValueType(getRootEvent(parser));
             Class<?> rawType = ReflectionUtils.getRawType(type);
             if (!DefaultSerializers.getInstance().isKnownType(rawType)) {
@@ -67,10 +65,10 @@ public class Unmarshaller extends ProcessingContext implements DeserializationCo
 
             return (T) deserializerBuilder.build().deserialize(parser, this, type);
         } catch (JsonbException e) {
-            logger.severe(e.getMessage());
+            LOGGER.severe(e.getMessage());
             throw e;
         } catch (Exception e) {
-            logger.severe(e.getMessage());
+            LOGGER.severe(e.getMessage());
             throw new JsonbException(Messages.getMessage(MessageKeys.INTERNAL_ERROR, e.getMessage()), e);
         }
     }

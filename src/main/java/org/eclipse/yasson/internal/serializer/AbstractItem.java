@@ -9,12 +9,13 @@
  *
  * Contributors:
  * Roman Grigoriadi
+ * David Kral
  ******************************************************************************/
 package org.eclipse.yasson.internal.serializer;
 
-import org.eclipse.yasson.internal.model.ClassModel;
-
 import java.lang.reflect.Type;
+
+import org.eclipse.yasson.internal.model.ClassModel;
 
 /**
  * Metadata wrapper for currently processed object.
@@ -22,7 +23,6 @@ import java.lang.reflect.Type;
  * creates instances of it, sets finished unmarshalled objects into object tree.
  *
  * @param <T> Instantiated object type
- * @author Roman Grigoriadi
  */
 public abstract class AbstractItem<T> implements CurrentItem<T> {
 
@@ -53,9 +53,9 @@ public abstract class AbstractItem<T> implements CurrentItem<T> {
     /**
      * Creates an instance.
      *
-     * @param wrapper Item wrapper.
+     * @param wrapper     Item wrapper.
      * @param runtimeType Runtime type.
-     * @param classModel Class model.
+     * @param classModel  Class model.
      */
     public AbstractItem(CurrentItem<?> wrapper, Type runtimeType, ClassModel classModel) {
         this.wrapper = wrapper;

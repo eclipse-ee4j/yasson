@@ -10,14 +10,15 @@
  ******************************************************************************/
 package org.eclipse.yasson.internal.jsonstructure;
 
-import org.eclipse.yasson.internal.properties.MessageKeys;
-import org.eclipse.yasson.internal.properties.Messages;
+import java.util.Iterator;
 
 import javax.json.JsonObject;
 import javax.json.JsonValue;
 import javax.json.bind.JsonbException;
 import javax.json.stream.JsonParser;
-import java.util.Iterator;
+
+import org.eclipse.yasson.internal.properties.MessageKeys;
+import org.eclipse.yasson.internal.properties.Messages;
 
 /**
  * Iterates over {@link JsonObject} managing internal state.
@@ -28,9 +29,21 @@ public class JsonObjectIterator extends JsonStructureIterator {
      * Location pointer.
      */
     public enum State {
+        /**
+         * Start of the object.
+         */
         START,
+        /**
+         * Property key name.
+         */
         KEY,
+        /**
+         * Property value.
+         */
         VALUE,
+        /**
+         * End of the object.
+         */
         END
     }
 
@@ -42,12 +55,10 @@ public class JsonObjectIterator extends JsonStructureIterator {
 
     private State state = State.START;
 
-
     JsonObjectIterator(JsonObject jsonObject) {
         this.jsonObject = jsonObject;
         this.keyIterator = jsonObject.keySet().iterator();
     }
-
 
     private void nextKey() {
         if (!keyIterator.hasNext()) {
@@ -59,29 +70,29 @@ public class JsonObjectIterator extends JsonStructureIterator {
     @Override
     public JsonParser.Event next() {
         switch (state) {
-            case START:
-                if (keyIterator.hasNext()) {
-                    nextKey();
-                    setState(JsonObjectIterator.State.KEY);
-                    return JsonParser.Event.KEY_NAME;
-                } else {
-                    setState(State.END);
-                    return JsonParser.Event.END_OBJECT;
-                }
-            case KEY:
-                setState(JsonObjectIterator.State.VALUE);
-                JsonValue value = getValue();
-                return getValueEvent(value);
-            case VALUE:
-                if (keyIterator.hasNext()) {
-                    nextKey();
-                    setState(JsonObjectIterator.State.KEY);
-                    return JsonParser.Event.KEY_NAME;
-                }
+        case START:
+            if (keyIterator.hasNext()) {
+                nextKey();
+                setState(JsonObjectIterator.State.KEY);
+                return JsonParser.Event.KEY_NAME;
+            } else {
                 setState(State.END);
                 return JsonParser.Event.END_OBJECT;
-            default:
-                throw new JsonbException("Illegal state");
+            }
+        case KEY:
+            setState(JsonObjectIterator.State.VALUE);
+            JsonValue value = getValue();
+            return getValueEvent(value);
+        case VALUE:
+            if (keyIterator.hasNext()) {
+                nextKey();
+                setState(JsonObjectIterator.State.KEY);
+                return JsonParser.Event.KEY_NAME;
+            }
+            setState(State.END);
+            return JsonParser.Event.END_OBJECT;
+        default:
+            throw new JsonbException("Illegal state");
         }
 
     }
@@ -94,6 +105,7 @@ public class JsonObjectIterator extends JsonStructureIterator {
 
     /**
      * {@link JsonValue} for current key.
+     *
      * @return Current JsonValue.
      */
     public JsonValue getValue() {
@@ -110,7 +122,9 @@ public class JsonObjectIterator extends JsonStructureIterator {
 
     @Override
     JsonbException createIncompatibleValueError() {
-        return new JsonbException(Messages.getMessage(MessageKeys.NUMBER_INCOMPATIBLE_VALUE_TYPE_OBJECT, getValue().getValueType(), currentKey));
+        return new JsonbException(Messages.getMessage(MessageKeys.NUMBER_INCOMPATIBLE_VALUE_TYPE_OBJECT,
+                                                      getValue().getValueType(),
+                                                      currentKey));
     }
 
     private void setState(State state) {
@@ -119,6 +133,7 @@ public class JsonObjectIterator extends JsonStructureIterator {
 
     /**
      * Current key this iterator is pointing at.
+     *
      * @return Current key.
      */
     public String getKey() {

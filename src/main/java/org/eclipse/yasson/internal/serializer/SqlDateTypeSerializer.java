@@ -13,20 +13,21 @@
 
 package org.eclipse.yasson.internal.serializer;
 
-import org.eclipse.yasson.internal.model.customization.Customization;
-
 import java.sql.Date;
 import java.time.format.DateTimeFormatter;
+
+import org.eclipse.yasson.internal.model.customization.Customization;
 
 /**
  * Serializer for {@link java.sql.Date} type.
  * {@link java.sql.Date} has no time portion, so it uses {@code ISO_DATE} format.
- *
- * @author Roman Grigoriadi
  */
 public class SqlDateTypeSerializer extends AbstractDateTypeSerializer<Date> {
 
-    public static DateTimeFormatter DEFAULT_FORMATTER = DateTimeFormatter.ISO_DATE.withZone(UTC);
+    /**
+     * Default date time formatter.
+     */
+    public static final DateTimeFormatter DEFAULT_FORMATTER = DateTimeFormatter.ISO_DATE.withZone(UTC);
 
     /**
      * Creates a new instance.

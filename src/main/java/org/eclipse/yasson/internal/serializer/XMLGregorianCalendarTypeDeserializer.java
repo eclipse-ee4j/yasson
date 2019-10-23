@@ -9,19 +9,16 @@
  *
  * Contributors:
  * Roman Grigoriadi
+ * David Kral
  ******************************************************************************/
 
 package org.eclipse.yasson.internal.serializer;
 
-import org.eclipse.yasson.internal.model.customization.Customization;
-import org.eclipse.yasson.internal.properties.MessageKeys;
-import org.eclipse.yasson.internal.properties.Messages;
-
-import javax.json.bind.JsonbException;
-import javax.xml.datatype.DatatypeConfigurationException;
-import javax.xml.datatype.DatatypeFactory;
-import javax.xml.datatype.XMLGregorianCalendar;
-import java.time.*;
+import java.time.Instant;
+import java.time.LocalDate;
+import java.time.LocalTime;
+import java.time.ZoneId;
+import java.time.ZonedDateTime;
 import java.time.format.DateTimeFormatter;
 import java.time.temporal.TemporalAccessor;
 import java.time.temporal.TemporalQueries;
@@ -30,16 +27,24 @@ import java.util.GregorianCalendar;
 import java.util.Locale;
 import java.util.TimeZone;
 
+import javax.json.bind.JsonbException;
+import javax.xml.datatype.DatatypeConfigurationException;
+import javax.xml.datatype.DatatypeFactory;
+import javax.xml.datatype.XMLGregorianCalendar;
+
+import org.eclipse.yasson.internal.model.customization.Customization;
+import org.eclipse.yasson.internal.properties.MessageKeys;
+import org.eclipse.yasson.internal.properties.Messages;
+
 /**
  * Deserializer for {@link XMLGregorianCalendar} type.
- *
- * @author David Kral
  */
 public class XMLGregorianCalendarTypeDeserializer extends AbstractDateTimeDeserializer<XMLGregorianCalendar> {
 
+    private static final LocalTime ZERO_LOCAL_TIME = LocalTime.parse("00:00:00");
+
     private final Calendar calendarTemplate;
     private final DatatypeFactory datatypeFactory;
-    private final LocalTime ZERO_LOCAL_TIME = LocalTime.parse("00:00:00");
 
     /**
      * Creates an instance.
@@ -58,7 +63,6 @@ public class XMLGregorianCalendarTypeDeserializer extends AbstractDateTimeDeseri
         }
     }
 
-
     @Override
     protected XMLGregorianCalendar fromInstant(Instant instant) {
         final GregorianCalendar calendar = (GregorianCalendar) calendarTemplate.clone();
@@ -68,8 +72,9 @@ public class XMLGregorianCalendarTypeDeserializer extends AbstractDateTimeDeseri
 
     @Override
     protected XMLGregorianCalendar parseDefault(String jsonValue, Locale locale) {
-        DateTimeFormatter formatter = jsonValue.contains("T") ?
-                DateTimeFormatter.ISO_DATE_TIME : DateTimeFormatter.ISO_DATE;
+        DateTimeFormatter formatter = jsonValue.contains("T")
+                ? DateTimeFormatter.ISO_DATE_TIME
+                : DateTimeFormatter.ISO_DATE;
         return parseWithFormatter(jsonValue, formatter.withLocale(locale));
     }
 

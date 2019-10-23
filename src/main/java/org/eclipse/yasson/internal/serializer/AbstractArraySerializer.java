@@ -9,43 +9,27 @@
  *
  * Contributors:
  * Roman Grigoriadi
+ * David Kral
  ******************************************************************************/
 
 package org.eclipse.yasson.internal.serializer;
 
-import java.lang.reflect.GenericArrayType;
-import java.lang.reflect.ParameterizedType;
-import java.lang.reflect.Type;
-
 import javax.json.stream.JsonGenerator;
-
-import org.eclipse.yasson.internal.ReflectionUtils;
 
 /**
  * Common serializer for arrays.
  *
- * @author Roman Grigoriadi
  * @param <T> Type to serialize.
  */
 public abstract class AbstractArraySerializer<T> extends AbstractContainerSerializer<T> implements EmbeddedItem {
 
-    protected final Type arrayValType;
-
+    /**
+     * Creates new instance of array serializer.
+     *
+     * @param builder serializer builder
+     */
     protected AbstractArraySerializer(SerializerBuilder builder) {
         super(builder);
-        arrayValType = resolveArrayType();
-    }
-
-    private Type resolveArrayType() {
-        if (getRuntimeType() == null || getRuntimeType() == Object.class) {
-            return Object.class;
-        } else if (getRuntimeType() instanceof ParameterizedType) {
-            return ReflectionUtils.resolveType(this, ((ParameterizedType) getRuntimeType()).getActualTypeArguments()[0]);
-        } else if (getRuntimeType() instanceof GenericArrayType) {
-            return ReflectionUtils.resolveRawType(this, ((GenericArrayType) getRuntimeType()).getGenericComponentType());
-        } else {
-            return ReflectionUtils.getRawType(getRuntimeType()).getComponentType();
-        }
     }
 
     @Override

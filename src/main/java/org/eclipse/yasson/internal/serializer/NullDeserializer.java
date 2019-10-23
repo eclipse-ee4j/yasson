@@ -13,13 +13,21 @@
 
 package org.eclipse.yasson.internal.serializer;
 
+import java.lang.reflect.Type;
+
 import javax.json.bind.serializer.DeserializationContext;
 import javax.json.bind.serializer.JsonbDeserializer;
 import javax.json.stream.JsonParser;
-import java.lang.reflect.Type;
 
+/**
+ * Deserializer of null value.
+ */
 public enum NullDeserializer implements JsonbDeserializer<Object> {
+    /**
+     * Singleton of null deserializer.
+     */
     INSTANCE;
+
     @Override
     public Object deserialize(JsonParser parser, DeserializationContext ctx, Type rtType) {
         return null;

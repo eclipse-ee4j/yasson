@@ -9,11 +9,10 @@
  *
  * Contributors:
  * Roman Grigoriadi
+ * David Kral
  ******************************************************************************/
 
 package org.eclipse.yasson.internal.serializer;
-
-import org.eclipse.yasson.internal.model.customization.Customization;
 
 import java.time.Instant;
 import java.time.ZonedDateTime;
@@ -22,13 +21,12 @@ import java.time.temporal.TemporalAccessor;
 import java.util.Calendar;
 import java.util.Locale;
 
+import org.eclipse.yasson.internal.model.customization.Customization;
+
 /**
  * Serializer for {@link Calendar} type.
- *
- * @author David Kral
  */
 public class CalendarTypeSerializer extends AbstractDateTimeSerializer<Calendar> {
-
 
     /**
      * Creates a new instance.
@@ -46,8 +44,9 @@ public class CalendarTypeSerializer extends AbstractDateTimeSerializer<Calendar>
 
     @Override
     protected String formatDefault(Calendar value, Locale locale) {
-        DateTimeFormatter formatter = value.isSet(Calendar.HOUR) || value.isSet(Calendar.HOUR_OF_DAY) ?
-                DateTimeFormatter.ISO_DATE_TIME : DateTimeFormatter.ISO_DATE;
+        DateTimeFormatter formatter = value.isSet(Calendar.HOUR) || value.isSet(Calendar.HOUR_OF_DAY)
+                ? DateTimeFormatter.ISO_DATE_TIME
+                : DateTimeFormatter.ISO_DATE;
         return formatter.withZone(value.getTimeZone().toZoneId())
                 .withLocale(locale).format(toTemporalAccessor(value));
     }
@@ -59,6 +58,6 @@ public class CalendarTypeSerializer extends AbstractDateTimeSerializer<Calendar>
 
     private ZonedDateTime toZonedDateTime(Calendar object) {
         return ZonedDateTime.ofInstant(Instant.ofEpochMilli(object.getTimeInMillis()),
-                object.getTimeZone().toZoneId());
+                                       object.getTimeZone().toZoneId());
     }
 }

@@ -9,19 +9,18 @@
  *
  * Contributors:
  * Roman Grigoriadi
+ * David Kral
  ******************************************************************************/
 
 package org.eclipse.yasson.internal.serializer;
 
+import javax.json.stream.JsonGenerator;
+
 import org.eclipse.yasson.internal.Marshaller;
 import org.eclipse.yasson.internal.model.customization.Customization;
 
-import javax.json.stream.JsonGenerator;
-
 /**
  * Serializer for {@link Boolean} type.
- *
- * @author David Kral
  */
 public class BooleanTypeSerializer extends AbstractValueTypeSerializer<Boolean> {
 

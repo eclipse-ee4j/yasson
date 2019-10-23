@@ -9,20 +9,19 @@
  *
  * Contributors:
  * Roman Grigoriadi
+ * David Kral
  ******************************************************************************/
 
 package org.eclipse.yasson.internal.serializer;
 
-import org.eclipse.yasson.internal.Unmarshaller;
-import org.eclipse.yasson.internal.model.customization.Customization;
-
 import java.lang.reflect.Type;
 import java.time.ZoneId;
 
+import org.eclipse.yasson.internal.Unmarshaller;
+import org.eclipse.yasson.internal.model.customization.Customization;
+
 /**
  * Deserializer for {@link ZoneId} type.
- * 
- * @author David Kral
  */
 public class ZoneIdTypeDeserializer extends AbstractValueTypeDeserializer<ZoneId> {
 

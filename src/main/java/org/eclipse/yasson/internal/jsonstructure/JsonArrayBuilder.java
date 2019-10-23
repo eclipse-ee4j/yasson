@@ -10,12 +10,13 @@
  ******************************************************************************/
 package org.eclipse.yasson.internal.jsonstructure;
 
+import java.math.BigDecimal;
+import java.math.BigInteger;
+
 import javax.json.JsonArray;
 import javax.json.JsonStructure;
 import javax.json.JsonValue;
 import javax.json.spi.JsonProvider;
-import java.math.BigDecimal;
-import java.math.BigInteger;
 
 /**
  * Builds {@link JsonArray}. Delegates to {@link javax.json.JsonArrayBuilder}.
@@ -26,6 +27,7 @@ class JsonArrayBuilder extends JsonStructureBuilder {
 
     /**
      * Create instance with cached provider.
+     *
      * @param provider Json provider to create JsonArrayBuilder on.
      */
     JsonArrayBuilder(JsonProvider provider) {

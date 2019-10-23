@@ -13,19 +13,20 @@
 
 package org.eclipse.yasson.internal.components;
 
-import org.eclipse.yasson.internal.JsonBinding;
-import org.eclipse.yasson.internal.properties.MessageKeys;
-import org.eclipse.yasson.internal.properties.Messages;
-import org.eclipse.yasson.spi.JsonbComponentInstanceCreator;
+import java.io.IOException;
+import java.util.concurrent.ConcurrentHashMap;
+import java.util.concurrent.ConcurrentMap;
 
 import javax.enterprise.context.spi.CreationalContext;
 import javax.enterprise.inject.spi.AnnotatedType;
 import javax.enterprise.inject.spi.BeanManager;
 import javax.enterprise.inject.spi.InjectionTarget;
 import javax.json.bind.JsonbException;
-import java.io.IOException;
-import java.util.concurrent.ConcurrentHashMap;
-import java.util.concurrent.ConcurrentMap;
+
+import org.eclipse.yasson.internal.JsonBinding;
+import org.eclipse.yasson.internal.properties.MessageKeys;
+import org.eclipse.yasson.internal.properties.Messages;
+import org.eclipse.yasson.spi.JsonbComponentInstanceCreator;
 
 /**
  * CDI instance manager.
@@ -33,8 +34,6 @@ import java.util.concurrent.ConcurrentMap;
  * Calling close on JsonBinding, cleans up Jsonb CDI instances and in case of "dependant" scope its dependencies.
  *
  * CDI API dependency is optional, this class is never referenced / loaded if CDI API is not resolvable.
- *
- * @author Roman Grigoriadi
  */
 public class BeanManagerInstanceCreator implements JsonbComponentInstanceCreator {
 
@@ -50,7 +49,7 @@ public class BeanManagerInstanceCreator implements JsonbComponentInstanceCreator
     public BeanManagerInstanceCreator(Object beanManager) {
         if (!(beanManager instanceof BeanManager)) {
             throw new JsonbException(Messages.getMessage(MessageKeys.INTERNAL_ERROR,
-                    "beanManager instance should be of type '" + BeanManager.class + "'"));
+                                                         "beanManager instance should be of type '" + BeanManager.class + "'"));
         }
         this.beanManager = (BeanManager) beanManager;
     }
@@ -79,7 +78,7 @@ public class BeanManagerInstanceCreator implements JsonbComponentInstanceCreator
     @Override
     @SuppressWarnings("unchecked")
     public void close() throws IOException {
-        injectionTargets.forEach((clazz,target)-> cleanupBean(target));
+        injectionTargets.forEach((clazz, target) -> cleanupBean(target));
         injectionTargets.clear();
     }
 
@@ -97,7 +96,7 @@ public class BeanManagerInstanceCreator implements JsonbComponentInstanceCreator
         private final InjectionTarget<T> injectionTarget;
         private final CreationalContext<T> creationalContext;
 
-        public CDIManagedBean(T instance, InjectionTarget<T> injectionTarget, CreationalContext<T> creationalContext) {
+        CDIManagedBean(T instance, InjectionTarget<T> injectionTarget, CreationalContext<T> creationalContext) {
             this.instance = instance;
             this.injectionTarget = injectionTarget;
             this.creationalContext = creationalContext;

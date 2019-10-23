@@ -9,23 +9,28 @@
  *
  * Contributors:
  * Roman Grigoriadi
+ * David Kral
  ******************************************************************************/
 
 package org.eclipse.yasson.internal.serializer;
 
-import org.eclipse.yasson.internal.Unmarshaller;
-
 import java.util.ArrayList;
 import java.util.List;
 
+import org.eclipse.yasson.internal.Unmarshaller;
+
 /**
  * Array unmarshaller item implementation for small double.
- *
- * @author Roman Grigoriadi
  */
 public class DoubleArrayDeserializer extends AbstractArrayDeserializer<double[]> {
+
     private final List<Double> items = new ArrayList<>();
 
+    /**
+     * Creates new instance of double array deserializer.
+     *
+     * @param builder deserializer builder
+     */
     protected DoubleArrayDeserializer(DeserializerBuilder builder) {
         super(builder);
     }
@@ -39,7 +44,7 @@ public class DoubleArrayDeserializer extends AbstractArrayDeserializer<double[]>
     public double[] getInstance(Unmarshaller unmarshaller) {
         final int size = items.size();
         final double[] doubleArray = new double[size];
-        for(int i=0; i<size; i++) {
+        for (int i = 0; i < size; i++) {
             doubleArray[i] = items.get(i);
         }
         return doubleArray;
