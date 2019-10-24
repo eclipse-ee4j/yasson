@@ -13,14 +13,12 @@
 
 package org.eclipse.yasson.customization;
 
+import org.junit.jupiter.api.*;
+import static org.junit.jupiter.api.Assertions.*;
+import static org.eclipse.yasson.Jsonbs.*;
+
 import org.eclipse.yasson.customization.model.InterfacedPojoB;
 import org.eclipse.yasson.customization.model.InterfacedPojoImpl;
-import org.junit.Test;
-
-import javax.json.bind.Jsonb;
-import javax.json.bind.JsonbBuilder;
-
-import static org.junit.Assert.assertEquals;
 
 /**
  * @author Roman Grigoriadi
@@ -33,10 +31,7 @@ public class InterfaceAnnotationsTest {
         pojo.setPropertyA("AA");
         pojo.setPropertyB("BB");
 
-        final Jsonb jsonb = JsonbBuilder.create();
         final String json = "{\"propA\":\"AA\",\"propB\":\"BB\"}";
-        assertEquals(json, jsonb.toJson(pojo));
+        assertEquals(json, defaultJsonb.toJson(pojo));
     }
-
-
 }

@@ -1,12 +1,11 @@
 package org.eclipse.yasson.internal;
 
+import org.junit.jupiter.api.*;
+import static org.junit.jupiter.api.Assertions.*;
+
 import static org.eclipse.yasson.internal.AnnotationFinderTestFixtures.TESTVALUE;
 import static org.eclipse.yasson.internal.AnnotationFinderTestFixtures.getConstructorAnnotationsOf;
 import static org.eclipse.yasson.internal.AnnotationFinderTestFixtures.getMethodAnnotationsOf;
-import static org.junit.Assert.assertArrayEquals;
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertNotNull;
-import static org.junit.Assert.assertNull;
 
 import org.eclipse.yasson.internal.AnnotationFinderTestFixtures.AnnotationAnnotatedWithDeprecated;
 import org.eclipse.yasson.internal.AnnotationFinderTestFixtures.AnnotationWithoutValueProperty;
@@ -19,8 +18,6 @@ import org.eclipse.yasson.internal.AnnotationFinderTestFixtures.ObjectWithInheri
 import org.eclipse.yasson.internal.AnnotationFinderTestFixtures.ObjectWithInheritedDeprecatedMethod;
 import org.eclipse.yasson.internal.AnnotationFinderTestFixtures.ObjectWithMissingValuePropertyAnnotation;
 import org.eclipse.yasson.internal.AnnotationFinderTestFixtures.ObjectWithNoAnnotations;
-
-import org.junit.Test;
 
 public class AnnotationFinderTest {
 

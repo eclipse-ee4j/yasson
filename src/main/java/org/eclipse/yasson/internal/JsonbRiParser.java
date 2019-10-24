@@ -13,15 +13,6 @@
 
 package org.eclipse.yasson.internal;
 
-import org.eclipse.yasson.internal.properties.MessageKeys;
-import org.eclipse.yasson.internal.properties.Messages;
-
-import javax.json.JsonArray;
-import javax.json.JsonObject;
-import javax.json.JsonValue;
-import javax.json.bind.JsonbException;
-import javax.json.stream.JsonLocation;
-import javax.json.stream.JsonParser;
 import java.math.BigDecimal;
 import java.util.ArrayDeque;
 import java.util.Arrays;
@@ -30,10 +21,18 @@ import java.util.Map;
 import java.util.Objects;
 import java.util.stream.Stream;
 
+import javax.json.JsonArray;
+import javax.json.JsonObject;
+import javax.json.JsonValue;
+import javax.json.bind.JsonbException;
+import javax.json.stream.JsonLocation;
+import javax.json.stream.JsonParser;
+
+import org.eclipse.yasson.internal.properties.MessageKeys;
+import org.eclipse.yasson.internal.properties.Messages;
+
 /**
  * Decorator for JSONP parser used by JSONB.
- *
- * @author Roman Grigoriadi
  */
 public class JsonbRiParser implements JsonParser, JsonbParser {
 
@@ -125,7 +124,7 @@ public class JsonbRiParser implements JsonParser, JsonbParser {
 
     @Override
     public boolean hasNext() {
-        return  jsonParser.hasNext();
+        return jsonParser.hasNext();
     }
 
     @Override
@@ -143,21 +142,21 @@ public class JsonbRiParser implements JsonParser, JsonbParser {
         final JsonParser.Event next = jsonParser.next();
         level.peek().setLastEvent(next);
         switch (next) {
-            case START_ARRAY:
-            case START_OBJECT:
-                final LevelContext newLevel = new LevelContext(level.peek());
-                newLevel.setLastEvent(next);
-                level.push(newLevel);
-                break;
-            case END_ARRAY:
-            case END_OBJECT:
-                level.pop().finish();
-                break;
-            case KEY_NAME:
-                getCurrentLevel().setLastKeyName(jsonParser.getString());
-                break;
-            default:
-                break;
+        case START_ARRAY:
+        case START_OBJECT:
+            final LevelContext newLevel = new LevelContext(level.peek());
+            newLevel.setLastEvent(next);
+            level.push(newLevel);
+            break;
+        case END_ARRAY:
+        case END_OBJECT:
+            level.pop().finish();
+            break;
+        case KEY_NAME:
+            getCurrentLevel().setLastKeyName(jsonParser.getString());
+            break;
+        default:
+            break;
         }
         return next;
     }
@@ -198,7 +197,8 @@ public class JsonbRiParser implements JsonParser, JsonbParser {
             return;
         }
 
-        throw new JsonbException(Messages.getMessage(MessageKeys.INTERNAL_ERROR, "Event " + required + " not found." + getLastDataMsg()));
+        throw new JsonbException(Messages.getMessage(MessageKeys.INTERNAL_ERROR,
+                                                     "Event " + required + " not found." + getLastDataMsg()));
     }
 
     @Override
@@ -221,7 +221,9 @@ public class JsonbRiParser implements JsonParser, JsonbParser {
             return next;
         }
 
-        throw new JsonbException(Messages.getMessage(MessageKeys.INTERNAL_ERROR, "Parser event ["+Arrays.toString(events)+"] not found." + getLastDataMsg()));
+        throw new JsonbException(Messages.getMessage(MessageKeys.INTERNAL_ERROR,
+                                                     "Parser event [" + Arrays
+                                                             .toString(events) + "] not found." + getLastDataMsg()));
     }
 
     private boolean contains(Event[] events, Event candidate) {
@@ -250,14 +252,14 @@ public class JsonbRiParser implements JsonParser, JsonbParser {
     public void skipJsonStructure() {
         final LevelContext currentLevel = level.peek();
         switch (currentLevel.getLastEvent()) {
-            case START_ARRAY:
-            case START_OBJECT:
-                while (!currentLevel.isParsed()) {
-                    next();
-                }
-                return;
-            default:
-                return;
+        case START_ARRAY:
+        case START_OBJECT:
+            while (!currentLevel.isParsed()) {
+                next();
+            }
+            return;
+        default:
+            return;
         }
     }
 

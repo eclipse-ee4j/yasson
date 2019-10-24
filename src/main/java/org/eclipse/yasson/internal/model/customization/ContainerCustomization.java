@@ -14,8 +14,6 @@ package org.eclipse.yasson.internal.model.customization;
 
 /**
  * Customization for container like types (Maps, Collections, Arrays).
- *
- * @author Roman Grigoriadi
  */
 public class ContainerCustomization extends ClassCustomization {
 

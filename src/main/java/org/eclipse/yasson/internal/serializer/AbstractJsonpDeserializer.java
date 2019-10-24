@@ -9,21 +9,22 @@
  *
  * Contributors:
  * Roman Grigoriadi
+ * David Kral
  ******************************************************************************/
 
 package org.eclipse.yasson.internal.serializer;
+
+import javax.json.JsonValue;
+import javax.json.stream.JsonParser;
 
 import org.eclipse.yasson.internal.JsonbParser;
 import org.eclipse.yasson.internal.JsonbRiParser;
 import org.eclipse.yasson.internal.Unmarshaller;
 
-import javax.json.JsonValue;
-import javax.json.stream.JsonParser;
-
 /**
  * Common implementation for JSONP Object and Array.
  *
- * @author Roman Grigoriadi
+ * @param <T> json value type
  */
 public abstract class AbstractJsonpDeserializer<T extends JsonValue> extends AbstractContainerDeserializer<T> {
 

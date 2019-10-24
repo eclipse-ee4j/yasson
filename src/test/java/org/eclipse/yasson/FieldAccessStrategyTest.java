@@ -11,8 +11,8 @@
  * Roman Grigoriadi
  ******************************************************************************/package org.eclipse.yasson;
 
-import org.junit.Assert;
-import org.junit.Test;
+ import org.junit.jupiter.api.*;
+ import static org.junit.jupiter.api.Assertions.*;
 
 import javax.json.bind.Jsonb;
 import javax.json.bind.JsonbBuilder;
@@ -62,11 +62,11 @@ public class FieldAccessStrategyTest {
 
         String expected = "{\"strField\":\"pojo string\"}";
 
-        Assert.assertEquals(expected, jsonb.toJson(pojo));
+        assertEquals(expected, jsonb.toJson(pojo));
         PrivateFields result = jsonb.fromJson(expected, PrivateFields.class);
-        Assert.assertEquals(false, result.getterCalled);
-        Assert.assertEquals(false, result.setterCalled);
-        Assert.assertEquals("pojo string", result.strField);
+        assertEquals(false, result.getterCalled);
+        assertEquals(false, result.setterCalled);
+        assertEquals("pojo string", result.strField);
     }
 
 
@@ -79,9 +79,9 @@ public class FieldAccessStrategyTest {
 
         String expected = "{}";
 
-        Assert.assertEquals(expected, jsonb.toJson(pojo));
+        assertEquals(expected, jsonb.toJson(pojo));
         PublicFields result = jsonb.fromJson("{\"strField\":\"pojo string\"}", PublicFields.class);
-        Assert.assertEquals(null, result.strField);
+        assertEquals(null, result.strField);
     }
 
     /**
@@ -96,13 +96,13 @@ public class FieldAccessStrategyTest {
         simpleContainer.setStringInstance("Test String");
         simpleContainer.setIntegerInstance(10);
         simpleContainer.setFloatInstance(10.0f);
-        Assert.assertEquals(json, jsonb.toJson(simpleContainer));
+        assertEquals(json, jsonb.toJson(simpleContainer));
 
 
         SimpleContainer result = jsonb.fromJson("{ \"stringInstance\" : \"Test String\", \"floatInstance\" : 1.0, \"integerInstance\" : 1 }", SimpleContainer.class);
-        Assert.assertEquals("Test String", result.stringInstance);
-        Assert.assertNull(result.integerInstance);
-        Assert.assertNull(result.floatInstance);
+        assertEquals("Test String", result.stringInstance);
+        assertNull(result.integerInstance);
+        assertNull(result.floatInstance);
     }
 
     public class CustomVisibilityStrategy implements PropertyVisibilityStrategy {

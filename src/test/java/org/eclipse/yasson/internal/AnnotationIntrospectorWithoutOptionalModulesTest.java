@@ -1,8 +1,10 @@
 package org.eclipse.yasson.internal;
 
+import org.junit.jupiter.api.*;
+import static org.junit.jupiter.api.Assertions.*;
+
 import static org.eclipse.yasson.internal.AnnotationIntrospectorTestAsserts.assertCreatedInstanceContainsAllParameters;
 import static org.eclipse.yasson.internal.AnnotationIntrospectorTestAsserts.assertParameters;
-import static org.junit.Assert.assertNull;
 
 import org.eclipse.yasson.internal.AnnotationIntrospectorTestFixtures.ObjectWithJsonbCreatorAnnotatedConstructor;
 import org.eclipse.yasson.internal.AnnotationIntrospectorTestFixtures.ObjectWithJsonbCreatorAnnotatedFactoryMethod;
@@ -10,11 +12,7 @@ import org.eclipse.yasson.internal.AnnotationIntrospectorTestFixtures.ObjectWith
 import org.eclipse.yasson.internal.model.JsonbCreator;
 
 import javax.json.bind.JsonbConfig;
-
 import javax.json.spi.JsonProvider;
-
-import org.junit.Assert;
-import org.junit.Test;
 
 /**
  * Tests the {@link AnnotationIntrospector} with missing optional module "java.deskop", <br>
@@ -27,19 +25,17 @@ import org.junit.Test;
  */
 public class AnnotationIntrospectorWithoutOptionalModulesTest {
 
-    private JsonbContext jsonbContext = new JsonbContext(new JsonbConfig(), JsonProvider.provider());
-
     /**
      * class under test.
      */
-    private AnnotationIntrospector instrospector = new AnnotationIntrospector(jsonbContext);
+    private static final AnnotationIntrospector instrospector = new AnnotationIntrospector(new JsonbContext(new JsonbConfig(), JsonProvider.provider()));
 
     @Test
     public void testNoConstructorPropertiesAnnotationWithoutOptionalModules() {
         String className = "java.beans.ConstructorProperties";
         try {
             Class.forName(className);
-            Assert.fail("Class [" + className + "] should not be available for this test.");
+            fail("Class [" + className + "] should not be available for this test.");
         } catch (ClassNotFoundException e) {
             // OK, as expected
         }

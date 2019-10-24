@@ -9,21 +9,23 @@
  *
  * Contributors:
  * Roman Grigoriadi
+ * David Kral
  ******************************************************************************/
 
 package org.eclipse.yasson.internal.serializer;
 
-import org.eclipse.yasson.internal.Marshaller;
-import org.eclipse.yasson.internal.model.customization.Customization;
-
-import javax.json.stream.JsonGenerator;
 import java.text.DecimalFormat;
 import java.text.NumberFormat;
+
+import javax.json.stream.JsonGenerator;
+
+import org.eclipse.yasson.internal.Marshaller;
+import org.eclipse.yasson.internal.model.customization.Customization;
 
 /**
  * Common serializer for numbers, using number format.
  *
- * @author Roman Grigoriadi
+ * @param <T> number type
  */
 public abstract class AbstractNumberSerializer<T extends Number> extends AbstractValueTypeSerializer<T> {
 
@@ -36,24 +38,26 @@ public abstract class AbstractNumberSerializer<T extends Number> extends Abstrac
      */
     public AbstractNumberSerializer(Customization customization) {
         super(customization);
-        formatter = customization != null ?
-                customization.getSerializeNumberFormatter() : null;
+        formatter = customization != null
+                ? customization.getSerializeNumberFormatter()
+                : null;
     }
 
     /**
      * Serialize raw number when NumberFormat is not present.
      *
-     * @param obj number
+     * @param obj       number
      * @param generator generator to use
-     * @param key json key
+     * @param key       json key
      */
     protected abstract void serializeNonFormatted(T obj, JsonGenerator generator, String key);
 
     @Override
     protected void serialize(T obj, JsonGenerator generator, Marshaller marshaller) {
         if (formatter != null) {
-            final NumberFormat format = NumberFormat.getInstance(marshaller.getJsonbContext().getConfigProperties().getLocale(formatter.getLocale()));
-            ((DecimalFormat)format).applyPattern(formatter.getFormat());
+            final NumberFormat format = NumberFormat
+                    .getInstance(marshaller.getJsonbContext().getConfigProperties().getLocale(formatter.getLocale()));
+            ((DecimalFormat) format).applyPattern(formatter.getFormat());
             generator.write(format.format(obj));
         } else {
             serializeNonFormatted(obj, generator);
@@ -63,7 +67,7 @@ public abstract class AbstractNumberSerializer<T extends Number> extends Abstrac
     /**
      * Serialize raw number when NumberFormat is not present.
      *
-     * @param obj number
+     * @param obj       number
      * @param generator generator to use
      */
     protected abstract void serializeNonFormatted(T obj, JsonGenerator generator);

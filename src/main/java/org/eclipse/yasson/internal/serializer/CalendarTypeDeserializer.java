@@ -9,13 +9,16 @@
  *
  * Contributors:
  * Roman Grigoriadi
+ * David Kral
  ******************************************************************************/
 
 package org.eclipse.yasson.internal.serializer;
 
-import org.eclipse.yasson.internal.model.customization.Customization;
-
-import java.time.*;
+import java.time.Instant;
+import java.time.LocalDate;
+import java.time.LocalTime;
+import java.time.ZoneId;
+import java.time.ZonedDateTime;
 import java.time.format.DateTimeFormatter;
 import java.time.temporal.TemporalAccessor;
 import java.time.temporal.TemporalQueries;
@@ -24,15 +27,16 @@ import java.util.GregorianCalendar;
 import java.util.Locale;
 import java.util.TimeZone;
 
+import org.eclipse.yasson.internal.model.customization.Customization;
+
 /**
  * Deserializer for {@link Calendar} type.
- *
- * @author David Kral
  */
 public class CalendarTypeDeserializer extends AbstractDateTimeDeserializer<Calendar> {
 
+    private static final LocalTime ZERO_LOCAL_TIME = LocalTime.parse("00:00:00");
+
     private final Calendar calendarTemplate;
-    private final LocalTime ZERO_LOCAL_TIME = LocalTime.parse("00:00:00");
 
     /**
      * Creates an instance.
@@ -46,7 +50,6 @@ public class CalendarTypeDeserializer extends AbstractDateTimeDeserializer<Calen
         this.calendarTemplate.setTimeZone(TimeZone.getTimeZone(UTC));
     }
 
-
     @Override
     protected Calendar fromInstant(Instant instant) {
         final Calendar calendar = (Calendar) calendarTemplate.clone();
@@ -56,8 +59,9 @@ public class CalendarTypeDeserializer extends AbstractDateTimeDeserializer<Calen
 
     @Override
     protected Calendar parseDefault(String jsonValue, Locale locale) {
-        DateTimeFormatter formatter = jsonValue.contains("T") ?
-                DateTimeFormatter.ISO_DATE_TIME : DateTimeFormatter.ISO_DATE;
+        DateTimeFormatter formatter = jsonValue.contains("T")
+                ? DateTimeFormatter.ISO_DATE_TIME
+                : DateTimeFormatter.ISO_DATE;
         return parseWithFormatter(jsonValue, formatter.withLocale(locale));
     }
 

@@ -13,14 +13,11 @@
 
 package org.eclipse.yasson.customization;
 
-import org.junit.Test;
+import org.junit.jupiter.api.*;
+import static org.junit.jupiter.api.Assertions.*;
+import static org.eclipse.yasson.Jsonbs.*;
 
-import javax.json.bind.Jsonb;
-import javax.json.bind.JsonbBuilder;
-import javax.json.bind.JsonbConfig;
 import java.util.Arrays;
-
-import static org.junit.Assert.assertEquals;
 
 /**
  * Tests pretty print to JSONP propagation
@@ -31,18 +28,11 @@ public class PrettyPrintTest {
 
     @Test
     public void testPrettyPrint() {
-        final JsonbConfig config = new JsonbConfig();
-        config.setProperty(JsonbConfig.FORMATTING, Boolean.TRUE);
-        final Jsonb jsonb = JsonbBuilder.create(config);
-        assertEquals("\n[\n    \"first\",\n    \"second\"\n]", jsonb.toJson(Arrays.asList("first", "second")));
+        assertEquals("\n[\n    \"first\",\n    \"second\"\n]", formattingJsonb.toJson(Arrays.asList("first", "second")));
     }
 
     @Test
     public void testPrettyPrintFalse() {
-        final JsonbConfig config = new JsonbConfig();
-        config.setProperty(JsonbConfig.FORMATTING, Boolean.FALSE);
-        final Jsonb jsonb = JsonbBuilder.create(config);
-        assertEquals("[\"first\",\"second\"]", jsonb.toJson(Arrays.asList("first", "second")));
+        assertEquals("[\"first\",\"second\"]", defaultJsonb.toJson(Arrays.asList("first", "second")));
     }
-
 }

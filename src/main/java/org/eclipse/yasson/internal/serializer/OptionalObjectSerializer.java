@@ -14,24 +14,24 @@
 
 package org.eclipse.yasson.internal.serializer;
 
+import java.lang.reflect.ParameterizedType;
+import java.lang.reflect.Type;
+import java.util.Optional;
+import java.util.function.Predicate;
+
+import javax.json.bind.serializer.JsonbSerializer;
+import javax.json.bind.serializer.SerializationContext;
+import javax.json.stream.JsonGenerator;
+
 import org.eclipse.yasson.internal.JsonbContext;
 import org.eclipse.yasson.internal.Marshaller;
 import org.eclipse.yasson.internal.ProcessingContext;
 import org.eclipse.yasson.internal.model.ClassModel;
 import org.eclipse.yasson.internal.model.customization.Customization;
 
-import javax.json.bind.serializer.JsonbSerializer;
-import javax.json.bind.serializer.SerializationContext;
-import javax.json.stream.JsonGenerator;
-import java.lang.reflect.ParameterizedType;
-import java.lang.reflect.Type;
-import java.util.Optional;
-import java.util.function.Predicate;
-
 /**
  * Common serializer logic for java Optionals.
  *
- * @author Roman Grigoriadi
  * @param <T> instantiated Optional type
  */
 public class OptionalObjectSerializer<T extends Optional<?>> implements CurrentItem<T>, JsonbSerializer<T> {
@@ -81,7 +81,7 @@ public class OptionalObjectSerializer<T extends Optional<?>> implements CurrentI
     @Override
     public void serialize(T obj, JsonGenerator generator, SerializationContext ctx) {
         JsonbContext jsonbContext = ((ProcessingContext) ctx).getJsonbContext();
-        if (handleEmpty(obj, Optional::isPresent, customization, generator, (Marshaller)ctx)) {
+        if (handleEmpty(obj, Optional::isPresent, customization, generator, (Marshaller) ctx)) {
             return;
         }
         Object optionalValue = obj.get();
@@ -90,7 +90,11 @@ public class OptionalObjectSerializer<T extends Optional<?>> implements CurrentI
         serialCaptor(serializer, optionalValue, generator, ctx);
     }
 
-    static <T> boolean handleEmpty(T value, Predicate<T> presentCheck,  Customization customization, JsonGenerator generator, Marshaller marshaller) {
+    static <T> boolean handleEmpty(T value,
+                                   Predicate<T> presentCheck,
+                                   Customization customization,
+                                   JsonGenerator generator,
+                                   Marshaller marshaller) {
         if (value == null || !presentCheck.test(value)) {
             if (customization != null) {
                 if (customization.isNillable()) {
@@ -107,7 +111,10 @@ public class OptionalObjectSerializer<T extends Optional<?>> implements CurrentI
     }
 
     @SuppressWarnings("unchecked")
-    private <T> void serialCaptor(JsonbSerializer<?> serializer, T object, JsonGenerator generator, SerializationContext context) {
+    private <T> void serialCaptor(JsonbSerializer<?> serializer,
+                                  T object,
+                                  JsonGenerator generator,
+                                  SerializationContext context) {
         ((JsonbSerializer<T>) serializer).serialize(object, generator, context);
     }
 }

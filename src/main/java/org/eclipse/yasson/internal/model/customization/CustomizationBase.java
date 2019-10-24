@@ -31,7 +31,7 @@ abstract class CustomizationBase implements Customization, ComponentBoundCustomi
      *
      * @param builder not null
      */
-    public CustomizationBase(CustomizationBuilder builder) {
+    CustomizationBase(CustomizationBuilder builder) {
         this.nillable = builder.isNillable();
         this.adapterBinding = builder.getAdapterInfo();
         this.serializerBinding = builder.getSerializerBinding();
@@ -43,7 +43,7 @@ abstract class CustomizationBase implements Customization, ComponentBoundCustomi
      *
      * @param other other customization instance
      */
-    public CustomizationBase(CustomizationBase other) {
+    CustomizationBase(CustomizationBase other) {
         this.nillable = other.isNillable();
         this.adapterBinding = other.getSerializeAdapterBinding();
         this.serializerBinding = other.getSerializerBinding();
@@ -62,7 +62,7 @@ abstract class CustomizationBase implements Customization, ComponentBoundCustomi
     public AdapterBinding getSerializeAdapterBinding() {
         return adapterBinding;
     }
-    
+
     @Override
     public AdapterBinding getDeserializeAdapterBinding() {
         return adapterBinding;
@@ -85,6 +85,5 @@ abstract class CustomizationBase implements Customization, ComponentBoundCustomi
     public DeserializerBinding getDeserializerBinding() {
         return deserializerBinding;
     }
-
 
 }

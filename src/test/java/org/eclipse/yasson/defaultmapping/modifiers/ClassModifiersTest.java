@@ -13,20 +13,12 @@
 
 package org.eclipse.yasson.defaultmapping.modifiers;
 
-import javax.json.bind.Jsonb;
-import javax.json.bind.JsonbBuilder;
-import javax.json.bind.JsonbException;
+import org.junit.jupiter.api.*;
+import static org.junit.jupiter.api.Assertions.*;
+import static org.eclipse.yasson.Jsonbs.*;
 
 import org.eclipse.yasson.Assertions;
 import org.eclipse.yasson.defaultmapping.modifiers.model.ChildOfPackagePrivateParent;
-import org.eclipse.yasson.defaultmapping.modifiers.model.FieldModifiersClass;
-import org.junit.Before;
-import org.junit.Test;
-
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertNull;
-import static org.junit.Assert.assertTrue;
-import static org.junit.Assert.fail;
 
 /**
  * Test access modifiers on classes
@@ -35,21 +27,14 @@ import static org.junit.Assert.fail;
  */
 public class ClassModifiersTest {
 
-    private Jsonb jsonb;
-
-    @Before
-    public void before() {
-        jsonb = JsonbBuilder.create();
-    }
-
     @Test
     public void testPackagePrivateParent() {
         ChildOfPackagePrivateParent child = new ChildOfPackagePrivateParent();
         child.id = 1;
         child.name = "SomeName";
-        String json = jsonb.toJson(child);
+        String json = defaultJsonb.toJson(child);
         assertEquals("{\"id\":1,\"name\":\"SomeName\"}", json);
-        ChildOfPackagePrivateParent result = jsonb.fromJson(json, ChildOfPackagePrivateParent.class);
+        ChildOfPackagePrivateParent result = defaultJsonb.fromJson(json, ChildOfPackagePrivateParent.class);
         assertEquals(child.id, result.id);
         assertEquals(child.name, result.name);
     }
@@ -68,7 +53,7 @@ public class ClassModifiersTest {
         NestedPackageChild child = new NestedPackageChild();
         child.id = 1;
         child.name = "SomeName";
-        Assertions.shouldFail(() -> jsonb.toJson(child),
+        Assertions.shouldFail(() -> defaultJsonb.toJson(child),
                 msg -> msg.contains("Unable to serialize property 'id'") &&
                 msg.contains("java.lang.IllegalAccessException")); 
     }
@@ -86,7 +71,7 @@ public class ClassModifiersTest {
         NestedPrivateChild child = new NestedPrivateChild();
         child.id = 1;
         child.name = "SomeName";
-        Assertions.shouldFail(() -> jsonb.toJson(child),
+        Assertions.shouldFail(() -> defaultJsonb.toJson(child),
                 msg -> msg.contains("java.lang.IllegalAccessException"));
     }
 
@@ -104,7 +89,7 @@ public class ClassModifiersTest {
         NestedStaticPackageChild child = new NestedStaticPackageChild();
         child.id = 1;
         child.name = "SomeName";
-        Assertions.shouldFail(() -> jsonb.toJson(child),
+        Assertions.shouldFail(() -> defaultJsonb.toJson(child),
                 msg -> msg.contains("java.lang.IllegalAccessException"));
     }
 
@@ -121,7 +106,7 @@ public class ClassModifiersTest {
         NestedStaticPrivateChild child = new NestedStaticPrivateChild();
         child.id = 1;
         child.name = "SomeName";
-        Assertions.shouldFail(() -> jsonb.toJson(child),
+        Assertions.shouldFail(() -> defaultJsonb.toJson(child),
                 msg -> msg.contains("java.lang.IllegalAccessException"));
     }
 

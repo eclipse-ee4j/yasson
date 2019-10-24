@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2016 Oracle and/or its affiliates. All rights reserved.
+ * Copyright (c) 2016, 2019 Oracle and/or its affiliates. All rights reserved.
  * This program and the accompanying materials are made available under the
  * terms of the Eclipse Public License v1.0 and Eclipse Distribution License v. 1.0
  * which accompanies this distribution.
@@ -19,8 +19,6 @@ import java.util.Objects;
 /**
  * Wrapper for user components, components, (de)serializer.
  * Contains resolved binding type an component.
- *
- * @author Roman Grigoriadi
  */
 public abstract class AbstractComponentBinding {
 
@@ -28,6 +26,7 @@ public abstract class AbstractComponentBinding {
 
     /**
      * Creates info.
+     *
      * @param bindingType type to which component is bound.
      */
     public AbstractComponentBinding(Type bindingType) {
@@ -46,6 +45,7 @@ public abstract class AbstractComponentBinding {
 
     /**
      * Class of user component.
+     *
      * @return component class
      */
     public abstract Class<?> getComponentClass();

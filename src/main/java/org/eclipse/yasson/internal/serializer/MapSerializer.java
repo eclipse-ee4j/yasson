@@ -9,6 +9,7 @@
  *
  * Contributors:
  * Roman Grigoriadi
+ * David Kral
  * Tomas Kraus
  ******************************************************************************/
 
@@ -26,7 +27,7 @@ import javax.json.stream.JsonGenerator;
  * @param <K> {@link Map} key type to serialize
  * @param <V> {@link Map} value type to serialize
  */
-public class MapSerializer<K,V> extends AbstractContainerSerializer<Map<K,V>> implements EmbeddedItem {
+public class MapSerializer<K, V> extends AbstractContainerSerializer<Map<K, V>> implements EmbeddedItem {
 
     /**
      * Internal Map serializing delegate interface.
@@ -34,7 +35,7 @@ public class MapSerializer<K,V> extends AbstractContainerSerializer<Map<K,V>> im
      * @param <K> {@link Map} key type to serialize
      * @param <V> {@link Map} value type to serialize
      */
-    interface Delegate<K,V> {
+    interface Delegate<K, V> {
 
         /**
          * Process container before serialization begins.
@@ -42,7 +43,7 @@ public class MapSerializer<K,V> extends AbstractContainerSerializer<Map<K,V>> im
          *
          * @param obj item to be serialized
          */
-        default void beforeSerialize(Map<K,V> obj) {
+        default void beforeSerialize(Map<K, V> obj) {
         }
 
         /**
@@ -55,7 +56,7 @@ public class MapSerializer<K,V> extends AbstractContainerSerializer<Map<K,V>> im
         /**
          * Write start of an object or an array with a key.
          *
-         * @param key JSON key name.
+         * @param key       JSON key name.
          * @param generator JSON format generator
          */
         void writeStart(String key, JsonGenerator generator);
@@ -72,19 +73,23 @@ public class MapSerializer<K,V> extends AbstractContainerSerializer<Map<K,V>> im
         /**
          * Serialize content of provided container.
          *
-         * @param obj container to be serialized
+         * @param obj       container to be serialized
          * @param generator JSON format generator
-         * @param ctx JSON serialization context
+         * @param ctx       JSON serialization context
          */
-        void serializeContainer(Map<K,V> obj, JsonGenerator generator, SerializationContext ctx);
+        void serializeContainer(Map<K, V> obj, JsonGenerator generator, SerializationContext ctx);
 
     }
 
-    /** Whether to serialize null values too. */
+    /**
+     * Whether to serialize null values too.
+     */
     private final boolean nullable;
 
-    /** Instance that is responsible for serialization. */
-    private Delegate<K,V> serializer;
+    /**
+     * Instance that is responsible for serialization.
+     */
+    private Delegate<K, V> serializer;
 
     /**
      * Creates an instance of {@link Map} serialization.
@@ -104,7 +109,7 @@ public class MapSerializer<K,V> extends AbstractContainerSerializer<Map<K,V>> im
      * @param obj {@link Map} to be serialized
      */
     @Override
-    protected void beforeSerialize(Map<K,V> obj) {
+    protected void beforeSerialize(Map<K, V> obj) {
         if (serializer == null) {
             // All keys can be serialized as String
             boolean allStrings = true;
@@ -120,12 +125,12 @@ public class MapSerializer<K,V> extends AbstractContainerSerializer<Map<K,V>> im
                     } else {
                         allStrings = cls.equals(key.getClass());
                     }
-                // 1st pass: check whether key type is supported for Map to JSON Object serialization
-                } else if (key instanceof String || key instanceof Number || key instanceof Enum ) {
+                    // 1st pass: check whether key type is supported for Map to JSON Object serialization
+                } else if (key instanceof String || key instanceof Number || key instanceof Enum) {
                     cls = key.getClass();
                     first = false;
-                // 1st pass: check whether key is null, which is also supported for Map to JSON Object serialization
-                // Map shall contain only single mapping for null value and nothing else
+                    // 1st pass: check whether key is null, which is also supported for Map to JSON Object serialization
+                    // Map shall contain only single mapping for null value and nothing else
                 } else if (key == null && first) {
                     first = false;
                 } else {
@@ -145,12 +150,12 @@ public class MapSerializer<K,V> extends AbstractContainerSerializer<Map<K,V>> im
      * Serialize content of provided {@link Map}.
      * Passing execution to delegate instance.
      *
-     * @param obj {@link Map} to be serialized
+     * @param obj       {@link Map} to be serialized
      * @param generator JSON format generator
-     * @param ctx JSON serialization context
+     * @param ctx       JSON serialization context
      */
     @Override
-    protected void serializeInternal(Map<K,V> obj, JsonGenerator generator, SerializationContext ctx) {
+    protected void serializeInternal(Map<K, V> obj, JsonGenerator generator, SerializationContext ctx) {
         serializer.serializeContainer(obj, generator, ctx);
     }
 
@@ -169,7 +174,7 @@ public class MapSerializer<K,V> extends AbstractContainerSerializer<Map<K,V>> im
      * Write start of {@link Map} serialization.
      * Passing execution to delegate instance.
      *
-     * @param key JSON key name
+     * @param key       JSON key name
      * @param generator JSON format generator
      */
     @Override

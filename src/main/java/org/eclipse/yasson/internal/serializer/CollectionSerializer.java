@@ -9,6 +9,7 @@
  *
  * Contributors:
  * Roman Grigoriadi
+ * David Kral
  ******************************************************************************/
 
 package org.eclipse.yasson.internal.serializer;
@@ -18,8 +19,6 @@ import java.util.Collection;
 import javax.json.bind.serializer.SerializationContext;
 import javax.json.stream.JsonGenerator;
 
-import org.eclipse.yasson.internal.JsonbContext;
-
 /**
  * Serializer for collections.
  *
@@ -27,11 +26,13 @@ import org.eclipse.yasson.internal.JsonbContext;
  */
 public class CollectionSerializer<V> extends AbstractContainerSerializer<Collection<V>> implements EmbeddedItem {
 
-    protected final JsonbContext jsonbContext;
-
+    /**
+     * Creates new collection serializer.
+     *
+     * @param builder serializer builder
+     */
     protected CollectionSerializer(SerializerBuilder builder) {
         super(builder);
-        this.jsonbContext = builder.getJsonbContext();
     }
 
     @Override

@@ -9,26 +9,25 @@
  *
  * Contributors:
  * Roman Grigoriadi
+ * David Kral
  ******************************************************************************/
 
 package org.eclipse.yasson.internal.serializer;
 
-import org.eclipse.yasson.internal.model.customization.Customization;
-
-import javax.xml.datatype.XMLGregorianCalendar;
 import java.time.Instant;
 import java.time.ZonedDateTime;
 import java.time.format.DateTimeFormatter;
 import java.time.temporal.TemporalAccessor;
 import java.util.Locale;
 
+import javax.xml.datatype.XMLGregorianCalendar;
+
+import org.eclipse.yasson.internal.model.customization.Customization;
+
 /**
  * Serializer for {@link XMLGregorianCalendar} type.
- *
- * @author David Kral
  */
 public class XMLGregorianCalendarTypeSerializer extends AbstractDateTimeSerializer<XMLGregorianCalendar> {
-
 
     /**
      * Creates a new instance.
@@ -60,6 +59,6 @@ public class XMLGregorianCalendarTypeSerializer extends AbstractDateTimeSerializ
 
     private ZonedDateTime toZonedDateTime(XMLGregorianCalendar object) {
         return ZonedDateTime.ofInstant(Instant.ofEpochMilli(object.toGregorianCalendar().getTimeInMillis()),
-                object.toGregorianCalendar().getTimeZone().toZoneId());
+                                       object.toGregorianCalendar().getTimeZone().toZoneId());
     }
 }

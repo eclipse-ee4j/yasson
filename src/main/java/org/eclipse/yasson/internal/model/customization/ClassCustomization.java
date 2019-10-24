@@ -13,16 +13,14 @@
 
 package org.eclipse.yasson.internal.model.customization;
 
+import javax.json.bind.config.PropertyVisibilityStrategy;
+
+import org.eclipse.yasson.internal.model.JsonbCreator;
 import org.eclipse.yasson.internal.serializer.JsonbDateFormatter;
 import org.eclipse.yasson.internal.serializer.JsonbNumberFormatter;
-import org.eclipse.yasson.internal.model.JsonbCreator;
-
-import javax.json.bind.config.PropertyVisibilityStrategy;
 
 /**
  * Customization, which could be applied on a class or package level.
- *
- * @author Roman Grigoriadi
  */
 public class ClassCustomization extends CustomizationBase {
 
@@ -93,6 +91,7 @@ public class ClassCustomization extends CustomizationBase {
 
     /**
      * Property visibility strategy for this class model.
+     *
      * @return visibility strategy
      */
     public PropertyVisibilityStrategy getPropertyVisibilityStrategy() {

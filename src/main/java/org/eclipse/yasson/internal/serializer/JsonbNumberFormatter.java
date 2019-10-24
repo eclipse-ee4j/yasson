@@ -9,21 +9,19 @@
  *
  * Contributors:
  * Roman Grigoriadi
+ * David Kral
  ******************************************************************************/
 
 package org.eclipse.yasson.internal.serializer;
 
 /**
  * Formatter for numbers.
- *
- * @author Roman Grigoriadi
  */
 public class JsonbNumberFormatter {
 
     private final String format;
 
     private final String locale;
-
 
     /**
      * Construct with format string and locale.
@@ -47,6 +45,7 @@ public class JsonbNumberFormatter {
 
     /**
      * Locale to use with formatter.
+     *
      * @return locale
      */
     public String getLocale() {

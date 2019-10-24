@@ -9,23 +9,25 @@
  *
  * Contributors:
  * Roman Grigoriadi
+ * David Kral
  ******************************************************************************/
 
 package org.eclipse.yasson.internal.serializer;
+
+import java.lang.reflect.Type;
+
+import javax.json.bind.serializer.DeserializationContext;
+import javax.json.bind.serializer.JsonbDeserializer;
+import javax.json.stream.JsonParser;
 
 import org.eclipse.yasson.internal.JsonbParser;
 import org.eclipse.yasson.internal.Unmarshaller;
 import org.eclipse.yasson.internal.model.customization.Customization;
 
-import javax.json.bind.serializer.DeserializationContext;
-import javax.json.bind.serializer.JsonbDeserializer;
-import javax.json.stream.JsonParser;
-import java.lang.reflect.Type;
-
 /**
  * Common type for all supported value type serializers.
  *
- * @author Roman Grigoriadi
+ * @param <T> value type
  */
 public abstract class AbstractValueTypeDeserializer<T> implements JsonbDeserializer<T> {
 
@@ -36,7 +38,7 @@ public abstract class AbstractValueTypeDeserializer<T> implements JsonbDeseriali
     /**
      * Creates a new instance.
      *
-     * @param clazz Class to work with.
+     * @param clazz         Class to work with.
      * @param customization Model customization.
      */
     public AbstractValueTypeDeserializer(Class<T> clazz, Customization customization) {
@@ -48,7 +50,7 @@ public abstract class AbstractValueTypeDeserializer<T> implements JsonbDeseriali
      * Extracts single string value for conversion.
      *
      * @param parser Parser to get value from.
-     * @param ctx Unmarshaller.
+     * @param ctx    Unmarshaller.
      * @param rtType return type.
      * @return Deserialized object.
      */
@@ -67,9 +69,9 @@ public abstract class AbstractValueTypeDeserializer<T> implements JsonbDeseriali
     /**
      * Convert string value to object.
      *
-     * @param jsonValue Json value.
+     * @param jsonValue    Json value.
      * @param unmarshaller Unmarshaller instance.
-     * @param rtType Runtime type.
+     * @param rtType       Runtime type.
      * @return Deserialized object.
      */
     protected T deserialize(String jsonValue, Unmarshaller unmarshaller, Type rtType) {
@@ -77,7 +79,7 @@ public abstract class AbstractValueTypeDeserializer<T> implements JsonbDeseriali
     }
 
     /**
-     * Returns customization of object
+     * Returns customization of object.
      *
      * @return object customization
      */

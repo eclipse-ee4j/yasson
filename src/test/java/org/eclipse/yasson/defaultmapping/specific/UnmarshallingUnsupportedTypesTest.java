@@ -13,13 +13,16 @@
 
 package org.eclipse.yasson.defaultmapping.specific;
 
+import org.junit.jupiter.api.*;
+import static org.junit.jupiter.api.Assertions.*;
+import static org.eclipse.yasson.Jsonbs.*;
+
 import org.eclipse.yasson.TestTypeToken;
 import org.eclipse.yasson.defaultmapping.generics.model.GenericTestClass;
 import org.eclipse.yasson.defaultmapping.specific.model.ClassWithUnsupportedFields;
 import org.eclipse.yasson.defaultmapping.specific.model.CustomUnsupportedInterface;
 import org.eclipse.yasson.defaultmapping.specific.model.SupportedTypes;
 import org.eclipse.yasson.defaultmapping.specific.model.SupportedTypes.NestedPojo;
-import org.junit.Test;
 
 import javax.json.bind.Jsonb;
 import javax.json.bind.JsonbBuilder;
@@ -37,14 +40,11 @@ import java.util.OptionalInt;
 import java.util.OptionalLong;
 
 import static org.eclipse.yasson.YassonProperties.FAIL_ON_UNKNOWN_PROPERTIES;
-import static org.junit.Assert.*;
 
 /**
  * @author Roman Grigoriadi
  */
 public class UnmarshallingUnsupportedTypesTest {
-
-    private final Jsonb jsonb = JsonbBuilder.create();
 
     @Test
     public void testUnmarshallToUnsupportedInterface() {
@@ -63,9 +63,9 @@ public class UnmarshallingUnsupportedTypesTest {
             }
         };
         String expected = "{\"customInterface\":{\"value\":\"value1\"}}";
-        assertEquals(expected, jsonb.toJson(unsupported));
+        assertEquals(expected, defaultJsonb.toJson(unsupported));
         try {
-            jsonb.fromJson(expected, ClassWithUnsupportedFields.class);
+        	defaultJsonb.fromJson(expected, ClassWithUnsupportedFields.class);
             fail("Should report an error");
         } catch (JsonbException e) {
             assertTrue(e.getMessage().contains("Cannot infer a type"));
@@ -87,9 +87,9 @@ public class UnmarshallingUnsupportedTypesTest {
         supportedTypes.getNestedPojo().setIntegerValue(10);
 
         String json = "{\"instant\":\"2015-12-28T14:57:00Z\",\"nestedPojo\":{\"integerValue\":10},\"optionalLong\":11,\"zonedDateTime\":\"2015-12-28T15:57:00+01:00[Europe/Prague]\"}";
-        assertEquals(json, jsonb.toJson(supportedTypes));
+        assertEquals(json, defaultJsonb.toJson(supportedTypes));
 
-        SupportedTypes result = jsonb.fromJson(json, SupportedTypes.class);
+        SupportedTypes result = defaultJsonb.fromJson(json, SupportedTypes.class);
         assertEquals(result.getInstant(), supportedTypes.getInstant());
         assertEquals(result.getZonedDateTime(), supportedTypes.getZonedDateTime());
         assertEquals(result.getOptionalLong(), supportedTypes.getOptionalLong());
@@ -113,27 +113,27 @@ public class UnmarshallingUnsupportedTypesTest {
 
     @Test()
     public void testMissingFieldDefault() {
-        Jsonb defaultConfig = JsonbBuilder.create();
         String json  = "{\"nestedPojo\":{\"integerValue\":10,\"missingField\":5},\"optionalLong\":11}";
-        SupportedTypes result = defaultConfig.fromJson(json, SupportedTypes.class);
+        SupportedTypes result = defaultJsonb.fromJson(json, SupportedTypes.class);
         assertEquals(Integer.valueOf(10), result.getNestedPojo().getIntegerValue());
         assertEquals(11, result.getOptionalLong().getAsLong());
     }
 
     @Test()
     public void testMissingFieldDefaultNull() {
-        Jsonb defaultConfig = JsonbBuilder.create();
         String json  = "{\"nestedPojo\":{\"integerValue\":10,\"missingField\":null},\"optionalLong\":11}";
-        SupportedTypes result = defaultConfig.fromJson(json, SupportedTypes.class);
+        SupportedTypes result = defaultJsonb.fromJson(json, SupportedTypes.class);
         assertEquals(Integer.valueOf(10), result.getNestedPojo().getIntegerValue());
         assertEquals(11, result.getOptionalLong().getAsLong());
     }
 
-    @Test(expected = JsonbException.class)
+    @Test
     public void testMissingFieldIgnored() {
-        Jsonb defaultConfig = JsonbBuilder.create(new JsonbConfig().setProperty(FAIL_ON_UNKNOWN_PROPERTIES, true));
-        String json  = "{\"nestedPojo\":{\"integerValue\":10,\"missingField\":5},\"optionalLong\":11}";
-        SupportedTypes result = defaultConfig.fromJson(json, SupportedTypes.class);
+    	assertThrows(JsonbException.class, () -> {
+	        Jsonb defaultConfig = JsonbBuilder.create(new JsonbConfig().setProperty(FAIL_ON_UNKNOWN_PROPERTIES, true));
+	        String json  = "{\"nestedPojo\":{\"integerValue\":10,\"missingField\":5},\"optionalLong\":11}";
+	        SupportedTypes result = defaultConfig.fromJson(json, SupportedTypes.class);
+    	});
     }
 
     @Test
@@ -204,7 +204,7 @@ public class UnmarshallingUnsupportedTypesTest {
 
     private void assertFail(String json, Type type, String failureProperty, Class<?> failurePropertyClass) {
         try {
-            jsonb.fromJson(json, type);
+        	defaultJsonb.fromJson(json, type);
             fail();
         } catch (JsonbException e) {
             if(!e.getMessage().contains(failureProperty) || !e.getMessage().contains(failurePropertyClass.getName())) {

@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <!--
- Copyright (c) 2016, 2018 Oracle and/or its affiliates. All rights reserved.
+ Copyright (c) 2016, 2019 Oracle and/or its affiliates. All rights reserved.
  This program and the accompanying materials are made available under the
  terms of the Eclipse Public License v1.0 and Eclipse Distribution License v. 1.0
  which accompanies this distribution.
@@ -26,6 +26,61 @@
 
     <description>Eclipse Yasson. Reference implementation of JSR-367 (JSON-B).</description>
     <url>https://projects.eclipse.org/projects/ee4j.yasson</url>
+    
+    <properties>
+        <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
+        <jakarta.json.version>1.1.6</jakarta.json.version>
+        <jakarta.json.bind.version>1.0.2</jakarta.json.bind.version>
+        <netbeans.hint.jdkPlatform>JDK_9</netbeans.hint.jdkPlatform>
+    </properties>
+    
+    <dependencies>
+        <!-- Compile dependencies -->
+        <dependency>
+            <groupId>jakarta.json.bind</groupId>
+            <artifactId>jakarta.json.bind-api</artifactId>
+            <version>${jakarta.json.bind.version}</version>
+        </dependency>
+        <dependency>
+            <groupId>jakarta.json</groupId>
+            <artifactId>jakarta.json-api</artifactId>
+            <version>${jakarta.json.version}</version>
+        </dependency>
+        <dependency>
+            <groupId>org.glassfish</groupId>
+            <artifactId>jakarta.json</artifactId>
+            <version>${jakarta.json.version}</version>
+            <classifier>module</classifier>
+            <scope>compile</scope>
+            <optional>true</optional>
+        </dependency>
+        <!-- Test/Provided dependencies -->
+        <dependency>
+            <groupId>jakarta.enterprise</groupId>
+            <artifactId>jakarta.enterprise.cdi-api</artifactId>
+            <version>2.0.2</version>
+            <optional>true</optional>
+            <scope>provided</scope>
+        </dependency>
+        <dependency>
+            <groupId>org.jboss.weld.se</groupId>
+            <artifactId>weld-se</artifactId>
+            <version>2.4.3.Final</version>
+            <scope>test</scope>
+        </dependency>
+        <dependency>
+            <groupId>org.junit.jupiter</groupId>
+            <artifactId>junit-jupiter-api</artifactId>
+            <version>5.5.2</version>
+            <scope>test</scope>
+        </dependency>
+        <dependency>
+            <groupId>org.junit.jupiter</groupId>
+            <artifactId>junit-jupiter-engine</artifactId>
+            <version>5.5.2</version>
+            <scope>test</scope>
+        </dependency>
+    </dependencies>
 
     <organization>
         <name>Oracle Corporation</name>
@@ -108,69 +163,21 @@
         </developer>
     </developers>
 
-    <properties>
-        <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
-        <jakarta.json.version>1.1.5</jakarta.json.version>
-        <javax.json.bind.version>1.0.1</javax.json.bind.version>
-        <netbeans.hint.jdkPlatform>JDK_9</netbeans.hint.jdkPlatform>
-    </properties>
-
-    <!-- TODO: Remove this once JakartaEE 8 artifacts are officially released -->
-    <repositories>
-        <repository>
-            <id>staging</id>
-            <url>https://oss.sonatype.org/content/repositories/staging/</url>
-        </repository>
-    </repositories>
-
     <profiles>
         <profile>
-            <id>re-build</id>
-            <activation>
-                <property>
-                    <name>license.url</name>
-                </property>
-            </activation>
+            <id>checkstyle</id>
             <build>
                 <plugins>
                     <plugin>
-                        <groupId>org.codehaus.mojo</groupId>
-                        <artifactId>wagon-maven-plugin</artifactId>
-                        <version>1.0</version>
-                        <inherited>false</inherited>
-                        <executions>
-                            <execution>
-                                <id>get-license</id>
-                                <phase>package</phase>
-                                <goals>
-                                    <goal>download-single</goal>
-                                </goals>
-                                <configuration>
-                                    <url>${license.url}</url>
-                                    <fromFile>TLDA_SCSL_Licensees_License_Notice.txt</fromFile>
-                                    <toDir>${project.build.directory}/license</toDir>
-                                </configuration>
-                            </execution>
-                        </executions>
-                    </plugin>
-                    <plugin>
                         <groupId>org.apache.maven.plugins</groupId>
-                        <artifactId>maven-assembly-plugin</artifactId>
+                        <artifactId>maven-checkstyle-plugin</artifactId>
                         <executions>
                             <execution>
-                                <id>make-licensee-src-assembly</id>
-                                <phase>package</phase>
+                                <id>run-checkstyle</id>
                                 <goals>
-                                    <goal>single</goal>
+                                    <goal>check</goal>
                                 </goals>
-                                <configuration>
-                                    <finalName>yasson-${project.version}-src-licensee</finalName>
-                                    <attach>false</attach>
-                                    <appendAssemblyId>false</appendAssemblyId>
-                                    <descriptors>
-                                        <descriptor>src/main/assembly/assembly-src-licensee.xml</descriptor>
-                                    </descriptors>
-                                </configuration>
+                                <phase>validate</phase>
                             </execution>
                         </executions>
                     </plugin>
@@ -445,6 +452,32 @@
                         </execution>
                     </executions>
                 </plugin>
+                <plugin>
+                    <groupId>org.apache.maven.plugins</groupId>
+                    <artifactId>maven-checkstyle-plugin</artifactId>
+                    <version>3.1.0</version>
+                    <configuration>
+                        <configLocation>etc/checkstyle.xml</configLocation>
+                        <suppressionsLocation>etc/checkstyle-suppressions.xml</suppressionsLocation>
+                        <encoding>UTF-8</encoding>
+                        <consoleOutput>true</consoleOutput>
+                        <failsOnError>true</failsOnError>
+                        <linkXRef>false</linkXRef>
+                    </configuration>
+                    <dependencies>
+                        <dependency>
+                            <groupId>com.puppycrawl.tools</groupId>
+                            <artifactId>checkstyle</artifactId>
+                            <version>8.18</version>
+                            <exclusions>
+                                <exclusion>
+                                    <groupId>com.sun</groupId>
+                                    <artifactId>tools</artifactId>
+                                </exclusion>
+                            </exclusions>
+                        </dependency>
+                    </dependencies>
+                </plugin>
             </plugins>
         </pluginManagement>
         <plugins>
@@ -486,76 +519,6 @@
             </plugin>
         </plugins>
     </build>
-
-    <dependencyManagement>
-        <dependencies>
-            <dependency>
-                <groupId>jakarta.json.bind</groupId>
-                <artifactId>jakarta.json.bind-api</artifactId>
-                <version>${javax.json.bind.version}</version>
-            </dependency>
-            <dependency>
-                <groupId>jakarta.json</groupId>
-                <artifactId>jakarta.json-api</artifactId>
-                <version>${jakarta.json.version}</version>
-            </dependency>
-            <dependency>
-                <groupId>javax.enterprise</groupId>
-                <artifactId>cdi-api</artifactId>
-                <version>2.0</version>
-                <optional>true</optional>
-                <scope>provided</scope>
-            </dependency>
-            <dependency>
-                <groupId>org.glassfish</groupId>
-                <artifactId>jakarta.json</artifactId>
-                <version>${jakarta.json.version}</version>
-                <classifier>module</classifier>
-                <scope>compile</scope>
-                <optional>true</optional>
-            </dependency>
-            <dependency>
-                <groupId>org.jboss.weld.se</groupId>
-                <artifactId>weld-se</artifactId>
-                <version>2.4.3.Final</version>
-                <scope>test</scope>
-            </dependency>
-            <dependency>
-                <groupId>junit</groupId>
-                <artifactId>junit</artifactId>
-                <version>4.12</version>
-                <scope>test</scope>
-            </dependency>
-        </dependencies>
-    </dependencyManagement>
-
-    <dependencies>
-        <dependency>
-            <groupId>jakarta.json.bind</groupId>
-            <artifactId>jakarta.json.bind-api</artifactId>
-        </dependency>
-        <dependency>
-            <groupId>jakarta.json</groupId>
-            <artifactId>jakarta.json-api</artifactId>
-        </dependency>
-        <dependency>
-            <groupId>javax.enterprise</groupId>
-            <artifactId>cdi-api</artifactId>
-        </dependency>
-        <dependency>
-            <groupId>org.glassfish</groupId>
-            <artifactId>jakarta.json</artifactId>
-            <classifier>module</classifier>
-        </dependency>
-        <dependency>
-            <groupId>org.jboss.weld.se</groupId>
-            <artifactId>weld-se</artifactId>
-        </dependency>
-        <dependency>
-            <groupId>junit</groupId>
-            <artifactId>junit</artifactId>
-        </dependency>
-    </dependencies>
 
     <reporting>
         <plugins>

@@ -26,20 +26,23 @@ import javax.json.stream.JsonGenerator;
  *     ...
  * }
  * </pre>
+ *
  * @param <K> {@link Map} key type to serialize
  * @param <V> {@link Map} value type to serialize
  */
-public class MapToObjectSerializer<K,V> implements MapSerializer.Delegate<K,V> {
+public class MapToObjectSerializer<K, V> implements MapSerializer.Delegate<K, V> {
 
-    /** Reference to {@link Map} serialization entry point. Contains serialization setup information. */
-    private final MapSerializer<K,V> serializer;
+    /**
+     * Reference to {@link Map} serialization entry point. Contains serialization setup information.
+     */
+    private final MapSerializer<K, V> serializer;
 
     /**
      * Creates an instance of {@link Map} serialization to {@code JsonObject}.
      *
      * @param serializer reference to {@link Map} serialization entry point
      */
-    protected MapToObjectSerializer(MapSerializer<K,V> serializer) {
+    protected MapToObjectSerializer(MapSerializer<K, V> serializer) {
         this.serializer = serializer;
     }
 
@@ -54,11 +57,11 @@ public class MapToObjectSerializer<K,V> implements MapSerializer.Delegate<K,V> {
         generator.writeStartObject();
     }
 
-   /**
+    /**
      * Write start of {@link Map} serialization.
      * Opens {@code JsonObject} block.
      *
-     * @param key JSON key name
+     * @param key       JSON key name
      * @param generator JSON format generator
      */
     @Override
@@ -71,14 +74,20 @@ public class MapToObjectSerializer<K,V> implements MapSerializer.Delegate<K,V> {
      * Content of provided {@link Map} is written into {@code JsonObject} block. Map keys are written
      * as {@code JsonObject} property name {@link String}s.
      *
-     * @param obj {@link Map} to be serialized
+     * @param obj       {@link Map} to be serialized
      * @param generator JSON format generator
-     * @param ctx JSON serialization context
+     * @param ctx       JSON serialization context
      */
     @Override
-    public void serializeContainer(Map<K,V> obj, JsonGenerator generator, SerializationContext ctx) {
-        for (Map.Entry<?,?> entry : obj.entrySet()) {
-            final String keyString = String.valueOf(entry.getKey());
+    public void serializeContainer(Map<K, V> obj, JsonGenerator generator, SerializationContext ctx) {
+        for (Map.Entry<K, V> entry : obj.entrySet()) {
+            final String keyString;
+            K key = entry.getKey();
+            if (key instanceof Enum<?>) {
+                keyString = ((Enum<?>) key).name();
+            } else {
+                keyString = String.valueOf(key);
+            }
             final Object value = entry.getValue();
             if (value == null) {
                 if (serializer.isNullable()) {

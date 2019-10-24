@@ -9,6 +9,7 @@
  *
  * Contributors:
  * Roman Grigoriadi
+ * David Kral
  ******************************************************************************/
 
 package org.eclipse.yasson.internal.serializer;
@@ -18,11 +19,14 @@ import javax.json.stream.JsonGenerator;
 
 /**
  * Serializes byte array as JSON array of ints.
- *
- * @author Bernd Zeitler
  */
 public class CharArraySerializer extends AbstractArraySerializer<char[]> {
 
+    /**
+     * Creates new instance of char array serializer.
+     *
+     * @param builder serializer builder
+     */
     protected CharArraySerializer(SerializerBuilder builder) {
         super(builder);
     }

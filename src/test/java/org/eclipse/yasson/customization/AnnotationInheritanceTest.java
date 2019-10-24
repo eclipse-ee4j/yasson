@@ -13,13 +13,11 @@
 
 package org.eclipse.yasson.customization;
 
+import org.junit.jupiter.api.*;
+import static org.junit.jupiter.api.Assertions.*;
+import static org.eclipse.yasson.Jsonbs.*;
+
 import org.eclipse.yasson.customization.model.InheritedAnnotationsPojo;
-import org.junit.Test;
-
-import javax.json.bind.Jsonb;
-import javax.json.bind.JsonbBuilder;
-
-import static org.junit.Assert.assertEquals;
 
 /**
  * @author Roman Grigoriadi
@@ -30,10 +28,9 @@ public class AnnotationInheritanceTest {
     public void testAnnotationInheritance() {
         InheritedAnnotationsPojo pojo = new InheritedAnnotationsPojo();
         String expectedJson = "{}";
-        final Jsonb jsonb = JsonbBuilder.create();
-        assertEquals(expectedJson, jsonb.toJson(pojo));
+        assertEquals(expectedJson, defaultJsonb.toJson(pojo));
 
-        InheritedAnnotationsPojo result = jsonb.fromJson("{\"renamedProperty\":\"abc\"}", InheritedAnnotationsPojo.class);
+        InheritedAnnotationsPojo result = defaultJsonb.fromJson("{\"renamedProperty\":\"abc\"}", InheritedAnnotationsPojo.class);
         assertEquals("abc", result.property);
     }
 }

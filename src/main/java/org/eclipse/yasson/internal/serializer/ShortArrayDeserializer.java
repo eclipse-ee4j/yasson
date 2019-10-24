@@ -13,20 +13,23 @@
 
 package org.eclipse.yasson.internal.serializer;
 
-import org.eclipse.yasson.internal.Unmarshaller;
-
 import java.util.ArrayList;
 import java.util.List;
 
+import org.eclipse.yasson.internal.Unmarshaller;
+
 /**
  * Array unmarshaller item implementation for small short.
- *
- * @author Roman Grigoriadi
  */
 public class ShortArrayDeserializer extends AbstractArrayDeserializer<short[]> {
 
     private final List<Short> items = new ArrayList<>();
 
+    /**
+     * Creates new short array deserializer.
+     *
+     * @param builder deserializer builder
+     */
     protected ShortArrayDeserializer(DeserializerBuilder builder) {
         super(builder);
     }
@@ -40,7 +43,7 @@ public class ShortArrayDeserializer extends AbstractArrayDeserializer<short[]> {
     public short[] getInstance(Unmarshaller unmarshaller) {
         final int size = items.size();
         final short[] shortArray = new short[size];
-        for(int i=0; i<size; i++) {
+        for (int i = 0; i < size; i++) {
             shortArray[i] = items.get(i);
         }
         return shortArray;

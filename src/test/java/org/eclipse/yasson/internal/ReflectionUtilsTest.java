@@ -1,14 +1,12 @@
 package org.eclipse.yasson.internal;
 
-import org.junit.Test;
+import org.junit.jupiter.api.*;
+import static org.junit.jupiter.api.Assertions.*;
 
 import java.lang.reflect.Field;
 import java.lang.reflect.Type;
 import java.util.List;
 import java.util.Map;
-
-import static org.junit.Assert.assertFalse;
-import static org.junit.Assert.assertTrue;
 
 /**
  * @author Roman Grigoriadi
@@ -45,7 +43,7 @@ public class ReflectionUtilsTest {
         assertFalse(ReflectionUtils.isResolvedType(getFieldType("unresolvedWildcardField")));
     }
 
-    private Type getFieldType(String fieldName) {
+    private static Type getFieldType(String fieldName) {
         try {
             Field field = Types.class.getField(fieldName);
             return field.getGenericType();

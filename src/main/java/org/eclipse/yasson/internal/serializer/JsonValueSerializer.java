@@ -9,20 +9,19 @@
  *
  * Contributors:
  * Roman Grigoriadi
+ * David Kral
  ******************************************************************************/
 
 package org.eclipse.yasson.internal.serializer;
 
-import org.eclipse.yasson.internal.Marshaller;
-import org.eclipse.yasson.internal.model.customization.Customization;
-
 import javax.json.JsonValue;
 import javax.json.stream.JsonGenerator;
 
+import org.eclipse.yasson.internal.Marshaller;
+import org.eclipse.yasson.internal.model.customization.Customization;
+
 /**
  * Serializer for {@link JsonValue} type.
- *
- * @author Roman Grigoriadi
  */
 public class JsonValueSerializer extends AbstractValueTypeSerializer<JsonValue> {
 

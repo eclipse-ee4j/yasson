@@ -13,32 +13,28 @@
 
 package org.eclipse.yasson.adapters;
 
+import org.junit.jupiter.api.*;
+import static org.junit.jupiter.api.Assertions.*;
+import static org.eclipse.yasson.Jsonbs.*;
+
 import org.eclipse.yasson.TestTypeToken;
 import org.eclipse.yasson.adapters.model.*;
-import org.junit.Before;
-import org.junit.Test;
 
-import javax.json.bind.Jsonb;
-import javax.json.bind.JsonbBuilder;
 import javax.json.bind.JsonbException;
 import javax.json.bind.adapter.JsonbAdapter;
 import javax.json.bind.annotation.JsonbTypeAdapter;
-
-import static org.junit.Assert.*;
 
 /**
  * @author Roman Grigoriadi
  */
 public class JsonbTypeAdapterTest {
 
-    private Jsonb jsonb;
-
     public static class BoxToStringAdapter implements JsonbAdapter<Box, String> {
 
         @Override
         public Box adaptFromJson(String obj) throws Exception {
             String[] strings = obj.split(":");
-            return new Box(strings[0], Integer.parseInt(strings[1]));
+            return new Box(strings[0], Integer.valueOf(strings[1]));
         }
 
         @Override
@@ -64,47 +60,39 @@ public class JsonbTypeAdapterTest {
         public GenericBox<X> xBox;
     }
 
-    @Before
-    public void setUp() throws Exception {
-        jsonb = JsonbBuilder.create();
-    }
-
     @Test
     public void testIncompatibleAdapter() throws Exception {
-
         IncompatibleAdapterPojo incompatibleAdapterFieldPojo = new IncompatibleAdapterPojo();
         incompatibleAdapterFieldPojo.str = "STR";
         try {
-            jsonb.toJson(incompatibleAdapterFieldPojo);
+            defaultJsonb.toJson(incompatibleAdapterFieldPojo);
             fail();
         } catch (JsonbException e) {
             assertTrue(e.getMessage().startsWith("Adapter of runtime type class"));
             assertTrue(e.getMessage().contains("does not match property type "));
         }
-
     }
 
     @Test
     public void testGenericFieldsMatch() {
         AnnotatedPojo<Integer, String> annotatedPojo = new AnnotatedPojo<>();
         annotatedPojo.tBox = new GenericBox<>("T_BOX", 110);
-        String marshalledJson = jsonb.toJson(annotatedPojo, new TestTypeToken<AnnotatedPojo<Integer, String>>(){}.getType());
+        String marshalledJson = defaultJsonb.toJson(annotatedPojo, new TestTypeToken<AnnotatedPojo<Integer, String>>(){}.getType());
         assertEquals("{\"tBox\":{\"adaptedT\":{\"x\":[\"110\"]},\"crateStrField\":\"T_BOX\"}}", marshalledJson);
 
-        AnnotatedPojo<Integer,String> result = jsonb.fromJson("{\"tBox\":{\"crateStrField\":\"T_BOX\",\"adaptedT\":{\"x\":[\"110\"]}}}", new TestTypeToken<AnnotatedPojo<Integer,String>>(){}.getType());
+        AnnotatedPojo<Integer,String> result = defaultJsonb.fromJson("{\"tBox\":{\"crateStrField\":\"T_BOX\",\"adaptedT\":{\"x\":[\"110\"]}}}", new TestTypeToken<AnnotatedPojo<Integer,String>>(){}.getType());
         assertEquals("T_BOX", result.tBox.getStrField());
         assertEquals(Integer.valueOf(110), result.tBox.getX());
     }
 
     @Test
     public void testAnnotatedTbox() throws Exception {
-
         AnnotatedPojo pojo = new AnnotatedPojo();
         pojo.box = new Box("STR", 101);
-        String marshalledJson = jsonb.toJson(pojo);
+        String marshalledJson = defaultJsonb.toJson(pojo);
         assertEquals("{\"box\":\"STR:101\"}", marshalledJson);
 
-        AnnotatedPojo<?, ?> result = jsonb.fromJson("{\"box\":\"STR:110\"}", AnnotatedPojo.class);
+        AnnotatedPojo<?, ?> result = defaultJsonb.fromJson("{\"box\":\"STR:110\"}", AnnotatedPojo.class);
         assertEquals("STR", result.box.getBoxStrField());
         assertEquals(Integer.valueOf(110), result.box.getBoxIntegerField());
     }
@@ -112,10 +100,10 @@ public class JsonbTypeAdapterTest {
     @Test
     public void testBoxWithTypeAdapter() {
         BoxWithAdapter boxWithAdapter = new BoxWithAdapter("STR", 101);
-        String marshalledJson = jsonb.toJson(boxWithAdapter);
+        String marshalledJson = defaultJsonb.toJson(boxWithAdapter);
         assertEquals("{\"boxInteger\":101,\"boxStr\":\"STR\"}", marshalledJson);
 
-        BoxWithAdapter result = jsonb.fromJson("{\"boxInteger\":101,\"boxStr\":\"STR\"}", BoxWithAdapter.class);
+        BoxWithAdapter result = defaultJsonb.fromJson("{\"boxInteger\":101,\"boxStr\":\"STR\"}", BoxWithAdapter.class);
         assertEquals("STR", result.getBoxStrField());
         assertEquals(Integer.valueOf(101), result.getBoxIntegerField());
     }
@@ -123,15 +111,14 @@ public class JsonbTypeAdapterTest {
     @Test
     public void testBoxWithTypeSerializer() {
         BoxWithSerializer boxWithSerializer = new BoxWithSerializer("STR", 101);
-        String marshalledJson = jsonb.toJson(boxWithSerializer);
+        String marshalledJson = defaultJsonb.toJson(boxWithSerializer);
         assertEquals("{\"boxInteger\":101,\"boxStr\":\"STR\"}", marshalledJson);
     }
 
     @Test
     public void testBoxWithTypeDeserializer() {
-        BoxWithDeserializer result = jsonb.fromJson("{\"boxInteger\":101,\"boxStr\":\"STR\"}", BoxWithDeserializer.class);
+        BoxWithDeserializer result = defaultJsonb.fromJson("{\"boxInteger\":101,\"boxStr\":\"STR\"}", BoxWithDeserializer.class);
         assertEquals("STR", result.getBoxStrField());
         assertEquals(Integer.valueOf(101), result.getBoxIntegerField());
     }
-
 }

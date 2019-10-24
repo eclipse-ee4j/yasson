@@ -9,6 +9,7 @@
  *
  * Contributors:
  * Roman Grigoriadi
+ * David Kral
  ******************************************************************************/
 
 package org.eclipse.yasson.internal.serializer;
@@ -31,7 +32,7 @@ import org.eclipse.yasson.internal.model.customization.ContainerCustomization;
 /**
  * Base class for container serializers (list, array, etc.).
  *
- * @author Roman Grigoriadi
+ * @param <T> container value type
  */
 public abstract class AbstractContainerSerializer<T> extends AbstractItem<T> implements JsonbSerializer<T> {
 
@@ -51,9 +52,9 @@ public abstract class AbstractContainerSerializer<T> extends AbstractItem<T> imp
     /**
      * Creates a new instance.
      *
-     * @param wrapper Item to serialize.
+     * @param wrapper     Item to serialize.
      * @param runtimeType Runtime type of the item.
-     * @param classModel Class model.
+     * @param classModel  Class model.
      */
     public AbstractContainerSerializer(CurrentItem<?> wrapper, Type runtimeType, ClassModel classModel) {
         super(wrapper, runtimeType, classModel);
@@ -78,7 +79,7 @@ public abstract class AbstractContainerSerializer<T> extends AbstractItem<T> imp
     /**
      * Write start of an object or an array with a key.
      *
-     * @param key JSON key name.
+     * @param key       JSON key name.
      * @param generator JSON format generator
      */
     protected abstract void writeStart(String key, JsonGenerator generator);
@@ -95,9 +96,9 @@ public abstract class AbstractContainerSerializer<T> extends AbstractItem<T> imp
     /**
      * Serialize content of provided container.
      *
-     * @param obj container to be serialized
+     * @param obj       container to be serialized
      * @param generator JSON format generator
-     * @param ctx JSON serialization context
+     * @param ctx       JSON serialization context
      */
     protected abstract void serializeInternal(T obj, JsonGenerator generator, SerializationContext ctx);
 
@@ -109,13 +110,26 @@ public abstract class AbstractContainerSerializer<T> extends AbstractItem<T> imp
         writeEnd(generator);
     }
 
+    /**
+     * Serializes container object item.
+     *
+     * @param serializer serializer of the object
+     * @param object     object to serialize
+     * @param generator  json generator
+     * @param ctx        context
+     * @param <X>        type of object
+     */
     @SuppressWarnings("unchecked")
-    protected <X> void serializerCaptor(JsonbSerializer<?> serializer, X object, JsonGenerator generator, SerializationContext ctx) {
+    protected <X> void serializerCaptor(JsonbSerializer<?> serializer,
+                                        X object,
+                                        JsonGenerator generator,
+                                        SerializationContext ctx) {
         ((JsonbSerializer<X>) serializer).serialize(object, generator, ctx);
     }
 
     /**
      * Return last used serializer if last value class matches.
+     *
      * @param valueClass class of the serialized object
      * @return cached serializer or null
      */
@@ -128,8 +142,9 @@ public abstract class AbstractContainerSerializer<T> extends AbstractItem<T> imp
 
     /**
      * Cache a serializer and serialized object class for next use.
+     *
      * @param valueSerializer serializer
-     * @param valueClass class of serializer object
+     * @param valueClass      class of serializer object
      */
     protected void addValueSerializer(JsonbSerializer<?> valueSerializer, Class<?> valueClass) {
         Objects.requireNonNull(valueSerializer);
@@ -138,6 +153,13 @@ public abstract class AbstractContainerSerializer<T> extends AbstractItem<T> imp
         this.valueClass = valueClass;
     }
 
+    /**
+     * Serializes container object.
+     *
+     * @param item      container
+     * @param generator json generator
+     * @param ctx       context
+     */
     protected void serializeItem(Object item, JsonGenerator generator, SerializationContext ctx) {
         if (item == null) {
             generator.writeNull();
@@ -157,10 +179,9 @@ public abstract class AbstractContainerSerializer<T> extends AbstractItem<T> imp
             builder.withWrapper(this);
             builder.withType(instanceValueType);
 
-
             if (!DefaultSerializers.getInstance().isKnownType(itemClass)) {
                 //Need for class level annotations + user adapters/serializers bound to type
-                ClassModel classModel = ((Marshaller)ctx).getJsonbContext().getMappingContext().getOrCreateClassModel(itemClass);
+                ClassModel classModel = ((Marshaller) ctx).getJsonbContext().getMappingContext().getOrCreateClassModel(itemClass);
                 builder.withCustomization(new ContainerCustomization(classModel.getCustomization()));
             } else {
                 //Still need to override isNillable to true with ContainerCustomization for all serializers
@@ -175,9 +196,16 @@ public abstract class AbstractContainerSerializer<T> extends AbstractItem<T> imp
         serializerCaptor(serializer, item, generator, ctx);
     }
 
+    /**
+     * Value type of the container.
+     *
+     * @param valueType value type
+     * @return raw value type
+     */
     protected Type getValueType(Type valueType) {
         if (valueType instanceof ParameterizedType) {
-            Optional<Type> runtimeTypeOptional = ReflectionUtils.resolveOptionalType(this, ((ParameterizedType) valueType).getActualTypeArguments()[0]);
+            Optional<Type> runtimeTypeOptional = ReflectionUtils
+                    .resolveOptionalType(this, ((ParameterizedType) valueType).getActualTypeArguments()[0]);
             return runtimeTypeOptional.orElse(Object.class);
         }
         return Object.class;

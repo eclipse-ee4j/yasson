@@ -9,9 +9,17 @@
  *
  * Contributors:
  * Roman Grigoriadi
+ * David Kral
  ******************************************************************************/
 
 package org.eclipse.yasson.internal.serializer;
+
+import java.lang.reflect.Type;
+import java.util.OptionalLong;
+
+import javax.json.bind.JsonbException;
+import javax.json.bind.serializer.DeserializationContext;
+import javax.json.stream.JsonParser;
 
 import org.eclipse.yasson.internal.JsonbParser;
 import org.eclipse.yasson.internal.Unmarshaller;
@@ -19,16 +27,8 @@ import org.eclipse.yasson.internal.model.customization.Customization;
 import org.eclipse.yasson.internal.properties.MessageKeys;
 import org.eclipse.yasson.internal.properties.Messages;
 
-import javax.json.bind.JsonbException;
-import javax.json.bind.serializer.DeserializationContext;
-import javax.json.stream.JsonParser;
-import java.lang.reflect.Type;
-import java.util.OptionalLong;
-
 /**
  * Deserializer for {@link OptionalLong} type.
- * 
- * @author David Kral
  */
 public class OptionalLongTypeDeserializer extends AbstractValueTypeDeserializer<OptionalLong> {
 

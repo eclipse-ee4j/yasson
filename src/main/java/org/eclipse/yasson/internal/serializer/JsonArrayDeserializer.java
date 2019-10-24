@@ -9,19 +9,18 @@
  *
  * Contributors:
  * Roman Grigoriadi
+ * David Kral
  ******************************************************************************/
 
 package org.eclipse.yasson.internal.serializer;
 
+import javax.json.JsonArray;
+
 import org.eclipse.yasson.internal.JsonbParser;
 import org.eclipse.yasson.internal.Unmarshaller;
 
-import javax.json.JsonArray;
-
 /**
  * Item for JsonArray.
- *
- * @author Roman Grigoriadi
  */
 public class JsonArrayDeserializer extends AbstractJsonpDeserializer<JsonArray> {
 

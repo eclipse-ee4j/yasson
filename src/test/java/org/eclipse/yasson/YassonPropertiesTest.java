@@ -1,12 +1,12 @@
 package org.eclipse.yasson;
 
-import org.junit.Test;
+import org.junit.jupiter.api.*;
+import static org.junit.jupiter.api.Assertions.*;
 
 import static org.eclipse.yasson.YassonProperties.FAIL_ON_UNKNOWN_PROPERTIES;
 import static org.eclipse.yasson.YassonProperties.NULL_ROOT_SERIALIZER;
 import static org.eclipse.yasson.YassonProperties.USER_TYPE_MAPPING;
 import static org.eclipse.yasson.YassonProperties.ZERO_TIME_PARSE_DEFAULTING;
-import static org.junit.Assert.assertEquals;
 
 /**
  * Tests that the names of configuration fields in {@link YassonProperties} do not change.

@@ -1,6 +1,6 @@
 package org.eclipse.yasson;
 
-import static org.junit.Assert.fail;
+import static org.junit.jupiter.api.Assertions.*;
 
 import java.util.function.Function;
 import java.util.function.Supplier;
@@ -61,7 +61,5 @@ public class Assertions {
 				fail("Expected to get an exception of " + expectedType + " but instead was " + t.getClass());
 			}
 		}
-		
 	}
-
 }

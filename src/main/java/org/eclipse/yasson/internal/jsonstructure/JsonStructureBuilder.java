@@ -10,10 +10,11 @@
  ******************************************************************************/
 package org.eclipse.yasson.internal.jsonstructure;
 
-import javax.json.JsonStructure;
-import javax.json.JsonValue;
 import java.math.BigDecimal;
 import java.math.BigInteger;
+
+import javax.json.JsonStructure;
+import javax.json.JsonValue;
 
 /**
  * Grouping interface for {@link javax.json.JsonObject} and {@link javax.json.JsonArray} generation.
@@ -21,7 +22,8 @@ import java.math.BigInteger;
 abstract class JsonStructureBuilder {
 
     /**
-     * Build and get constructed {@link JsonStructure}
+     * Build and get constructed {@link JsonStructure}.
+     *
      * @return JsonStructure result.
      */
     abstract JsonStructure build();
@@ -29,6 +31,7 @@ abstract class JsonStructureBuilder {
     /**
      * Puts another {@link JsonStructure} into current. If current is {@link javax.json.JsonObject} than last written
      * key is used.
+     *
      * @param structure
      */
     abstract void put(JsonStructure structure);

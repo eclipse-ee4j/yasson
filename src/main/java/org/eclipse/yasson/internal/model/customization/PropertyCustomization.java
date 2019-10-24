@@ -18,8 +18,6 @@ import org.eclipse.yasson.internal.serializer.JsonbNumberFormatter;
 
 /**
  * Customization for a property of a class.
- *
- * @author Roman Grigoriadi
  */
 public class PropertyCustomization extends CustomizationBase {
 
@@ -31,7 +29,7 @@ public class PropertyCustomization extends CustomizationBase {
 
     private final JsonbDateFormatter serializeDateFormatter;
     private final JsonbDateFormatter deserializeDateFormatter;
-    
+
     private final AdapterBinding serializeAdapter;
     private final AdapterBinding deserializeAdapter;
 
@@ -98,20 +96,23 @@ public class PropertyCustomization extends CustomizationBase {
         return deserializeDateFormatter;
     }
 
-
     /**
-     * The flag indicating whether the value of the underlying type/property should be processed during serialization process or not.
+     * The flag indicating whether the value of the underlying type/property should be processed during serialization process
+     * or not.
      *
-     * @return true indicates that the underlying type/property should be included in serialization process and false indicates it should not
+     * @return true indicates that the underlying type/property should be included in serialization process and false indicates
+     * it should not
      */
     public boolean isReadTransient() {
         return readTransient;
     }
 
     /**
-     * The flag indicating whether the value of the underlying type/property should be processed during deserialization process or not.
+     * The flag indicating whether the value of the underlying type/property should be processed during deserialization process
+     * or not.
      *
-     * @return true indicates that the underlying type/property should be included in deserialization process and false indicates it should not
+     * @return true indicates that the underlying type/property should be included in deserialization process and false
+     * indicates it should not
      */
     public boolean isWriteTransient() {
         return writeTransient;
@@ -125,12 +126,12 @@ public class PropertyCustomization extends CustomizationBase {
     public Class<?> getImplementationClass() {
         return implementationClass;
     }
-    
+
     @Override
     public AdapterBinding getDeserializeAdapterBinding() {
         return deserializeAdapter;
     }
-    
+
     @Override
     public AdapterBinding getSerializeAdapterBinding() {
         return serializeAdapter;

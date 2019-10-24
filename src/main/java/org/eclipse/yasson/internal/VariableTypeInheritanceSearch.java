@@ -13,27 +13,27 @@
 
 package org.eclipse.yasson.internal;
 
-import org.eclipse.yasson.internal.properties.MessageKeys;
-import org.eclipse.yasson.internal.properties.Messages;
-
-import javax.json.bind.JsonbException;
 import java.lang.reflect.ParameterizedType;
 import java.lang.reflect.Type;
 import java.lang.reflect.TypeVariable;
 import java.util.ArrayDeque;
 import java.util.Deque;
 
+import javax.json.bind.JsonbException;
+
+import org.eclipse.yasson.internal.properties.MessageKeys;
+import org.eclipse.yasson.internal.properties.Messages;
+
 /**
  * Search for type variable in inheritance hierarchy and resolve if possible.
- *
- * @author Roman Grigoriadi
  */
 public class VariableTypeInheritanceSearch {
 
     private final Deque<ParameterizedType> parameterizedSubclasses = new ArrayDeque<>();
 
     /**
-     * Searches the hierarchy of classes to resolve a type variable. If typevar resolved value is another typevar redirection (propagated from wrapping class),
+     * Searches the hierarchy of classes to resolve a type variable. If typevar resolved value is another typevar redirection
+     * (propagated from wrapping class),
      * this typevar is returned.
      *
      * <pre>

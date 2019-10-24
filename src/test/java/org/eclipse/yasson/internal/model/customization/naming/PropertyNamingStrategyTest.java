@@ -13,7 +13,8 @@
 
 package org.eclipse.yasson.internal.model.customization.naming;
 
-import org.junit.Test;
+import org.junit.jupiter.api.*;
+import static org.junit.jupiter.api.Assertions.*;
 
 import javax.json.bind.Jsonb;
 import javax.json.bind.JsonbBuilder;
@@ -21,9 +22,6 @@ import javax.json.bind.JsonbConfig;
 import javax.json.bind.config.PropertyNamingStrategy;
 
 import org.eclipse.yasson.internal.model.customization.StrategiesProvider;
-
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertNull;
 
 /**
  * Tests naming strategies.
@@ -48,7 +46,6 @@ public class PropertyNamingStrategyTest {
         assertEquals(lowercaseUnderscoresJson, jsonb.toJson(pojo));
         NamingPojo result = jsonb.fromJson(lowercaseUnderscoresJson, NamingPojo.class);
         assertResult(result);
-
     }
 
     @Test
@@ -95,7 +92,6 @@ public class PropertyNamingStrategyTest {
 
     @Test
     public void testCaseInsensitive() {
-
         Jsonb jsonb = JsonbBuilder.create(new JsonbConfig().withPropertyNamingStrategy(PropertyNamingStrategy.CASE_INSENSITIVE));
         String upperCased = "{\"CAPS_UNDERSCORE_PROPERTY\":\"ghi\",\"_startingWithUnderscoreProperty\":\"def\",\"upperCasedProperty\":\"abc\"}";
         assertEquals(upperCased, jsonb.toJson(pojo));
@@ -122,11 +118,9 @@ public class PropertyNamingStrategyTest {
         assertResult(result);
     }
     
-    private void assertResult(NamingPojo result) {
+    private static void assertResult(NamingPojo result) {
         assertEquals("abc", result.upperCasedProperty);
         assertEquals("def", result._startingWithUnderscoreProperty);
         assertEquals("ghi", result.CAPS_UNDERSCORE_PROPERTY);
     }
-
-
 }

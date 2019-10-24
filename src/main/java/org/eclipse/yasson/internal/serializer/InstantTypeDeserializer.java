@@ -9,20 +9,19 @@
  *
  * Contributors:
  * Roman Grigoriadi
+ * David Kral
  ******************************************************************************/
 
 package org.eclipse.yasson.internal.serializer;
-
-import org.eclipse.yasson.internal.model.customization.Customization;
 
 import java.time.Instant;
 import java.time.format.DateTimeFormatter;
 import java.util.Locale;
 
+import org.eclipse.yasson.internal.model.customization.Customization;
+
 /**
  * Deserializer for {@link Instant} type.
- *
- * @author David Kral
  */
 public class InstantTypeDeserializer extends AbstractDateTimeDeserializer<Instant> {
 

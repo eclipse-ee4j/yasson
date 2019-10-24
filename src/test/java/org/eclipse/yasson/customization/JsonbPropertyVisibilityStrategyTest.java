@@ -13,7 +13,9 @@
 
 package org.eclipse.yasson.customization;
 
-import org.junit.Test;
+import org.junit.jupiter.api.*;
+import static org.junit.jupiter.api.Assertions.*;
+import static org.eclipse.yasson.Jsonbs.*;
 
 import javax.json.bind.Jsonb;
 import javax.json.bind.JsonbBuilder;
@@ -22,8 +24,6 @@ import javax.json.bind.annotation.JsonbVisibility;
 import javax.json.bind.config.PropertyVisibilityStrategy;
 import java.lang.reflect.Field;
 import java.lang.reflect.Method;
-
-import static org.junit.Assert.assertEquals;
 
 /**
  * Tests custom {@link PropertyVisibilityStrategy}
@@ -158,8 +158,7 @@ public class JsonbPropertyVisibilityStrategyTest {
 
     @Test
     public void testAnnotatedPojo() {
-        final Jsonb jsonb = JsonbBuilder.create();
         AnnotatedPojo fieldPojo = new AnnotatedPojo("avalue", "bvalue", "cvalue", "dvalue");
-        assertEquals("{\"bfield\":\"bvalue\",\"bgetter\":\"bvalue\",\"cfield\":\"cvalue\",\"cgetter\":\"cvalue\"}", jsonb.toJson(fieldPojo));
+        assertEquals("{\"bfield\":\"bvalue\",\"bgetter\":\"bvalue\",\"cfield\":\"cvalue\",\"cgetter\":\"cvalue\"}", defaultJsonb.toJson(fieldPojo));
     }
 }

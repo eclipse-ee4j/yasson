@@ -1,8 +1,7 @@
 package org.eclipse.yasson.internal;
 
-import static org.junit.Assert.assertArrayEquals;
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertNotNull;
+import org.junit.jupiter.api.*;
+import static org.junit.jupiter.api.Assertions.*;
 
 import org.eclipse.yasson.internal.AnnotationIntrospectorTestFixtures.ProvidesParameterRepresentation;
 import org.eclipse.yasson.internal.model.CreatorModel;
@@ -12,9 +11,7 @@ import java.lang.reflect.Type;
 import java.util.Map;
 import java.util.Map.Entry;
 
-import org.junit.Ignore;
-
-@Ignore
+@Disabled
 class AnnotationIntrospectorTestAsserts {
 
     /**
@@ -25,7 +22,7 @@ class AnnotationIntrospectorTestAsserts {
      * @param creator  {@link JsonbCreator}
      */
     public static <T extends ProvidesParameterRepresentation> void assertCreatedInstanceContainsAllParameters(T expected, JsonbCreator creator) {
-        assertNotNull(JsonbCreator.class.getSimpleName() + " expected", creator);
+        assertNotNull(creator, JsonbCreator.class.getSimpleName() + " expected");
         @SuppressWarnings("unchecked")
         T created = (T) creator.call(expected.asParameters(), expected.getClass());
         assertArrayEquals(expected.asParameters(), created.asParameters());
@@ -38,7 +35,7 @@ class AnnotationIntrospectorTestAsserts {
      * @param creator            CreatorModel
      */
     public static void assertParameters(Map<String, Type> expectedParameters, JsonbCreator creator) {
-        assertNotNull(JsonbCreator.class.getSimpleName() + " expected", creator);
+        assertNotNull(creator, JsonbCreator.class.getSimpleName() + " expected");
         for (Entry<String, Type> parameter : expectedParameters.entrySet()) {
             CreatorModel creatorModel = creator.findByName(parameter.getKey());
             assertEquals(parameter.getKey(), creatorModel.getName());

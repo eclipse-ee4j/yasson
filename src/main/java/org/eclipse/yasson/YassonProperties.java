@@ -16,6 +16,11 @@ package org.eclipse.yasson;
  * Custom properties for configuring Yasson outside of the specification {@link javax.json.bind.JsonbConfig} scope.
  */
 public class YassonProperties {
+
+    private YassonProperties() {
+        throw new IllegalStateException("Util classes cannot be instantiated.");
+    }
+
     /**
      * Property used to specify behaviour on deserialization when JSON document contains properties
      * which doesn't exist in the target class. Default value is 'true'.

@@ -17,9 +17,8 @@ import org.eclipse.yasson.internal.serializer.JsonbDateFormatter;
 import org.eclipse.yasson.internal.serializer.JsonbNumberFormatter;
 
 /**
- * The property customization builder that would be used to build an instance of {@link PropertyCustomization} to ensure its immutability.
- *
- * @author Ehsan Zaery Moghaddam (zaerymoghaddam@gmail.com)
+ * The property customization builder that would be used to build an instance of {@link PropertyCustomization} to ensure its
+ * immutability.
  */
 public class PropertyCustomizationBuilder extends CustomizationBuilder {
 
@@ -34,7 +33,7 @@ public class PropertyCustomizationBuilder extends CustomizationBuilder {
 
     private boolean readTransient;
     private boolean writeTransient;
-    
+
     private AdapterBinding serializeAdapter;
     private AdapterBinding deserializeAdapter;
 
@@ -193,7 +192,6 @@ public class PropertyCustomizationBuilder extends CustomizationBuilder {
         this.writeTransient = writeTransient;
     }
 
-
     /**
      * Implementation class if property is interface type.
      *
@@ -211,29 +209,29 @@ public class PropertyCustomizationBuilder extends CustomizationBuilder {
     public void setImplementationClass(Class implementationClass) {
         this.implementationClass = implementationClass;
     }
-    
+
     @Override
     public void setAdapterInfo(AdapterBinding adapterInfo) {
         throw new UnsupportedOperationException();
     }
-    
+
     @Override
     public AdapterBinding getAdapterInfo() {
         return null;
     }
-    
+
     public AdapterBinding getSerializeAdapter() {
         return serializeAdapter;
     }
-    
+
     public void setSerializeAdapter(AdapterBinding adapter) {
         this.serializeAdapter = adapter;
     }
-    
+
     public AdapterBinding getDeserializeAdapter() {
         return deserializeAdapter;
     }
-    
+
     public void setDeserializeAdapter(AdapterBinding adapter) {
         this.deserializeAdapter = adapter;
     }

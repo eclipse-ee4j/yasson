@@ -18,11 +18,14 @@ import javax.json.stream.JsonGenerator;
 
 /**
  * Serializer for arrays of shorts.
- * 
- * @author Roman Grigoriadi
  */
 public class ShortArraySerializer extends AbstractArraySerializer<short[]> {
 
+    /**
+     * Creates new short array serializer.
+     *
+     * @param builder serializer builder
+     */
     protected ShortArraySerializer(SerializerBuilder builder) {
         super(builder);
     }

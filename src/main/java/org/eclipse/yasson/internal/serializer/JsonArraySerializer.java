@@ -9,6 +9,7 @@
  *
  * Contributors:
  * Roman Grigoriadi
+ * David Kral
  ******************************************************************************/
 
 package org.eclipse.yasson.internal.serializer;
@@ -20,11 +21,14 @@ import javax.json.stream.JsonGenerator;
 
 /**
  * Serializer for {@link JsonArray}.
- *
- * @author Roman Grigoriadi
  */
 public class JsonArraySerializer extends AbstractJsonpSerializer<JsonArray> {
 
+    /**
+     * Creates new instance of json array serializer.
+     *
+     * @param builder serializer builder
+     */
     protected JsonArraySerializer(SerializerBuilder builder) {
         super(builder);
     }

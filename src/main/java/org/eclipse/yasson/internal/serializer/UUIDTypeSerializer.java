@@ -12,12 +12,12 @@
 
 package org.eclipse.yasson.internal.serializer;
 
+import java.util.UUID;
+
+import javax.json.stream.JsonGenerator;
 
 import org.eclipse.yasson.internal.Marshaller;
 import org.eclipse.yasson.internal.model.customization.Customization;
-
-import javax.json.stream.JsonGenerator;
-import java.util.UUID;
 
 /**
  * Serializer for {@link UUID} type.

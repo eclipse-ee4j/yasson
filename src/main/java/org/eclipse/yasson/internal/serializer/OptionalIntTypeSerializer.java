@@ -10,23 +10,22 @@
  *
  * Contributors:
  * Roman Grigoriadi
+ * David Kral
  ******************************************************************************/
 
 package org.eclipse.yasson.internal.serializer;
 
-import org.eclipse.yasson.internal.Marshaller;
-import org.eclipse.yasson.internal.model.customization.Customization;
+import java.util.OptionalInt;
 
 import javax.json.stream.JsonGenerator;
-import java.util.OptionalDouble;
-import java.util.OptionalInt;
+
+import org.eclipse.yasson.internal.Marshaller;
+import org.eclipse.yasson.internal.model.customization.Customization;
 
 import static org.eclipse.yasson.internal.serializer.OptionalObjectSerializer.handleEmpty;
 
 /**
  * Serializer for {@link OptionalInt} type.
- * 
- * @author David Kral
  */
 public class OptionalIntTypeSerializer extends AbstractValueTypeSerializer<OptionalInt> {
 
@@ -41,7 +40,7 @@ public class OptionalIntTypeSerializer extends AbstractValueTypeSerializer<Optio
 
     @Override
     protected void serialize(OptionalInt obj, JsonGenerator generator, Marshaller marshaller) {
-        if (!handleEmpty(obj, OptionalInt::isPresent, customization, generator, marshaller)) {
+        if (!handleEmpty(obj, OptionalInt::isPresent, getCustomization(), generator, marshaller)) {
             generator.write(obj.getAsInt());
         }
     }

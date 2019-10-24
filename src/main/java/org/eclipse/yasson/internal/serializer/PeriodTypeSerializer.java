@@ -9,20 +9,20 @@
  *
  * Contributors:
  * Roman Grigoriadi
+ * David Kral
  ******************************************************************************/
 
 package org.eclipse.yasson.internal.serializer;
 
+import java.time.Period;
+
+import javax.json.stream.JsonGenerator;
+
 import org.eclipse.yasson.internal.Marshaller;
 import org.eclipse.yasson.internal.model.customization.Customization;
 
-import javax.json.stream.JsonGenerator;
-import java.time.Period;
-
 /**
  * Serializer for {@link Period} type.
- * 
- * @author David Kral
  */
 public class PeriodTypeSerializer extends AbstractValueTypeSerializer<Period> {
 

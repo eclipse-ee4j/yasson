@@ -12,18 +12,6 @@
  ******************************************************************************/
 package org.eclipse.yasson.internal;
 
-import org.eclipse.yasson.YassonJsonb;
-import org.eclipse.yasson.internal.jsonstructure.JsonGeneratorToStructureAdapter;
-import org.eclipse.yasson.internal.jsonstructure.JsonStructureToParserAdapter;
-import org.eclipse.yasson.internal.properties.MessageKeys;
-import org.eclipse.yasson.internal.properties.Messages;
-
-import javax.json.JsonStructure;
-import javax.json.bind.JsonbConfig;
-import javax.json.bind.JsonbException;
-import javax.json.spi.JsonProvider;
-import javax.json.stream.JsonGenerator;
-import javax.json.stream.JsonParser;
 import java.io.InputStream;
 import java.io.OutputStream;
 import java.io.Reader;
@@ -36,10 +24,21 @@ import java.util.HashMap;
 import java.util.Map;
 import java.util.Optional;
 
+import javax.json.JsonStructure;
+import javax.json.bind.JsonbConfig;
+import javax.json.bind.JsonbException;
+import javax.json.spi.JsonProvider;
+import javax.json.stream.JsonGenerator;
+import javax.json.stream.JsonParser;
+
+import org.eclipse.yasson.YassonJsonb;
+import org.eclipse.yasson.internal.jsonstructure.JsonGeneratorToStructureAdapter;
+import org.eclipse.yasson.internal.jsonstructure.JsonStructureToParserAdapter;
+import org.eclipse.yasson.internal.properties.MessageKeys;
+import org.eclipse.yasson.internal.properties.Messages;
+
 /**
  * Implementation of Jsonb interface.
- *
- * @author Dmitry Kornilov
  */
 public class JsonBinding implements YassonJsonb {
 
@@ -106,9 +105,11 @@ public class JsonBinding implements YassonJsonb {
     }
 
     private JsonParser inputStreamParser(InputStream stream) {
-        return new JsonbRiParser(jsonbContext.getJsonProvider().createParserFactory(createJsonpProperties(jsonbContext.getConfig()))
-                .createParser(stream,
-                        Charset.forName((String) jsonbContext.getConfig().getProperty(JsonbConfig.ENCODING).orElse("UTF-8"))));
+        return new JsonbRiParser(jsonbContext.getJsonProvider()
+                                         .createParserFactory(createJsonpProperties(jsonbContext.getConfig()))
+                                         .createParser(stream,
+                                                       Charset.forName((String) jsonbContext.getConfig()
+                                                               .getProperty(JsonbConfig.ENCODING).orElse("UTF-8"))));
     }
 
     @Override
@@ -202,7 +203,8 @@ public class JsonBinding implements YassonJsonb {
     private JsonGenerator streamGenerator(OutputStream stream) {
         Map<String, ?> factoryProperties = createJsonpProperties(jsonbContext.getConfig());
         final String encoding = (String) jsonbContext.getConfig().getProperty(JsonbConfig.ENCODING).orElse("UTF-8");
-        return jsonbContext.getJsonProvider().createGeneratorFactory(factoryProperties).createGenerator(stream, Charset.forName(encoding));
+        return jsonbContext.getJsonProvider().createGeneratorFactory(factoryProperties)
+                .createGenerator(stream, Charset.forName(encoding));
     }
 
     @Override

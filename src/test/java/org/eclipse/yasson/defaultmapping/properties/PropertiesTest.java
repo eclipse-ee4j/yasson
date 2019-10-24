@@ -12,15 +12,14 @@
  ******************************************************************************/
 package org.eclipse.yasson.defaultmapping.properties;
 
+import org.junit.jupiter.api.*;
+import static org.junit.jupiter.api.Assertions.*;
+
 import org.eclipse.yasson.internal.properties.MessageKeys;
 import org.eclipse.yasson.internal.properties.Messages;
-import org.junit.Test;
 
 import java.io.IOException;
 import java.util.Locale;
-
-import static org.junit.Assert.assertEquals;
-
 
 /**
  * This class contains properties tests

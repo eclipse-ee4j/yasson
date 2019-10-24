@@ -9,27 +9,27 @@
  *
  * Contributors:
  * Roman Grigoriadi
+ * David Kral
  ******************************************************************************/
 
 package org.eclipse.yasson.internal.serializer;
 
-import org.eclipse.yasson.internal.Unmarshaller;
-import org.eclipse.yasson.internal.model.customization.Customization;
+import java.lang.reflect.Type;
+import java.math.BigDecimal;
 
 import javax.json.JsonBuilderFactory;
 import javax.json.JsonNumber;
 import javax.json.JsonObject;
-import java.lang.reflect.Type;
-import java.math.BigDecimal;
+
+import org.eclipse.yasson.internal.Unmarshaller;
+import org.eclipse.yasson.internal.model.customization.Customization;
 
 /**
  * Deserializer for {@link JsonNumber} type.
- * 
- * @author David Kral
  */
 public class JsonNumberTypeDeserializer extends AbstractValueTypeDeserializer<JsonNumber> {
 
-    private final static String NUMBER = "number";
+    private static final String NUMBER = "number";
 
     /**
      * Creates a new instance.

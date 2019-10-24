@@ -10,15 +10,16 @@
  ******************************************************************************/
 package org.eclipse.yasson.internal.jsonstructure;
 
-import org.eclipse.yasson.internal.properties.MessageKeys;
-import org.eclipse.yasson.internal.properties.Messages;
+import java.math.BigDecimal;
+import java.math.BigInteger;
 
 import javax.json.JsonStructure;
 import javax.json.JsonValue;
 import javax.json.bind.JsonbException;
 import javax.json.spi.JsonProvider;
-import java.math.BigDecimal;
-import java.math.BigInteger;
+
+import org.eclipse.yasson.internal.properties.MessageKeys;
+import org.eclipse.yasson.internal.properties.Messages;
 
 /**
  * Builds {@link javax.json.JsonObject} delegates to {@link javax.json.JsonObjectBuilder}, caches key when
@@ -32,6 +33,7 @@ class JsonObjectBuilder extends JsonStructureBuilder {
 
     /**
      * Create instance with cached provider.
+     *
      * @param provider Json provider to create JsonObjectBuilder on.
      */
     JsonObjectBuilder(JsonProvider provider) {
@@ -50,7 +52,8 @@ class JsonObjectBuilder extends JsonStructureBuilder {
 
     /**
      * Puts another {@link JsonStructure} into current using provided key.
-     * @param name key to put JsonStructure under.
+     *
+     * @param name      key to put JsonStructure under.
      * @param structure JsonStructure to put.
      */
     void put(String name, JsonStructure structure) {
@@ -104,7 +107,8 @@ class JsonObjectBuilder extends JsonStructureBuilder {
 
     /**
      * Write a key-value pair into current {@link javax.json.JsonObject}.
-     * @param name Key name to write value with.
+     *
+     * @param name  Key name to write value with.
      * @param value A value to write.
      */
     void write(String name, JsonValue value) {
@@ -113,7 +117,8 @@ class JsonObjectBuilder extends JsonStructureBuilder {
 
     /**
      * Write a key-value pair into current {@link javax.json.JsonObject}.
-     * @param name Key name to write value with.
+     *
+     * @param name  Key name to write value with.
      * @param value A value to write.
      */
     void write(String name, String value) {
@@ -122,7 +127,8 @@ class JsonObjectBuilder extends JsonStructureBuilder {
 
     /**
      * Write a key-value pair into current {@link javax.json.JsonObject}.
-     * @param name Key name to write value with.
+     *
+     * @param name  Key name to write value with.
      * @param value A value to write.
      */
     void write(String name, BigDecimal value) {
@@ -131,7 +137,8 @@ class JsonObjectBuilder extends JsonStructureBuilder {
 
     /**
      * Write a key-value pair into current {@link javax.json.JsonObject}.
-     * @param name Key name to write value with.
+     *
+     * @param name  Key name to write value with.
      * @param value A value to write.
      */
     void write(String name, BigInteger value) {
@@ -140,7 +147,8 @@ class JsonObjectBuilder extends JsonStructureBuilder {
 
     /**
      * Write a key-value pair into current {@link javax.json.JsonObject}.
-     * @param name Key name to write value with.
+     *
+     * @param name  Key name to write value with.
      * @param value A value to write.
      */
     void write(String name, int value) {
@@ -149,7 +157,8 @@ class JsonObjectBuilder extends JsonStructureBuilder {
 
     /**
      * Write a key-value pair into current {@link javax.json.JsonObject}.
-     * @param name Key name to write value with.
+     *
+     * @param name  Key name to write value with.
      * @param value A value to write.
      */
     void write(String name, long value) {
@@ -158,7 +167,8 @@ class JsonObjectBuilder extends JsonStructureBuilder {
 
     /**
      * Write a key-value pair into current {@link javax.json.JsonObject}.
-     * @param name Key name to write value with.
+     *
+     * @param name  Key name to write value with.
      * @param value A value to write.
      */
     void write(String name, double value) {
@@ -167,7 +177,8 @@ class JsonObjectBuilder extends JsonStructureBuilder {
 
     /**
      * Write a key-value pair into current {@link javax.json.JsonObject}.
-     * @param name Key name to write value with.
+     *
+     * @param name  Key name to write value with.
      * @param value A value to write.
      */
     void write(String name, boolean value) {
@@ -176,6 +187,7 @@ class JsonObjectBuilder extends JsonStructureBuilder {
 
     /**
      * Write a null into current {@link javax.json.JsonObject} with a given key.
+     *
      * @param name Key name to write null with.
      */
     void writeNull(String name) {
@@ -184,17 +196,17 @@ class JsonObjectBuilder extends JsonStructureBuilder {
 
     /**
      * Store a key for putting next value into built {@link javax.json.JsonObject}.
+     *
      * @param key Key to store.
      */
     void writeKey(String key) {
         this.nextKey = key;
     }
 
-
     private String getNextKey() {
         if (nextKey == null) {
             throw new JsonbException(Messages.getMessage(MessageKeys.INTERNAL_ERROR,
-                    "Can't write a value without key name"));
+                                                         "Can't write a value without key name"));
         }
         String key = nextKey;
         nextKey = null;

@@ -12,10 +12,13 @@
  ******************************************************************************/
 package org.eclipse.yasson.customization;
 
+import org.junit.jupiter.api.*;
+import static org.junit.jupiter.api.Assertions.*;
+import static org.eclipse.yasson.Jsonbs.*;
+
 import org.eclipse.yasson.customization.model.Animal;
 import org.eclipse.yasson.customization.model.Dog;
 import org.eclipse.yasson.customization.model.ImplementationClassPojo;
-import org.junit.Test;
 
 import javax.json.bind.Jsonb;
 import javax.json.bind.JsonbBuilder;
@@ -23,12 +26,8 @@ import javax.json.bind.JsonbConfig;
 import java.util.HashMap;
 
 import static org.eclipse.yasson.YassonProperties.USER_TYPE_MAPPING;
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertTrue;
 
 public class ImplementationClassTest {
-
-    private final Jsonb jsonb = JsonbBuilder.create();
 
     @Test
     public void testAnnotatedImplementation() {
@@ -36,10 +35,10 @@ public class ImplementationClassTest {
         Animal dog = new Dog("Bulldog");
         pojo.setAnimal(dog);
         String expected = "{\"animal\":{\"dogProperty\":\"Bulldog\"}}";
-        String json = jsonb.toJson(pojo);
+        String json = defaultJsonb.toJson(pojo);
 
         assertEquals(expected, json);
-        ImplementationClassPojo result = jsonb.fromJson(expected, ImplementationClassPojo.class);
+        ImplementationClassPojo result = defaultJsonb.fromJson(expected, ImplementationClassPojo.class);
         assertTrue(result.getAnimal() instanceof Dog);
         assertEquals("Bulldog", ((Dog)result.getAnimal()).getDogProperty());
     }

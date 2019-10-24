@@ -27,37 +27,47 @@ import java.util.function.Supplier;
  * (Constructors of parsed types are stored in {@link org.eclipse.yasson.internal.model.ClassModel}).
  */
 public class InstanceCreator {
-    private final Map<Class<?>, Supplier<?>> creators;
+    private static final InstanceCreator INSTANCE = new InstanceCreator();
 
-    public InstanceCreator() {
-        creators = new HashMap<>();
-        creators.put(ArrayList.class, ArrayList::new);
-        creators.put(LinkedList.class, LinkedList::new);
-        creators.put(HashSet.class, HashSet::new);
-        creators.put(TreeSet.class, TreeSet::new);
-        creators.put(HashMap.class, HashMap::new);
-        creators.put(TreeMap.class, TreeMap::new);
+    static InstanceCreator getSingleton() {
+        return INSTANCE;
+    }
+
+    private static final Map<Class, Supplier> CREATORS = new HashMap<>();
+
+    static {
+        CREATORS.put(ArrayList.class, ArrayList::new);
+        CREATORS.put(LinkedList.class, LinkedList::new);
+        CREATORS.put(HashSet.class, HashSet::new);
+        CREATORS.put(TreeSet.class, TreeSet::new);
+        CREATORS.put(HashMap.class, HashMap::new);
+        CREATORS.put(TreeMap.class, TreeMap::new);
+    }
+
+    private InstanceCreator() {
+        if (INSTANCE != null) {
+            throw new IllegalStateException("This class should never be instantiated");
+        }
     }
 
     /**
      * Create an instance of the given class with its default constructor.
+     *
      * @param tClass class to create instance
-     * @param <T> Type of the class/instance
+     * @param <T>    Type of the class/instance
      * @return crated instance
      */
     @SuppressWarnings("unchecked")
-    public <T> T createInstance(Class<T> tClass) {
-        Supplier<?> creator = creators.get(tClass);
+    public static <T> T createInstance(Class<T> tClass) {
+        Supplier<T> creator = CREATORS.get(tClass);
         //No worries for race conditions here, instance may be replaced during first attempt.
         if (creator == null) {
-            creator = createConstructorSupplier(ReflectionUtils.getDefaultConstructor(tClass, true));
-            creators.put(tClass, creator);
+            Constructor<T> constructor = ReflectionUtils.getDefaultConstructor(tClass, true);
+            creator = () -> ReflectionUtils.createNoArgConstructorInstance(constructor);
+            CREATORS.put(tClass, creator);
         }
 
-        return (T) creator.get();
+        return creator.get();
     }
-    
-    private static Supplier<?> createConstructorSupplier(Constructor<?> constructor){
-    	return () -> ReflectionUtils.createNoArgConstructorInstance(constructor);
-    }
+
 }

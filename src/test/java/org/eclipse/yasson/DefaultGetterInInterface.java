@@ -12,32 +12,22 @@
  ******************************************************************************/
 package org.eclipse.yasson;
 
-import org.eclipse.yasson.internal.JsonbContext;
-import org.junit.Assert;
-import org.junit.Before;
-import org.junit.Test;
+import org.junit.jupiter.api.*;
+import static org.junit.jupiter.api.Assertions.*;
+import static org.eclipse.yasson.Jsonbs.*;
 
-import javax.json.bind.Jsonb;
-import javax.json.bind.JsonbBuilder;
+import org.eclipse.yasson.internal.JsonbContext;
+
 import javax.json.bind.JsonbConfig;
 import javax.json.bind.annotation.JsonbProperty;
 import javax.json.spi.JsonProvider;
 import java.lang.reflect.Method;
-
-import static org.junit.Assert.assertEquals;
 
 /**
  *
  * @author Maxence Laurent
  */
 public class DefaultGetterInInterface {
-
-    private Jsonb jsonb;
-
-    @Before
-    public void before() {
-        jsonb = JsonbBuilder.create();
-    }
 
     public static interface Defaulted {
 
@@ -52,8 +42,8 @@ public class DefaultGetterInInterface {
     @Test
     public void testWithDefault() {
         PojoWithDefault pojo = new PojoWithDefault();
-        String result = jsonb.toJson(pojo);
-        Assert.assertEquals("{\"getterA\":\"valueA\"}", result);
+        String result = defaultJsonb.toJson(pojo);
+        assertEquals("{\"getterA\":\"valueA\"}", result);
     }
 
     public static interface WithGetterI {
@@ -144,16 +134,16 @@ public class DefaultGetterInInterface {
         assertEquals(PojoWithDefaultImplementation.class.getMethod("getGetterI"), pojoTwoDefault);
 
         // assert serialized json is correct, including property name as specified by JsonbProperty annotations
-        this.assertJson(new Pojo(), "implementation");
-        this.assertJson(new PojoNoAnnotation(), "withGetterI");
-        this.assertJson(new PojoWithDefaultOnly(), "default");
-        this.assertJson(new PojoWithDefaultSuperImplementation(), "implementation");
-        this.assertJson(new PojoWithDefaultImplementation(), "defaultImplementation");
-        this.assertJson(new PojoGetterDefaultedTwice(), "defaultImplementation");
+        assertJson(new Pojo(), "implementation");
+        assertJson(new PojoNoAnnotation(), "withGetterI");
+        assertJson(new PojoWithDefaultOnly(), "default");
+        assertJson(new PojoWithDefaultSuperImplementation(), "implementation");
+        assertJson(new PojoWithDefaultImplementation(), "defaultImplementation");
+        assertJson(new PojoGetterDefaultedTwice(), "defaultImplementation");
     }
 
-    private void assertJson(WithGetterI pojo, String expected){
+    private static void assertJson(WithGetterI pojo, String expected){
         assertEquals(expected, pojo.getGetterI());
-        assertEquals("{\"" + expected + "\":\"" + pojo.getGetterI() + "\"}", jsonb.toJson(pojo));
+        assertEquals("{\"" + expected + "\":\"" + pojo.getGetterI() + "\"}", defaultJsonb.toJson(pojo));
     }
 }

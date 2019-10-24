@@ -9,6 +9,7 @@
  *
  * Contributors:
  * Roman Grigoriadi
+ * David Kral
  ******************************************************************************/
 package org.eclipse.yasson.internal.serializer;
 
@@ -33,7 +34,7 @@ import org.eclipse.yasson.internal.properties.Messages;
 /**
  * Serializes arbitrary object by reading its properties.
  *
- * @author Roman Grigoriadi
+ * @param <T> object type
  */
 public class ObjectSerializer<T> extends AbstractContainerSerializer<T> {
 
@@ -49,9 +50,9 @@ public class ObjectSerializer<T> extends AbstractContainerSerializer<T> {
     /**
      * Creates a new instance.
      *
-     * @param wrapper wrapped item
+     * @param wrapper     wrapped item
      * @param runtimeType class type
-     * @param classModel model of the class
+     * @param classModel  model of the class
      */
     public ObjectSerializer(CurrentItem<?> wrapper, Type runtimeType, ClassModel classModel) {
         super(wrapper, runtimeType, classModel);
@@ -59,13 +60,14 @@ public class ObjectSerializer<T> extends AbstractContainerSerializer<T> {
 
     @Override
     protected void serializeInternal(T object, JsonGenerator generator, SerializationContext ctx) {
-        final PropertyModel[] allProperties = ((Marshaller) ctx).getMappingContext().getOrCreateClassModel(object.getClass()).getSortedProperties();
+        final PropertyModel[] allProperties = ((Marshaller) ctx).getMappingContext().getOrCreateClassModel(object.getClass())
+                .getSortedProperties();
         for (PropertyModel model : allProperties) {
             try {
                 marshallProperty(object, generator, ctx, model);
             } catch (Exception e) {
                 throw new JsonbException(Messages.getMessage(MessageKeys.SERIALIZE_PROPERTY_ERROR, model.getWriteName(),
-                        object.getClass().getCanonicalName()), e);
+                                                             object.getClass().getCanonicalName()), e);
             }
         }
     }
@@ -100,7 +102,8 @@ public class ObjectSerializer<T> extends AbstractContainerSerializer<T> {
                 return;
             }
 
-            Optional<Type> runtimeTypeOptional = ReflectionUtils.resolveOptionalType(this, propertyModel.getPropertySerializationType());
+            Optional<Type> runtimeTypeOptional = ReflectionUtils
+                    .resolveOptionalType(this, propertyModel.getPropertySerializationType());
             Type genericType = runtimeTypeOptional.orElse(null);
             final JsonbSerializer<?> serializer = new SerializerBuilder(marshaller.getJsonbContext())
                     .withWrapper(this)
