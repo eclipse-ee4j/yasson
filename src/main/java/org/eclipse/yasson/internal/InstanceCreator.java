@@ -27,6 +27,7 @@ import java.util.function.Supplier;
  * (Constructors of parsed types are stored in {@link org.eclipse.yasson.internal.model.ClassModel}).
  */
 public class InstanceCreator {
+
     private static final InstanceCreator INSTANCE = new InstanceCreator();
 
     static InstanceCreator getSingleton() {

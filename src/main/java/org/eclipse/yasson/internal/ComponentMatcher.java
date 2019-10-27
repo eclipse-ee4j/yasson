@@ -10,7 +10,6 @@
  * Contributors:
  * Roman Grigoriadi
  ******************************************************************************/
-
 package org.eclipse.yasson.internal;
 
 import java.lang.reflect.ParameterizedType;
