@@ -10,7 +10,6 @@
  * Contributors:
  * Roman Grigoriadi
  ******************************************************************************/
-
 package org.eclipse.yasson.internal.model;
 
 import java.lang.annotation.Annotation;
@@ -30,7 +29,9 @@ import org.eclipse.yasson.internal.properties.MessageKeys;
  * @param <T> annotated element
  */
 public class JsonbAnnotatedElement<T extends AnnotatedElement> {
+	
     private final Map<Class<? extends Annotation>, Annotation> annotations;
+    
     private final T element;
 
     /**
@@ -44,6 +45,7 @@ public class JsonbAnnotatedElement<T extends AnnotatedElement> {
         for (Annotation ann : element.getAnnotations()) {
             annotations.put(ann.annotationType(), ann);
         }
+        
         this.annotations = annotations;
         this.element = element;
     }
