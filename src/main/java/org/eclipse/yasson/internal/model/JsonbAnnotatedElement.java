@@ -14,14 +14,13 @@ package org.eclipse.yasson.internal.model;
 
 import java.lang.annotation.Annotation;
 import java.lang.reflect.AnnotatedElement;
-
-import java.util.Map;
 import java.util.HashMap;
+import java.util.Map;
 
 import javax.json.bind.JsonbException;
 
-import org.eclipse.yasson.internal.properties.Messages;
 import org.eclipse.yasson.internal.properties.MessageKeys;
+import org.eclipse.yasson.internal.properties.Messages;
 
 /**
  * Annotation holder for fields, getters and setters.
@@ -29,7 +28,7 @@ import org.eclipse.yasson.internal.properties.MessageKeys;
  * @param <T> annotated element
  */
 public class JsonbAnnotatedElement<T extends AnnotatedElement> {
-	
+
     private final Map<Class<? extends Annotation>, Annotation> annotations;
     
     private final T element;
@@ -59,7 +58,13 @@ public class JsonbAnnotatedElement<T extends AnnotatedElement> {
         return element;
     }
     
-    public <T extends Annotation> T getAnnotation(Class<T> annotationClass) {
+    /**
+     * Get an annotation by type.
+     * @param <AT> Type of annotation
+     * @param annotationClass Type of annotation
+     * @return Annotation by passed type
+     */
+    public <AT extends Annotation> AT getAnnotation(Class<AT> annotationClass) {
         return annotationClass.cast(annotations.get(annotationClass));
     }
     
