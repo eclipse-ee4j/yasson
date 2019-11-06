@@ -123,15 +123,6 @@ public class ClassModel {
     }
 
     /**
-     * Gets customization.
-     *
-     * @return Customization.
-     */
-    public ClassCustomization getCustomization() {
-        return classCustomization;
-    }
-
-    /**
      * Gets type.
      *
      * @return Type.

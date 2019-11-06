@@ -93,7 +93,7 @@ public class AdaptedObjectSerializer<T, A> implements CurrentItem<T>, JsonbSeria
         }
         return (JsonbSerializer<A>) new SerializerBuilder(ctx.getJsonbContext())
                 .withObjectClass(adapted.getClass())
-                .withCustomization(classModel == null ? null : classModel.getCustomization())
+                .withCustomization(classModel == null ? null : classModel.getClassCustomization())
                 .withWrapper(this)
                 .build();
     }
