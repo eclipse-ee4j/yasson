@@ -90,6 +90,33 @@ public class JsonbPropertyTest {
         assertEquals("hi", b1.getTest()); //this fails but passes in 1.0.4
     }
     
+    @Test
+    public void testRenamedGetterAndSetter2() {
+        // Reported in issue: https://github.com/eclipse-ee4j/yasson/issues/81
+        final Jsonb jsonb = JsonbBuilder.create(
+                new JsonbConfig().withPropertyNamingStrategy(PropertyNamingStrategy.UPPER_CAMEL_CASE));
+
+        final RenamedGetterAndSetter2 bean1 = new RenamedGetterAndSetter2();
+        bean1.setAPIDocumentation("REST");
+
+        final String json = jsonb.toJson(bean1);
+        final RenamedGetterAndSetter2 bean2 = jsonb.fromJson(json, RenamedGetterAndSetter2.class);
+        assertEquals(bean1.getAPIDocumentation(), bean2.getAPIDocumentation());
+    }
+    
+    @Test
+    public void testRenamedGetterAndSetter3() {
+        // Reported in issue: https://github.com/eclipse-ee4j/yasson/issues/81
+        final Jsonb jsonb = JsonbBuilder.create();
+        
+        final RenamedGetterAndSetter2 bean1 = new RenamedGetterAndSetter2();
+        bean1.setAPIDocumentation("REST");
+
+        final String json = jsonb.toJson(bean1);
+        final RenamedGetterAndSetter2 bean2 = jsonb.fromJson(json, RenamedGetterAndSetter2.class);
+        assertEquals(bean1.getAPIDocumentation(), bean2.getAPIDocumentation());
+    }
+    
     public static class RenamedGetterAndSetter {
         private String apple;
         
@@ -101,6 +128,21 @@ public class JsonbPropertyTest {
         @JsonbProperty("apple")
         public void setTest(String test) {
             this.apple = test;
+        }
+    }
+    
+    public static class RenamedGetterAndSetter2 {
+        
+        private String api;
+        
+        @JsonbProperty("api")
+        public String getAPIDocumentation() {
+            return api;
+        }
+        
+        @JsonbProperty("api")
+        public void setAPIDocumentation(String api) {
+            this.api = api;
         }
     }
 
