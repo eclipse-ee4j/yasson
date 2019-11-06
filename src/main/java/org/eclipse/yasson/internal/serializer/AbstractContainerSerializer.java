@@ -182,7 +182,7 @@ public abstract class AbstractContainerSerializer<T> extends AbstractItem<T> imp
             if (!DefaultSerializers.getInstance().isKnownType(itemClass)) {
                 //Need for class level annotations + user adapters/serializers bound to type
                 ClassModel classModel = ((Marshaller) ctx).getJsonbContext().getMappingContext().getOrCreateClassModel(itemClass);
-                builder.withCustomization(new ContainerCustomization(classModel.getCustomization()));
+                builder.withCustomization(new ContainerCustomization(classModel.getClassCustomization()));
             } else {
                 //Still need to override isNillable to true with ContainerCustomization for all serializers
                 //to preserve collections and array null elements

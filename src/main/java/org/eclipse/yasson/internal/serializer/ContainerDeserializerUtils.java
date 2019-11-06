@@ -108,7 +108,7 @@ class ContainerDeserializerUtils {
         DeserializerBuilder deserializerBuilder = newUnmarshallerItemBuilder(wrapper, ctx, event).withType(actualValueType);
         if (!DefaultSerializers.getInstance().isKnownType(ReflectionUtils.getRawType(actualValueType))) {
             ClassModel classModel = ctx.getMappingContext().getOrCreateClassModel(ReflectionUtils.getRawType(actualValueType));
-            deserializerBuilder.withCustomization(classModel == null ? null : classModel.getCustomization());
+            deserializerBuilder.withCustomization(classModel == null ? null : classModel.getClassCustomization());
         }
         return deserializerBuilder.build();
     }

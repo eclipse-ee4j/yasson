@@ -160,7 +160,7 @@ public class Marshaller extends ProcessingContext implements SerializationContex
 
         if (!DefaultSerializers.getInstance().isKnownType(rootClazz)) {
             ClassModel classModel = getMappingContext().getOrCreateClassModel(rootClazz);
-            serializerBuilder.withCustomization(classModel.getCustomization());
+            serializerBuilder.withCustomization(classModel.getClassCustomization());
         }
         return serializerBuilder.build();
     }

@@ -76,6 +76,33 @@ public class JsonbPropertyTest {
         JsonbPropertyNillable pojo = new JsonbPropertyNillable();
         assertEquals("{\"nullField\":null}", defaultJsonb.toJson(pojo));
     }
+    
+    @Test
+    public void testRenamedGetterAndSetter() {
+        // Reported in issue: https://github.com/eclipse-ee4j/yasson/issues/355
+        final RenamedGetterAndSetter b = new RenamedGetterAndSetter();
+        b.setTest("hi");
+        final String h = defaultJsonb.toJson(b);
+        final String expectedJson = "{\"apple\":\"hi\"}";
+        assertEquals(expectedJson, h); //this passes
+        final RenamedGetterAndSetter b1 = defaultJsonb.fromJson(h, RenamedGetterAndSetter.class);
+        
+        assertEquals("hi", b1.getTest()); //this fails but passes in 1.0.4
+    }
+    
+    public static class RenamedGetterAndSetter {
+        private String apple;
+        
+        @JsonbProperty("apple")
+        public String getTest() {
+            return apple;
+        }
+
+        @JsonbProperty("apple")
+        public void setTest(String test) {
+            this.apple = test;
+        }
+    }
 
     /**
      * In this test getter / setter doesn't match to field "doi", because declared by javabean convention.

@@ -60,7 +60,7 @@ public class Unmarshaller extends ProcessingContext implements DeserializationCo
             Class<?> rawType = ReflectionUtils.getRawType(type);
             if (!DefaultSerializers.getInstance().isKnownType(rawType)) {
                 ClassModel classModel = getMappingContext().getOrCreateClassModel(rawType);
-                deserializerBuilder.withCustomization(classModel.getCustomization());
+                deserializerBuilder.withCustomization(classModel.getClassCustomization());
             }
 
             return (T) deserializerBuilder.build().deserialize(parser, this, type);
