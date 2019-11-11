@@ -23,13 +23,13 @@ import org.eclipse.yasson.internal.properties.MessageKeys;
 import org.eclipse.yasson.internal.properties.Messages;
 
 /**
- * Annotation holder for fields, getters and setters.
+ * Annotation holder for classes, superclasses, interfaces, fields, getters and setters.
  *
  * @param <T> annotated element
  */
 public class JsonbAnnotatedElement<T extends AnnotatedElement> {
 
-    private final Map<Class<? extends Annotation>, Annotation> annotations;
+    private final Map<Class<? extends Annotation>, Annotation> annotations = new HashMap<>(4);
     
     private final T element;
 
@@ -39,13 +39,10 @@ public class JsonbAnnotatedElement<T extends AnnotatedElement> {
      * @param element Element.
      */
     public JsonbAnnotatedElement(T element) {
-        Map<Class<? extends Annotation>, Annotation> annotations = new HashMap<>();
-        
         for (Annotation ann : element.getAnnotations()) {
             annotations.put(ann.annotationType(), ann);
         }
         
-        this.annotations = annotations;
         this.element = element;
     }
 
