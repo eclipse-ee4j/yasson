@@ -18,87 +18,94 @@ import static org.junit.jupiter.api.Assertions.assertNotEquals;
 import static org.junit.jupiter.api.Assertions.fail;
 
 import java.util.Arrays;
+import java.util.List;
 
+import javax.json.bind.Jsonb;
+import javax.json.bind.JsonbBuilder;
+import javax.json.bind.JsonbConfig;
 import javax.json.bind.JsonbException;
 
 import org.eclipse.yasson.Jsonbs;
+import org.eclipse.yasson.adapters.model.Chain;
+import org.eclipse.yasson.adapters.model.ChainAdapter;
+import org.eclipse.yasson.adapters.model.Foo;
+import org.eclipse.yasson.adapters.model.FooAdapter;
 import org.junit.jupiter.api.Test;
 
 public class RecursiveReferenceTest {
 
+    private static final Jsonb adapterSerializerJsonb = JsonbBuilder.create(new JsonbConfig()
+            .withAdapters(new ChainAdapter(), new FooAdapter()));
+    private final static List<Jsonb> testInstances = Arrays.asList(Jsonbs.defaultJsonb, adapterSerializerJsonb);
+    
     @Test
     public void testSerializeRecursiveReference() {
-        Recursive recursive = new Recursive();
-        recursive.ref = recursive;
+        Chain recursive = new Chain("test");
+        recursive.setLinksTo(recursive);
         try {
             Jsonbs.defaultJsonb.toJson(recursive);
             fail("Fail is expected");
         } catch (JsonbException e) {
             assertEquals(
-                    "Unable to serialize property 'ref' from org.eclipse.yasson.defaultmapping.specific.RecursiveReferenceTest.Recursive",
+                    "Unable to serialize property 'linksTo' from org.eclipse.yasson.adapters.model.Chain",
                     e.getMessage());
             assertEquals(
-                    "Recursive reference has been found in class class org.eclipse.yasson.defaultmapping.specific.RecursiveReferenceTest$Recursive.",
+                    "Recursive reference has been found in class class org.eclipse.yasson.adapters.model.Chain.",
                     e.getCause().getMessage());
         }
     }
 
     @Test
     public void testSerializeRepeatedInstance() {
-        Recursive recursive = new Recursive();
-        recursive.ref = new Recursive();
-        String result = Jsonbs.defaultJsonb.toJson(Arrays.asList(recursive, recursive));
-        assertEquals("[{\"ref\":{\"val\":\"test\"},\"val\":\"test\"},{\"ref\":{\"val\":\"test\"},\"val\":\"test\"}]",
-                result);
+        testInstances.forEach(jsonb -> checkSerializeRepeatedInstance(jsonb));
+    }
+    
+    private void checkSerializeRepeatedInstance(Jsonb jsonb) {
+        Chain recursive = new Chain("test");
+        recursive.setLinksTo(new Chain("test"));
+        String result = jsonb.toJson(Arrays.asList(recursive, recursive));
+        assertEquals("[{\"linksTo\":{\"name\":\"test\"},\"name\":\"test\"},{\"linksTo\":{\"name\":\"test\"},\"name\":\"test\"}]", result);
     }
 
     @Test
     public void testDeserializeRecursiveReference() {
-        Recursive recursive = Jsonbs.defaultJsonb.fromJson("{\"ref\":{\"val\":\"test\"},\"val\":\"test\"}",
-                Recursive.class);
-        assertNotEquals(recursive.ref, recursive);
+        testInstances.forEach(jsonb -> checkDeserializeRecursiveReference(jsonb));
+    }
+    
+    private void checkDeserializeRecursiveReference(Jsonb jsonb) {
+        Chain recursive = jsonb.fromJson("{\"linksTo\":{\"name\":\"test\"},\"name\":\"test\"}", Chain.class);
+        assertNotEquals(recursive.getLinksTo(), recursive);
     }
 
     @Test
     public void testDeserialize2ReferencesSameObject() {
         A a = new A();
-        B b = new B();
+        Foo b = new Foo("foo");
         a.ref1 = b;
         a.ref2 = b;
         String result = Jsonbs.defaultJsonb.toJson(a);
-        assertEquals("{\"ref1\":{\"prop\":\"foo\"},\"ref2\":{\"prop\":\"foo\"}}", result);
+        assertEquals("{\"ref1\":{\"bar\":\"foo\"},\"ref2\":{\"bar\":\"foo\"}}", result);
+    }
+    
+    @Test
+    public void testChain() {
+        testInstances.forEach(jsonb -> checkChain(jsonb));
+    }
+    
+    private void checkChain(Jsonb jsonb) {
+        Foo foo = new Foo("foo");
+        Chain c1 = new Chain("c1");
+        Chain c2 = new Chain("c2");
+        c1.setLinksTo(c2);
+        c1.setHas(foo);
+        c2.setHas(foo);
+        String result = jsonb.toJson(c1);
+        assertEquals("{\"has\":{\"bar\":\"foo\"},\"linksTo\":{\"has\":{\"bar\":\"foo\"},\"name\":\"c2\"},\"name\":\"c1\"}", result);
     }
 
     public static class A {
-        public B ref1;
-        public B ref2;
-    }
-
-    public static class B {
-        public String prop = "foo";
-    }
-
-    public static class Recursive {
-
-        private Recursive ref;
-        private String val = "test";
-
-        public Recursive getRef() {
-            return ref;
-        }
-
-        public void setRef(Recursive ref) {
-            this.ref = ref;
-        }
-
-        public String getVal() {
-            return val;
-        }
-
-        public void setVal(String val) {
-            this.val = val;
-        }
-
+        public Foo ref1;
+        public Foo ref2;
     }
 
 }
