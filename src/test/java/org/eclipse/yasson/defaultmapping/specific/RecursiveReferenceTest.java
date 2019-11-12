@@ -31,12 +31,13 @@ import org.eclipse.yasson.adapters.model.ChainAdapter;
 import org.eclipse.yasson.adapters.model.ChainSerializer;
 import org.eclipse.yasson.adapters.model.Foo;
 import org.eclipse.yasson.adapters.model.FooAdapter;
+import org.eclipse.yasson.adapters.model.FooSerializer;
 import org.junit.jupiter.api.Test;
 
 public class RecursiveReferenceTest {
 
     private static final Jsonb userSerializerJsonb = JsonbBuilder.create(new JsonbConfig()
-            .withSerializers(new ChainSerializer()));
+            .withSerializers(new ChainSerializer(), new FooSerializer()));
     private static final Jsonb adapterSerializerJsonb = JsonbBuilder.create(new JsonbConfig()
             .withAdapters(new ChainAdapter(), new FooAdapter()));
     private final static List<Jsonb> testInstances = Arrays.asList(Jsonbs.defaultJsonb, adapterSerializerJsonb, userSerializerJsonb);
@@ -80,8 +81,7 @@ public class RecursiveReferenceTest {
             userSerializerJsonb.toJson(recursive);
             fail("Exception should be caught");
         } catch (JsonbException e) {
-            assertEquals("Internal error: "+ChainSerializer.RECURSIVE_REFERENCE_ERROR, e.getMessage());
-            assertEquals(ChainSerializer.RECURSIVE_REFERENCE_ERROR, e.getCause().getMessage());
+            assertEquals("Recursive reference has been found in class class org.eclipse.yasson.adapters.model.Chain.", e.getMessage());
         }
     }
 
