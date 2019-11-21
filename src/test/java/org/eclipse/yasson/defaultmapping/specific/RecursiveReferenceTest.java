@@ -14,7 +14,6 @@
 package org.eclipse.yasson.defaultmapping.specific;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.fail;
 
 import java.util.Arrays;
@@ -95,18 +94,6 @@ public class RecursiveReferenceTest {
         recursive.setLinksTo(new Chain("test"));
         String result = jsonb.toJson(Arrays.asList(recursive, recursive));
         assertEquals("[{\"linksTo\":{\"name\":\"test\"},\"name\":\"test\"},{\"linksTo\":{\"name\":\"test\"},\"name\":\"test\"}]", result);
-    }
-
-    @Test
-    public void testDeserializeRecursiveReference() {
-        checkDeserializeRecursiveReference(Jsonbs.defaultJsonb);
-        checkDeserializeRecursiveReference(adapterSerializerJsonb);
-        checkDeserializeRecursiveReference(userSerializerJsonb);
-    }
-    
-    private void checkDeserializeRecursiveReference(Jsonb jsonb) {
-        Chain recursive = jsonb.fromJson("{\"linksTo\":{\"name\":\"test\"},\"name\":\"test\"}", Chain.class);
-        assertFalse(recursive.getLinksTo() == recursive);
     }
 
     @Test
