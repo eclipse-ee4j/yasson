@@ -41,7 +41,7 @@ Something not working right? Have an idea for an enhancement? Get in touch with 
 
 ## Licenses
 - [Eclipse Distribution License 1.0 (BSD)](https://projects.eclipse.org/content/eclipse-distribution-license-1.0-bsd)
-- [Eclipse Public License 1.0](https://projects.eclipse.org/content/eclipse-public-license-1.0)
+- [Eclipse Public License 2.0](https://projects.eclipse.org/content/eclipse-public-license-2.0)
 
 ## Links
 - Yasson home page: https://projects.eclipse.org/projects/ee4j.yasson

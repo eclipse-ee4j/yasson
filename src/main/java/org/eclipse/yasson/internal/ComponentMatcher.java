@@ -1,15 +1,14 @@
-/*******************************************************************************
+/*
  * Copyright (c) 2016, 2019 Oracle and/or its affiliates. All rights reserved.
+ *
  * This program and the accompanying materials are made available under the
- * terms of the Eclipse Public License v1.0 and Eclipse Distribution License v. 1.0
- * which accompanies this distribution.
- * The Eclipse Public License is available at http://www.eclipse.org/legal/epl-v10.html
- * and the Eclipse Distribution License is available at
+ * terms of the Eclipse Public License v. 2.0 which is available at
+ * http://www.eclipse.org/legal/epl-2.0,
+ * or the Eclipse Distribution License v. 1.0 which is available at
  * http://www.eclipse.org/org/documents/edl-v10.php.
  *
- * Contributors:
- * Roman Grigoriadi
- ******************************************************************************/
+ * SPDX-License-Identifier: EPL-2.0 OR BSD-3-Clause
+ */
 
 package org.eclipse.yasson.internal;
 
@@ -20,6 +19,7 @@ import java.util.Objects;
 import java.util.Optional;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ConcurrentMap;
+import java.util.function.Function;
 
 import javax.json.bind.JsonbConfig;
 import javax.json.bind.adapter.JsonbAdapter;
@@ -44,16 +44,6 @@ public class ComponentMatcher {
      * Flag for searching for generic serializers and adapters in runtime.
      */
     private volatile boolean genericComponents;
-
-    /**
-     * Supplier for component binging.
-     *
-     * @param <T> component binding class
-     */
-    private interface ComponentSupplier<T extends AbstractComponentBinding> {
-
-        T getComponent(ComponentBindings componentBindings);
-    }
 
     private final ConcurrentMap<Type, ComponentBindings> userComponents;
 
@@ -205,10 +195,9 @@ public class ComponentMatcher {
         return Optional.of(customization.getDeserializeAdapterBinding());
     }
 
-    private <T extends AbstractComponentBinding> Optional<T> searchComponentBinding(Type runtimeType,
-                                                                                    ComponentSupplier<T> supplier) {
+    private <T extends AbstractComponentBinding> Optional<T> searchComponentBinding(Type runtimeType, Function<ComponentBindings, T> supplier) {
         for (ComponentBindings componentBindings : userComponents.values()) {
-            final T component = supplier.getComponent(componentBindings);
+            final T component = supplier.apply(componentBindings);
             if (component != null && matches(runtimeType, componentBindings.getBindingType())) {
                 return Optional.of(component);
             }

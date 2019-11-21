@@ -1,15 +1,15 @@
-/*******************************************************************************
+/*
  * Copyright (c) 2015, 2019 Oracle and/or its affiliates. All rights reserved.
+ *
  * This program and the accompanying materials are made available under the
- * terms of the Eclipse Public License v1.0 and Eclipse Distribution License v. 1.0
- * which accompanies this distribution.
- * The Eclipse Public License is available at http://www.eclipse.org/legal/epl-v10.html
- * and the Eclipse Distribution License is available at
+ * terms of the Eclipse Public License v. 2.0 which is available at
+ * http://www.eclipse.org/legal/epl-2.0,
+ * or the Eclipse Distribution License v. 1.0 which is available at
  * http://www.eclipse.org/org/documents/edl-v10.php.
  *
- * Contributors:
- * Roman Grigoriadi
- ******************************************************************************/
+ * SPDX-License-Identifier: EPL-2.0 OR BSD-3-Clause
+ */
+
 package org.eclipse.yasson.internal.model;
 
 import java.lang.reflect.Type;
@@ -65,6 +65,8 @@ public class PropertyModel implements Comparable<PropertyModel> {
      * Model of the class this field belongs to.
      */
     private final ClassModel classModel;
+    
+    private final Property property;
 
     /**
      * Customization of this property.
@@ -78,6 +80,43 @@ public class PropertyModel implements Comparable<PropertyModel> {
     private final Type getterMethodType;
 
     private final Type setterMethodType;
+    
+    /**
+     * Create a new PropertyModel that merges two existing PropertyModel that have identical read/write names.
+     * The input PropertyModel objects MUST be equal (a.equals(b) == true)
+     * @param a a PropertyModel instance to merge
+     * @param b the other PropertyModel instance to merge
+     */
+    public PropertyModel(PropertyModel a, PropertyModel b) {
+        if (!a.equals(b)) {
+            throw new IllegalStateException("Property models " + a + " and " + b + " cannot be merged");
+        }
+        
+        // Initial cloning steps
+        this.classModel = a.classModel;
+        this.propertyName = a.propertyName;
+        this.readName = a.readName;
+        this.writeName = a.writeName;
+        this.propertyType = a.propertyType;
+        this.customization = a.customization;
+        
+        // Merging steps
+        this.getterMethodType = a.getterMethodType != null ? a.getterMethodType : b.getterMethodType;
+        this.setterMethodType = a.setterMethodType != null ? a.setterMethodType : b.setterMethodType;
+        this.property = a.property;
+        if (b.property.getField() != null) {
+            this.property.setField(b.property.getField());
+        }
+        if (b.property.getGetter() != null) {
+            this.property.setGetter(b.property.getGetter());
+        }
+        if (b.property.getSetter() != null) {
+            this.property.setSetter(b.property.getSetter());
+        }
+        this.propagation = new ReflectionPropagation(property,
+                classModel.getClassCustomization().getPropertyVisibilityStrategy());
+        this.propertySerializer = resolveCachedSerializer();
+    }
 
     /**
      * Creates an instance.
@@ -88,6 +127,7 @@ public class PropertyModel implements Comparable<PropertyModel> {
      */
     public PropertyModel(ClassModel classModel, Property property, JsonbContext jsonbContext) {
         this.classModel = classModel;
+        this.property = property;
         this.propertyName = property.getName();
         this.propertyType = property.getPropertyType();
         this.propagation = new ReflectionPropagation(property,
@@ -366,7 +406,11 @@ public class PropertyModel implements Comparable<PropertyModel> {
 
     @Override
     public int compareTo(PropertyModel o) {
-        return propertyName.compareTo(o.getPropertyName());
+        int compare = readName.compareTo(o.readName);
+        if (compare == 0) {
+            compare = writeName.compareTo(o.writeName);
+        }
+        return compare;
     }
 
     @Override
@@ -377,13 +421,14 @@ public class PropertyModel implements Comparable<PropertyModel> {
         if (o == null || getClass() != o.getClass()) {
             return false;
         }
-        PropertyModel that = (PropertyModel) o;
-        return Objects.equals(propertyName, that.propertyName);
+        PropertyModel other = (PropertyModel) o;
+        return Objects.equals(readName, other.readName)
+               && Objects.equals(writeName, other.writeName);
     }
 
     @Override
     public int hashCode() {
-        return Objects.hash(propertyName);
+        return Objects.hash(readName, writeName);
     }
 
     /**

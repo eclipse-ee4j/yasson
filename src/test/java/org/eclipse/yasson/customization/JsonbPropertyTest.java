@@ -1,15 +1,14 @@
-/*******************************************************************************
+/*
  * Copyright (c) 2016, 2019 Oracle and/or its affiliates. All rights reserved.
+ *
  * This program and the accompanying materials are made available under the
- * terms of the Eclipse Public License v1.0 and Eclipse Distribution License v. 1.0
- * which accompanies this distribution.
- * The Eclipse Public License is available at http://www.eclipse.org/legal/epl-v10.html
- * and the Eclipse Distribution License is available at
+ * terms of the Eclipse Public License v. 2.0 which is available at
+ * http://www.eclipse.org/legal/epl-2.0,
+ * or the Eclipse Distribution License v. 1.0 which is available at
  * http://www.eclipse.org/org/documents/edl-v10.php.
  *
- * Contributors:
- * Roman Grigoriadi
- ******************************************************************************/
+ * SPDX-License-Identifier: EPL-2.0 OR BSD-3-Clause
+ */
 
 package org.eclipse.yasson.customization;
 
@@ -75,6 +74,75 @@ public class JsonbPropertyTest {
     public void testPropertyNillable() {
         JsonbPropertyNillable pojo = new JsonbPropertyNillable();
         assertEquals("{\"nullField\":null}", defaultJsonb.toJson(pojo));
+    }
+    
+    @Test
+    public void testRenamedGetterAndSetter() {
+        // Reported in issue: https://github.com/eclipse-ee4j/yasson/issues/355
+        final RenamedGetterAndSetter b = new RenamedGetterAndSetter();
+        b.setTest("hi");
+        final String h = defaultJsonb.toJson(b);
+        final String expectedJson = "{\"apple\":\"hi\"}";
+        assertEquals(expectedJson, h); //this passes
+        final RenamedGetterAndSetter b1 = defaultJsonb.fromJson(h, RenamedGetterAndSetter.class);
+        
+        assertEquals("hi", b1.getTest()); //this fails but passes in 1.0.4
+    }
+    
+    @Test
+    public void testRenamedGetterAndSetter2() {
+        // Reported in issue: https://github.com/eclipse-ee4j/yasson/issues/81
+        final Jsonb jsonb = JsonbBuilder.create(
+                new JsonbConfig().withPropertyNamingStrategy(PropertyNamingStrategy.UPPER_CAMEL_CASE));
+
+        final RenamedGetterAndSetter2 bean1 = new RenamedGetterAndSetter2();
+        bean1.setAPIDocumentation("REST");
+
+        final String json = jsonb.toJson(bean1);
+        final RenamedGetterAndSetter2 bean2 = jsonb.fromJson(json, RenamedGetterAndSetter2.class);
+        assertEquals(bean1.getAPIDocumentation(), bean2.getAPIDocumentation());
+    }
+    
+    @Test
+    public void testRenamedGetterAndSetter3() {
+        // Reported in issue: https://github.com/eclipse-ee4j/yasson/issues/81
+        final Jsonb jsonb = JsonbBuilder.create();
+        
+        final RenamedGetterAndSetter2 bean1 = new RenamedGetterAndSetter2();
+        bean1.setAPIDocumentation("REST");
+
+        final String json = jsonb.toJson(bean1);
+        final RenamedGetterAndSetter2 bean2 = jsonb.fromJson(json, RenamedGetterAndSetter2.class);
+        assertEquals(bean1.getAPIDocumentation(), bean2.getAPIDocumentation());
+    }
+    
+    public static class RenamedGetterAndSetter {
+        private String apple;
+        
+        @JsonbProperty("apple")
+        public String getTest() {
+            return apple;
+        }
+
+        @JsonbProperty("apple")
+        public void setTest(String test) {
+            this.apple = test;
+        }
+    }
+    
+    public static class RenamedGetterAndSetter2 {
+        
+        private String api;
+        
+        @JsonbProperty("api")
+        public String getAPIDocumentation() {
+            return api;
+        }
+        
+        @JsonbProperty("api")
+        public void setAPIDocumentation(String api) {
+            this.api = api;
+        }
     }
 
     /**

@@ -1,16 +1,15 @@
-/*******************************************************************************
+/*
  * Copyright (c) 2015, 2019 Oracle and/or its affiliates. All rights reserved.
+ *
  * This program and the accompanying materials are made available under the
- * terms of the Eclipse Public License v1.0 and Eclipse Distribution License v. 1.0
- * which accompanies this distribution.
- * The Eclipse Public License is available at http://www.eclipse.org/legal/epl-v10.html
- * and the Eclipse Distribution License is available at
+ * terms of the Eclipse Public License v. 2.0 which is available at
+ * http://www.eclipse.org/legal/epl-2.0,
+ * or the Eclipse Distribution License v. 1.0 which is available at
  * http://www.eclipse.org/org/documents/edl-v10.php.
  *
- * Contributors:
- *     Dmitry Kornilov - initial implementation
- *     Maxence Laurent - parse default methods in interface as properties
- ******************************************************************************/
+ * SPDX-License-Identifier: EPL-2.0 OR BSD-3-Clause
+ */
+
 package org.eclipse.yasson.internal;
 
 import java.lang.annotation.Annotation;
@@ -60,7 +59,6 @@ class ClassParser {
      * Parse class fields and getters setters. Merge to java bean like properties.
      */
     void parseProperties(ClassModel classModel, JsonbAnnotatedElement<Class<?>> classElement) {
-
         final Map<String, Property> classProperties = new HashMap<>();
         parseFields(classElement, classProperties);
         parseClassAndInterfaceMethods(classElement, classProperties);
@@ -74,12 +72,14 @@ class ClassParser {
                 .collect(Collectors.toList());
 
         //check for collision on same property read name
-        List<PropertyModel> unsortedMerged = new ArrayList<>();
+        List<PropertyModel> unsortedMerged = new ArrayList<>(sortedParentProperties.size() + classPropertyModels.size());
         unsortedMerged.addAll(sortedParentProperties);
         unsortedMerged.addAll(classPropertyModels);
         checkPropertyNameClash(unsortedMerged, classModel.getType());
 
-        List<PropertyModel> sortedPropertyModels = new ArrayList<>();
+        mergePropertyModels(classPropertyModels);
+
+        List<PropertyModel> sortedPropertyModels = new ArrayList<>(sortedParentProperties.size() + classPropertyModels.size());
         sortedPropertyModels.addAll(sortedParentProperties);
         sortedPropertyModels.addAll(jsonbContext.getConfigProperties().getPropertyOrdering()
                                             .orderProperties(classPropertyModels, classModel));
@@ -87,21 +87,32 @@ class ClassParser {
         //reference property to creator parameter by name to merge configuration in runtime
         JsonbCreator creator = classModel.getClassCustomization().getCreator();
         if (creator != null) {
-            sortedPropertyModels.forEach((
-                                                 propertyModel -> {
-                                                     for (CreatorModel creatorModel : creator.getParams()) {
-                                                         if (creatorModel.getName().equals(propertyModel.getPropertyName())) {
-                                                             CreatorCustomization customization =
-                                                                     (CreatorCustomization) creatorModel
-                                                                             .getCustomization();
-                                                             customization.setPropertyModel(propertyModel);
-                                                         }
-                                                     }
-                                                 }));
+            sortedPropertyModels.forEach(propertyModel -> {
+                for (CreatorModel creatorModel : creator.getParams()) {
+                    if (creatorModel.getName().equals(propertyModel.getPropertyName())) {
+                        CreatorCustomization customization = (CreatorCustomization) creatorModel.getCustomization();
+                        customization.setPropertyModel(propertyModel);
+                    }
+                }
+            });
         }
 
         classModel.setProperties(sortedPropertyModels);
 
+    }
+
+    private void mergePropertyModels(List<PropertyModel> unsortedMerged) {
+        PropertyModel[] clone = unsortedMerged.toArray(new PropertyModel[unsortedMerged.size()]);
+        for (int i = 0; i < clone.length; i++) {
+            for (int j = i + 1; j < clone.length; j++) {
+                if (clone[i].equals(clone[j])) {
+                    // Need to merge two properties
+                    unsortedMerged.remove(clone[i]);
+                    unsortedMerged.remove(clone[j]);
+                    unsortedMerged.add(new PropertyModel(clone[i], clone[j]));
+                }
+            }
+        }
     }
 
     private void parseClassAndInterfaceMethods(JsonbAnnotatedElement<Class<?>> classElement,
@@ -186,7 +197,7 @@ class ClassParser {
             }
             final String propertyName = toPropertyMethod(name);
 
-            Property property = registerMethod(propertyName, method, classElement, classProperties);
+            registerMethod(propertyName, method, classElement, classProperties);
         }
     }
 
@@ -258,20 +269,19 @@ class ClassParser {
         }
     }
 
-    private void checkPropertyNameClash(List<PropertyModel> collectedProperties, Class cls) {
+    private void checkPropertyNameClash(List<PropertyModel> collectedProperties, Class<?> cls) {
         final List<PropertyModel> checkedProperties = new ArrayList<>();
         for (PropertyModel collectedPropertyModel : collectedProperties) {
             for (PropertyModel checkedPropertyModel : checkedProperties) {
-
-                if ((
-                        checkedPropertyModel.getReadName().equals(collectedPropertyModel.getReadName())
-                                && checkedPropertyModel.isReadable() && collectedPropertyModel.isReadable())
-                        || (checkedPropertyModel.getWriteName().equals(collectedPropertyModel.getWriteName()))
-                        && checkedPropertyModel.isWritable() && collectedPropertyModel.isWritable()) {
-                    throw new JsonbException(Messages.getMessage(MessageKeys.PROPERTY_NAME_CLASH,
-                                                                 checkedPropertyModel.getPropertyName(),
-                                                                 collectedPropertyModel.getPropertyName(),
-                                                                 cls.getName()));
+                if ((checkedPropertyModel.getReadName().equals(collectedPropertyModel.getReadName())
+                        && checkedPropertyModel.isReadable() //
+                        && collectedPropertyModel.isReadable())
+                        || (checkedPropertyModel.getWriteName().equals(collectedPropertyModel.getWriteName())
+                                && checkedPropertyModel.isWritable() //
+                                && collectedPropertyModel.isWritable())) {
+                    throw new JsonbException(
+                            Messages.getMessage(MessageKeys.PROPERTY_NAME_CLASH, checkedPropertyModel.getPropertyName(),
+                                    collectedPropertyModel.getPropertyName(), cls.getName()));
                 }
             }
             checkedProperties.add(collectedPropertyModel);
