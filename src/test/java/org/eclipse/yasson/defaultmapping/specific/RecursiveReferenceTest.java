@@ -14,11 +14,10 @@
 package org.eclipse.yasson.defaultmapping.specific;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertNotEquals;
+import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.fail;
 
 import java.util.Arrays;
-import java.util.List;
 
 import javax.json.bind.Jsonb;
 import javax.json.bind.JsonbBuilder;
@@ -40,7 +39,6 @@ public class RecursiveReferenceTest {
             .withSerializers(new ChainSerializer(), new FooSerializer()));
     private static final Jsonb adapterSerializerJsonb = JsonbBuilder.create(new JsonbConfig()
             .withAdapters(new ChainAdapter(), new FooAdapter()));
-    private final static List<Jsonb> testInstances = Arrays.asList(Jsonbs.defaultJsonb, adapterSerializerJsonb, userSerializerJsonb);
     
     @Test
     public void testSerializeRecursiveReference() {
@@ -87,7 +85,9 @@ public class RecursiveReferenceTest {
 
     @Test
     public void testSerializeRepeatedInstance() {
-        testInstances.forEach(jsonb -> checkSerializeRepeatedInstance(jsonb));
+        checkSerializeRepeatedInstance(Jsonbs.defaultJsonb);
+        checkSerializeRepeatedInstance(adapterSerializerJsonb);
+        checkSerializeRepeatedInstance(userSerializerJsonb);
     }
     
     private void checkSerializeRepeatedInstance(Jsonb jsonb) {
@@ -99,16 +99,18 @@ public class RecursiveReferenceTest {
 
     @Test
     public void testDeserializeRecursiveReference() {
-        testInstances.forEach(jsonb -> checkDeserializeRecursiveReference(jsonb));
+        checkDeserializeRecursiveReference(Jsonbs.defaultJsonb);
+        checkDeserializeRecursiveReference(adapterSerializerJsonb);
+        checkDeserializeRecursiveReference(userSerializerJsonb);
     }
     
     private void checkDeserializeRecursiveReference(Jsonb jsonb) {
         Chain recursive = jsonb.fromJson("{\"linksTo\":{\"name\":\"test\"},\"name\":\"test\"}", Chain.class);
-        assertNotEquals(recursive.getLinksTo(), recursive);
+        assertFalse(recursive.getLinksTo() == recursive);
     }
 
     @Test
-    public void testDeserialize2ReferencesSameObject() {
+    public void testSerialize2ReferencesSameObject() {
         A a = new A();
         Foo b = new Foo("foo");
         a.ref1 = b;
@@ -119,7 +121,9 @@ public class RecursiveReferenceTest {
     
     @Test
     public void testChain() {
-        testInstances.forEach(jsonb -> checkChain(jsonb));
+        checkChain(Jsonbs.defaultJsonb);
+        checkChain(adapterSerializerJsonb);
+        checkChain(userSerializerJsonb);
     }
     
     private void checkChain(Jsonb jsonb) {
@@ -135,7 +139,9 @@ public class RecursiveReferenceTest {
     
     @Test
     public void testDeeperChain() {
-        testInstances.forEach(jsonb -> checkDeeperChain(jsonb));
+        checkDeeperChain(Jsonbs.defaultJsonb);
+        checkDeeperChain(adapterSerializerJsonb);
+        checkDeeperChain(userSerializerJsonb);
     }
     
     private void checkDeeperChain(Jsonb jsonb) {
