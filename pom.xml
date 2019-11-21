@@ -204,7 +204,7 @@
                             <execution>
                                 <id>run-copyright</id>
                                 <goals>
-                                    <goal>copyright</goal>
+                                    <goal>check</goal>
                                 </goals>
                                 <phase>validate</phase>
                             </execution>
