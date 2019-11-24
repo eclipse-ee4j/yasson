@@ -12,6 +12,8 @@
 
 package org.eclipse.yasson.internal;
 
+import java.util.HashMap;
+import java.util.Map;
 import java.util.Optional;
 
 import javax.json.bind.Jsonb;
@@ -25,17 +27,24 @@ import javax.json.spi.JsonProvider;
 public class JsonBindingBuilder implements JsonbBuilder {
     private JsonbConfig config = new JsonbConfig();
     private JsonProvider provider = null;
+    private JsonBinding bindingCache = null;
+    private Map<String, Object> configCache = null;
+    private JsonProvider providerCache = null;
 
     @Override
     public JsonbBuilder withConfig(JsonbConfig config) {
-        this.config = config;
-        return this;
+        synchronized (this) {
+            this.config = config;
+            return this;
+        }
     }
 
     @Override
     public JsonbBuilder withProvider(JsonProvider jsonpProvider) {
-        this.provider = jsonpProvider;
-        return this;
+        synchronized (this) {
+            this.provider = jsonpProvider;
+            return this;
+        }
     }
 
     /**
@@ -58,6 +67,33 @@ public class JsonBindingBuilder implements JsonbBuilder {
 
     @Override
     public Jsonb build() {
-        return new JsonBinding(this);
+        synchronized (this) {
+            if (bindingCache != null
+                    && configEqualsCachedConfig()
+                    && providerEqualsCachedProvider()) {
+                return bindingCache;
+            }
+            JsonBinding jsonBinding = new JsonBinding(this);
+            cacheCurrentConfiguration(jsonBinding);
+            return jsonBinding;
+        }
+    }
+
+    private boolean configEqualsCachedConfig() {
+        return (configCache != null && config != null && configCache.equals(config.getAsMap()))
+                || (config == null && configCache == null);
+    }
+
+    private boolean providerEqualsCachedProvider() {
+        return (providerCache != null && providerCache.equals(provider))
+                || (provider == null && providerCache == null);
+    }
+
+    private void cacheCurrentConfiguration(JsonBinding jsonBinding) {
+        bindingCache = jsonBinding;
+        if (config != null) {
+            configCache = new HashMap<>(config.getAsMap());
+        }
+        providerCache = provider;
     }
 }
