@@ -319,7 +319,7 @@ public class ComponentMatcher {
             return ReflectionUtils.resolveTypeArguments((ParameterizedType) adapterTypeArg, adapterType);
         } else if (adapterTypeArg instanceof TypeVariable) {
             return ReflectionUtils
-                    .resolveItemVariableType(new RuntimeTypeHolder(null, adapterType), (TypeVariable<?>) adapterTypeArg);
+                    .resolveItemVariableType(new RuntimeTypeHolder(null, adapterType), (TypeVariable<?>) adapterTypeArg, true);
         } else {
             return adapterTypeArg;
         }
