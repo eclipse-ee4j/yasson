@@ -99,7 +99,7 @@ public class ReflectionUtils {
             return getRawType(resolveType(item, type));
         }
     }
-
+    
     /**
      * Resolve a type by item.
      * If type is a {@link TypeVariable} recursively search {@link AbstractItem} for resolution of typevar.
@@ -111,10 +111,14 @@ public class ReflectionUtils {
      * @return resolved type
      */
     public static Type resolveType(RuntimeTypeInfo item, Type type) {
+        return resolveType(item, type, true);
+    }
+
+    private static Type resolveType(RuntimeTypeInfo item, Type type, boolean warn) {
         if (type instanceof WildcardType) {
-            return resolveMostSpecificBound(item, (WildcardType) type);
+            return resolveMostSpecificBound(item, (WildcardType) type, warn);
         } else if (type instanceof TypeVariable) {
-            return resolveItemVariableType(item, (TypeVariable<?>) type);
+            return resolveItemVariableType(item, (TypeVariable<?>) type, warn);
         } else if (type instanceof ParameterizedType && item != null) {
             return resolveTypeArguments((ParameterizedType) type, item.getRuntimeType());
         }
@@ -130,33 +134,36 @@ public class ReflectionUtils {
      */
     public static Optional<Type> resolveOptionalType(RuntimeTypeInfo info, Type type) {
         try {
-            return Optional.of(resolveType(info, type));
+            return Optional.of(resolveType(info, type, false));
         } catch (RuntimeException e) {
             return Optional.empty();
         }
     }
-
+    
     /**
      * Resolve a bounded type variable type by its wrapper types.
      * Resolution could be done only if a compile time generic information is provided, either:
      * by generic field or subclass of a generic class.
      *
+     * @param whether or not to log a warning message when bounds are not found
      * @param item         item to search "runtime" generic type of a TypeVariable.
      * @param typeVariable type to search in item for, not null.
      * @return Type of a generic "runtime" bound, not null.
      */
-    public static Type resolveItemVariableType(RuntimeTypeInfo item, TypeVariable<?> typeVariable) {
+    static Type resolveItemVariableType(RuntimeTypeInfo item, TypeVariable<?> typeVariable, boolean warn) {
         if (item == null) {
             //Bound not found, treat it as an Object.class
-            LOGGER.warning(Messages.getMessage(MessageKeys.GENERIC_BOUND_NOT_FOUND,
-                                               typeVariable,
-                                               typeVariable.getGenericDeclaration()));
+            if (warn) {
+                LOGGER.warning(Messages.getMessage(MessageKeys.GENERIC_BOUND_NOT_FOUND,
+                                                   typeVariable,
+                                                   typeVariable.getGenericDeclaration()));
+            }
             return Object.class;
         }
 
         //Embedded items doesn't hold information about variable types
         if (item instanceof EmbeddedItem) {
-            return resolveItemVariableType(item.getWrapper(), typeVariable);
+            return resolveItemVariableType(item.getWrapper(), typeVariable, warn);
         }
 
         ParameterizedType wrapperParameterizedType = findParameterizedSuperclass(item.getRuntimeType());
@@ -165,12 +172,12 @@ public class ReflectionUtils {
         Type foundType = search.searchParametrizedType(wrapperParameterizedType, typeVariable);
         if (foundType != null) {
             if (foundType instanceof TypeVariable) {
-                return resolveItemVariableType(item.getWrapper(), (TypeVariable<?>) foundType);
+                return resolveItemVariableType(item.getWrapper(), (TypeVariable<?>) foundType, warn);
             }
             return foundType;
         }
 
-        return resolveItemVariableType(item.getWrapper(), typeVariable);
+        return resolveItemVariableType(item.getWrapper(), typeVariable, warn);
     }
 
     /**
@@ -314,23 +321,23 @@ public class ReflectionUtils {
      * @param wildcardType Wildcard type.
      * @return The most specific type.
      */
-    private static Type resolveMostSpecificBound(RuntimeTypeInfo item, WildcardType wildcardType) {
+    private static Type resolveMostSpecificBound(RuntimeTypeInfo item, WildcardType wildcardType, boolean warn) {
         Class<?> result = Object.class;
         for (Type upperBound : wildcardType.getUpperBounds()) {
-            result = getMostSpecificBound(item, result, upperBound);
+            result = getMostSpecificBound(item, result, upperBound, warn);
         }
         for (Type lowerBound : wildcardType.getLowerBounds()) {
-            result = getMostSpecificBound(item, result, lowerBound);
+            result = getMostSpecificBound(item, result, lowerBound, warn);
         }
         return result;
     }
 
-    private static Class<?> getMostSpecificBound(RuntimeTypeInfo item, Class<?> result, Type bound) {
+    private static Class<?> getMostSpecificBound(RuntimeTypeInfo item, Class<?> result, Type bound, boolean warn) {
         if (bound == Object.class) {
             return result;
         }
         //if bound is type variable search recursively for wrapper generic expansion
-        Type resolvedBoundType = bound instanceof TypeVariable ? resolveType(item, bound) : bound;
+        Type resolvedBoundType = bound instanceof TypeVariable ? resolveType(item, bound, warn) : bound;
         Class<?> boundRawType = getRawType(resolvedBoundType);
         //resolved class is a subclass of a result candidate
         if (result.isAssignableFrom(boundRawType)) {
