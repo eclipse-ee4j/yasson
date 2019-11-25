@@ -24,6 +24,10 @@ install: true
 
 jobs:
   include:
+    - stage: checkstyle
+      script: mvn checkstyle:checkstyle
+    - stage: copyright
+      script: bash etc/copyright.sh
     - stage: install-yasson
       script: mvn -U -C -Pstaging clean install
 #    - stage: run-jmh
@@ -31,11 +35,7 @@ jobs:
 #        - cd yasson-jmh
 #        - mvn clean install
 #        - java -jar target/yasson-jmh.jar -t 1 -f 2
-    - stage: checkstyle
-      script: mvn checkstyle:checkstyle
-    - stage: copyright
-      script: mvn glassfish-copyright:check
     - stage: tck-run
-      script: bash tck.sh
+      script: bash etc/tck.sh
 
 
