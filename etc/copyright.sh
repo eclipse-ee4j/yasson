@@ -16,7 +16,7 @@ die(){ echo "${1}" ; exit 1 ;}
 readonly RESULT_FILE="copyright-check.txt"
 
 mvn -q org.glassfish.copyright:glassfish-copyright-maven-plugin:copyright \
-        > ${RESULT_FILE} || die "Error running the Maven command"
+        > ${RESULT_FILE} || (cat ${RESULT_FILE}; die "Error running the Maven command")
 
 grep -i "copyright" ${RESULT_FILE} \
     && die "COPYRIGHT ERROR" || echo "COPYRIGHT OK"
