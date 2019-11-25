@@ -34,7 +34,7 @@ jobs:
     - stage: checkstyle
       script: mvn checkstyle:checkstyle
     - stage: copyright
-      script: mvn glassfish-copyright:check
+      script: bash copyright.sh
     - stage: tck-run
       script: bash tck.sh
 
