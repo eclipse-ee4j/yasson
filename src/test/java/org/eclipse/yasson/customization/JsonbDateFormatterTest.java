@@ -30,7 +30,7 @@ import java.util.Calendar;
 import java.util.Date;
 import java.util.TimeZone;
 
-import static org.eclipse.yasson.YassonProperties.ZERO_TIME_PARSE_DEFAULTING;
+import static org.eclipse.yasson.YassonConfig.ZERO_TIME_PARSE_DEFAULTING;
 
 /**
  * Tests customization of date fields via {@link javax.json.bind.annotation.JsonbDateFormat} annotation

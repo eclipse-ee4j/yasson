@@ -29,7 +29,7 @@ import org.eclipse.yasson.internal.properties.MessageKeys;
 import org.eclipse.yasson.internal.properties.Messages;
 
 /**
- * Abstract class for converting date objects from {@link java.time}.
+ * Abstract class for converting date objects from java.time.
  *
  * @param <T> date type
  */
@@ -110,7 +110,7 @@ public abstract class AbstractDateTimeDeserializer<T> extends AbstractValueTypeD
     protected abstract T fromInstant(Instant instant);
 
     /**
-     * Parse {@link java.time} date object with default formatter.
+     * Parse java.time date object with default formatter.
      * Different default formatter for each date object type is used.
      *
      * @param jsonValue string value to parse from
@@ -120,7 +120,7 @@ public abstract class AbstractDateTimeDeserializer<T> extends AbstractValueTypeD
     protected abstract T parseDefault(String jsonValue, Locale locale);
 
     /**
-     * Parse {@link java.time} date object with provided formatter.
+     * Parse java.time date object with provided formatter.
      *
      * @param jsonValue string value to parse from
      * @param formatter a formatter to use

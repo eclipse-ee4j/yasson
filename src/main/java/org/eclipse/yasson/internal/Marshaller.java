@@ -146,7 +146,7 @@ public class Marshaller extends ProcessingContext implements SerializationContex
         rootSerializer.serialize(root, generator, this);
     }
 
-    private JsonbSerializer<?> getRootSerializer(Class<?> rootClazz) {
+    JsonbSerializer<?> getRootSerializer(Class<?> rootClazz) {
         final ContainerSerializerProvider serializerProvider = getMappingContext().getSerializerProvider(rootClazz);
         if (serializerProvider != null) {
             return serializerProvider
@@ -163,5 +163,5 @@ public class Marshaller extends ProcessingContext implements SerializationContex
         }
         return serializerBuilder.build();
     }
-
+    
 }
