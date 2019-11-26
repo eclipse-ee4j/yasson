@@ -17,7 +17,8 @@ GF_BUNDLE_URL="central.maven.org/maven2/org/glassfish/main/distributions/glassfi
 TCK_NAME=jsonb-tck
 TCK_VERSION=1.0.1
 
-export TCK_HOME=`pwd`"/target-tck"
+export YASSON_HOME=`pwd`
+export TCK_HOME=${YASSON_HOME}"/target-tck"
 rm -r ${TCK_HOME}
 mkdir ${TCK_HOME}
 cd ${TCK_HOME}
@@ -33,7 +34,7 @@ wget -q --no-cache ${GF_BUNDLE_URL} -O latest-glassfish.zip
 echo "Exporting downloaded GlassFish"
 unzip -qq ${TCK_HOME}/latest-glassfish.zip -d ${TCK_HOME}
 
-cp -a ${TCK_HOME}/target/yasson.jar ${TCK_HOME}/glassfish5/glassfish/modules/yasson.jar
+cp -a ${YASSON_HOME}/target/yasson.jar ${TCK_HOME}/glassfish5/glassfish/modules/yasson.jar
 
 cd ${TS_HOME}/bin
 
