@@ -57,7 +57,6 @@
             <version>${jakarta.json.version}</version>
             <classifier>module</classifier>
             <scope>compile</scope>
-            <optional>true</optional>
         </dependency>
         <!-- Test/Provided dependencies -->
         <dependency>
