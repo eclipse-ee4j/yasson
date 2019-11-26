@@ -1,4 +1,4 @@
-#!/bin/bash -x
+#!/bin/bash
 #
 # Copyright (c) 2019 Oracle and/or its affiliates. All rights reserved.
 #
@@ -11,13 +11,7 @@
 # SPDX-License-Identifier: EPL-2.0 OR BSD-3-Clause
 #
 
-die(){ echo "${1}" ; exit 1 ;}
+mvn checkstyle:checkstyle && \
+etc/copyright.sh && \
+echo "Completed normally"
 
-readonly RESULT_FILE="target/copyright-check.txt"
-mkdir target
-
-mvn -q org.glassfish.copyright:glassfish-copyright-maven-plugin:copyright \
-        > ${RESULT_FILE} || (cat ${RESULT_FILE}; die "Error running the Maven command")
-
-grep -i "copyright" ${RESULT_FILE} \
-    && die "COPYRIGHT ERROR" || echo "COPYRIGHT OK"
