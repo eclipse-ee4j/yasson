@@ -16,12 +16,15 @@ package org.eclipse.yasson.internal;
 import java.time.format.DateTimeFormatter;
 import java.time.format.DateTimeFormatterBuilder;
 import java.time.temporal.ChronoField;
+import java.util.Arrays;
 import java.util.Collections;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Locale;
 import java.util.Map;
 import java.util.Optional;
+import java.util.Set;
 import java.util.TreeMap;
 import java.util.function.Consumer;
 
@@ -34,7 +37,7 @@ import javax.json.bind.config.PropertyOrderStrategy;
 import javax.json.bind.config.PropertyVisibilityStrategy;
 import javax.json.bind.serializer.JsonbSerializer;
 
-import org.eclipse.yasson.YassonProperties;
+import org.eclipse.yasson.YassonConfig;
 import org.eclipse.yasson.internal.model.PropertyModel;
 import org.eclipse.yasson.internal.model.ReverseTreeMap;
 import org.eclipse.yasson.internal.model.customization.PropertyOrdering;
@@ -76,6 +79,8 @@ public class JsonbConfigProperties {
     private final Class<?> defaultMapImplType;
 
     private final JsonbSerializer<Object> nullSerializer;
+    
+    private final Set<Class<?>> eagerInitClasses;
 
     /**
      * Creates new resolved JSONB config.
@@ -97,6 +102,7 @@ public class JsonbConfigProperties {
         this.zeroTimeDefaulting = initZeroTimeDefaultingForJavaTime();
         this.defaultMapImplType = initDefaultMapImplType();
         this.nullSerializer = initNullSerializer();
+        this.eagerInitClasses = initEagerInitClasses();
     }
 
     private Class<?> initDefaultMapImplType() {
@@ -115,19 +121,19 @@ public class JsonbConfigProperties {
     }
 
     private boolean initZeroTimeDefaultingForJavaTime() {
-        return getBooleanConfigProperty(YassonProperties.ZERO_TIME_PARSE_DEFAULTING, false);
+        return getBooleanConfigProperty(YassonConfig.ZERO_TIME_PARSE_DEFAULTING, false);
     }
 
     @SuppressWarnings("unchecked")
     private Map<Class<?>, Class<?>> initUserTypeMapping() {
-        Optional<Object> property = jsonbConfig.getProperty(YassonProperties.USER_TYPE_MAPPING);
+        Optional<Object> property = jsonbConfig.getProperty(YassonConfig.USER_TYPE_MAPPING);
         if (!property.isPresent()) {
             return Collections.emptyMap();
         }
         Object result = property.get();
         if (!(result instanceof Map)) {
             throw new JsonbException(Messages.getMessage(MessageKeys.JSONB_CONFIG_PROPERTY_INVALID_TYPE,
-                                                         YassonProperties.USER_TYPE_MAPPING,
+                    YassonConfig.USER_TYPE_MAPPING,
                                                          Map.class.getSimpleName()));
         }
         return (Map<Class<?>, Class<?>>) result;
@@ -229,11 +235,12 @@ public class JsonbConfigProperties {
     }
 
     private boolean initConfigFailOnUnknownProperties() {
-        return getBooleanConfigProperty(YassonProperties.FAIL_ON_UNKNOWN_PROPERTIES, false);
+        return getBooleanConfigProperty(YassonConfig.FAIL_ON_UNKNOWN_PROPERTIES, false);
     }
 
+    @SuppressWarnings("unchecked")
     private JsonbSerializer<Object> initNullSerializer() {
-        Optional<Object> property = jsonbConfig.getProperty(YassonProperties.NULL_ROOT_SERIALIZER);
+        Optional<Object> property = jsonbConfig.getProperty(YassonConfig.NULL_ROOT_SERIALIZER);
         if (!property.isPresent()) {
             return new NullSerializer();
         }
@@ -243,6 +250,18 @@ public class JsonbConfigProperties {
                                              + "<Object>");
         }
         return (JsonbSerializer<Object>) nullSerializer;
+    }
+    
+    private Set<Class<?>> initEagerInitClasses() {
+        Optional<Object> property = jsonbConfig.getProperty(YassonConfig.EAGER_PARSE_CLASSES);
+        if (!property.isPresent()) {
+            return Collections.emptySet();
+        }
+        Object eagerInitClasses = property.get();
+        if (!(eagerInitClasses instanceof Class<?>[])) {
+            throw new JsonbException("YassonConfig.EAGER_PARSE_CLASSES must be instance of Class<?>[]");
+        }
+        return new HashSet<Class<?>>(Arrays.asList((Class<?>[]) eagerInitClasses));
     }
 
     /**
@@ -404,5 +423,9 @@ public class JsonbConfigProperties {
 
     public JsonbSerializer<Object> getNullSerializer() {
         return nullSerializer;
+    }
+    
+    public Set<Class<?>> getEagerInitClasses() {
+        return eagerInitClasses;
     }
 }

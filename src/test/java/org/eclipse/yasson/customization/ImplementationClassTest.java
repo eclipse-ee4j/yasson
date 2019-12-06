@@ -25,7 +25,7 @@ import javax.json.bind.JsonbBuilder;
 import javax.json.bind.JsonbConfig;
 import java.util.HashMap;
 
-import static org.eclipse.yasson.YassonProperties.USER_TYPE_MAPPING;
+import static org.eclipse.yasson.YassonConfig.USER_TYPE_MAPPING;
 
 public class ImplementationClassTest {
 

@@ -23,6 +23,7 @@ import java.nio.charset.Charset;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Optional;
+import java.util.Set;
 
 import javax.json.JsonStructure;
 import javax.json.bind.JsonbConfig;
@@ -46,6 +47,12 @@ public class JsonBinding implements YassonJsonb {
 
     JsonBinding(JsonBindingBuilder builder) {
         this.jsonbContext = new JsonbContext(builder.getConfig(), builder.getProvider().orElseGet(JsonProvider::provider));
+        Set<Class<?>> eagerInitClasses = this.jsonbContext.getConfigProperties().getEagerInitClasses();
+        for (Class<?> eagerInitClass : eagerInitClasses) {
+            // Eagerly initialize requested ClassModels and Serializers
+            jsonbContext.getMappingContext().getOrCreateClassModel(eagerInitClass);
+            new Marshaller(jsonbContext).getRootSerializer(eagerInitClass);
+        }
     }
 
     private <T> T deserialize(final Type type, final JsonParser parser, final Unmarshaller unmarshaller) {

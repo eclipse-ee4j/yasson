@@ -127,7 +127,7 @@ public abstract class AbstractDateTimeSerializer<T> extends AbstractValueTypeSer
     protected abstract Instant toInstant(T value);
 
     /**
-     * Format with default formatter for a given {@link java.time} date object.
+     * Format with default formatter for a given java.time date object.
      * Different default formatter for each date object type is used.
      *
      * @param value  date object

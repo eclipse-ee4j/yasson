@@ -38,7 +38,7 @@ import java.util.OptionalDouble;
 import java.util.OptionalInt;
 import java.util.OptionalLong;
 
-import static org.eclipse.yasson.YassonProperties.FAIL_ON_UNKNOWN_PROPERTIES;
+import static org.eclipse.yasson.YassonConfig.FAIL_ON_UNKNOWN_PROPERTIES;
 
 /**
  * @author Roman Grigoriadi
