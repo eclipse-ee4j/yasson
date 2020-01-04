@@ -29,17 +29,19 @@ import org.eclipse.yasson.internal.serializer.DeserializerBuilder;
  * JSONB unmarshaller.
  * Uses {@link JsonParser} to navigate through json string.
  */
-public class Unmarshaller extends ProcessingContext implements DeserializationContext {
+public class Unmarshaller implements DeserializationContext {
 
     private static final Logger LOGGER = Logger.getLogger(Unmarshaller.class.getName());
 
+    private final JsonbContext jsonbContext;
+    
     /**
      * Creates instance of unmarshaller.
      *
      * @param jsonbContext context to use
      */
     public Unmarshaller(JsonbContext jsonbContext) {
-        super(jsonbContext);
+        this.jsonbContext = jsonbContext;
     }
 
     @Override
@@ -55,11 +57,11 @@ public class Unmarshaller extends ProcessingContext implements DeserializationCo
     @SuppressWarnings("unchecked")
     private <T> T deserializeItem(Type type, JsonParser parser) {
         try {
-            DeserializerBuilder deserializerBuilder = new DeserializerBuilder(getJsonbContext())
+            DeserializerBuilder deserializerBuilder = new DeserializerBuilder(jsonbContext)
                     .withType(type).withJsonValueType(getRootEvent(parser));
             Class<?> rawType = ReflectionUtils.getRawType(type);
             if (!DefaultSerializers.getInstance().isKnownType(rawType)) {
-                ClassModel classModel = getMappingContext().getOrCreateClassModel(rawType);
+                ClassModel classModel = jsonbContext.getMappingContext().getOrCreateClassModel(rawType);
                 deserializerBuilder.withCustomization(classModel.getClassCustomization());
             }
 
@@ -77,7 +79,7 @@ public class Unmarshaller extends ProcessingContext implements DeserializationCo
      * Get root value event, either for new deserialization process, or deserialization sub-process invoked from
      * custom user deserializer.
      */
-    private JsonParser.Event getRootEvent(JsonParser parser) {
+    private static JsonParser.Event getRootEvent(JsonParser parser) {
         JsonbRiParser.LevelContext currentLevel = ((JsonbParser) parser).getCurrentLevel();
         //Wrapper parser is at start
         if (currentLevel.getParent() == null) {
@@ -87,4 +89,12 @@ public class Unmarshaller extends ProcessingContext implements DeserializationCo
         return lastEvent == JsonParser.Event.KEY_NAME ? parser.next() : lastEvent;
     }
 
+    /**
+     * Jsonb context.
+     *
+     * @return jsonb context
+     */
+    public JsonbContext getJsonbContext() {
+        return jsonbContext;
+    }
 }

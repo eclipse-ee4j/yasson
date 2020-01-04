@@ -157,7 +157,7 @@ public class PropertyModel implements Comparable<PropertyModel> {
             return new AdaptedObjectSerializer<>(classModel, customization.getSerializeAdapterBinding());
         }
         if (customization.getSerializerBinding() != null) {
-            return new UserSerializerSerializer<>(classModel, customization.getSerializerBinding().getJsonbSerializer());
+            return new UserSerializerSerializer<>(customization.getSerializerBinding().getJsonbSerializer());
         }
 
         final Class<?> propertyRawType = ReflectionUtils.getRawType(serializationType);

@@ -21,7 +21,6 @@ import javax.json.bind.serializer.SerializationContext;
 import javax.json.stream.JsonGenerator;
 
 import org.eclipse.yasson.internal.Marshaller;
-import org.eclipse.yasson.internal.ProcessingContext;
 import org.eclipse.yasson.internal.components.AdapterBinding;
 import org.eclipse.yasson.internal.model.ClassModel;
 import org.eclipse.yasson.internal.model.JsonbPropertyInfo;
@@ -55,7 +54,7 @@ public class AdaptedObjectSerializer<T, A> implements CurrentItem<T>, JsonbSeria
     @Override
     @SuppressWarnings("unchecked")
     public void serialize(T obj, JsonGenerator generator, SerializationContext ctx) {
-        ProcessingContext context = (ProcessingContext) ctx;
+        Marshaller context = (Marshaller) ctx;
         try {
             if (context.addProcessedObject(obj)) {
                 final JsonbAdapter<T, A> adapter = (JsonbAdapter<T, A>) adapterInfo.getAdapter();

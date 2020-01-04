@@ -14,6 +14,8 @@
 package org.eclipse.yasson.internal;
 
 import java.lang.reflect.Type;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Objects;
 import java.util.logging.Logger;
 
@@ -35,10 +37,16 @@ import org.eclipse.yasson.internal.serializer.SerializerBuilder;
 /**
  * JSONB marshaller. Created each time marshalling operation called.
  */
-public class Marshaller extends ProcessingContext implements SerializationContext {
+public class Marshaller implements SerializationContext {
 
     private static final Logger LOGGER = Logger.getLogger(Marshaller.class.getName());
 
+    /**
+     * Used to avoid StackOverflowError, when adapted / serialized object
+     * contains contains instance of its type inside it or when object has recursive reference.
+     */
+    private final List<Object> currentlyProcessedObjects = new ArrayList<>();
+    private final JsonbContext jsonbContext;
     private final Type runtimeType;
 
     /**
@@ -48,7 +56,7 @@ public class Marshaller extends ProcessingContext implements SerializationContex
      * @param rootRuntimeType Type of root object.
      */
     public Marshaller(JsonbContext jsonbContext, Type rootRuntimeType) {
-        super(jsonbContext);
+        this.jsonbContext = jsonbContext;
         this.runtimeType = rootRuntimeType;
     }
 
@@ -58,7 +66,7 @@ public class Marshaller extends ProcessingContext implements SerializationContex
      * @param jsonbContext Current context.
      */
     public Marshaller(JsonbContext jsonbContext) {
-        super(jsonbContext);
+        this.jsonbContext = jsonbContext;
         this.runtimeType = null;
     }
 
@@ -135,11 +143,11 @@ public class Marshaller extends ProcessingContext implements SerializationContex
     @SuppressWarnings("unchecked")
     public <T> void serializeRoot(T root, JsonGenerator generator) {
         if (root == null) {
-            getJsonbContext().getConfigProperties().getNullSerializer().serialize(null, generator, this);
+            jsonbContext.getConfigProperties().getNullSerializer().serialize(null, generator, this);
             return;
         }
         final JsonbSerializer<T> rootSerializer = (JsonbSerializer<T>) getRootSerializer(root.getClass());
-        if (getJsonbContext().getConfigProperties().isStrictIJson()
+        if (jsonbContext.getConfigProperties().isStrictIJson()
                 && rootSerializer instanceof AbstractValueTypeSerializer) {
             throw new JsonbException(Messages.getMessage(MessageKeys.IJSON_ENABLED_SINGLE_VALUE));
         }
@@ -147,21 +155,61 @@ public class Marshaller extends ProcessingContext implements SerializationContex
     }
 
     JsonbSerializer<?> getRootSerializer(Class<?> rootClazz) {
-        final ContainerSerializerProvider serializerProvider = getMappingContext().getSerializerProvider(rootClazz);
+        final ContainerSerializerProvider serializerProvider = jsonbContext.getMappingContext().getSerializerProvider(rootClazz);
         if (serializerProvider != null) {
             return serializerProvider
                     .provideSerializer(new JsonbPropertyInfo()
                                                .withRuntimeType(runtimeType));
         }
-        SerializerBuilder serializerBuilder = new SerializerBuilder(getJsonbContext())
+        SerializerBuilder serializerBuilder = new SerializerBuilder(jsonbContext)
                 .withObjectClass(rootClazz)
                 .withType(runtimeType);
 
         if (!DefaultSerializers.getInstance().isKnownType(rootClazz)) {
-            ClassModel classModel = getMappingContext().getOrCreateClassModel(rootClazz);
+            ClassModel classModel = jsonbContext.getMappingContext().getOrCreateClassModel(rootClazz);
             serializerBuilder.withCustomization(classModel.getClassCustomization());
         }
         return serializerBuilder.build();
     }
     
+    /**
+     * Jsonb context.
+     *
+     * @return jsonb context
+     */
+    public JsonbContext getJsonbContext() {
+        return jsonbContext;
+    }
+    
+    /**
+     * Mapping context.
+     *
+     * @return mapping context
+     */
+    public MappingContext getMappingContext() {
+        return getJsonbContext().getMappingContext();
+    }
+    
+    /**
+     * Adds currently processed object to the {@link Set}.
+     *
+     * @param object processed object
+     * @return if object was added
+     */
+    public boolean addProcessedObject(Object object) {
+        if(currentlyProcessedObjects.contains(object)) {
+            return false;
+        }
+        return currentlyProcessedObjects.add(object);
+    }
+
+    /**
+     * Removes processed object from the {@link Set}.
+     *
+     * @param object processed object
+     * @return if object was removed
+     */
+    public void removeProcessedObject(Object object) {
+        currentlyProcessedObjects.remove(object);
+    }
 }

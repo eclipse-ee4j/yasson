@@ -24,7 +24,6 @@ import javax.json.stream.JsonGenerator;
 
 import org.eclipse.yasson.internal.JsonbContext;
 import org.eclipse.yasson.internal.Marshaller;
-import org.eclipse.yasson.internal.ProcessingContext;
 import org.eclipse.yasson.internal.model.ClassModel;
 import org.eclipse.yasson.internal.model.customization.Customization;
 
@@ -51,7 +50,7 @@ public class OptionalObjectSerializer<T extends Optional<?>> implements CurrentI
         this.optionalValueType = resolveOptionalType(builder.getRuntimeType());
     }
 
-    private Type resolveOptionalType(Type runtimeType) {
+    private static Type resolveOptionalType(Type runtimeType) {
         if (runtimeType instanceof ParameterizedType) {
             return ((ParameterizedType) runtimeType).getActualTypeArguments()[0];
         }
@@ -79,7 +78,7 @@ public class OptionalObjectSerializer<T extends Optional<?>> implements CurrentI
 
     @Override
     public void serialize(T obj, JsonGenerator generator, SerializationContext ctx) {
-        JsonbContext jsonbContext = ((ProcessingContext) ctx).getJsonbContext();
+        JsonbContext jsonbContext = ((Marshaller) ctx).getJsonbContext();
         if (handleEmpty(obj, Optional::isPresent, customization, generator, (Marshaller) ctx)) {
             return;
         }
@@ -110,7 +109,7 @@ public class OptionalObjectSerializer<T extends Optional<?>> implements CurrentI
     }
 
     @SuppressWarnings("unchecked")
-    private <T> void serialCaptor(JsonbSerializer<?> serializer,
+    private static <T> void serialCaptor(JsonbSerializer<?> serializer,
                                   T object,
                                   JsonGenerator generator,
                                   SerializationContext context) {

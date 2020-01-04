@@ -71,7 +71,7 @@ public class SerializerBuilder extends AbstractSerializerBuilder<SerializerBuild
             Optional<SerializerBinding<?>> userSerializer = componentMatcher
                     .getSerializerBinding(getRuntimeType(), customization);
             if (userSerializer.isPresent()) {
-                return new UserSerializerSerializer<>(getClassModel(), userSerializer.get().getJsonbSerializer());
+                return new UserSerializerSerializer<>(userSerializer.get().getJsonbSerializer());
             }
 
             //Second user components is registered.
@@ -117,7 +117,7 @@ public class SerializerBuilder extends AbstractSerializerBuilder<SerializerBuild
 
     }
 
-    private boolean isByteArray(Class<?> rawType) {
+    private static boolean isByteArray(Class<?> rawType) {
         return rawType.isArray() && rawType.getComponentType() == Byte.TYPE;
     }
 
