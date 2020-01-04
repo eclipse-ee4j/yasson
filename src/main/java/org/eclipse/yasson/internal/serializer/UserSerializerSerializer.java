@@ -33,7 +33,6 @@ public class UserSerializerSerializer<T> implements JsonbSerializer<T> {
     /**
      * Create instance of current item with its builder.
      *
-     * @param classModel     model
      * @param userSerializer user serializer
      */
     public UserSerializerSerializer(JsonbSerializer<T> userSerializer) {

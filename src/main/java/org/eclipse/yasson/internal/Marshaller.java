@@ -197,7 +197,7 @@ public class Marshaller implements SerializationContext {
      * @return if object was added
      */
     public boolean addProcessedObject(Object object) {
-        if(currentlyProcessedObjects.contains(object)) {
+        if (currentlyProcessedObjects.contains(object)) {
             return false;
         }
         return currentlyProcessedObjects.add(object);
@@ -207,7 +207,6 @@ public class Marshaller implements SerializationContext {
      * Removes processed object from the {@link Set}.
      *
      * @param object processed object
-     * @return if object was removed
      */
     public void removeProcessedObject(Object object) {
         currentlyProcessedObjects.remove(object);
