@@ -430,7 +430,7 @@
                             <configuration>
                                 <argLine>
                                     <!--java.management is required by Maven's ForkedBooter-->
-                                    --limit-modules java.base,java.logging,java.sql,java.json.bind,java.json,java.management
+                                    --limit-modules java.base,java.logging,java.sql,java.json.bind,java.json,java.management,jdk.localedata
                                 </argLine>
                                 <includes>
                                     <include>**/JavaxNamingExcludedTest.class</include>
