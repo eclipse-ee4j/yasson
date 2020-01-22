@@ -1,6 +1,6 @@
 # Eclipse Yasson
 
-[![Maven Central](https://img.shields.io/maven-central/v/org.eclipse/yasson.svg?label=Maven%20Central)](http://search.maven.org/#search%7Cga%7C1%7Cg%3A%22org.eclipse%22%20a%3A%22yasson%22)
+[![Maven Central](https://img.shields.io/maven-central/v/org.eclipse/yasson.svg?label=Maven%20Central)](https://mvnrepository.com/artifact/org.eclipse/yasson)
 [![Sonatype Nexus (Snapshots)](https://img.shields.io/nexus/s/https/oss.sonatype.org/org.eclipse/yasson.svg)](https://oss.sonatype.org/content/repositories/snapshots/org/eclipse/yasson/)
 [![Gitter](https://badges.gitter.im/eclipse/yasson.svg)](https://gitter.im/eclipse/yasson)
 [![Javadocs](https://www.javadoc.io/badge/org.eclipse/yasson.svg)](https://www.javadoc.io/doc/org.eclipse/yasson)
