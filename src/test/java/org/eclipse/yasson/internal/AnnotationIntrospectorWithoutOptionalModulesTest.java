@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2019 Oracle and/or its affiliates. All rights reserved.
+ * Copyright (c) 2019, 2020 Oracle and/or its affiliates. All rights reserved.
  *
  * This program and the accompanying materials are made available under the
  * terms of the Eclipse Public License v. 2.0 which is available at
@@ -23,8 +23,8 @@ import org.eclipse.yasson.internal.AnnotationIntrospectorTestFixtures.ObjectWith
 import org.eclipse.yasson.internal.AnnotationIntrospectorTestFixtures.ObjectWithoutAnnotatedConstructor;
 import org.eclipse.yasson.internal.model.JsonbCreator;
 
-import javax.json.bind.JsonbConfig;
-import javax.json.spi.JsonProvider;
+import jakarta.json.bind.JsonbConfig;
+import jakarta.json.spi.JsonProvider;
 
 /**
  * Tests the {@link AnnotationIntrospector} with missing optional module "java.deskop", <br>

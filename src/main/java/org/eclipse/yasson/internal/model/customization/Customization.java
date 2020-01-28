@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2015, 2019 Oracle and/or its affiliates. All rights reserved.
+ * Copyright (c) 2015, 2020 Oracle and/or its affiliates. All rights reserved.
  *
  * This program and the accompanying materials are made available under the
  * terms of the Eclipse Public License v. 2.0 which is available at
@@ -43,7 +43,7 @@ public interface Customization {
     /**
      * Date formatter for formatting date values during serialization process. It could be the same formatter instance used for
      * deserialization
-     * (returned by {@link #getDeserializeDateFormatter()}. If not set, defaulted to <code>javax.json.bind.annotation
+     * (returned by {@link #getDeserializeDateFormatter()}. If not set, defaulted to <code>jakarta.json.bind.annotation
      * .JsonbDateFormat.DEFAULT_FORMAT.
      * </code>
      *
@@ -54,7 +54,7 @@ public interface Customization {
     /**
      * Date formatter for formatting date values during deserialization process. It could be the same formatter instance used
      * for serialization
-     * (returned by {@link #getSerializeDateFormatter()}. If not set, defaulted to <code>javax.json.bind.annotation
+     * (returned by {@link #getSerializeDateFormatter()}. If not set, defaulted to <code>jakarta.json.bind.annotation
      * .JsonbDateFormat.DEFAULT_FORMAT.
      * </code>
      *

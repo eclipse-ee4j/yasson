@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2016, 2019 Oracle and/or its affiliates. All rights reserved.
+ * Copyright (c) 2016, 2020 Oracle and/or its affiliates. All rights reserved.
  *
  * This program and the accompanying materials are made available under the
  * terms of the Eclipse Public License v. 2.0 which is available at
@@ -21,9 +21,9 @@ import org.eclipse.yasson.customization.model.DateFormatPojoWithClassLevelFormat
 import org.eclipse.yasson.customization.model.TrimmedDatePojo;
 import org.eclipse.yasson.internal.JsonBindingBuilder;
 
-import javax.json.bind.Jsonb;
-import javax.json.bind.JsonbBuilder;
-import javax.json.bind.JsonbConfig;
+import jakarta.json.bind.Jsonb;
+import jakarta.json.bind.JsonbBuilder;
+import jakarta.json.bind.JsonbConfig;
 import java.time.ZoneId;
 import java.time.ZonedDateTime;
 import java.util.Calendar;
@@ -33,7 +33,7 @@ import java.util.TimeZone;
 import static org.eclipse.yasson.YassonConfig.ZERO_TIME_PARSE_DEFAULTING;
 
 /**
- * Tests customization of date fields via {@link javax.json.bind.annotation.JsonbDateFormat} annotation
+ * Tests customization of date fields via {@link jakarta.json.bind.annotation.JsonbDateFormat} annotation
  *
  * @author Ehsan Zaery Moghaddam (zaerymoghaddam@gmail.com)
  */

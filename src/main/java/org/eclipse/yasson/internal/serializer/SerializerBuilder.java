@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2016, 2019 Oracle and/or its affiliates. All rights reserved.
+ * Copyright (c) 2016, 2020 Oracle and/or its affiliates. All rights reserved.
  *
  * This program and the accompanying materials are made available under the
  * terms of the Eclipse Public License v. 2.0 which is available at
@@ -18,10 +18,10 @@ import java.util.Collection;
 import java.util.Map;
 import java.util.Optional;
 
-import javax.json.JsonObject;
-import javax.json.JsonValue;
-import javax.json.bind.config.BinaryDataStrategy;
-import javax.json.bind.serializer.JsonbSerializer;
+import jakarta.json.JsonObject;
+import jakarta.json.JsonValue;
+import jakarta.json.bind.config.BinaryDataStrategy;
+import jakarta.json.bind.serializer.JsonbSerializer;
 
 import org.eclipse.yasson.internal.ComponentMatcher;
 import org.eclipse.yasson.internal.JsonbContext;
