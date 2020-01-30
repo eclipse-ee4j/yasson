@@ -30,13 +30,6 @@ jobs:
       script: bash etc/copyright.sh
     - stage: install-yasson
       script: mvn -U -C -Pstaging clean install
-#    - stage: run-jmh
-#      script:
-#        - cd yasson-jmh
-#        - mvn clean install
-#        - java -jar target/yasson-jmh.jar -t 1 -f 2
-# TOOD: re-enable TCK once it's been updated to use jakarta packages
-#    - stage: tck-run
-#      script: bash etc/tck.sh
-
+    - stage: tck-run
+      script: mvn -U test
 
