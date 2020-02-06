@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2018, 2019 Oracle and/or its affiliates. All rights reserved.
+ * Copyright (c) 2018, 2020 Oracle and/or its affiliates. All rights reserved.
  *
  * This program and the accompanying materials are made available under the
  * terms of the Eclipse Public License v. 2.0 which is available at
@@ -18,9 +18,9 @@ import static org.eclipse.yasson.Jsonbs.*;
 
 import org.eclipse.yasson.internal.JsonbContext;
 
-import javax.json.bind.JsonbConfig;
-import javax.json.bind.annotation.JsonbProperty;
-import javax.json.spi.JsonProvider;
+import jakarta.json.bind.JsonbConfig;
+import jakarta.json.bind.annotation.JsonbProperty;
+import jakarta.json.spi.JsonProvider;
 import java.lang.reflect.Method;
 
 /**

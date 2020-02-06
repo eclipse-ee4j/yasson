@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2016, 2019 Oracle and/or its affiliates. All rights reserved.
+ * Copyright (c) 2016, 2020 Oracle and/or its affiliates. All rights reserved.
  *
  * This program and the accompanying materials are made available under the
  * terms of the Eclipse Public License v. 2.0 which is available at
@@ -20,7 +20,7 @@ import java.time.Instant;
 import java.util.HashMap;
 import java.util.HashSet;
 
-import javax.json.bind.annotation.JsonbTransient;
+import jakarta.json.bind.annotation.JsonbTransient;
 
 import org.jboss.weld.exceptions.IllegalStateException;
 

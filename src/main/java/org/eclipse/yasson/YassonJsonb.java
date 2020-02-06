@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2019 Oracle and/or its affiliates. All rights reserved.
+ * Copyright (c) 2019, 2020 Oracle and/or its affiliates. All rights reserved.
  *
  * This program and the accompanying materials are made available under the
  * terms of the Eclipse Public License v. 2.0 which is available at
@@ -14,15 +14,15 @@ package org.eclipse.yasson;
 
 import java.lang.reflect.Type;
 
-import javax.json.JsonStructure;
-import javax.json.bind.JsonbException;
-import javax.json.stream.JsonGenerator;
-import javax.json.stream.JsonParser;
+import jakarta.json.JsonStructure;
+import jakarta.json.bind.JsonbException;
+import jakarta.json.stream.JsonGenerator;
+import jakarta.json.stream.JsonParser;
 
 /**
  * Adds methods to Jsonb that are operating directly with {@link JsonGenerator} or {@link JsonParser} types.
  * <p>
- * {@link javax.json.spi.JsonProvider} operates on top of the
+ * {@link jakarta.json.spi.JsonProvider} operates on top of the
  * {@link java.io.InputStream} / {@link java.io.OutputStream} or {@link java.io.Reader} / {@link java.io.Writer}
  * and creates generator / parser instances during runtime.
  * </p>
@@ -30,7 +30,7 @@ import javax.json.stream.JsonParser;
  * This interface accepts instantiated generators and parsers with different input / output sources.
  * </p>
  */
-public interface YassonJsonb extends javax.json.bind.Jsonb {
+public interface YassonJsonb extends jakarta.json.bind.Jsonb {
 
     /**
      * Reads in a JSON data with a specified {@link JsonParser} and return the
@@ -110,7 +110,7 @@ public interface YassonJsonb extends javax.json.bind.Jsonb {
     void toJson(Object object, Type runtimeType, JsonGenerator jsonGenerator) throws JsonbException;
 
     /**
-     * Serializes the object content tree to a {@link javax.json.JsonStructure}.
+     * Serializes the object content tree to a {@link jakarta.json.JsonStructure}.
      *
      * @param object The object content tree to be serialized.
      * @return The {@link JsonStructure} serialized from java content tree.
@@ -121,7 +121,7 @@ public interface YassonJsonb extends javax.json.bind.Jsonb {
     JsonStructure toJsonStructure(Object object) throws JsonbException;
 
     /**
-     * Serializes the object content tree to a {@link javax.json.JsonStructure}.
+     * Serializes the object content tree to a {@link jakarta.json.JsonStructure}.
      *
      * @param object      The object content tree to be serialized.
      * @param runtimeType Runtime type of the content tree's root object.

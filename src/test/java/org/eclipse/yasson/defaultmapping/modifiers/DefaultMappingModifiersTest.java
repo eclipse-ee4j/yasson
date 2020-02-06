@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2015, 2019 Oracle and/or its affiliates. All rights reserved.
+ * Copyright (c) 2015, 2020 Oracle and/or its affiliates. All rights reserved.
  *
  * This program and the accompanying materials are made available under the
  * terms of the Eclipse Public License v. 2.0 which is available at
@@ -22,7 +22,7 @@ import org.eclipse.yasson.defaultmapping.modifiers.model.MethodModifiersClass;
 import org.eclipse.yasson.defaultmapping.modifiers.model.PrivateConstructorClass;
 import org.eclipse.yasson.defaultmapping.modifiers.model.ProtectedConstructorClass;
 
-import javax.json.bind.JsonbException;
+import jakarta.json.bind.JsonbException;
 
 /**
  * Test access modifiers for default mapping.

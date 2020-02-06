@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2016, 2019 Oracle and/or its affiliates. All rights reserved.
+ * Copyright (c) 2016, 2020 Oracle and/or its affiliates. All rights reserved.
  *
  * This program and the accompanying materials are made available under the
  * terms of the Eclipse Public License v. 2.0 which is available at
@@ -19,14 +19,14 @@ import java.util.Map;
 import java.util.Objects;
 import java.util.function.Consumer;
 
-import javax.json.bind.JsonbConfig;
-import javax.json.bind.config.PropertyOrderStrategy;
+import jakarta.json.bind.JsonbConfig;
+import jakarta.json.bind.config.PropertyOrderStrategy;
 
 import org.eclipse.yasson.internal.model.ClassModel;
 import org.eclipse.yasson.internal.model.PropertyModel;
 
 /**
- * Order properties in bean object. {@link javax.json.bind.annotation.JsonbPropertyOrder} have always precedence.
+ * Order properties in bean object. {@link jakarta.json.bind.annotation.JsonbPropertyOrder} have always precedence.
  * If configured with {@link JsonbConfig} provided property order strategy will be used.
  */
 public class PropertyOrdering {
@@ -43,7 +43,7 @@ public class PropertyOrdering {
     }
 
     /**
-     * Sorts class properties either, by class {@link javax.json.bind.annotation.JsonbPropertyOrder} annotation,
+     * Sorts class properties either, by class {@link jakarta.json.bind.annotation.JsonbPropertyOrder} annotation,
      * or by {@link PropertyOrderStrategy} if set in {@link JsonbConfig}.
      *
      * @param properties Properties to sort.

@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2019 Oracle and/or its affiliates. All rights reserved.
+ * Copyright (c) 2019, 2020 Oracle and/or its affiliates. All rights reserved.
  *
  * This program and the accompanying materials are made available under the
  * terms of the Eclipse Public License v. 2.0 which is available at
@@ -17,11 +17,11 @@ import java.math.BigInteger;
 import java.util.ArrayDeque;
 import java.util.Deque;
 
-import javax.json.JsonStructure;
-import javax.json.JsonValue;
-import javax.json.bind.JsonbException;
-import javax.json.spi.JsonProvider;
-import javax.json.stream.JsonGenerator;
+import jakarta.json.JsonStructure;
+import jakarta.json.JsonValue;
+import jakarta.json.bind.JsonbException;
+import jakarta.json.spi.JsonProvider;
+import jakarta.json.stream.JsonGenerator;
 
 import org.eclipse.yasson.internal.properties.MessageKeys;
 import org.eclipse.yasson.internal.properties.Messages;

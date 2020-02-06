@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2019 Oracle and/or its affiliates. All rights reserved.
+ * Copyright (c) 2019, 2020 Oracle and/or its affiliates. All rights reserved.
  *
  * This program and the accompanying materials are made available under the
  * terms of the Eclipse Public License v. 2.0 which is available at
@@ -19,9 +19,9 @@ import static org.eclipse.yasson.Jsonbs.*;
 import org.eclipse.yasson.Assertions;
 import org.eclipse.yasson.TestTypeToken;
 
-import javax.json.bind.JsonbException;
-import javax.json.stream.JsonGenerator;
-import javax.json.stream.JsonParser;
+import jakarta.json.bind.JsonbException;
+import jakarta.json.stream.JsonGenerator;
+import jakarta.json.stream.JsonParser;
 import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
 import java.util.List;

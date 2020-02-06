@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2016, 2019 Oracle and/or its affiliates. All rights reserved.
+ * Copyright (c) 2016, 2020 Oracle and/or its affiliates. All rights reserved.
  *
  * This program and the accompanying materials are made available under the
  * terms of the Eclipse Public License v. 2.0 which is available at
@@ -20,15 +20,15 @@ import org.eclipse.yasson.customization.model.JsonbPropertyName;
 import org.eclipse.yasson.customization.model.JsonbPropertyNameCollision;
 import org.eclipse.yasson.customization.model.JsonbPropertyNillable;
 
-import javax.json.bind.Jsonb;
-import javax.json.bind.JsonbBuilder;
-import javax.json.bind.JsonbConfig;
-import javax.json.bind.JsonbException;
-import javax.json.bind.annotation.JsonbProperty;
-import javax.json.bind.config.PropertyNamingStrategy;
+import jakarta.json.bind.Jsonb;
+import jakarta.json.bind.JsonbBuilder;
+import jakarta.json.bind.JsonbConfig;
+import jakarta.json.bind.JsonbException;
+import jakarta.json.bind.annotation.JsonbProperty;
+import jakarta.json.bind.config.PropertyNamingStrategy;
 
 /**
- * Tests parsing of {@link javax.json.bind.annotation.JsonbProperty} test.
+ * Tests parsing of {@link jakarta.json.bind.annotation.JsonbProperty} test.
  * @author Roman Grigoriadi
  */
 public class JsonbPropertyTest {

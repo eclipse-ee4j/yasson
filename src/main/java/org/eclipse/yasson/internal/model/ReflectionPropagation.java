@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2015, 2019 Oracle and/or its affiliates. All rights reserved.
+ * Copyright (c) 2015, 2020 Oracle and/or its affiliates. All rights reserved.
  *
  * This program and the accompanying materials are made available under the
  * terms of the Eclipse Public License v. 2.0 which is available at
@@ -17,8 +17,8 @@ import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 import java.util.Objects;
 
-import javax.json.bind.JsonbException;
-import javax.json.bind.config.PropertyVisibilityStrategy;
+import jakarta.json.bind.JsonbException;
+import jakarta.json.bind.config.PropertyVisibilityStrategy;
 
 /**
  * Property value propagation by reflection.

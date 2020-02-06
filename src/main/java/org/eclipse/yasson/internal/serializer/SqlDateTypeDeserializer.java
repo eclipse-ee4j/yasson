@@ -36,7 +36,7 @@ public class SqlDateTypeDeserializer extends AbstractDateTimeDeserializer<Date> 
     }
 
     /**
-     * No arg constructor in order ot make usable in {@link javax.json.bind.annotation.JsonbTypeDeserializer}.
+     * No arg constructor in order ot make usable in {@link jakarta.json.bind.annotation.JsonbTypeDeserializer}.
      */
     public SqlDateTypeDeserializer() {
         super(Date.class, null);

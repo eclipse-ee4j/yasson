@@ -1,6 +1,6 @@
 /*
- * Copyright (c) 2018, 2019 Oracle and/or its affiliates. All rights reserved.
- * Copyright (c) 2019 Payara Foundation and/or its affiliates. All rights reserved.
+ * Copyright (c) 2018, 2020 Oracle and/or its affiliates. All rights reserved.
+ * Copyright (c) 2019, 2020 Payara Foundation and/or its affiliates. All rights reserved.
  *
  * This program and the accompanying materials are made available under the
  * terms of the Eclipse Public License v. 2.0 which is available at
@@ -43,7 +43,7 @@ public class YassonProperties {
 
     /**
      * @deprecated
-     * @see YassonConfig#withNullRootSerializer(javax.json.bind.serializer.JsonbSerializer)
+     * @see YassonConfig#withNullRootSerializer(jakarta.json.bind.serializer.JsonbSerializer)
      */
     public static final String NULL_ROOT_SERIALIZER = YassonConfig.NULL_ROOT_SERIALIZER;
 
