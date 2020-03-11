@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2015, 2019 Oracle and/or its affiliates. All rights reserved.
+ * Copyright (c) 2015, 2020 Oracle and/or its affiliates. All rights reserved.
  *
  * This program and the accompanying materials are made available under the
  * terms of the Eclipse Public License v. 2.0 which is available at
@@ -17,8 +17,8 @@ import java.lang.invoke.MethodHandles;
 import java.lang.reflect.Field;
 import java.lang.reflect.Method;
 
-import javax.json.bind.JsonbException;
-import javax.json.bind.config.PropertyVisibilityStrategy;
+import jakarta.json.bind.JsonbException;
+import jakarta.json.bind.config.PropertyVisibilityStrategy;
 
 import org.eclipse.yasson.internal.properties.MessageKeys;
 import org.eclipse.yasson.internal.properties.Messages;
@@ -29,7 +29,7 @@ import org.eclipse.yasson.internal.properties.Messages;
  * Uses field getter / setter implicitly if those are present and public.
  * Uses field direct access otherwise if field is public.
  * </p>
- * Access policy could be modified by {@link javax.json.bind.annotation.JsonbVisibility}
+ * Access policy could be modified by {@link jakarta.json.bind.annotation.JsonbVisibility}
  */
 class MethodHandleValuePropagation extends PropertyValuePropagation {
 

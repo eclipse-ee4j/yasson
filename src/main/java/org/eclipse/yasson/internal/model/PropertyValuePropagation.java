@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2015, 2019 Oracle and/or its affiliates. All rights reserved.
+ * Copyright (c) 2015, 2020 Oracle and/or its affiliates. All rights reserved.
  *
  * This program and the accompanying materials are made available under the
  * terms of the Eclipse Public License v. 2.0 which is available at
@@ -20,7 +20,7 @@ import java.security.AccessController;
 import java.security.PrivilegedAction;
 import java.util.function.Function;
 
-import javax.json.bind.config.PropertyVisibilityStrategy;
+import jakarta.json.bind.config.PropertyVisibilityStrategy;
 
 /**
  * Abstract class for getting / setting value into the property.

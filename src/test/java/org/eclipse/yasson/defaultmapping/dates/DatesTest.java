@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2015, 2019 Oracle and/or its affiliates. All rights reserved.
+ * Copyright (c) 2015, 2020 Oracle and/or its affiliates. All rights reserved.
  *
  * This program and the accompanying materials are made available under the
  * terms of the Eclipse Public License v. 2.0 which is available at
@@ -29,15 +29,14 @@ import org.eclipse.yasson.defaultmapping.dates.model.OffsetDateTimePojo;
 import org.eclipse.yasson.defaultmapping.dates.model.OffsetTimePojo;
 import org.eclipse.yasson.defaultmapping.dates.model.ZonedDateTimePojo;
 import org.eclipse.yasson.defaultmapping.generics.model.ScalarValueWrapper;
-import org.eclipse.yasson.internal.JsonBindingBuilder;
 import org.eclipse.yasson.internal.serializer.SqlDateTypeDeserializer;
 
-import javax.json.bind.Jsonb;
-import javax.json.bind.JsonbBuilder;
-import javax.json.bind.JsonbConfig;
-import javax.json.bind.annotation.JsonbDateFormat;
-import javax.json.bind.annotation.JsonbTypeDeserializer;
-import javax.json.bind.config.PropertyVisibilityStrategy;
+import jakarta.json.bind.Jsonb;
+import jakarta.json.bind.JsonbBuilder;
+import jakarta.json.bind.JsonbConfig;
+import jakarta.json.bind.annotation.JsonbDateFormat;
+import jakarta.json.bind.annotation.JsonbTypeDeserializer;
+import jakarta.json.bind.config.PropertyVisibilityStrategy;
 import javax.xml.datatype.DatatypeConfigurationException;
 import javax.xml.datatype.DatatypeFactory;
 import javax.xml.datatype.XMLGregorianCalendar;
@@ -60,6 +59,7 @@ import java.time.ZoneId;
 import java.time.ZoneOffset;
 import java.time.ZonedDateTime;
 import java.time.format.DateTimeFormatter;
+import java.time.temporal.ChronoField;
 import java.util.Calendar;
 import java.util.Date;
 import java.util.GregorianCalendar;
@@ -75,6 +75,7 @@ import java.util.TimeZone;
  * @author Dmitry Kornilov
  */
 public class DatesTest {
+    
     private static LocalDate localDate = LocalDate.of(2018, 1, 31);
 
     @SuppressWarnings("serial")
@@ -84,11 +85,16 @@ public class DatesTest {
 
     @SuppressWarnings("serial")
 	public static class SqlDateObj implements Serializable {
-        public java.sql.Date sqlDate = new java.sql.Date(localDate.atStartOfDay(ZoneId.of("UTC")).toInstant().toEpochMilli());
+        public java.sql.Date sqlDate = java.sql.Date.valueOf("2018-01-31");
         //no way for runtime to choose java.sql.Date deserializer here without a hint
         @JsonbTypeDeserializer(SqlDateTypeDeserializer.class)
-        public java.util.Date utilDate = new java.sql.Date(localDate.atStartOfDay(ZoneId.of("UTC")).toInstant().toEpochMilli());
+        public java.util.Date utilDate = java.sql.Date.valueOf("2018-01-31");
 
+    }
+    
+    public static class SqlDateFormatted {
+        @JsonbDateFormat(value = "yyyy-MM-dd")
+        public java.sql.Date sqlDate;
     }
 
     @Test
@@ -110,9 +116,70 @@ public class DatesTest {
     @Test
     public void testUnmarshallSqlDate() {
         SqlDateObj result = bindingJsonb.fromJson("{\"sqlDate\":\"2018-01-31Z\",\"utilDate\":\"2018-01-31Z\"}", SqlDateObj.class);
-        long expectedUtcMillis = localDate.atStartOfDay(ZoneId.of("UTC")).toInstant().toEpochMilli();
-        assertEquals(new java.sql.Date(expectedUtcMillis), result.sqlDate);
-        assertEquals(new java.sql.Date(expectedUtcMillis), result.utilDate);
+        assertEquals("2018-01-31", result.sqlDate.toString());
+        assertEquals("2018-01-31", result.utilDate.toString());
+    }
+    
+    @Test
+    public void testSqlDateTimeZonesFormatted() {
+        testSqlDateWithTZFormatted(TimeZone.getTimeZone(ZoneId.of("Europe/Sofia")));
+        testSqlDateWithTZFormatted(TimeZone.getTimeZone(ZoneId.of("US/Hawaii")));
+        testSqlDateWithTZFormatted(TimeZone.getTimeZone(ZoneId.of("Australia/Sydney")));
+    }
+    
+    private void testSqlDateWithTZFormatted(TimeZone tz) {
+        final TimeZone originalTZ = TimeZone.getDefault();
+        TimeZone.setDefault(tz);
+        try {
+            Jsonb jsonb = JsonbBuilder.create(new JsonbConfig().withDateFormat("yyyy-MM-dd", Locale.getDefault()));
+            java.sql.Date d = java.sql.Date.valueOf("1966-11-04");
+            String json = jsonb.toJson(d);
+            assertEquals("\"1966-11-04\"", json);
+            assertEquals("1966-11-04", jsonb.fromJson(json, java.sql.Date.class).toString());
+        } finally {
+            TimeZone.setDefault(originalTZ);
+        }
+    }
+    
+    @Test
+    public void testSqlDateTimeZonesMillis() {
+        testSqlDateTimeZonesMillis(TimeZone.getTimeZone(ZoneId.of("Europe/Sofia")), -99712800000L);
+        testSqlDateTimeZonesMillis(TimeZone.getTimeZone(ZoneId.of("US/Hawaii")), -99669600000L);
+        testSqlDateTimeZonesMillis(TimeZone.getTimeZone(ZoneId.of("Australia/Sydney")), -99741600000L);
+    }
+    
+    private void testSqlDateTimeZonesMillis(TimeZone tz, long expectedMs) {
+        final TimeZone originalTZ = TimeZone.getDefault();
+        TimeZone.setDefault(tz);
+        try {
+            Jsonb jsonb = JsonbBuilder.create(new JsonbConfig().withDateFormat(JsonbDateFormat.TIME_IN_MILLIS, Locale.getDefault()));
+            java.sql.Date d = java.sql.Date.valueOf("1966-11-04");
+            String json = jsonb.toJson(d);
+            assertEquals("\"" + expectedMs + "\"", json);
+            assertEquals(d, jsonb.fromJson(json, java.sql.Date.class));
+        } finally {
+            TimeZone.setDefault(originalTZ);
+        }
+    }
+    
+    @Test
+    public void testSqlDateTimeZones() {
+        testSqlDateWithTZ(TimeZone.getTimeZone(ZoneId.of("Europe/Sofia")));
+        testSqlDateWithTZ(TimeZone.getTimeZone(ZoneId.of("US/Hawaii")));
+        testSqlDateWithTZ(TimeZone.getTimeZone(ZoneId.of("Australia/Sydney")));
+    }
+    
+    private void testSqlDateWithTZ(TimeZone tz) {
+        final TimeZone originalTZ = TimeZone.getDefault();
+        TimeZone.setDefault(tz);
+        try {
+            java.sql.Date d = java.sql.Date.valueOf("1966-11-04");
+            String json = defaultJsonb.toJson(d);
+            assertEquals("\"1966-11-04Z\"", json);
+            assertEquals("1966-11-04", defaultJsonb.fromJson(json, java.sql.Date.class).toString());
+        } finally {
+            TimeZone.setDefault(originalTZ);
+        }
     }
 
     @Test

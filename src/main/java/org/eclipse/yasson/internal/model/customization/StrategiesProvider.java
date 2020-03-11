@@ -17,27 +17,27 @@ import java.util.List;
 import java.util.Objects;
 import java.util.function.Consumer;
 
-import javax.json.bind.JsonbException;
-import javax.json.bind.config.PropertyNamingStrategy;
+import jakarta.json.bind.JsonbException;
+import jakarta.json.bind.config.PropertyNamingStrategy;
 
 import org.eclipse.yasson.internal.model.PropertyModel;
 import org.eclipse.yasson.internal.properties.MessageKeys;
 import org.eclipse.yasson.internal.properties.Messages;
 
 import static java.util.Comparator.comparing;
-import static javax.json.bind.config.PropertyNamingStrategy.CASE_INSENSITIVE;
-import static javax.json.bind.config.PropertyNamingStrategy.IDENTITY;
-import static javax.json.bind.config.PropertyNamingStrategy.LOWER_CASE_WITH_DASHES;
-import static javax.json.bind.config.PropertyNamingStrategy.LOWER_CASE_WITH_UNDERSCORES;
-import static javax.json.bind.config.PropertyNamingStrategy.UPPER_CAMEL_CASE;
-import static javax.json.bind.config.PropertyNamingStrategy.UPPER_CAMEL_CASE_WITH_SPACES;
-import static javax.json.bind.config.PropertyOrderStrategy.ANY;
-import static javax.json.bind.config.PropertyOrderStrategy.LEXICOGRAPHICAL;
-import static javax.json.bind.config.PropertyOrderStrategy.REVERSE;
+import static jakarta.json.bind.config.PropertyNamingStrategy.CASE_INSENSITIVE;
+import static jakarta.json.bind.config.PropertyNamingStrategy.IDENTITY;
+import static jakarta.json.bind.config.PropertyNamingStrategy.LOWER_CASE_WITH_DASHES;
+import static jakarta.json.bind.config.PropertyNamingStrategy.LOWER_CASE_WITH_UNDERSCORES;
+import static jakarta.json.bind.config.PropertyNamingStrategy.UPPER_CAMEL_CASE;
+import static jakarta.json.bind.config.PropertyNamingStrategy.UPPER_CAMEL_CASE_WITH_SPACES;
+import static jakarta.json.bind.config.PropertyOrderStrategy.ANY;
+import static jakarta.json.bind.config.PropertyOrderStrategy.LEXICOGRAPHICAL;
+import static jakarta.json.bind.config.PropertyOrderStrategy.REVERSE;
 
 /**
- * Provides strategies for {@link javax.json.bind.config.PropertyNamingStrategy} and
- * {@link javax.json.bind.config.PropertyOrderStrategy}.
+ * Provides strategies for {@link jakarta.json.bind.config.PropertyNamingStrategy} and
+ * {@link jakarta.json.bind.config.PropertyOrderStrategy}.
  */
 public final class StrategiesProvider {
     private StrategiesProvider() {

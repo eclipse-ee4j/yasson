@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2019 IBM and/or its affiliates. All rights reserved.
+ * Copyright (c) 2019, 2020 IBM and/or its affiliates. All rights reserved.
  *
  * This program and the accompanying materials are made available under the
  * terms of the Eclipse Public License v. 2.0 which is available at
@@ -13,11 +13,11 @@ package org.eclipse.yasson;
 
 import java.util.Map;
 
-import javax.json.bind.JsonbConfig;
-import javax.json.bind.serializer.JsonbSerializer;
+import jakarta.json.bind.JsonbConfig;
+import jakarta.json.bind.serializer.JsonbSerializer;
 
 /**
- * Custom properties for configuring Yasson outside of the specification {@link javax.json.bind.JsonbConfig} scope.
+ * Custom properties for configuring Yasson outside of the specification {@link jakarta.json.bind.JsonbConfig} scope.
  */
 public class YassonConfig extends JsonbConfig {
     
@@ -37,7 +37,7 @@ public class YassonConfig extends JsonbConfig {
     public static final String ZERO_TIME_PARSE_DEFAULTING = "jsonb.zero-time-defaulting";
 
     /**
-     * @see #withNullRootSerializer(javax.json.bind.serializer.JsonbSerializer)
+     * @see #withNullRootSerializer(jakarta.json.bind.serializer.JsonbSerializer)
      */
     public static final String NULL_ROOT_SERIALIZER = "yasson.null-root-serializer";
 
@@ -84,8 +84,8 @@ public class YassonConfig extends JsonbConfig {
     }
     
     /**
-     * Serializer to use when object provided to {@link javax.json.bind.Jsonb#toJson(Object)} is {@code null} or an empty
-     * Optional. Must be instance of {@link javax.json.bind.serializer.JsonbSerializer}{@code <Object>}. Its obj value
+     * Serializer to use when object provided to {@link jakarta.json.bind.Jsonb#toJson(Object)} is {@code null} or an empty
+     * Optional. Must be instance of {@link jakarta.json.bind.serializer.JsonbSerializer}{@code <Object>}. Its obj value
      * will be respective parameter.
      * @param nullSerializer JsonbSerializer instance to use for serializing null root values
      * @return This YassonConfig instance

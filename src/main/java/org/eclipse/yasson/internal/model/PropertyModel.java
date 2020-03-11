@@ -18,8 +18,8 @@ import java.util.Map;
 import java.util.Objects;
 import java.util.Optional;
 
-import javax.json.bind.config.PropertyNamingStrategy;
-import javax.json.bind.serializer.JsonbSerializer;
+import jakarta.json.bind.config.PropertyNamingStrategy;
+import jakarta.json.bind.serializer.JsonbSerializer;
 
 import org.eclipse.yasson.internal.AnnotationIntrospector;
 import org.eclipse.yasson.internal.JsonbContext;

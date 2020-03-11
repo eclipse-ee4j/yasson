@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2019 Oracle and/or its affiliates. All rights reserved.
+ * Copyright (c) 2019, 2020 Oracle and/or its affiliates. All rights reserved.
  *
  * This program and the accompanying materials are made available under the
  * terms of the Eclipse Public License v. 2.0 which is available at
@@ -15,17 +15,17 @@ package org.eclipse.yasson.internal.jsonstructure;
 import java.math.BigDecimal;
 import java.math.BigInteger;
 
-import javax.json.JsonArray;
-import javax.json.JsonStructure;
-import javax.json.JsonValue;
-import javax.json.spi.JsonProvider;
+import jakarta.json.JsonArray;
+import jakarta.json.JsonStructure;
+import jakarta.json.JsonValue;
+import jakarta.json.spi.JsonProvider;
 
 /**
- * Builds {@link JsonArray}. Delegates to {@link javax.json.JsonArrayBuilder}.
+ * Builds {@link JsonArray}. Delegates to {@link jakarta.json.JsonArrayBuilder}.
  */
 class JsonArrayBuilder extends JsonStructureBuilder {
 
-    private final javax.json.JsonArrayBuilder arrayBuilder;
+    private final jakarta.json.JsonArrayBuilder arrayBuilder;
 
     /**
      * Create instance with cached provider.

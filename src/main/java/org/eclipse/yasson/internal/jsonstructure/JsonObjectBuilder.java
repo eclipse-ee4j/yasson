@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2019 Oracle and/or its affiliates. All rights reserved.
+ * Copyright (c) 2019, 2020 Oracle and/or its affiliates. All rights reserved.
  *
  * This program and the accompanying materials are made available under the
  * terms of the Eclipse Public License v. 2.0 which is available at
@@ -15,21 +15,21 @@ package org.eclipse.yasson.internal.jsonstructure;
 import java.math.BigDecimal;
 import java.math.BigInteger;
 
-import javax.json.JsonStructure;
-import javax.json.JsonValue;
-import javax.json.bind.JsonbException;
-import javax.json.spi.JsonProvider;
+import jakarta.json.JsonStructure;
+import jakarta.json.JsonValue;
+import jakarta.json.bind.JsonbException;
+import jakarta.json.spi.JsonProvider;
 
 import org.eclipse.yasson.internal.properties.MessageKeys;
 import org.eclipse.yasson.internal.properties.Messages;
 
 /**
- * Builds {@link javax.json.JsonObject} delegates to {@link javax.json.JsonObjectBuilder}, caches key when
+ * Builds {@link jakarta.json.JsonObject} delegates to {@link jakarta.json.JsonObjectBuilder}, caches key when
  * written without a value.
  */
 class JsonObjectBuilder extends JsonStructureBuilder {
 
-    private final javax.json.JsonObjectBuilder builder;
+    private final jakarta.json.JsonObjectBuilder builder;
 
     private String nextKey;
 
@@ -108,7 +108,7 @@ class JsonObjectBuilder extends JsonStructureBuilder {
     }
 
     /**
-     * Write a key-value pair into current {@link javax.json.JsonObject}.
+     * Write a key-value pair into current {@link jakarta.json.JsonObject}.
      *
      * @param name  Key name to write value with.
      * @param value A value to write.
@@ -118,7 +118,7 @@ class JsonObjectBuilder extends JsonStructureBuilder {
     }
 
     /**
-     * Write a key-value pair into current {@link javax.json.JsonObject}.
+     * Write a key-value pair into current {@link jakarta.json.JsonObject}.
      *
      * @param name  Key name to write value with.
      * @param value A value to write.
@@ -128,7 +128,7 @@ class JsonObjectBuilder extends JsonStructureBuilder {
     }
 
     /**
-     * Write a key-value pair into current {@link javax.json.JsonObject}.
+     * Write a key-value pair into current {@link jakarta.json.JsonObject}.
      *
      * @param name  Key name to write value with.
      * @param value A value to write.
@@ -138,7 +138,7 @@ class JsonObjectBuilder extends JsonStructureBuilder {
     }
 
     /**
-     * Write a key-value pair into current {@link javax.json.JsonObject}.
+     * Write a key-value pair into current {@link jakarta.json.JsonObject}.
      *
      * @param name  Key name to write value with.
      * @param value A value to write.
@@ -148,7 +148,7 @@ class JsonObjectBuilder extends JsonStructureBuilder {
     }
 
     /**
-     * Write a key-value pair into current {@link javax.json.JsonObject}.
+     * Write a key-value pair into current {@link jakarta.json.JsonObject}.
      *
      * @param name  Key name to write value with.
      * @param value A value to write.
@@ -158,7 +158,7 @@ class JsonObjectBuilder extends JsonStructureBuilder {
     }
 
     /**
-     * Write a key-value pair into current {@link javax.json.JsonObject}.
+     * Write a key-value pair into current {@link jakarta.json.JsonObject}.
      *
      * @param name  Key name to write value with.
      * @param value A value to write.
@@ -168,7 +168,7 @@ class JsonObjectBuilder extends JsonStructureBuilder {
     }
 
     /**
-     * Write a key-value pair into current {@link javax.json.JsonObject}.
+     * Write a key-value pair into current {@link jakarta.json.JsonObject}.
      *
      * @param name  Key name to write value with.
      * @param value A value to write.
@@ -178,7 +178,7 @@ class JsonObjectBuilder extends JsonStructureBuilder {
     }
 
     /**
-     * Write a key-value pair into current {@link javax.json.JsonObject}.
+     * Write a key-value pair into current {@link jakarta.json.JsonObject}.
      *
      * @param name  Key name to write value with.
      * @param value A value to write.
@@ -188,7 +188,7 @@ class JsonObjectBuilder extends JsonStructureBuilder {
     }
 
     /**
-     * Write a null into current {@link javax.json.JsonObject} with a given key.
+     * Write a null into current {@link jakarta.json.JsonObject} with a given key.
      *
      * @param name Key name to write null with.
      */
@@ -197,7 +197,7 @@ class JsonObjectBuilder extends JsonStructureBuilder {
     }
 
     /**
-     * Store a key for putting next value into built {@link javax.json.JsonObject}.
+     * Store a key for putting next value into built {@link jakarta.json.JsonObject}.
      *
      * @param key Key to store.
      */
