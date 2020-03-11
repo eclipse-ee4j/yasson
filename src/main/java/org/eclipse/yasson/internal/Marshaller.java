@@ -191,7 +191,7 @@ public class Marshaller implements SerializationContext {
     }
     
     /**
-     * Adds currently processed object to the {@link List}.
+     * Adds currently processed object to the {@link Set}.
      *
      * @param object processed object
      * @return if object was added
@@ -204,7 +204,7 @@ public class Marshaller implements SerializationContext {
     }
 
     /**
-     * Removes processed object from the {@link List}.
+     * Removes processed object from the {@link Set}.
      *
      * @param object processed object
      */
