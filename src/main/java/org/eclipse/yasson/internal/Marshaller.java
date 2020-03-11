@@ -14,9 +14,9 @@
 package org.eclipse.yasson.internal;
 
 import java.lang.reflect.Type;
-import java.util.ArrayList;
-import java.util.List;
+import java.util.HashSet;
 import java.util.Objects;
+import java.util.Set;
 import java.util.logging.Logger;
 
 import jakarta.json.bind.JsonbException;
@@ -45,7 +45,7 @@ public class Marshaller implements SerializationContext {
      * Used to avoid StackOverflowError, when adapted / serialized object
      * contains contains instance of its type inside it or when object has recursive reference.
      */
-    private final List<Object> currentlyProcessedObjects = new ArrayList<>();
+    private final Set<Object> currentlyProcessedObjects = new HashSet<>();
     private final JsonbContext jsonbContext;
     private final Type runtimeType;
 
