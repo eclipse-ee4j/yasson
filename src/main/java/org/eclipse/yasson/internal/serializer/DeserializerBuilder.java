@@ -287,6 +287,8 @@ public class DeserializerBuilder extends AbstractSerializerBuilder<DeserializerB
             return new FloatArrayDeserializer(this);
         } else if (componentType == double.class) {
             return new DoubleArrayDeserializer(this);
+        } else if (componentType == boolean.class) {
+            return new BooleanArrayDeserializer(this);
         } else {
             return new ObjectArrayDeserializer(this);
         }
