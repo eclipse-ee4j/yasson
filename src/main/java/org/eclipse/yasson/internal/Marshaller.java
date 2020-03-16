@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2015, 2019 Oracle and/or its affiliates. All rights reserved.
+ * Copyright (c) 2015, 2020 Oracle and/or its affiliates. All rights reserved.
  * Copyright (c) 2019 Payara Foundation and/or its affiliates. All rights reserved.
  *
  * This program and the accompanying materials are made available under the
@@ -82,6 +82,8 @@ public class Marshaller extends ProcessingContext implements SerializationContex
             try {
                 if (close) {
                     jsonGenerator.close();
+                } else {
+                    jsonGenerator.flush();
                 }
             } catch (JsonGenerationException jge) {
                 LOGGER.severe(jge.getMessage());
