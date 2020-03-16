@@ -82,6 +82,8 @@ public class Marshaller extends ProcessingContext implements SerializationContex
             try {
                 if (close) {
                     jsonGenerator.close();
+                } else {
+                    jsonGenerator.flush();
                 }
             } catch (JsonGenerationException jge) {
                 LOGGER.severe(jge.getMessage());

@@ -138,13 +138,13 @@ public class JsonBinding implements YassonJsonb {
     @Override
     public void toJson(Object object, Writer writer) throws JsonbException {
         final Marshaller marshaller = new Marshaller(jsonbContext);
-        marshaller.marshall(object, writerGenerator(writer));
+        marshaller.marshallWithoutClose(object, writerGenerator(writer));
     }
 
     @Override
     public void toJson(Object object, Type type, Writer writer) throws JsonbException {
         final Marshaller marshaller = new Marshaller(jsonbContext, type);
-        marshaller.marshall(object, writerGenerator(writer));
+        marshaller.marshallWithoutClose(object, writerGenerator(writer));
     }
 
     private JsonGenerator writerGenerator(Writer writer) {
