@@ -16,12 +16,12 @@ import jakarta.json.bind.serializer.SerializationContext;
 import jakarta.json.stream.JsonGenerator;
 
 /**
- * Serializes byte array as JSON array of ints.
+ * Serializes byte array as JSON array of booleans.
  */
 public class BooleanArraySerializer extends AbstractArraySerializer<boolean[]> {
 
     /**
-     * Creates new instance of byte array serializer.
+     * Creates new instance of boolean array serializer.
      *
      * @param builder serializer builder
      */

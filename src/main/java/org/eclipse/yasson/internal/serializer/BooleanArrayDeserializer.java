@@ -18,14 +18,14 @@ import java.util.List;
 import org.eclipse.yasson.internal.Unmarshaller;
 
 /**
- * Array unmarshaller item implementation for small int.
+ * Array unmarshaller item implementation for booleans.
  */
 public class BooleanArrayDeserializer extends AbstractArrayDeserializer<boolean[]> {
 
     private final List<Boolean> items = new ArrayList<>();
 
     /**
-     * Creates new instance of byte array deserializer.
+     * Creates new instance of boolean array deserializer.
      *
      * @param builder deserializer builder
      */
