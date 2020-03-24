@@ -1,6 +1,6 @@
 #!/bin/bash -x
 #
-# Copyright (c) 2019 Oracle and/or its affiliates. All rights reserved.
+# Copyright (c) 2019, 2020 Oracle and/or its affiliates. All rights reserved.
 #
 # This program and the accompanying materials are made available under the
 # terms of the Eclipse Public License v. 2.0 which is available at
@@ -13,7 +13,7 @@
 
 mvn clean install -DskipTests
 
-GF_BUNDLE_URL="central.maven.org/maven2/org/glassfish/main/distributions/glassfish/5.1.0/glassfish-5.1.0.zip"
+GF_BUNDLE_URL="https://repo1.maven.org/maven2/org/glassfish/main/distributions/glassfish/5.1.0/glassfish-5.1.0.zip"
 TCK_NAME=jsonb-tck
 TCK_VERSION=1.0.1
 
@@ -30,7 +30,7 @@ echo "Exporting downloaded TCK tests"
 unzip -qq eclipse-${TCK_NAME}-*.zip -d ${TCK_HOME}
 
 echo "Downloading GlassFish"
-wget -q --no-cache ${GF_BUNDLE_URL} -O latest-glassfish.zip
+wget -q --no-check-certificate --no-cache ${GF_BUNDLE_URL} -O latest-glassfish.zip
 echo "Exporting downloaded GlassFish"
 unzip -qq ${TCK_HOME}/latest-glassfish.zip -d ${TCK_HOME}
 
