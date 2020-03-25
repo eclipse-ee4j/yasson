@@ -39,6 +39,17 @@ public class BasicTest {
         bindingJsonb.toJson(new Long[]{5L}, writer);
         assertEquals("[5]", writer.toString());
     }
+    
+    @Test
+    public void testDoubleWriter() throws Exception {
+        Writer writer = new StringWriter();
+        writer.write("{");
+        bindingJsonb.toJson("Hello", writer);
+        writer.write(",");
+        bindingJsonb.toJson("World", writer);
+        writer.write("}");
+        assertEquals("{\"Hello\",\"World\"}", writer.toString());
+    }
 
     @Test
     public void testMarshallOutputStream() throws IOException {
