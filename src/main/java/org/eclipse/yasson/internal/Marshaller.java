@@ -29,7 +29,6 @@ import org.eclipse.yasson.internal.properties.MessageKeys;
 import org.eclipse.yasson.internal.properties.Messages;
 import org.eclipse.yasson.internal.serializer.AbstractValueTypeSerializer;
 import org.eclipse.yasson.internal.serializer.ContainerSerializerProvider;
-import org.eclipse.yasson.internal.serializer.DefaultSerializers;
 import org.eclipse.yasson.internal.serializer.SerializerBuilder;
 
 /**
@@ -159,10 +158,8 @@ public class Marshaller extends ProcessingContext implements SerializationContex
                 .withObjectClass(rootClazz)
                 .withType(runtimeType);
 
-        if (!DefaultSerializers.getInstance().isKnownType(rootClazz)) {
-            ClassModel classModel = getMappingContext().getOrCreateClassModel(rootClazz);
-            serializerBuilder.withCustomization(classModel.getClassCustomization());
-        }
+        ClassModel classModel = getMappingContext().getOrCreateClassModel(rootClazz);
+        serializerBuilder.withCustomization(classModel.getClassCustomization());
         return serializerBuilder.build();
     }
     
