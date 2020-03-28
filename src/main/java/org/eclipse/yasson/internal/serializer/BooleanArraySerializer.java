@@ -12,8 +12,8 @@
 
 package org.eclipse.yasson.internal.serializer;
 
-import jakarta.json.bind.serializer.SerializationContext;
-import jakarta.json.stream.JsonGenerator;
+import javax.json.bind.serializer.SerializationContext;
+import javax.json.stream.JsonGenerator;
 
 /**
  * Serializes byte array as JSON array of booleans.
