@@ -38,6 +38,9 @@ import java.util.Locale;
 import java.util.Map;
 import java.util.Objects;
 import java.util.Optional;
+import java.util.OptionalDouble;
+import java.util.OptionalInt;
+import java.util.OptionalLong;
 import java.util.Queue;
 import java.util.Set;
 
@@ -70,6 +73,7 @@ import org.eclipse.yasson.internal.model.customization.ClassCustomization;
 import org.eclipse.yasson.internal.model.customization.ClassCustomizationBuilder;
 import org.eclipse.yasson.internal.properties.MessageKeys;
 import org.eclipse.yasson.internal.properties.Messages;
+import org.eclipse.yasson.internal.serializer.DefaultSerializers;
 import org.eclipse.yasson.internal.serializer.JsonbDateFormatter;
 import org.eclipse.yasson.internal.serializer.JsonbNumberFormatter;
 
@@ -350,6 +354,13 @@ public class AnnotationIntrospector {
         final JsonbNillable jsonbNillable = findAnnotation(clazzElement.getAnnotations(), JsonbNillable.class);
         if (jsonbNillable != null) {
             return jsonbNillable.value();
+        }
+        Class<?> clazz = clazzElement.getElement();
+        if (clazz == Optional.class
+                || clazz == OptionalDouble.class
+                || clazz == OptionalInt.class 
+                || clazz == OptionalLong.class) {
+            return true;
         }
         return jsonbContext.getConfigProperties().getConfigNullable();
     }
@@ -748,6 +759,10 @@ public class AnnotationIntrospector {
      */
     public JsonbAnnotatedElement<Class<?>> collectAnnotations(Class<?> clazz) {
         JsonbAnnotatedElement<Class<?>> classElement = new JsonbAnnotatedElement<>(clazz);
+        
+        if (DefaultSerializers.getInstance().isKnownType(clazz)) {
+            return classElement;
+        }
 
         for (Class<?> ifc : collectInterfaces(clazz)) {
             addIfNotPresent(classElement, ifc.getDeclaredAnnotations());

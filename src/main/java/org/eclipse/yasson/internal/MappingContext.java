@@ -22,6 +22,7 @@ import org.eclipse.yasson.internal.model.ClassModel;
 import org.eclipse.yasson.internal.model.JsonbAnnotatedElement;
 import org.eclipse.yasson.internal.model.customization.ClassCustomization;
 import org.eclipse.yasson.internal.serializer.ContainerSerializerProvider;
+import org.eclipse.yasson.internal.serializer.DefaultSerializers;
 
 /**
  * JSONB mappingContext. Created once per {@link jakarta.json.bind.Jsonb} instance. Represents a global scope.
@@ -92,7 +93,9 @@ public class MappingContext {
                                                       customization,
                                                       parentClassModel,
                                                       jsonbContext.getConfigProperties().getPropertyNamingStrategy());
-            classParser.parseProperties(newClassModel, clsElement);
+            if (!DefaultSerializers.getInstance().isKnownType(aClass)) {
+                classParser.parseProperties(newClassModel, clsElement);
+            }
             return newClassModel;
         };
     }
