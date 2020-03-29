@@ -57,4 +57,14 @@ public class BooleanTest {
         assertEquals("true", defaultJsonb.toJson(true, boolean.class));
         assertEquals("false", defaultJsonb.toJson(Boolean.FALSE, Boolean.class));
     }
+    
+    //Fix for issue #390
+    @Test
+    public void testBooleanArrays() {
+        assertArrayEquals(new boolean[] {true, false}, defaultJsonb.fromJson("[true, false]", boolean[].class));
+        assertArrayEquals(new Boolean[] {true, false}, defaultJsonb.fromJson("[true, false]", Boolean[].class));
+        
+        assertEquals("[true,false]", defaultJsonb.toJson(new boolean[] {true, false}));
+        assertEquals("[true,false]", defaultJsonb.toJson(new Boolean[] {true, false}));
+    }
 }
