@@ -22,7 +22,6 @@ import jakarta.json.stream.JsonParser;
 import org.eclipse.yasson.internal.model.ClassModel;
 import org.eclipse.yasson.internal.properties.MessageKeys;
 import org.eclipse.yasson.internal.properties.Messages;
-import org.eclipse.yasson.internal.serializer.DefaultSerializers;
 import org.eclipse.yasson.internal.serializer.DeserializerBuilder;
 
 /**
@@ -58,11 +57,8 @@ public class Unmarshaller extends ProcessingContext implements DeserializationCo
             DeserializerBuilder deserializerBuilder = new DeserializerBuilder(getJsonbContext())
                     .withType(type).withJsonValueType(getRootEvent(parser));
             Class<?> rawType = ReflectionUtils.getRawType(type);
-            if (!DefaultSerializers.getInstance().isKnownType(rawType)) {
-                ClassModel classModel = getMappingContext().getOrCreateClassModel(rawType);
-                deserializerBuilder.withCustomization(classModel.getClassCustomization());
-            }
-
+            ClassModel classModel = getMappingContext().getOrCreateClassModel(rawType);
+            deserializerBuilder.withCustomization(classModel.getClassCustomization());
             return (T) deserializerBuilder.build().deserialize(parser, this, type);
         } catch (JsonbException e) {
             LOGGER.severe(e.getMessage());

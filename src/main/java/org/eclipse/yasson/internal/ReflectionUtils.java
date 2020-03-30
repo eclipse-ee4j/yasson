@@ -246,7 +246,7 @@ public class ReflectionUtils {
                     declaredConstructor.setAccessible(true);
                 }
                 return declaredConstructor;
-            } catch (NoSuchMethodException e) {
+            } catch (NoSuchMethodException | RuntimeException e) {
                 if (required) {
                     throw new JsonbException(Messages.getMessage(MessageKeys.NO_DEFAULT_CONSTRUCTOR, clazz), e);
                 }
