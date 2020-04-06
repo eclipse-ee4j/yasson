@@ -140,6 +140,8 @@ public class SerializerBuilder extends AbstractSerializerBuilder<SerializerBuild
             return new FloatArraySerializer(this);
         } else if (componentType == double.class) {
             return new DoubleArraySerializer(this);
+        } else if (componentType == boolean.class) {
+            return new BooleanArraySerializer(this);
         } else {
             return new ObjectArraySerializer<>(this);
         }

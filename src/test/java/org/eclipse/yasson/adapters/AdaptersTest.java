@@ -24,6 +24,7 @@ import javax.json.bind.Jsonb;
 import javax.json.bind.JsonbBuilder;
 import javax.json.bind.JsonbConfig;
 import javax.json.bind.adapter.JsonbAdapter;
+
 import java.lang.reflect.Type;
 import java.math.BigDecimal;
 import java.time.Instant;
@@ -553,5 +554,31 @@ public class AdaptersTest {
         assertEquals("{\"error\":{\"message\":\"Error at: +1000000000-12-31T23:59:59.999999999Z\",\"type\":\"java.lang.RuntimeException\"}}", 
                 afterJson);
         assertEquals(1, throwableAdapter.callCount);
+    }
+    
+    public static class StringAdapter implements JsonbAdapter<String, String> {
+		@Override
+		public String adaptToJson(String obj) throws Exception {
+			return obj.toUpperCase();
+		}
+
+		@Override
+		public String adaptFromJson(String obj) throws Exception {
+			return obj.toLowerCase();
+		}
+    }
+    
+    /**
+     * Test for: https://github.com/eclipse-ee4j/yasson/issues/346
+     */
+    @Test
+    public void testAdaptedRootType() {
+    	Jsonb jsonb = JsonbBuilder.newBuilder()
+    			.withConfig(new JsonbConfig().withAdapters(new StringAdapter()))
+    			.build();
+    	
+    	String original = "hello world!";
+    	assertEquals("\"HELLO WORLD!\"", jsonb.toJson(original));
+    	assertEquals(original, jsonb.fromJson("\"HELLO WORLD!\"", String.class));
     }
 }
