@@ -1,6 +1,9 @@
-remote_theme: jakartaee/jekyll-theme-jakarta-ee
+github: [metadata]
 
-title: [Yasson]
+remote_theme: eclipsefdn/jekyll-theme-eclipsefdn
+#theme: jekyll-theme-eclipsefdn # for local execution
+
+title: [Eclipse Yasson]
 description: [Yasson is a Java framework which provides a standard binding layer between Java classes and JSON documents]
 
 links:
