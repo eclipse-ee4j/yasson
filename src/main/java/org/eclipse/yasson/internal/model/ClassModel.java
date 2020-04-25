@@ -18,6 +18,7 @@ import java.util.Collections;
 import java.util.List;
 import java.util.Map;
 import java.util.Objects;
+import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.stream.Collectors;
 
 import jakarta.json.bind.config.PropertyNamingStrategy;
@@ -37,7 +38,9 @@ public class ClassModel {
 
     private final ClassModel parentClassModel;
 
-    private final Constructor<?> defaultConstructor;
+    private final AtomicBoolean isInitialized = new AtomicBoolean(false);
+
+    private Constructor<?> defaultConstructor;
 
     /**
      * A map of all class properties, including properties from superclasses. Used to access by name.
@@ -77,7 +80,6 @@ public class ClassModel {
         this.classCustomization = customization;
         this.parentClassModel = parentClassModel;
         this.propertyNamingStrategy = propertyNamingStrategy;
-        this.defaultConstructor = ReflectionUtils.getDefaultConstructor(clazz, false);
         setProperties(new ArrayList<>());
     }
 
@@ -183,6 +185,13 @@ public class ClassModel {
      * @return default constructor
      */
     public Constructor<?> getDefaultConstructor() {
+        // Lazy-loads the default constructor to avoid Java 9+ "Illegal reflective access" warnings where possible.
+        // Example: Deserialization into Map won't use this constructor, and therefore never needs to call this method.
+        // Note: Null is a valid result and needs to be cached.
+        if (!isInitialized.get()) {
+            defaultConstructor = ReflectionUtils.getDefaultConstructor(clazz, false);
+            isInitialized.set(true);
+        }
         return defaultConstructor;
     }
 }
