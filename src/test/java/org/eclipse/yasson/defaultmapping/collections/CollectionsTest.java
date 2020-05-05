@@ -12,15 +12,36 @@
 
 package org.eclipse.yasson.defaultmapping.collections;
 
-import org.junit.jupiter.api.*;
-import static org.junit.jupiter.api.Assertions.*;
 import static org.eclipse.yasson.Jsonbs.*;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertTrue;
+
+import java.math.BigDecimal;
+import java.util.ArrayDeque;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Collection;
+import java.util.Deque;
+import java.util.EnumMap;
+import java.util.EnumSet;
+import java.util.HashMap;
+import java.util.Iterator;
+import java.util.LinkedHashMap;
+import java.util.LinkedHashSet;
+import java.util.LinkedList;
+import java.util.List;
+import java.util.Map;
+import java.util.NavigableMap;
+import java.util.SortedMap;
+import java.util.TreeMap;
+import java.util.concurrent.ConcurrentHashMap;
+import java.util.concurrent.ConcurrentMap;
+import java.util.concurrent.ConcurrentNavigableMap;
+import java.util.concurrent.ConcurrentSkipListMap;
 
 import org.eclipse.yasson.TestTypeToken;
 import org.eclipse.yasson.defaultmapping.generics.model.Circle;
-
-import java.math.BigDecimal;
-import java.util.*;
+import org.junit.jupiter.api.Test;
 
 /**
  * Default mapping arrays/collections/enums tests.
@@ -254,5 +275,51 @@ public class CollectionsTest {
         assertEquals(TreeMap.class, result.getClass());
         assertEquals("abc", result.get("first"));
         assertEquals("def", result.get("second"));
+    }
+    
+    public static class ConcurrentMapContainer {
+    	public ConcurrentMap<String, String> concurrentMap;
+    	public ConcurrentHashMap<String,String> concurrentHashMap;
+    	public ConcurrentNavigableMap<String, String> concurrentNavigableMap;
+    	public ConcurrentSkipListMap<String, String> concurrentSkipListMap;
+    }
+    
+    @Test
+    public void testConcurrentMaps() {
+    	// ConcurrentMap
+    	ConcurrentMapContainer c = new ConcurrentMapContainer();
+    	c.concurrentMap = new ConcurrentHashMap<String, String>();
+    	c.concurrentMap.put("foo", "fooVal");
+    	c.concurrentMap.put("bar", "barVal");
+    	String expectedJson = "{\"concurrentMap\":{\"bar\":\"barVal\",\"foo\":\"fooVal\"}}";
+    	assertEquals(expectedJson, defaultJsonb.toJson(c));
+    	assertEquals(c.concurrentMap, defaultJsonb.fromJson(expectedJson, ConcurrentMapContainer.class).concurrentMap);
+    	
+    	// ConcurrentHashMap
+    	c = new ConcurrentMapContainer();
+    	c.concurrentHashMap = new ConcurrentHashMap<String, String>();
+    	c.concurrentHashMap.put("foo", "fooVal2");
+    	c.concurrentHashMap.put("bar", "barVal2");
+    	expectedJson = "{\"concurrentHashMap\":{\"bar\":\"barVal2\",\"foo\":\"fooVal2\"}}";
+    	assertEquals(expectedJson, defaultJsonb.toJson(c));
+    	assertEquals(c.concurrentHashMap, defaultJsonb.fromJson(expectedJson, ConcurrentMapContainer.class).concurrentHashMap);
+    	
+    	// ConcurrentNavigableMap
+    	c = new ConcurrentMapContainer();
+    	c.concurrentNavigableMap = new ConcurrentSkipListMap<String, String>();
+    	c.concurrentNavigableMap.put("foo", "fooVal3");
+    	c.concurrentNavigableMap.put("bar", "barVal3");
+    	expectedJson = "{\"concurrentNavigableMap\":{\"bar\":\"barVal3\",\"foo\":\"fooVal3\"}}";
+    	assertEquals(expectedJson, defaultJsonb.toJson(c));
+    	assertEquals(c.concurrentNavigableMap, defaultJsonb.fromJson(expectedJson, ConcurrentMapContainer.class).concurrentNavigableMap);
+    	
+    	// ConcurrentSkipListMap
+    	c = new ConcurrentMapContainer();
+    	c.concurrentSkipListMap = new ConcurrentSkipListMap<String, String>();
+    	c.concurrentSkipListMap.put("foo", "fooVal4");
+    	c.concurrentSkipListMap.put("bar", "barVal4");
+    	expectedJson = "{\"concurrentSkipListMap\":{\"bar\":\"barVal4\",\"foo\":\"fooVal4\"}}";
+    	assertEquals(expectedJson, defaultJsonb.toJson(c));
+    	assertEquals(c.concurrentSkipListMap, defaultJsonb.fromJson(expectedJson, ConcurrentMapContainer.class).concurrentSkipListMap);
     }
 }
