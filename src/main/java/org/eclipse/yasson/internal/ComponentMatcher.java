@@ -137,7 +137,6 @@ public class ComponentMatcher {
      * @param customization       with component info
      * @return serializer optional
      */
-    @SuppressWarnings("unchecked")
     public Optional<SerializerBinding<?>> getSerializerBinding(Type propertyRuntimeType,
                                                                ComponentBoundCustomization customization) {
 
@@ -154,7 +153,6 @@ public class ComponentMatcher {
      * @param customization       customization with component info
      * @return serializer optional
      */
-    @SuppressWarnings("unchecked")
     public Optional<DeserializerBinding<?>> getDeserializerBinding(Type propertyRuntimeType,
                                                                    ComponentBoundCustomization customization) {
         if (customization == null || customization.getDeserializerBinding() == null) {
@@ -196,11 +194,45 @@ public class ComponentMatcher {
     }
 
     private <T extends AbstractComponentBinding> Optional<T> searchComponentBinding(Type runtimeType, Function<ComponentBindings, T> supplier) {
-        for (ComponentBindings componentBindings : userComponents.values()) {
-            final T component = supplier.apply(componentBindings);
-            if (component != null && matches(runtimeType, componentBindings.getBindingType())) {
-                return Optional.of(component);
+        // First check if there is an exact match
+        ComponentBindings binding = userComponents.get(runtimeType);
+        if (binding != null) {
+            Optional<T> match = getMatchingBinding(runtimeType, binding, supplier);
+            if (match.isPresent()) {
+               return match;
             }
+        }
+        
+        if (runtimeType instanceof Class) {
+            Class<?> runtimeClass = (Class<?>) runtimeType;
+            // Check if any interfaces have a match
+            for (Class<?> ifc : runtimeClass.getInterfaces()) {
+                ComponentBindings ifcBinding = userComponents.get(ifc);
+                if (ifcBinding != null) {
+                  Optional<T> match = getMatchingBinding(ifc, ifcBinding, supplier);
+                  if (match.isPresent()) {
+                      return match;
+                  }
+                }
+            }
+            
+            // check if the superclass has a match
+            Class<?> superClass = runtimeClass.getSuperclass();
+            if (superClass != null && superClass != Object.class) {
+                Optional<T> superBinding = searchComponentBinding(superClass, supplier);
+                if (superBinding.isPresent()) {
+                    return superBinding;
+                }
+            }
+        }
+        
+        return Optional.empty();
+    }
+    
+    private <T> Optional<T> getMatchingBinding(Type runtimeType, ComponentBindings binding, Function<ComponentBindings, T> supplier) {
+        final T component = supplier.apply(binding);
+        if (component != null && matches(runtimeType, binding.getBindingType())) {
+            return Optional.of(component);
         }
         return Optional.empty();
     }
