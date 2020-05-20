@@ -16,8 +16,12 @@ import java.lang.reflect.ParameterizedType;
 import java.lang.reflect.Type;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.NavigableMap;
 import java.util.SortedMap;
 import java.util.TreeMap;
+import java.util.concurrent.ConcurrentHashMap;
+import java.util.concurrent.ConcurrentMap;
+import java.util.concurrent.ConcurrentSkipListMap;
 
 import jakarta.json.bind.serializer.JsonbDeserializer;
 import jakarta.json.stream.JsonParser;
@@ -48,7 +52,6 @@ public class MapDeserializer<T extends Map<?, ?>> extends AbstractContainerDeser
      *
      * @param builder {@link DeserializerBuilder} used to build this instance
      */
-    @SuppressWarnings({"unchecked", "rawtypes"})
     protected MapDeserializer(DeserializerBuilder builder) {
         super(builder);
         mapValueRuntimeType = getRuntimeType() instanceof ParameterizedType
@@ -67,6 +70,13 @@ public class MapDeserializer<T extends Map<?, ?>> extends AbstractContainerDeser
     }
 
     private Map getMapImpl(Class ifcType, DeserializerBuilder builder) {
+        if (ConcurrentMap.class.isAssignableFrom(ifcType)) {
+            if (SortedMap.class.isAssignableFrom(ifcType) || NavigableMap.class.isAssignableFrom(ifcType)) {
+                return new ConcurrentSkipListMap<>();
+            } else {
+                return new ConcurrentHashMap<>();
+            }
+        }
         // SortedMap, NavigableMap
         if (SortedMap.class.isAssignableFrom(ifcType)) {
             Class<?> defaultMapImplType = builder.getJsonbContext().getConfigProperties().getDefaultMapImplType();
