@@ -3,7 +3,7 @@ package org.eclipse.yasson.jmh;
 import org.eclipse.yasson.jmh.model.TenPropertyData;
 import org.openjdk.jmh.annotations.*;
 
-import javax.json.bind.*;
+import jakarta.json.bind.*;
 import java.util.List;
 import java.util.concurrent.TimeUnit;
 

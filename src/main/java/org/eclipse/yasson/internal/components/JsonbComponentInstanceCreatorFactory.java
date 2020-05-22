@@ -45,7 +45,7 @@ public class JsonbComponentInstanceCreatorFactory {
      * Initial context class.
      */
     public static final String INITIAL_CONTEXT_CLASS = "javax.naming.InitialContext";
-    private static final String CDI_SPI_CLASS = "javax.enterprise.inject.spi.CDI";
+    private static final String CDI_SPI_CLASS = "jakarta.enterprise.inject.spi.CDI";
 
     /**
      * First check a CDI provider, if available use those.

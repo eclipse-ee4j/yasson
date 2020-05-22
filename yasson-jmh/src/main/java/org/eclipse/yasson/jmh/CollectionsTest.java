@@ -4,8 +4,8 @@ import org.eclipse.yasson.jmh.model.CollectionsData;
 import org.eclipse.yasson.jmh.model.ScalarData;
 import org.openjdk.jmh.annotations.*;
 
-import javax.json.bind.Jsonb;
-import javax.json.bind.JsonbBuilder;
+import jakarta.json.bind.Jsonb;
+import jakarta.json.bind.JsonbBuilder;
 import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.concurrent.TimeUnit;
