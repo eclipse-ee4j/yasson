@@ -12,10 +12,10 @@
 
 package org.eclipse.yasson.internal.cdi;
 
-import javax.annotation.PreDestroy;
-import javax.enterprise.context.Dependent;
-import javax.enterprise.event.Event;
-import javax.inject.Inject;
+import jakarta.annotation.PreDestroy;
+import jakarta.enterprise.context.Dependent;
+import jakarta.enterprise.event.Event;
+import jakarta.inject.Inject;
 
 /**
  * Dependant scoped bean, should be destroyed with its wrapper bean.
