@@ -39,23 +39,6 @@
         <jakarta.enterprise.cdi-api.version>3.0.0-M2</jakarta.enterprise.cdi-api.version>
         <netbeans.hint.jdkPlatform>JDK_9</netbeans.hint.jdkPlatform>
     </properties>
-    
-    <dependencyManagement>
-        <dependencies>
-            <dependency>
-                <groupId>jakarta.json</groupId>
-                <artifactId>jakarta.json-api</artifactId>
-                <version>${jakarta.json.version}</version>
-            </dependency>
-            <dependency>
-                <groupId>org.glassfish</groupId>
-                <artifactId>jakarta.json</artifactId>
-                <version>${jakarta.json.version}</version>
-                <classifier>module</classifier>
-                <scope>compile</scope>
-            </dependency>
-        </dependencies>
-    </dependencyManagement>
 
     <dependencies>
         <!-- Compile dependencies -->
@@ -65,13 +48,9 @@
             <version>${jakarta.json.bind.version}</version>
         </dependency>
         <dependency>
-            <groupId>jakarta.json</groupId>
-            <artifactId>jakarta.json-api</artifactId>
-        </dependency>
-        <dependency>
             <groupId>org.glassfish</groupId>
             <artifactId>jakarta.json</artifactId>
-            <classifier>module</classifier>
+            <version>${jakarta.json.version}</version>
         </dependency>
         <!-- Test/Provided dependencies -->
         <dependency>
