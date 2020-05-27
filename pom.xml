@@ -34,8 +34,9 @@
 
     <properties>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
-        <jakarta.json.version>2.0.0-RC1</jakarta.json.version>
+        <jakarta.json.version>2.0.0-RC2</jakarta.json.version>
         <jakarta.json.bind.version>2.0.0-RC1</jakarta.json.bind.version>
+        <jakarta.enterprise.cdi-api.version>3.0.0-M2</jakarta.enterprise.cdi-api.version>
         <netbeans.hint.jdkPlatform>JDK_9</netbeans.hint.jdkPlatform>
     </properties>
 
@@ -47,29 +48,22 @@
             <version>${jakarta.json.bind.version}</version>
         </dependency>
         <dependency>
-            <groupId>jakarta.json</groupId>
-            <artifactId>jakarta.json-api</artifactId>
-            <version>${jakarta.json.version}</version>
-        </dependency>
-        <dependency>
             <groupId>org.glassfish</groupId>
             <artifactId>jakarta.json</artifactId>
             <version>${jakarta.json.version}</version>
-            <classifier>module</classifier>
-            <scope>compile</scope>
         </dependency>
         <!-- Test/Provided dependencies -->
         <dependency>
             <groupId>jakarta.enterprise</groupId>
             <artifactId>jakarta.enterprise.cdi-api</artifactId>
-            <version>3.0.0-M2</version>
+            <version>${jakarta.enterprise.cdi-api.version}</version>
             <optional>true</optional>
             <scope>provided</scope>
         </dependency>
         <dependency>
             <groupId>org.jboss.weld.se</groupId>
             <artifactId>weld-se-core</artifactId>
-            <version>4.0.0.Alpha1</version>
+            <version>4.0.0.Alpha2</version>
             <scope>test</scope>
         </dependency>
         <dependency>
