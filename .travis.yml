@@ -25,11 +25,11 @@ install: true
 jobs:
   include:
     - stage: checkstyle
-      script: mvn checkstyle:checkstyle
+      script: mvn -B -Pstaging checkstyle:checkstyle
     - stage: copyright
       script: bash etc/copyright.sh
     - stage: install-yasson
       script: mvn -U -C -Pstaging clean install
     - stage: tck-run
-      script: mvn -U test
+      script: mvn -U -B -Pstaging test
 

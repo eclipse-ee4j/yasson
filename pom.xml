@@ -19,7 +19,7 @@
     <parent>
         <groupId>org.eclipse.ee4j</groupId>
         <artifactId>project</artifactId>
-        <version>1.0.5</version>
+        <version>1.0.6</version>
     </parent>
 
     <modelVersion>4.0.0</modelVersion>
@@ -35,7 +35,7 @@
     <properties>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
         <jakarta.json.version>2.0.0-RC2</jakarta.json.version>
-        <jakarta.json.bind.version>2.0.0-RC1</jakarta.json.bind.version>
+        <jakarta.json.bind.version>2.0.0-RC2</jakarta.json.bind.version>
         <jakarta.enterprise.cdi-api.version>3.0.0-M2</jakarta.enterprise.cdi-api.version>
         <netbeans.hint.jdkPlatform>JDK_9</netbeans.hint.jdkPlatform>
     </properties>
