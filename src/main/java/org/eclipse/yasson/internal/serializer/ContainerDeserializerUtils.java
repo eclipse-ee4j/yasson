@@ -106,7 +106,7 @@ class ContainerDeserializerUtils {
         //TODO In contrast to serialization value type cannot change here
         Type actualValueType = ReflectionUtils.resolveType(wrapper, valueType);
         DeserializerBuilder deserializerBuilder = newUnmarshallerItemBuilder(wrapper, ctx, event).withType(actualValueType);
-        if (!DefaultSerializers.getInstance().isKnownType(ReflectionUtils.getRawType(actualValueType))) {
+        if (!DefaultSerializers.isKnownType(ReflectionUtils.getRawType(actualValueType))) {
             ClassModel classModel = ctx.getMappingContext().getOrCreateClassModel(ReflectionUtils.getRawType(actualValueType));
             deserializerBuilder.withCustomization(classModel == null ? null : classModel.getClassCustomization());
         }
