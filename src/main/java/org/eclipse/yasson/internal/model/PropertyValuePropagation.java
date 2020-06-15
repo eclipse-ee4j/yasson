@@ -18,7 +18,7 @@ import java.lang.reflect.Method;
 import java.lang.reflect.Modifier;
 import java.security.AccessController;
 import java.security.PrivilegedAction;
-import java.util.function.Function;
+import java.util.function.Predicate;
 
 import jakarta.json.bind.config.PropertyVisibilityStrategy;
 
@@ -74,8 +74,8 @@ public abstract class PropertyValuePropagation {
         this.getter = property.getGetter();
         this.setter = property.getSetter();
         this.propertyVisibilityStrategy = strategy;
-        this.getterVisible = isMethodVisible(field, getter);
-        this.setterVisible = isMethodVisible(field, setter);
+        this.getterVisible = isMethodVisible(getter);
+        this.setterVisible = isMethodVisible(setter);
 
         initReadable(field, getter);
         initWritable(field, setter);
@@ -118,7 +118,7 @@ public abstract class PropertyValuePropagation {
         if (field == null) {
             return false;
         }
-        Boolean accessible = isVisible(strategy -> strategy.isVisible(field), field, method);
+        boolean accessible = isVisible(strategy -> strategy.isVisible(field), method);
         //overridden by strategy, or anonymous class (readable by spec)
         if (accessible && (
                 !Modifier.isPublic(field.getModifiers())
@@ -129,16 +129,16 @@ public abstract class PropertyValuePropagation {
         return accessible;
     }
 
-    private boolean isNotPublicAndNonNested(Class<?> declaringClass) {
+    private static boolean isNotPublicAndNonNested(Class<?> declaringClass) {
         return !declaringClass.isMemberClass() && !Modifier.isPublic(declaringClass.getModifiers());
     }
 
-    private boolean isMethodVisible(Field field, Method method) {
+    private boolean isMethodVisible(Method method) {
         if (method == null || Modifier.isStatic(method.getModifiers())) {
             return false;
         }
 
-        Boolean accessible = isVisible(strategy -> strategy.isVisible(method), field, method);
+        boolean accessible = isVisible(strategy -> strategy.isVisible(method), method);
         //overridden by strategy, anonymous class, or lambda
         if (accessible && (
                 !Modifier.isPublic(method.getModifiers()) || method.getDeclaringClass().isAnonymousClass() || method
@@ -148,7 +148,7 @@ public abstract class PropertyValuePropagation {
         return accessible;
     }
 
-    private void overrideAccessible(AccessibleObject accessibleObject) {
+    private static void overrideAccessible(AccessibleObject accessibleObject) {
         AccessController.doPrivileged((PrivilegedAction<Void>) () -> {
             accessibleObject.setAccessible(true);
             return null;
@@ -162,10 +162,10 @@ public abstract class PropertyValuePropagation {
      * @param visibilityCheckFunction function declaring visibility check
      * @return Optional with result of visibility check, or empty optional if no strategy is found
      */
-    private Boolean isVisible(Function<PropertyVisibilityStrategy, Boolean> visibilityCheckFunction, Field field, Method method) {
+    private boolean isVisible(Predicate<PropertyVisibilityStrategy> visibilityCheckFunction, Method method) {
         return propertyVisibilityStrategy != null
-                ? visibilityCheckFunction.apply(propertyVisibilityStrategy)
-                : visibilityCheckFunction.apply(new DefaultVisibilityStrategy(field, method));
+                ? visibilityCheckFunction.test(propertyVisibilityStrategy)
+                : visibilityCheckFunction.test(new DefaultVisibilityStrategy(method));
     }
 
     /**
@@ -254,12 +254,9 @@ public abstract class PropertyValuePropagation {
 
     private static final class DefaultVisibilityStrategy implements PropertyVisibilityStrategy {
 
-        private final Field field;
-
         private final Method method;
 
-        DefaultVisibilityStrategy(Field field, Method method) {
-            this.field = field;
+        DefaultVisibilityStrategy(Method method) {
             this.method = method;
         }
 
