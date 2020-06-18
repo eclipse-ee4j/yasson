@@ -760,7 +760,7 @@ public class AnnotationIntrospector {
     public JsonbAnnotatedElement<Class<?>> collectAnnotations(Class<?> clazz) {
         JsonbAnnotatedElement<Class<?>> classElement = new JsonbAnnotatedElement<>(clazz);
         
-        if (DefaultSerializers.getInstance().isKnownType(clazz)) {
+        if (DefaultSerializers.isKnownType(clazz)) {
             return classElement;
         }
 

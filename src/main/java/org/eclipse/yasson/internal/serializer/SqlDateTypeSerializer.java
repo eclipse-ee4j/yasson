@@ -14,51 +14,52 @@ package org.eclipse.yasson.internal.serializer;
 
 import java.time.Instant;
 import java.time.format.DateTimeFormatter;
-import java.time.temporal.TemporalAccessor;
 import java.util.Date;
 import java.util.Locale;
 
 import org.eclipse.yasson.internal.model.customization.Customization;
 
 /**
- * Serializer for {@link Date} type.
+ * Common serializer for {@link Date} and {@link java.sql.Date} types.
  * @param <T> date type
  */
-public class DateTypeSerializer<T extends Date> extends AbstractDateTimeSerializer<T> {
+public class SqlDateTypeSerializer<T extends Date> extends DateTypeSerializer<T> {
     
-    private static final DateTimeFormatter DEFAULT_DATE_FORMATTER = DateTimeFormatter.ISO_DATE_TIME.withZone(UTC);
-
     /**
      * Creates a new instance.
      *
      * @param customization Model customization.
      */
-    public DateTypeSerializer(Customization customization) {
+    public SqlDateTypeSerializer(Customization customization) {
         super(customization);
     }
 
     @Override
     protected Instant toInstant(Date value) {
-        return value.toInstant();
+        if (value instanceof java.sql.Date) {
+            // java.sql.Date doesn't have a time component, so do our best if TIME_IN_MILLIS is requested
+            // In the future (at a breaking change boundary) we should probably reject this code path
+            return Instant.ofEpochMilli(value.getTime());
+        } else {
+            return super.toInstant(value);
+        }
     }
 
     @Override
     protected String formatDefault(Date value, Locale locale) {
-        return DEFAULT_DATE_FORMATTER.withLocale(locale).format(toInstant(value));
+        if (value instanceof java.sql.Date) {
+            return value.toString() + 'Z'; // Z is the UTC timezone indicator
+        } else {
+            return super.formatDefault(value, locale);
+        }
     }
 
     @Override
     protected String formatWithFormatter(Date value, DateTimeFormatter formatter) {
-        return getZonedFormatter(formatter).format(toTemporalAccessor(value));
-    }
-
-    @Override
-    protected String formatStrictIJson(Date value) {
-        return JsonbDateFormatter.IJSON_DATE_FORMATTER.withZone(UTC).format(toTemporalAccessor(value));
-    }
-
-    @Override
-    protected TemporalAccessor toTemporalAccessor(Date object) {
-        return toInstant(object);
+        if (value instanceof java.sql.Date) {
+            return ((java.sql.Date) value).toLocalDate().format(formatter);
+        } else {
+            return super.formatWithFormatter(value, formatter);
+        }
     }
 }

@@ -69,7 +69,7 @@ public class DateTypeDeserializer extends AbstractDateTimeDeserializer<Date> {
      * @param defaultZone This Zone will be used if no other Zone was found in the jsonValue
      * @return Parsed date on base of a java.time.ZonedDateTime
      */
-    private TemporalAccessor parseWithOrWithoutZone(String jsonValue, DateTimeFormatter formatter, ZoneId defaultZone) {
+    private static TemporalAccessor parseWithOrWithoutZone(String jsonValue, DateTimeFormatter formatter, ZoneId defaultZone) {
         try {
             // Try parsing with a Zone
             return ZonedDateTime.parse(jsonValue, formatter);

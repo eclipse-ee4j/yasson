@@ -15,7 +15,7 @@ module org.eclipse.yasson {
     requires jakarta.json.bind;
     requires static java.naming;
     requires java.logging;
-    requires java.sql;
+    requires static java.sql;
     requires static java.desktop;
     
     exports org.eclipse.yasson;

@@ -29,7 +29,6 @@ import java.time.ZoneOffset;
 import java.time.ZonedDateTime;
 import java.util.Calendar;
 import java.util.Collection;
-import java.util.Collections;
 import java.util.Date;
 import java.util.GregorianCalendar;
 import java.util.HashMap;
@@ -54,21 +53,14 @@ import javax.xml.datatype.XMLGregorianCalendar;
  */
 public class DefaultSerializers {
 
-    private static final DefaultSerializers INSTANCE = new DefaultSerializers();
+    private static final Map<Class<?>, SerializerProviderWrapper> SERIALIZERS = initSerializers();
 
-    private final Map<Class<?>, SerializerProviderWrapper> serializers;
-
-    private final SerializerProviderWrapper enumProvider;
+    private static final SerializerProviderWrapper ENUM_PROVIDER = new SerializerProviderWrapper(EnumTypeSerializer::new, EnumTypeDeserializer::new);
 
     private DefaultSerializers() {
-        if (INSTANCE != null) {
-            throw new IllegalStateException("Only one instance of this class can be created!");
-        }
-        this.serializers = initSerializers();
-        enumProvider = new SerializerProviderWrapper(EnumTypeSerializer::new, EnumTypeDeserializer::new);
     }
 
-    private Map<Class<?>, SerializerProviderWrapper> initSerializers() {
+    private static Map<Class<?>, SerializerProviderWrapper> initSerializers() {
         final Map<Class<?>, SerializerProviderWrapper> serializers = new HashMap<>();
 
         serializers.put(Boolean.class, new SerializerProviderWrapper(BooleanTypeSerializer::new, BooleanTypeDeserializer::new));
@@ -83,11 +75,17 @@ public class DefaultSerializers {
                         new SerializerProviderWrapper(CharacterTypeSerializer::new, CharacterTypeDeserializer::new));
         serializers
                 .put(Character.TYPE, new SerializerProviderWrapper(CharacterTypeSerializer::new, CharacterTypeDeserializer::new));
-        serializers.put(Date.class, new SerializerProviderWrapper(DateTypeSerializer::new, DateTypeDeserializer::new));
-        serializers.put(java.sql.Date.class,
-                        new SerializerProviderWrapper(DateTypeSerializer::new, SqlDateTypeDeserializer::new));
-        serializers.put(java.sql.Timestamp.class,
-                        new SerializerProviderWrapper(SqlTimestampTypeSerializer::new, SqlTimestampTypeDeserializer::new));
+        
+        if (isClassAvailable("java.sql.Date")) {
+            serializers.put(Date.class, new SerializerProviderWrapper(SqlDateTypeSerializer::new, DateTypeDeserializer::new));
+            serializers.put(java.sql.Date.class,
+                    new SerializerProviderWrapper(SqlDateTypeSerializer::new, SqlDateTypeDeserializer::new));
+            serializers.put(java.sql.Timestamp.class,
+                    new SerializerProviderWrapper(SqlTimestampTypeSerializer::new, SqlTimestampTypeDeserializer::new));
+        } else {
+            serializers.put(Date.class, new SerializerProviderWrapper(DateTypeSerializer::new, DateTypeDeserializer::new));
+        }
+        
         serializers.put(Double.class, new SerializerProviderWrapper(DoubleTypeSerializer::new, DoubleTypeDeserializer::new));
         serializers.put(Double.TYPE, new SerializerProviderWrapper(DoubleTypeSerializer::new, DoubleTypeDeserializer::new));
         serializers.put(Float.class, new SerializerProviderWrapper(FloatTypeSerializer::new, FloatTypeDeserializer::new));
@@ -143,7 +141,7 @@ public class DefaultSerializers {
                         new SerializerProviderWrapper(XMLGregorianCalendarTypeSerializer::new,
                                                       XMLGregorianCalendarTypeDeserializer::new));
 
-        return Collections.unmodifiableMap(serializers);
+        return serializers;
     }
 
     /**
@@ -153,10 +151,10 @@ public class DefaultSerializers {
      * @param <T>   Type of serializer
      * @return serializer if found
      */
-    public <T> Optional<SerializerProviderWrapper> findValueSerializerProvider(Class<T> clazz) {
+    public static <T> Optional<SerializerProviderWrapper> findValueSerializerProvider(Class<T> clazz) {
         Class<?> candidate = clazz;
         do {
-            final SerializerProviderWrapper provider = serializers.get(candidate);
+            final SerializerProviderWrapper provider = SERIALIZERS.get(candidate);
             if (provider != null) {
                 return Optional.of(provider);
             }
@@ -166,16 +164,16 @@ public class DefaultSerializers {
         return findByCondition(clazz);
     }
 
-    private <T> Optional<SerializerProviderWrapper> findByCondition(Class<T> clazz) {
+    private static <T> Optional<SerializerProviderWrapper> findByCondition(Class<T> clazz) {
         if (Enum.class.isAssignableFrom(clazz)) {
-            return Optional.of(enumProvider);
+            return Optional.of(ENUM_PROVIDER);
         } else if (JsonString.class.isAssignableFrom(clazz)) {
-            return Optional.of(serializers.get(JsonString.class));
+            return Optional.of(SERIALIZERS.get(JsonString.class));
         } else if (JsonNumber.class.isAssignableFrom(clazz)) {
-            return Optional.of(serializers.get(JsonNumber.class));
+            return Optional.of(SERIALIZERS.get(JsonNumber.class));
         } else if (JsonValue.class.isAssignableFrom(clazz) && !(
                 JsonObject.class.isAssignableFrom(clazz) || JsonArray.class.isAssignableFrom(clazz))) {
-            return Optional.of(serializers.get(JsonValue.class));
+            return Optional.of(SERIALIZERS.get(JsonValue.class));
         }
         return Optional.empty();
     }
@@ -187,7 +185,7 @@ public class DefaultSerializers {
      * @param clazz class to check
      * @return true if supported
      */
-    public boolean isKnownType(Class<?> clazz) {
+    public static boolean isKnownType(Class<?> clazz) {
         boolean knownContainerValueType = Collection.class.isAssignableFrom(clazz)
                 || Map.class.isAssignableFrom(clazz)
                 || JsonValue.class.isAssignableFrom(clazz)
@@ -196,13 +194,13 @@ public class DefaultSerializers {
 
         return knownContainerValueType || findValueSerializerProvider(clazz).isPresent();
     }
-
-    /**
-     * Singleton instance.
-     *
-     * @return instance
-     */
-    public static DefaultSerializers getInstance() {
-        return INSTANCE;
+    
+    private static boolean isClassAvailable(String className) {
+        try {
+            Class.forName(className);
+            return true;
+        } catch (ClassNotFoundException | LinkageError e) {
+            return false;
+        }
     }
 }

@@ -161,8 +161,7 @@ public class PropertyModel implements Comparable<PropertyModel> {
         }
 
         final Class<?> propertyRawType = ReflectionUtils.getRawType(serializationType);
-        final Optional<SerializerProviderWrapper> valueSerializerProvider = DefaultSerializers.getInstance()
-                .findValueSerializerProvider(propertyRawType);
+        final Optional<SerializerProviderWrapper> valueSerializerProvider = DefaultSerializers.findValueSerializerProvider(propertyRawType);
         if (valueSerializerProvider.isPresent()) {
             return valueSerializerProvider.get().getSerializerProvider().provideSerializer(customization);
         }

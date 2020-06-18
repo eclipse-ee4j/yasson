@@ -93,7 +93,7 @@ public class MappingContext {
                                                       customization,
                                                       parentClassModel,
                                                       jsonbContext.getConfigProperties().getPropertyNamingStrategy());
-            if (!DefaultSerializers.getInstance().isKnownType(aClass)) {
+            if (!DefaultSerializers.isKnownType(aClass)) {
                 classParser.parseProperties(newClassModel, clsElement);
             }
             return newClassModel;
