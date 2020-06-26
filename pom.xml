@@ -63,7 +63,7 @@
         <dependency>
             <groupId>org.jboss.weld.se</groupId>
             <artifactId>weld-se-core</artifactId>
-            <version>4.0.0.Alpha2</version>
+            <version>4.0.0.Alpha3</version>
             <scope>test</scope>
         </dependency>
         <dependency>
