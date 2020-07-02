@@ -13,6 +13,7 @@
 package org.eclipse.yasson.defaultmapping.typeConvertors;
 
 import org.junit.jupiter.api.*;
+
 import static org.junit.jupiter.api.Assertions.*;
 import static org.eclipse.yasson.Jsonbs.*;
 
@@ -22,8 +23,13 @@ import org.eclipse.yasson.defaultmapping.typeConvertors.model.ByteArrayWrapper;
 import org.eclipse.yasson.internal.JsonBindingBuilder;
 
 import jakarta.json.bind.Jsonb;
+import jakarta.json.bind.JsonbBuilder;
 import jakarta.json.bind.JsonbConfig;
 import jakarta.json.bind.config.BinaryDataStrategy;
+
+import java.io.File;
+import java.nio.file.Path;
+import java.nio.file.Paths;
 import java.util.Base64;
 import java.util.UUID;
 
@@ -108,12 +114,31 @@ public class DefaultSerializersTest {
         result = jsonb.fromJson(base64UrlEncodedJson, ByteArrayWrapper.class);
         assertArrayEquals(array, result.array);
     }
-
+    
     @Test
     public void testUUID() {
         UUID uuid = UUID.randomUUID();
         String json = defaultJsonb.toJson(uuid);
         UUID result = defaultJsonb.fromJson(json, UUID.class);
         assertEquals(uuid, result);
+    }
+    
+    @Test
+    public void serializeObjectWithPth() {
+        
+        Path expectedPath = Paths.get("/tmp/hello/me.txt");
+        String expectedPathString = expectedPath.toString().replace("\\", "\\\\");        
+        String expectedJson = "{\"path\":\"" + expectedPathString + "\"}";
+        final ObjectWithPath objectWithPath = new ObjectWithPath();
+        objectWithPath.path = expectedPath;
+        final String s = defaultJsonb.toJson(objectWithPath);
+        assertEquals(expectedJson, s);
+        
+        ObjectWithPath actualObject = defaultJsonb.fromJson(expectedJson, ObjectWithPath.class);
+        assertEquals(expectedPath, actualObject.path);
+    }
+    
+    public static class ObjectWithPath {
+        public Path path;
     }
 }
