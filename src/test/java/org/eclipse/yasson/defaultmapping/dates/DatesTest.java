@@ -416,7 +416,6 @@ public class DatesTest {
     @Test
     public void testMarshalZoneId() {
         assertEquals("{\"value\":\"Europe/Prague\"}", bindingJsonb.toJson(new ScalarValueWrapper<>(ZoneId.of("Europe/Prague"))));
-        assertEquals("\"Z\"", bindingJsonb.toJson(ZoneId.of("UTC")));  // Issue #387
     }
 
     @Test
