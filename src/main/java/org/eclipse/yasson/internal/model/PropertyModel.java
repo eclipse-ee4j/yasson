@@ -12,13 +12,24 @@
 
 package org.eclipse.yasson.internal.model;
 
+import java.lang.invoke.MethodHandle;
+import java.lang.invoke.MethodHandles;
+import java.lang.reflect.AccessibleObject;
+import java.lang.reflect.Field;
+import java.lang.reflect.Method;
+import java.lang.reflect.Modifier;
 import java.lang.reflect.Type;
+import java.security.AccessController;
+import java.security.PrivilegedAction;
 import java.util.EnumSet;
 import java.util.Map;
 import java.util.Objects;
 import java.util.Optional;
+import java.util.function.Predicate;
 
+import jakarta.json.bind.JsonbException;
 import jakarta.json.bind.config.PropertyNamingStrategy;
+import jakarta.json.bind.config.PropertyVisibilityStrategy;
 import jakarta.json.bind.serializer.JsonbSerializer;
 
 import org.eclipse.yasson.internal.AnnotationIntrospector;
@@ -39,8 +50,10 @@ import org.eclipse.yasson.internal.serializer.UserSerializerSerializer;
  * A model for class property.
  * Property is JavaBean alike meta information field / getter / setter of a property in class.
  */
-public class PropertyModel implements Comparable<PropertyModel> {
-
+public final class PropertyModel implements Comparable<PropertyModel> {
+    
+    private static final MethodHandles.Lookup LOOKUP = MethodHandles.lookup();
+    
     /**
      * Field propertyName as in class by java bean convention.
      */
@@ -73,10 +86,18 @@ public class PropertyModel implements Comparable<PropertyModel> {
      */
     private final PropertyCustomization customization;
 
-    private final PropertyValuePropagation propagation;
-
     private final JsonbSerializer<?> propertySerializer;
 
+    private final MethodHandle getValueHandle;
+
+    private final MethodHandle setValueHandle;
+    
+    private final Field field;
+
+    private final Method getter;
+
+    private final Method setter;
+    
     private final Type getterMethodType;
 
     private final Type setterMethodType;
@@ -113,8 +134,13 @@ public class PropertyModel implements Comparable<PropertyModel> {
         if (b.property.getSetter() != null) {
             this.property.setSetter(b.property.getSetter());
         }
-        this.propagation = new ReflectionPropagation(property,
-                classModel.getClassCustomization().getPropertyVisibilityStrategy());
+        this.field = property.getField();
+        this.getter = property.getGetter();
+        this.setter = property.getSetter();
+        
+        PropertyVisibilityStrategy strategy = classModel.getClassCustomization().getPropertyVisibilityStrategy();
+        this.getValueHandle = createReadHandle(field, getter, isMethodVisible(getter, strategy), strategy);
+        this.setValueHandle = createWriteHandle(field, setter, isMethodVisible(setter, strategy), strategy);
         this.propertySerializer = resolveCachedSerializer();
     }
 
@@ -130,14 +156,22 @@ public class PropertyModel implements Comparable<PropertyModel> {
         this.property = property;
         this.propertyName = property.getName();
         this.propertyType = property.getPropertyType();
-        this.propagation = new ReflectionPropagation(property,
-                                                     classModel.getClassCustomization().getPropertyVisibilityStrategy());
-        this.getterMethodType = propagation.isGetterVisible() ? property.getGetterType() : null;
-        this.setterMethodType = propagation.isSetterVisible() ? property.getSetterType() : null;
+        this.field = property.getField();
+        this.getter = property.getGetter();
+        this.setter = property.getSetter();
+        
+        PropertyVisibilityStrategy strategy = classModel.getClassCustomization().getPropertyVisibilityStrategy();
+        boolean getterVisible = isMethodVisible(getter, strategy);
+        boolean setterVisible = isMethodVisible(setter, strategy);
+        
+        this.getValueHandle = createReadHandle(field, getter, getterVisible, strategy);
+        this.setValueHandle = createWriteHandle(field, setter, setterVisible, strategy);
+        this.getterMethodType = getterVisible ? property.getGetterType() : null;
+        this.setterMethodType = setterVisible ? property.getSetterType() : null;
         this.customization = introspectCustomization(property, jsonbContext);
-        this.readName = calculateReadWriteName(customization.getJsonReadName(),
+        this.readName = calculateReadWriteName(customization.getJsonReadName(), propertyName,
                                                jsonbContext.getConfigProperties().getPropertyNamingStrategy());
-        this.writeName = calculateReadWriteName(customization.getJsonWriteName(),
+        this.writeName = calculateReadWriteName(customization.getJsonWriteName(), propertyName,
                                                 jsonbContext.getConfigProperties().getPropertyNamingStrategy());
         this.propertySerializer = resolveCachedSerializer();
     }
@@ -188,7 +222,7 @@ public class PropertyModel implements Comparable<PropertyModel> {
     }
 
     private SerializerBinding<?> getUserSerializerBinding(Property property, JsonbContext jsonbContext) {
-        final SerializerBinding serializerBinding = jsonbContext.getAnnotationIntrospector().getSerializerBinding(property);
+        final SerializerBinding<?> serializerBinding = jsonbContext.getAnnotationIntrospector().getSerializerBinding(property);
         if (serializerBinding != null) {
             return serializerBinding;
         }
@@ -254,10 +288,10 @@ public class PropertyModel implements Comparable<PropertyModel> {
         return builder.buildPropertyCustomization();
     }
 
-    private void introspectDateFormatter(Property property,
-                                         AnnotationIntrospector introspector,
-                                         PropertyCustomizationBuilder builder,
-                                         JsonbContext jsonbContext) {
+    private static void introspectDateFormatter(Property property,
+                                                AnnotationIntrospector introspector,
+                                                PropertyCustomizationBuilder builder,
+                                                JsonbContext jsonbContext) {
         /*
          * If @JsonbDateFormat is placed on getter implementation must use this format on serialization.
          * If @JsonbDateFormat is placed on setter implementation must use this format on deserialization.
@@ -288,9 +322,9 @@ public class PropertyModel implements Comparable<PropertyModel> {
         }
     }
 
-    private void introspectNumberFormatter(Property property,
-                                           AnnotationIntrospector introspector,
-                                           PropertyCustomizationBuilder builder) {
+    private static void introspectNumberFormatter(Property property,
+                                                  AnnotationIntrospector introspector,
+                                                  PropertyCustomizationBuilder builder) {
         /*
          * If @JsonbNumberFormat is placed on getter implementation must use this format on serialization.
          * If @JsonbNumberFormat is placed on setter implementation must use this format on deserialization.
@@ -321,7 +355,7 @@ public class PropertyModel implements Comparable<PropertyModel> {
      * @param collectedAnnotations all targets
      * @param targets              ordered target types by scope
      */
-    private <T> T getTargetForMostPreciseScope(Map<AnnotationTarget, T> collectedAnnotations, AnnotationTarget... targets) {
+    private static <T> T getTargetForMostPreciseScope(Map<AnnotationTarget, T> collectedAnnotations, AnnotationTarget... targets) {
         for (AnnotationTarget target : targets) {
             final T result = collectedAnnotations.get(target);
             if (result != null) {
@@ -338,7 +372,11 @@ public class PropertyModel implements Comparable<PropertyModel> {
      * @return property's value
      */
     public Object getValue(Object object) {
-        return propagation.getValue(object);
+        try {
+            return getValueHandle.invoke(object);
+        } catch (Throwable e) {
+            throw new JsonbException("Error getting value on: " + object, e);
+        }
     }
 
     /**
@@ -353,7 +391,11 @@ public class PropertyModel implements Comparable<PropertyModel> {
         if (!isWritable()) {
             return;
         }
-        propagation.setValue(object, value);
+        try {
+            setValueHandle.invoke(object, value);
+        } catch (Throwable e) {
+            throw new JsonbException("Error getting value on: " + object, e);
+        }
     }
 
     /**
@@ -362,7 +404,7 @@ public class PropertyModel implements Comparable<PropertyModel> {
      * @return true if can be serialized to JSON
      */
     public boolean isReadable() {
-        return !customization.isReadTransient() && propagation.isReadable();
+        return !customization.isReadTransient() && this.getValueHandle != null;
     }
 
     /**
@@ -371,7 +413,7 @@ public class PropertyModel implements Comparable<PropertyModel> {
      * @return true if can be deserialized from JSON
      */
     public boolean isWritable() {
-        return !customization.isWriteTransient() && propagation.isWritable();
+        return !customization.isWriteTransient() && this.setValueHandle != null;
     }
 
     /**
@@ -406,10 +448,7 @@ public class PropertyModel implements Comparable<PropertyModel> {
     @Override
     public int compareTo(PropertyModel o) {
         int compare = readName.compareTo(o.readName);
-        if (compare == 0) {
-            compare = writeName.compareTo(o.writeName);
-        }
-        return compare;
+        return compare == 0 ? writeName.compareTo(o.writeName) : compare;
     }
 
     @Override
@@ -457,16 +496,157 @@ public class PropertyModel implements Comparable<PropertyModel> {
      * Since this is cached for performance reasons strategy has to be consistent
      * with calculated values for same input.
      */
-    private String calculateReadWriteName(String readWriteName, PropertyNamingStrategy strategy) {
+    private static String calculateReadWriteName(String readWriteName, String propertyName, PropertyNamingStrategy strategy) {
         return readWriteName != null ? readWriteName : strategy.translateName(propertyName);
+    }
+    
+    /**
+     * Field of a javabean property.
+     *
+     * @return {@link Field field}
+     */
+    public Field getField() {
+        return field;
     }
 
     /**
-     * Wrapper object of {@code java.lang.reflect} representations of this javabean property.
+     * Setter of a javabean property.
      *
-     * @return Property model
+     * @return {@link Method getter}
      */
-    public PropertyValuePropagation getPropagation() {
-        return propagation;
+    public Method getGetter() {
+        return getter;
+    }
+
+    /**
+     * Getter of a javabean property.
+     *
+     * @return {@link Method setter}
+     */
+    public Method getSetter() {
+        return setter;
+    }
+    
+    // Used in ClassParser
+    public static boolean isPropertyReadable(Field field, Method getter, PropertyVisibilityStrategy strategy) {
+        return createReadHandle(field, getter, isMethodVisible(getter, strategy), strategy) != null;
+    }
+    
+    private static MethodHandle createReadHandle(Field field, Method getter, boolean getterVisible, PropertyVisibilityStrategy strategy) {
+        boolean fieldReadable = field == null || (field.getModifiers() & (Modifier.TRANSIENT | Modifier.STATIC)) == 0;
+        
+        if (fieldReadable) {
+            if (getter != null && getterVisible) {
+                try {
+                    return LOOKUP.unreflect(getter);
+                } catch (Throwable e) {
+                    throw new JsonbException("Error accessing getter '" + getter.getName() + "' declared in '" + getter.getDeclaringClass() + "'", e);
+                }
+            }
+            if (isFieldVisible(field, getter, strategy)) {
+                try {
+                    return LOOKUP.unreflectGetter(field);
+                } catch (IllegalAccessException e) {
+                    throw new JsonbException("Error accessing field '" + field.getName() + "' declared in '" + field.getDeclaringClass() + "'", e);
+                }
+            }
+        }
+        
+        return null;
+    }
+    
+    private static MethodHandle createWriteHandle(Field field, Method setter, boolean setterVisible, PropertyVisibilityStrategy strategy) {
+        boolean fieldWritable = field == null || (field.getModifiers() & (Modifier.TRANSIENT | Modifier.STATIC | Modifier.FINAL)) == 0;
+        
+        if (fieldWritable) {
+            if (setter != null && setterVisible && !setter.getDeclaringClass().isAnonymousClass()) {
+                try {
+                    return LOOKUP.unreflect(setter);
+                } catch (IllegalAccessException e) {
+                    throw new JsonbException("Error accessing setter '" + setter.getName() + "' declared in '" + setter.getDeclaringClass() + "'", e);
+                }
+            }
+            if (isFieldVisible(field, setter, strategy) && !field.getDeclaringClass().isAnonymousClass()) {
+                try {
+                    return LOOKUP.unreflectSetter(field);
+                } catch (IllegalAccessException e) {
+                    throw new JsonbException("Error accessing field '" + field.getName() + "' declared in '" + field.getDeclaringClass() + "'", e);
+                }
+            }
+        }
+        
+        return null;
+    }
+
+    private static boolean isFieldVisible(Field field, Method method, PropertyVisibilityStrategy strategy) {
+        if (field == null) {
+            return false;
+        }
+        boolean accessible = isVisible(strat -> strat.isVisible(field), method, strategy);
+        //overridden by strategy, or anonymous class (readable by spec)
+        if (accessible && (
+                !Modifier.isPublic(field.getModifiers())
+                        || field.getDeclaringClass().isAnonymousClass()
+                        || isNotPublicAndNonNested(field.getDeclaringClass()))) {
+            overrideAccessible(field);
+        }
+        return accessible;
+    }
+
+    private static boolean isNotPublicAndNonNested(Class<?> declaringClass) {
+        return !declaringClass.isMemberClass() && !Modifier.isPublic(declaringClass.getModifiers());
+    }
+
+    private static boolean isMethodVisible(Method method, PropertyVisibilityStrategy strategy) {
+        if (method == null || Modifier.isStatic(method.getModifiers())) {
+            return false;
+        }
+
+        boolean accessible = isVisible(strat -> strat.isVisible(method), method, strategy);
+        //overridden by strategy, anonymous class, or lambda
+        if (accessible && (
+                !Modifier.isPublic(method.getModifiers()) || method.getDeclaringClass().isAnonymousClass() || method
+                        .getDeclaringClass().isSynthetic())) {
+            overrideAccessible(method);
+        }
+        return accessible;
+    }
+
+    private static void overrideAccessible(AccessibleObject accessibleObject) {
+        AccessController.doPrivileged((PrivilegedAction<Void>) () -> {
+            accessibleObject.setAccessible(true);
+            return null;
+        });
+    }
+
+    /**
+     * Look up class and package level @JsonbVisibility, or global config PropertyVisibilityStrategy.
+     * If any is found it is used for resolving visibility by calling provided visibilityCheckFunction.
+     *
+     * @param visibilityCheckFunction function declaring visibility check
+     * @return Optional with result of visibility check, or empty optional if no strategy is found
+     */
+    private static boolean isVisible(Predicate<PropertyVisibilityStrategy> visibilityCheckFunction, Method method, PropertyVisibilityStrategy strategy) {
+        return strategy != null ? visibilityCheckFunction.test(strategy) : visibilityCheckFunction.test(new DefaultVisibilityStrategy(method));
+    }
+
+    private static final class DefaultVisibilityStrategy implements PropertyVisibilityStrategy {
+
+        private final Method method;
+
+        DefaultVisibilityStrategy(Method method) {
+            this.method = method;
+        }
+
+        @Override
+        public boolean isVisible(Field field) {
+            //don't check field if getter is not visible (forced by spec)
+            return (method == null || isVisible(method)) && Modifier.isPublic(field.getModifiers());
+        }
+
+        @Override
+        public boolean isVisible(Method method) {
+            return Modifier.isPublic(method.getModifiers());
+        }
     }
 }
