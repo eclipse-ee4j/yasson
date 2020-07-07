@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2016, 2020 Oracle and/or its affiliates. All rights reserved.
+ * Copyright (c) 2020 IBM and/or its affiliates. All rights reserved.
  *
  * This program and the accompanying materials are made available under the
  * terms of the Eclipse Public License v. 2.0 which is available at
@@ -12,29 +12,20 @@
 
 package org.eclipse.yasson.internal.serializer;
 
-import java.time.ZoneId;
+import java.nio.file.Path;
 
 import javax.json.stream.JsonGenerator;
 
 import org.eclipse.yasson.internal.Marshaller;
 import org.eclipse.yasson.internal.model.customization.Customization;
 
-/**
- * Serializer for {@link ZoneId} type.
- */
-public class ZoneIdTypeSerializer extends AbstractValueTypeSerializer<ZoneId> {
-
-    /**
-     * Creates a new instance.
-     *
-     * @param customization Model customization.
-     */
-    public ZoneIdTypeSerializer(Customization customization) {
+public class PathTypeSerializer extends AbstractValueTypeSerializer<Path> {
+    public PathTypeSerializer(Customization customization) {
         super(customization);
     }
 
     @Override
-    protected void serialize(ZoneId obj, JsonGenerator generator, Marshaller marshaller) {
-        generator.write(obj.getId());
+    protected void serialize(Path obj, JsonGenerator generator, Marshaller marshaller) {
+        generator.write(obj.toString());
     }
 }

@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2016, 2019 Oracle and/or its affiliates. All rights reserved.
+ * Copyright (c) 2016, 2020 Oracle and/or its affiliates. All rights reserved.
  *
  * This program and the accompanying materials are made available under the
  * terms of the Eclipse Public License v. 2.0 which is available at
@@ -12,11 +12,13 @@
 
 package org.eclipse.yasson.serializers;
 
-import org.junit.jupiter.api.*;
-import static org.junit.jupiter.api.Assertions.*;
-import static org.eclipse.yasson.Jsonbs.*;
-
 import static java.util.Collections.singletonMap;
+import static org.eclipse.yasson.Jsonbs.defaultJsonb;
+import static org.eclipse.yasson.Jsonbs.nullableJsonb;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertNull;
+import static org.junit.jupiter.api.Assertions.assertTrue;
+import static org.junit.jupiter.api.Assertions.fail;
 
 import java.io.StringReader;
 import java.lang.reflect.Type;
@@ -39,6 +41,9 @@ import javax.json.bind.JsonbException;
 import javax.json.bind.config.PropertyOrderStrategy;
 import javax.json.bind.serializer.DeserializationContext;
 import javax.json.bind.serializer.JsonbDeserializer;
+import javax.json.bind.serializer.JsonbSerializer;
+import javax.json.bind.serializer.SerializationContext;
+import javax.json.stream.JsonGenerator;
 import javax.json.stream.JsonParser;
 
 import org.eclipse.yasson.TestTypeToken;
@@ -64,6 +69,7 @@ import org.eclipse.yasson.serializers.model.SimpleAnnotatedSerializedArrayContai
 import org.eclipse.yasson.serializers.model.SimpleContainer;
 import org.eclipse.yasson.serializers.model.StringWrapper;
 import org.eclipse.yasson.serializers.model.SupertypeSerializerPojo;
+import org.junit.jupiter.api.Test;
 
 /**
  * @author Roman Grigoriadi
@@ -514,4 +520,81 @@ public class SerializersTest {
         crateInner.crateInnerBigDec = BigDecimal.TEN;
         return crateInner;
     }
+    
+    public static class Foo { }
+
+    public static class Bar extends Foo { }
+    
+    public static class Baz extends Bar { }
+
+    public static class FooSerializer implements JsonbSerializer<Foo> {
+      public void serialize(Foo obj, JsonGenerator generator, SerializationContext ctx) {
+        generator.write("foo");
+      }
+    }
+
+    public static class BazSerializer implements JsonbSerializer<Baz> {
+      public void serialize(Baz obj, JsonGenerator generator, SerializationContext ctx) {
+        generator.write("baz");
+      }
+    }
+    
+    /**
+     * Test for issue: https://github.com/quarkusio/quarkus/issues/8925
+     * Ensure that if multiple customizations (serializer, deserializer, or adapter) are applied 
+     * for different types in the same class hierarchy, we use the customization for the most 
+     * specific type in the class hierarchy.
+     */
+    @Test
+    public void testSerializerMatching() {
+      Jsonb jsonb = JsonbBuilder.create(new JsonbConfig()
+          .withSerializers(new FooSerializer(), new BazSerializer()));
+      assertEquals("\"foo\"", jsonb.toJson(new Foo()));
+      // Since 'Bar' does not have its own serializer, it should use 
+      // the next serializer in the tree (FooSerializer)
+      assertEquals("\"foo\"", jsonb.toJson(new Bar()));
+      assertEquals("\"baz\"", jsonb.toJson(new Baz()));
+    }
+    
+    public static interface One { }
+    public static interface Two { }
+    public static interface Three { }
+    
+    public static class OneTwo implements One, Two { }
+    public static class OneTwoThree implements One, Two, Three { }
+    
+    public static class OneSerializer implements JsonbSerializer<One> {
+      public void serialize(One obj, JsonGenerator generator, SerializationContext ctx) {
+        generator.write("one");
+      }
+    }
+    
+    public static class TwoSerializer implements JsonbSerializer<Two> {
+      public void serialize(Two obj, JsonGenerator generator, SerializationContext ctx) {
+        generator.write("two");
+      }
+    }
+    
+    public static class ThreeSerializer implements JsonbSerializer<Three> {
+      public void serialize(Three obj, JsonGenerator generator, SerializationContext ctx) {
+        generator.write("three");
+      }
+    }
+    
+    @Test
+    public void testSerializerMatchingInterfaces01() {
+      Jsonb jsonb = JsonbBuilder.create(new JsonbConfig()
+          .withSerializers(new OneSerializer(), new TwoSerializer(), new ThreeSerializer()));
+      assertEquals("\"one\"", jsonb.toJson(new OneTwo()));
+      assertEquals("\"one\"", jsonb.toJson(new OneTwoThree()));
+    }
+    
+    @Test
+    public void testSerializerMatchingInterfaces02() {
+      Jsonb jsonb = JsonbBuilder.create(new JsonbConfig()
+          .withSerializers(new ThreeSerializer(), new TwoSerializer()));
+      assertEquals("\"two\"", jsonb.toJson(new OneTwo()));
+      assertEquals("\"two\"", jsonb.toJson(new OneTwoThree()));
+    }
+    
 }
