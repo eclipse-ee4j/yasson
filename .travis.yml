@@ -31,5 +31,5 @@ jobs:
     - stage: install-yasson
       script: mvn -U -C -Pstaging clean install
     - stage: tck-run
-      script: mvn -U -B -Pstaging test
+      script: cd yasson-tck && mvn -U -B -Pstaging test
 
