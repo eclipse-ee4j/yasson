@@ -13,7 +13,13 @@
 package org.eclipse.yasson.customization;
 
 import org.junit.jupiter.api.*;
+
+import jakarta.json.bind.Jsonb;
+import jakarta.json.bind.JsonbBuilder;
+import jakarta.json.bind.annotation.JsonbProperty;
+
 import static org.junit.jupiter.api.Assertions.*;
+
 import static org.eclipse.yasson.Jsonbs.*;
 
 import org.eclipse.yasson.customization.model.JsonbNillableClassSecondLevel;
@@ -77,5 +83,26 @@ public class JsonbNillableTest {
     public void testNillableInConfig() {
         String jsonString = nullableJsonb.toJson(new ScalarValueWrapper<String>(){});
         assertEquals("{\"value\":null}", jsonString);
+    }
+    
+    public static class PrimitiveNullBoolean {
+
+        @JsonbProperty(nillable = true)
+        private Boolean someBoolean;
+
+        void setSomeBoolean(boolean value) { // note that value is a primitive boolean
+            // leaving this empty, exception will be thrown before Yasson gets here.
+        }
+    }
+    
+    /**
+     * Test for issue https://github.com/eclipse-ee4j/yasson/issues/399
+     */
+    @Test
+    public void testNillableSomeBoolean() {
+    	Jsonb jsonb = JsonbBuilder.create();
+        String input = "{\"someBoolean\": null}";
+        PrimitiveNullBoolean deserialized = jsonb.fromJson(input, PrimitiveNullBoolean.class);
+        assertNull(deserialized.someBoolean);
     }
 }
