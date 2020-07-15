@@ -112,19 +112,19 @@ public class DefaultGetterInInterface {
         JsonbContext jsonbContext = new JsonbContext(new JsonbConfig(), JsonProvider.provider());
 
         // direct implementation only (no default implementation)
-        Method pojoGetter = jsonbContext.getMappingContext().getOrCreateClassModel(Pojo.class).getPropertyModel("getterI").getPropagation().getGetter();
+        Method pojoGetter = jsonbContext.getMappingContext().getOrCreateClassModel(Pojo.class).getPropertyModel("getterI").getGetter();
 
         // default implementation
-        Method pojoDefaultOnlyGetter = jsonbContext.getMappingContext().getOrCreateClassModel(PojoWithDefaultOnly.class).getPropertyModel("getterI").getPropagation().getGetter();
+        Method pojoDefaultOnlyGetter = jsonbContext.getMappingContext().getOrCreateClassModel(PojoWithDefaultOnly.class).getPropertyModel("getterI").getGetter();
 
         // default implementation overriden by super class
-        Method pojoDefaultSuperGetter = jsonbContext.getMappingContext().getOrCreateClassModel(PojoWithDefaultSuperImplementation.class).getPropertyModel("getterI").getPropagation().getGetter();
+        Method pojoDefaultSuperGetter = jsonbContext.getMappingContext().getOrCreateClassModel(PojoWithDefaultSuperImplementation.class).getPropertyModel("getterI").getGetter();
 
         // default implementation
-        Method pojoDefaultImplementationGetter = jsonbContext.getMappingContext().getOrCreateClassModel(PojoWithDefaultImplementation.class).getPropertyModel("getterI").getPropagation().getGetter();
+        Method pojoDefaultImplementationGetter = jsonbContext.getMappingContext().getOrCreateClassModel(PojoWithDefaultImplementation.class).getPropertyModel("getterI").getGetter();
 
         // two default implementations
-        Method pojoTwoDefault = jsonbContext.getMappingContext().getOrCreateClassModel(PojoGetterDefaultedTwice.class).getPropertyModel("getterI").getPropagation().getGetter();
+        Method pojoTwoDefault = jsonbContext.getMappingContext().getOrCreateClassModel(PojoGetterDefaultedTwice.class).getPropertyModel("getterI").getGetter();
 
         // assert getters selected by ClassParser
         assertEquals(Pojo.class.getMethod("getGetterI"), pojoGetter);

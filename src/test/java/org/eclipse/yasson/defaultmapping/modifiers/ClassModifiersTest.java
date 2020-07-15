@@ -53,8 +53,9 @@ public class ClassModifiersTest {
         child.id = 1;
         child.name = "SomeName";
         Assertions.shouldFail(() -> defaultJsonb.toJson(child),
-                msg -> msg.contains("Unable to serialize property 'id'") &&
-                msg.contains("java.lang.IllegalAccessException")); 
+                msg -> msg.contains("java.lang.IllegalAccessException") &&
+                       msg.contains("Error accessing field 'id' declared in " +
+                                    "'class org.eclipse.yasson.defaultmapping.modifiers.ClassModifiersTest$NestedPackageParent'"));
     }
 
     private class NestedPrivateParent {
@@ -71,7 +72,9 @@ public class ClassModifiersTest {
         child.id = 1;
         child.name = "SomeName";
         Assertions.shouldFail(() -> defaultJsonb.toJson(child),
-                msg -> msg.contains("java.lang.IllegalAccessException"));
+                msg -> msg.contains("java.lang.IllegalAccessException") &&
+                       msg.contains("Error accessing field 'id' declared in " +
+                                    "'class org.eclipse.yasson.defaultmapping.modifiers.ClassModifiersTest$NestedPrivateParent'"));
     }
 
 
@@ -89,7 +92,9 @@ public class ClassModifiersTest {
         child.id = 1;
         child.name = "SomeName";
         Assertions.shouldFail(() -> defaultJsonb.toJson(child),
-                msg -> msg.contains("java.lang.IllegalAccessException"));
+                msg -> msg.contains("java.lang.IllegalAccessException") &&
+                       msg.contains("Error accessing field 'id' declared in " +
+                                    "'class org.eclipse.yasson.defaultmapping.modifiers.ClassModifiersTest$NestedStaticPackageParent'"));
     }
 
     private static class NestedStaticPrivateParent {
@@ -106,7 +111,8 @@ public class ClassModifiersTest {
         child.id = 1;
         child.name = "SomeName";
         Assertions.shouldFail(() -> defaultJsonb.toJson(child),
-                msg -> msg.contains("java.lang.IllegalAccessException"));
+                msg -> msg.contains("java.lang.IllegalAccessException") &&
+                       msg.contains("Error accessing field 'id' declared in " +
+                                   "'class org.eclipse.yasson.defaultmapping.modifiers.ClassModifiersTest$NestedStaticPrivateParent'"));
     }
-
 }
