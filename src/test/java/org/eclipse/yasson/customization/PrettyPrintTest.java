@@ -27,7 +27,7 @@ public class PrettyPrintTest {
 
     @Test
     public void testPrettyPrint() {
-        assertEquals("\n[\n    \"first\",\n    \"second\"\n]", formattingJsonb.toJson(Arrays.asList("first", "second")));
+        assertEquals("[\n    \"first\",\n    \"second\"\n]", formattingJsonb.toJson(Arrays.asList("first", "second")));
     }
 
     @Test

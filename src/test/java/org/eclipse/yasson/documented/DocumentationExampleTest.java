@@ -140,8 +140,7 @@ public class DocumentationExampleTest {
 
         // Use it!
         String result = formattingJsonb.toJson(pojo);
-        assertEquals("\n" + 
-                "{\n" + 
+        assertEquals("{\n" + 
                 "    \"age\": 4,\n" + 
                 "    \"bitable\": false,\n" + 
                 "    \"name\": \"Falco\"\n" + 
@@ -161,8 +160,7 @@ public class DocumentationExampleTest {
         p.profession = "Super Agent";
         
         String result = formattingJsonb.toJson(p);
-        assertEquals("\n" +
-                "{\n" + 
+        assertEquals("{\n" + 
                 "    \"person-name\": \"Jason Bourne\",\n" + 
                 "    \"profession\": \"Super Agent\"\n" + 
                 "}", result);
@@ -197,8 +195,7 @@ public class DocumentationExampleTest {
         p.profession = "Super Agent";
         
         String result = formattingJsonb.toJson(p);
-        assertEquals("\n" +
-                "{\n" + 
+        assertEquals("{\n" + 
                 "    \"person-name\": \"Jason Bourne\",\n" + 
                 "    \"profession\": \"Super Agent\"\n" + 
                 "}", result);
