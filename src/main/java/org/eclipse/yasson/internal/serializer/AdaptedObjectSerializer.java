@@ -21,10 +21,8 @@ import jakarta.json.bind.serializer.SerializationContext;
 import jakarta.json.stream.JsonGenerator;
 
 import org.eclipse.yasson.internal.Marshaller;
-import org.eclipse.yasson.internal.ProcessingContext;
 import org.eclipse.yasson.internal.components.AdapterBinding;
 import org.eclipse.yasson.internal.model.ClassModel;
-import org.eclipse.yasson.internal.model.JsonbPropertyInfo;
 import org.eclipse.yasson.internal.properties.MessageKeys;
 import org.eclipse.yasson.internal.properties.Messages;
 
@@ -55,7 +53,7 @@ public class AdaptedObjectSerializer<T, A> implements CurrentItem<T>, JsonbSeria
     @Override
     @SuppressWarnings("unchecked")
     public void serialize(T obj, JsonGenerator generator, SerializationContext ctx) {
-        ProcessingContext context = (ProcessingContext) ctx;
+        Marshaller context = (Marshaller) ctx;
         try {
             if (context.addProcessedObject(obj)) {
                 final JsonbAdapter<T, A> adapter = (JsonbAdapter<T, A>) adapterInfo.getAdapter();
@@ -64,8 +62,8 @@ public class AdaptedObjectSerializer<T, A> implements CurrentItem<T>, JsonbSeria
                     generator.writeNull();
                     return;
                 }
-                final JsonbSerializer<A> serializer = resolveSerializer((Marshaller) ctx, adapted);
-                serializer.serialize(adapted, generator, ctx);
+                final JsonbSerializer<A> serializer = resolveSerializer(context, adapted);
+                serializer.serialize(adapted, generator, context);
             } else {
                 throw new JsonbException(Messages.getMessage(MessageKeys.RECURSIVE_REFERENCE, obj.getClass()));
             }
@@ -81,13 +79,9 @@ public class AdaptedObjectSerializer<T, A> implements CurrentItem<T>, JsonbSeria
 
     @SuppressWarnings("unchecked")
     private JsonbSerializer<A> resolveSerializer(Marshaller ctx, A adapted) {
-        final ContainerSerializerProvider cached = ctx.getMappingContext().getSerializerProvider(adapted.getClass());
+        final ContainerSerializerProvider cached = ctx.getJsonbContext().getMappingContext().getSerializerProvider(adapted.getClass());
         if (cached != null) {
-            return (JsonbSerializer<A>) cached.provideSerializer(new JsonbPropertyInfo()
-                                                                         .withWrapper(this)
-                                                                         .withRuntimeType(classModel == null
-                                                                                                  ? null
-                                                                                                  : classModel.getType()));
+            return (JsonbSerializer<A>) cached.provideSerializer(classModel == null ? null : classModel.getType(), this);
         }
         return (JsonbSerializer<A>) new SerializerBuilder(ctx.getJsonbContext())
                 .withObjectClass(adapted.getClass())

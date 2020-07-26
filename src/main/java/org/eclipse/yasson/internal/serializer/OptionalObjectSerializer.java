@@ -24,7 +24,6 @@ import jakarta.json.stream.JsonGenerator;
 
 import org.eclipse.yasson.internal.JsonbContext;
 import org.eclipse.yasson.internal.Marshaller;
-import org.eclipse.yasson.internal.ProcessingContext;
 import org.eclipse.yasson.internal.model.ClassModel;
 import org.eclipse.yasson.internal.model.customization.Customization;
 
@@ -46,16 +45,12 @@ public class OptionalObjectSerializer<T extends Optional<?>> implements CurrentI
      * @param builder Builder to initialize the instance.
      */
     public OptionalObjectSerializer(SerializerBuilder builder) {
+        Type runtimeType = builder.getRuntimeType();
+        
         this.wrapper = builder.getWrapper();
         this.customization = builder.getCustomization();
-        this.optionalValueType = resolveOptionalType(builder.getRuntimeType());
-    }
-
-    private Type resolveOptionalType(Type runtimeType) {
-        if (runtimeType instanceof ParameterizedType) {
-            return ((ParameterizedType) runtimeType).getActualTypeArguments()[0];
-        }
-        return Object.class;
+        this.optionalValueType = runtimeType instanceof ParameterizedType ? ((ParameterizedType) runtimeType).getActualTypeArguments()[0] 
+                                                                          : Object.class;
     }
 
     @Override
@@ -79,7 +74,7 @@ public class OptionalObjectSerializer<T extends Optional<?>> implements CurrentI
 
     @Override
     public void serialize(T obj, JsonGenerator generator, SerializationContext ctx) {
-        JsonbContext jsonbContext = ((ProcessingContext) ctx).getJsonbContext();
+        JsonbContext jsonbContext = ((Marshaller) ctx).getJsonbContext();
         if (handleEmpty(obj, Optional::isPresent, customization, generator, (Marshaller) ctx)) {
             return;
         }

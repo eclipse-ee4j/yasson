@@ -12,7 +12,6 @@
 
 package org.eclipse.yasson.internal.serializer;
 
-import java.lang.reflect.Constructor;
 import java.lang.reflect.Type;
 import java.util.ArrayList;
 import java.util.LinkedHashMap;

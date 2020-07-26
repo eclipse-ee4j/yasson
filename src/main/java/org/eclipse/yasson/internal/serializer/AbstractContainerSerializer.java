@@ -52,10 +52,9 @@ public abstract class AbstractContainerSerializer<T> extends AbstractItem<T> imp
      *
      * @param wrapper     Item to serialize.
      * @param runtimeType Runtime type of the item.
-     * @param classModel  Class model.
      */
-    public AbstractContainerSerializer(CurrentItem<?> wrapper, Type runtimeType, ClassModel classModel) {
-        super(wrapper, runtimeType, classModel);
+    public AbstractContainerSerializer(CurrentItem<?> wrapper, Type runtimeType) {
+        super(wrapper, runtimeType);
     }
 
     /**

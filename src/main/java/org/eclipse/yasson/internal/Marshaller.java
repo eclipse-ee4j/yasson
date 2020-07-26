@@ -14,7 +14,9 @@
 package org.eclipse.yasson.internal;
 
 import java.lang.reflect.Type;
+import java.util.HashSet;
 import java.util.Objects;
+import java.util.Set;
 import java.util.logging.Logger;
 
 import jakarta.json.bind.JsonbException;
@@ -24,7 +26,6 @@ import jakarta.json.stream.JsonGenerationException;
 import jakarta.json.stream.JsonGenerator;
 
 import org.eclipse.yasson.internal.model.ClassModel;
-import org.eclipse.yasson.internal.model.JsonbPropertyInfo;
 import org.eclipse.yasson.internal.properties.MessageKeys;
 import org.eclipse.yasson.internal.properties.Messages;
 import org.eclipse.yasson.internal.serializer.AbstractValueTypeSerializer;
@@ -34,12 +35,20 @@ import org.eclipse.yasson.internal.serializer.SerializerBuilder;
 /**
  * JSONB marshaller. Created each time marshalling operation called.
  */
-public class Marshaller extends ProcessingContext implements SerializationContext {
+public final class Marshaller implements SerializationContext {
 
     private static final Logger LOGGER = Logger.getLogger(Marshaller.class.getName());
 
     private final Type runtimeType;
 
+    private final JsonbContext jsonbContext;
+
+    /**
+     * Used to avoid StackOverflowError, when adapted / serialized object
+     * contains contains instance of its type inside it or when object has recursive reference.
+     */
+    private final Set<Object> currentlyProcessedObjects = new HashSet<>();
+    
     /**
      * Creates Marshaller for generation to String.
      *
@@ -47,7 +56,7 @@ public class Marshaller extends ProcessingContext implements SerializationContex
      * @param rootRuntimeType Type of root object.
      */
     public Marshaller(JsonbContext jsonbContext, Type rootRuntimeType) {
-        super(jsonbContext);
+        this.jsonbContext = jsonbContext;
         this.runtimeType = rootRuntimeType;
     }
 
@@ -57,7 +66,7 @@ public class Marshaller extends ProcessingContext implements SerializationContex
      * @param jsonbContext Current context.
      */
     public Marshaller(JsonbContext jsonbContext) {
-        super(jsonbContext);
+        this.jsonbContext = jsonbContext;
         this.runtimeType = null;
     }
 
@@ -136,11 +145,11 @@ public class Marshaller extends ProcessingContext implements SerializationContex
     @SuppressWarnings("unchecked")
     public <T> void serializeRoot(T root, JsonGenerator generator) {
         if (root == null) {
-            getJsonbContext().getConfigProperties().getNullSerializer().serialize(null, generator, this);
+            jsonbContext.getConfigProperties().getNullSerializer().serialize(null, generator, this);
             return;
         }
         final JsonbSerializer<T> rootSerializer = (JsonbSerializer<T>) getRootSerializer(root.getClass());
-        if (getJsonbContext().getConfigProperties().isStrictIJson()
+        if (jsonbContext.getConfigProperties().isStrictIJson()
                 && rootSerializer instanceof AbstractValueTypeSerializer) {
             throw new JsonbException(Messages.getMessage(MessageKeys.IJSON_ENABLED_SINGLE_VALUE));
         }
@@ -148,19 +157,45 @@ public class Marshaller extends ProcessingContext implements SerializationContex
     }
 
     JsonbSerializer<?> getRootSerializer(Class<?> rootClazz) {
-        final ContainerSerializerProvider serializerProvider = getMappingContext().getSerializerProvider(rootClazz);
+        final ContainerSerializerProvider serializerProvider = jsonbContext.getMappingContext().getSerializerProvider(rootClazz);
         if (serializerProvider != null) {
-            return serializerProvider
-                    .provideSerializer(new JsonbPropertyInfo()
-                                               .withRuntimeType(runtimeType));
+            return serializerProvider.provideSerializer(runtimeType, null);
         }
-        SerializerBuilder serializerBuilder = new SerializerBuilder(getJsonbContext())
+        SerializerBuilder serializerBuilder = new SerializerBuilder(jsonbContext)
                 .withObjectClass(rootClazz)
                 .withType(runtimeType);
 
-        ClassModel classModel = getMappingContext().getOrCreateClassModel(rootClazz);
+        ClassModel classModel = jsonbContext.getMappingContext().getOrCreateClassModel(rootClazz);
         serializerBuilder.withCustomization(classModel.getClassCustomization());
         return serializerBuilder.build();
     }
     
+    /**
+     * Jsonb context.
+     *
+     * @return jsonb context
+     */
+    public JsonbContext getJsonbContext() {
+        return jsonbContext;
+    }
+    
+    /**
+     * Adds currently processed object to the {@link Set}.
+     *
+     * @param object processed object
+     * @return if object was added
+     */
+    public boolean addProcessedObject(Object object) {
+        return this.currentlyProcessedObjects.add(object);
+    }
+
+    /**
+     * Removes processed object from the {@link Set}.
+     *
+     * @param object processed object
+     * @return if object was removed
+     */
+    public boolean removeProcessedObject(Object object) {
+        return currentlyProcessedObjects.remove(object);
+    }
 }

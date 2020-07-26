@@ -23,7 +23,7 @@ import jakarta.json.stream.JsonParser;
 
 import org.eclipse.yasson.internal.JsonbContext;
 import org.eclipse.yasson.internal.JsonbParser;
-import org.eclipse.yasson.internal.ProcessingContext;
+import org.eclipse.yasson.internal.Unmarshaller;
 
 /**
  * Deserialize optional object.
@@ -46,7 +46,7 @@ public class OptionalObjectDeserializer implements JsonbDeserializer<Optional<?>
 
     @Override
     public Optional<?> deserialize(JsonParser parser, DeserializationContext ctx, Type rtType) {
-        JsonbContext jsonbContext = ((ProcessingContext) ctx).getJsonbContext();
+        JsonbContext jsonbContext = ((Unmarshaller) ctx).getJsonbContext();
         final JsonParser.Event lastEvent = ((JsonbParser) parser).getCurrentLevel().getLastEvent();
         if (lastEvent == JsonParser.Event.VALUE_NULL) {
             return Optional.empty();
@@ -56,7 +56,7 @@ public class OptionalObjectDeserializer implements JsonbDeserializer<Optional<?>
         return Optional.of(deserializer.deserialize(parser, ctx, optionalValueType));
     }
 
-    private Type resolveOptionalType(Type runtimeType) {
+    private static Type resolveOptionalType(Type runtimeType) {
         if (runtimeType instanceof ParameterizedType) {
             return ((ParameterizedType) runtimeType).getActualTypeArguments()[0];
         }

@@ -25,7 +25,6 @@ import jakarta.json.stream.JsonGenerator;
 
 import org.eclipse.yasson.internal.Marshaller;
 import org.eclipse.yasson.internal.ReflectionUtils;
-import org.eclipse.yasson.internal.model.ClassModel;
 import org.eclipse.yasson.internal.model.PropertyModel;
 import org.eclipse.yasson.internal.properties.MessageKeys;
 import org.eclipse.yasson.internal.properties.Messages;
@@ -51,10 +50,9 @@ public class ObjectSerializer<T> extends AbstractContainerSerializer<T> {
      *
      * @param wrapper     wrapped item
      * @param runtimeType class type
-     * @param classModel  model of the class
      */
-    public ObjectSerializer(CurrentItem<?> wrapper, Type runtimeType, ClassModel classModel) {
-        super(wrapper, runtimeType, classModel);
+    public ObjectSerializer(Type runtimeType, CurrentItem<?> wrapper) {
+        super(wrapper, runtimeType);
     }
 
     @Override
@@ -62,7 +60,7 @@ public class ObjectSerializer<T> extends AbstractContainerSerializer<T> {
         Marshaller context = (Marshaller) ctx;
         try {
             if (context.addProcessedObject(object)) {
-                final PropertyModel[] allProperties = context.getMappingContext().getOrCreateClassModel(object.getClass())
+                final PropertyModel[] allProperties = context.getJsonbContext().getMappingContext().getOrCreateClassModel(object.getClass())
                         .getSortedProperties();
                 for (PropertyModel model : allProperties) {
                     try {
@@ -122,7 +120,7 @@ public class ObjectSerializer<T> extends AbstractContainerSerializer<T> {
         }
     }
 
-    private boolean isEmptyOptional(Object object) {
+    private static boolean isEmptyOptional(Object object) {
         if (object instanceof Optional) {
             return !((Optional) object).isPresent();
         } else if (object instanceof OptionalInt) {
@@ -134,5 +132,4 @@ public class ObjectSerializer<T> extends AbstractContainerSerializer<T> {
         }
         return false;
     }
-
 }

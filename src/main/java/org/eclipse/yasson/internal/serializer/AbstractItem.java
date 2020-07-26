@@ -54,12 +54,11 @@ public abstract class AbstractItem<T> implements CurrentItem<T> {
      *
      * @param wrapper     Item wrapper.
      * @param runtimeType Runtime type.
-     * @param classModel  Class model.
      */
-    public AbstractItem(CurrentItem<?> wrapper, Type runtimeType, ClassModel classModel) {
+    public AbstractItem(CurrentItem<?> wrapper, Type runtimeType) {
         this.wrapper = wrapper;
         this.runtimeType = runtimeType;
-        this.classModel = classModel;
+        this.classModel = null;
     }
 
     @Override
@@ -76,5 +75,4 @@ public abstract class AbstractItem<T> implements CurrentItem<T> {
     public Type getRuntimeType() {
         return runtimeType;
     }
-
 }

@@ -42,7 +42,7 @@ import org.eclipse.yasson.internal.serializer.ResolvedParameterizedType;
  */
 public final class ReflectionUtils {
 
-    // Global shared Lookup object for MethodHandle stuff
+    /**Global shared Lookup object for MethodHandle stuff.*/
     public static final MethodHandles.Lookup LOOKUP = MethodHandles.lookup();
 
     private static final Logger LOGGER = Logger.getLogger(ReflectionUtils.class.getName());

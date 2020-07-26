@@ -18,8 +18,6 @@ import jakarta.json.bind.serializer.SerializationContext;
 import jakarta.json.stream.JsonGenerator;
 
 import org.eclipse.yasson.internal.Marshaller;
-import org.eclipse.yasson.internal.ProcessingContext;
-import org.eclipse.yasson.internal.model.ClassModel;
 import org.eclipse.yasson.internal.properties.MessageKeys;
 import org.eclipse.yasson.internal.properties.Messages;
 
@@ -32,22 +30,18 @@ public class UserSerializerSerializer<T> implements JsonbSerializer<T> {
 
     private final JsonbSerializer<T> userSerializer;
 
-    private final ClassModel classModel;
-
     /**
      * Create instance of current item with its builder.
      *
-     * @param classModel     model
      * @param userSerializer user serializer
      */
-    public UserSerializerSerializer(ClassModel classModel, JsonbSerializer<T> userSerializer) {
-        this.classModel = classModel;
+    public UserSerializerSerializer(JsonbSerializer<T> userSerializer) {
         this.userSerializer = userSerializer;
     }
 
     @Override
     public void serialize(T obj, JsonGenerator generator, SerializationContext ctx) {
-        ProcessingContext context = (Marshaller) ctx;
+        Marshaller context = (Marshaller) ctx;
         try {
             if (context.addProcessedObject(obj)) {
                 userSerializer.serialize(obj, generator, ctx);
