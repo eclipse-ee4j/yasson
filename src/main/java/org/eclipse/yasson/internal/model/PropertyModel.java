@@ -13,7 +13,6 @@
 package org.eclipse.yasson.internal.model;
 
 import java.lang.invoke.MethodHandle;
-import java.lang.invoke.MethodHandles;
 import java.lang.reflect.AccessibleObject;
 import java.lang.reflect.Field;
 import java.lang.reflect.Method;
@@ -51,8 +50,6 @@ import org.eclipse.yasson.internal.serializer.UserSerializerSerializer;
  * Property is JavaBean alike meta information field / getter / setter of a property in class.
  */
 public final class PropertyModel implements Comparable<PropertyModel> {
-    
-    private static final MethodHandles.Lookup LOOKUP = MethodHandles.lookup();
     
     /**
      * Field propertyName as in class by java bean convention.
@@ -538,14 +535,14 @@ public final class PropertyModel implements Comparable<PropertyModel> {
         if (fieldReadable) {
             if (getter != null && getterVisible) {
                 try {
-                    return LOOKUP.unreflect(getter);
+                    return ReflectionUtils.LOOKUP.unreflect(getter);
                 } catch (Throwable e) {
                     throw new JsonbException("Error accessing getter '" + getter.getName() + "' declared in '" + getter.getDeclaringClass() + "'", e);
                 }
             }
             if (isFieldVisible(field, getter, strategy)) {
                 try {
-                    return LOOKUP.unreflectGetter(field);
+                    return ReflectionUtils.LOOKUP.unreflectGetter(field);
                 } catch (IllegalAccessException e) {
                     throw new JsonbException("Error accessing field '" + field.getName() + "' declared in '" + field.getDeclaringClass() + "'", e);
                 }
@@ -561,14 +558,14 @@ public final class PropertyModel implements Comparable<PropertyModel> {
         if (fieldWritable) {
             if (setter != null && setterVisible && !setter.getDeclaringClass().isAnonymousClass()) {
                 try {
-                    return LOOKUP.unreflect(setter);
+                    return ReflectionUtils.LOOKUP.unreflect(setter);
                 } catch (IllegalAccessException e) {
                     throw new JsonbException("Error accessing setter '" + setter.getName() + "' declared in '" + setter.getDeclaringClass() + "'", e);
                 }
             }
             if (isFieldVisible(field, setter, strategy) && !field.getDeclaringClass().isAnonymousClass()) {
                 try {
-                    return LOOKUP.unreflectSetter(field);
+                    return ReflectionUtils.LOOKUP.unreflectSetter(field);
                 } catch (IllegalAccessException e) {
                     throw new JsonbException("Error accessing field '" + field.getName() + "' declared in '" + field.getDeclaringClass() + "'", e);
                 }

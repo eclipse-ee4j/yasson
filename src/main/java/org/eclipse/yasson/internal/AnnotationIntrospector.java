@@ -581,8 +581,7 @@ public class AnnotationIntrospector {
             visibilityAnnotation = findAnnotation(clazz.getPackage().getDeclaredAnnotations(), JsonbVisibility.class);
         }
         if (visibilityAnnotation != null) {
-            return ReflectionUtils.createNoArgConstructorInstance(
-                    ReflectionUtils.getDefaultConstructor(visibilityAnnotation.value(), true));
+            return ReflectionUtils.createNoArgConstructorInstance(visibilityAnnotation.value());
         }
         return jsonbContext.getConfigProperties().getPropertyVisibilityStrategy();
     }

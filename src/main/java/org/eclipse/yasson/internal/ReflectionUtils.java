@@ -12,9 +12,10 @@
 
 package org.eclipse.yasson.internal;
 
+import java.lang.invoke.MethodHandle;
+import java.lang.invoke.MethodHandles;
 import java.lang.reflect.Constructor;
 import java.lang.reflect.GenericArrayType;
-import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Modifier;
 import java.lang.reflect.ParameterizedType;
 import java.lang.reflect.Type;
@@ -25,6 +26,7 @@ import java.security.PrivilegedAction;
 import java.util.Arrays;
 import java.util.Objects;
 import java.util.Optional;
+import java.util.concurrent.ConcurrentHashMap;
 import java.util.logging.Logger;
 
 import jakarta.json.bind.JsonbException;
@@ -38,12 +40,17 @@ import org.eclipse.yasson.internal.serializer.ResolvedParameterizedType;
 /**
  * Utility class for resolution of generics during unmarshalling.
  */
-public class ReflectionUtils {
+public final class ReflectionUtils {
+
+    // Global shared Lookup object for MethodHandle stuff
+    public static final MethodHandles.Lookup LOOKUP = MethodHandles.lookup();
 
     private static final Logger LOGGER = Logger.getLogger(ReflectionUtils.class.getName());
+    
+    // Global shared cache for default constructors
+    private static final ConcurrentHashMap<Class<?>, MethodHandle> DEFAULT_CONSTRUCTOR_CACHE = new ConcurrentHashMap<>();
 
     private ReflectionUtils() {
-        throw new IllegalStateException("Utility classes should not be instantiated.");
     }
 
     /**
@@ -215,42 +222,29 @@ public class ReflectionUtils {
     /**
      * Create instance with constructor.
      *
-     * @param constructor const not null
+     * @param clazz Class
      * @param <T>         type of instance
      * @return instance
      */
-    public static <T> T createNoArgConstructorInstance(Constructor<T> constructor) {
-        Objects.requireNonNull(constructor);
+    public static <T> T createNoArgConstructorInstance(Class<?> clazz) {
         try {
-            return constructor.newInstance();
-        } catch (InstantiationException | IllegalAccessException | InvocationTargetException e) {
+            return (T) DEFAULT_CONSTRUCTOR_CACHE.computeIfAbsent(Objects.requireNonNull(clazz), ReflectionUtils::createDefaultConstructorHandle)
+                                                .invoke();
+        } catch (Throwable e) {
             throw new JsonbException("Can't create instance", e);
         }
     }
-
-    /**
-     * Get default no argument constructor of the class.
-     *
-     * @param clazz    Class to get constructor from
-     * @param <T>      Class generic type
-     * @param required if true, throws an exception if the default constructor is missing.
-     *                 If false, returns null in that case
-     * @return the constructor of the class, or null. Depending on required.
-     */
-    public static <T> Constructor<T> getDefaultConstructor(Class<T> clazz, boolean required) {
-        Objects.requireNonNull(clazz);
-        return AccessController.doPrivileged((PrivilegedAction<Constructor<T>>) () -> {
+    
+    private static MethodHandle createDefaultConstructorHandle(Class<?> clazz) {
+        return AccessController.doPrivileged((PrivilegedAction<MethodHandle>) () -> {
             try {
-                final Constructor<T> declaredConstructor = clazz.getDeclaredConstructor();
+                Constructor<?> declaredConstructor = clazz.getDeclaredConstructor();
                 if (declaredConstructor.getModifiers() == Modifier.PROTECTED) {
                     declaredConstructor.setAccessible(true);
                 }
-                return declaredConstructor;
-            } catch (NoSuchMethodException | RuntimeException e) {
-                if (required) {
-                    throw new JsonbException(Messages.getMessage(MessageKeys.NO_DEFAULT_CONSTRUCTOR, clazz), e);
-                }
-                return null;
+                return LOOKUP.unreflectConstructor(declaredConstructor);
+            } catch (NoSuchMethodException | RuntimeException | IllegalAccessException e) {
+                throw new JsonbException(Messages.getMessage(MessageKeys.NO_DEFAULT_CONSTRUCTOR, clazz), e);
             }
         });
     }

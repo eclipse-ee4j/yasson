@@ -12,7 +12,6 @@
 
 package org.eclipse.yasson.internal;
 
-import java.lang.reflect.Constructor;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.HashSet;
@@ -63,12 +62,10 @@ public class InstanceCreator {
         Supplier<T> creator = CREATORS.get(tClass);
         //No worries for race conditions here, instance may be replaced during first attempt.
         if (creator == null) {
-            Constructor<T> constructor = ReflectionUtils.getDefaultConstructor(tClass, true);
-            creator = () -> ReflectionUtils.createNoArgConstructorInstance(constructor);
+            creator = () -> ReflectionUtils.createNoArgConstructorInstance(tClass);
             CREATORS.put(tClass, creator);
         }
 
         return creator.get();
     }
-
 }

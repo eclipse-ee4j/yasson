@@ -96,11 +96,7 @@ class ObjectDeserializer<T> extends AbstractContainerDeserializer<T> {
         if (creator != null) {
             instance = createInstance((Class<T>) rawType, creator);
         } else {
-            Constructor<T> defaultConstructor = (Constructor<T>) getClassModel().getDefaultConstructor();
-            if (defaultConstructor == null) {
-                throw new JsonbException(Messages.getMessage(MessageKeys.NO_DEFAULT_CONSTRUCTOR, rawType));
-            }
-            instance = ReflectionUtils.createNoArgConstructorInstance(defaultConstructor);
+            instance = ReflectionUtils.createNoArgConstructorInstance(getClassModel().getType());
         }
         //values must be set in order, in which they appears in JSON by spec
         values.forEach((key, wrapper) -> {
