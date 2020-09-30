@@ -13,11 +13,12 @@
 module org.eclipse.yasson {
     requires jakarta.json;
     requires jakarta.json.bind;
-    requires static java.naming;
     requires java.logging;
+    requires static java.naming;
     requires static java.sql;
     requires static java.desktop;
-    
+    requires static jakarta.cdi;
+
     exports org.eclipse.yasson;
     exports org.eclipse.yasson.spi;
     provides jakarta.json.bind.spi.JsonbProvider with org.eclipse.yasson.JsonBindingProvider;

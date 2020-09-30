@@ -10,8 +10,8 @@
   <version>1.0.0-SNAPSHOT</version>
 
   <properties>
-    <jsonb.version>2.0.0-SNAPSHOT</jsonb.version>
-    <yasson.version>2.0.0-SNAPSHOT</yasson.version>
+    <jsonb.tck.version>2.0.0-SNAPSHOT</jsonb.tck.version>
+    <yasson.version>2.0.1-SNAPSHOT</yasson.version>
   </properties>
   
   <!-- TODO: Temporarily enable snapshot repository -->
@@ -27,7 +27,7 @@
     <dependency>
       <groupId>jakarta.json.bind</groupId>
       <artifactId>jakarta.json.bind-tck</artifactId>
-      <version>${jsonb.version}</version>
+      <version>${jsonb.tck.version}</version>
       <scope>test</scope>
     </dependency>
     <dependency>
@@ -45,7 +45,7 @@
     <dependency>
         <groupId>org.jboss.weld.se</groupId>
         <artifactId>weld-se-core</artifactId>
-        <version>4.0.0.Alpha2</version>
+        <version>4.0.0.Beta1</version>
         <scope>test</scope>
     </dependency>
   </dependencies>
