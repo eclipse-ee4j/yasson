@@ -19,7 +19,7 @@
   <repositories>
     <repository>
         <id>jakarta-snapshots</id>
-        <url>https://jakarta.oss.sonatype.org/content/repositories/snapshots/</url>
+        <url>https://jakarta.oss.sonatype.org/content/repositories/staging/</url>
     </repository>
   </repositories>
 
