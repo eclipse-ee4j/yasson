@@ -394,7 +394,7 @@ public final class PropertyModel implements Comparable<PropertyModel> {
         try {
             setValueHandle.invoke(object, value);
         } catch (Throwable e) {
-            throw new JsonbException("Error getting value on: " + object, e);
+            throw new JsonbException("Error setting value on: " + object, e);
         }
     }
 
