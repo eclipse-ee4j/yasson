@@ -36,7 +36,7 @@ String result = jsonb.toJson(someObject);
 Something not working right? Have an idea for an enhancement? Get in touch with the Yasson community in the following ways:
 
 - [Gitter](https://gitter.im/eclipse/yasson): a free instant-messaging platform (similar to Slack) that anyone can join.
-- [Stackoverflow](https://stackoverflow.com/questions/tagged/yasson): As a quesiton tagged `[jsonb-api]` and `[yasson]`
+- [Stackoverflow](https://stackoverflow.com/questions/tagged/yasson): As a question tagged `[jsonb-api]` and `[yasson]`
 - [Github Issues](https://github.com/eclipse-ee4j/yasson/issues/new): Open issues for enhancement ideas or bug reports
 
 ## Licenses
