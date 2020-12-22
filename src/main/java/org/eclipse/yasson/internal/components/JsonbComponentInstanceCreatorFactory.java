@@ -135,7 +135,7 @@ public class JsonbComponentInstanceCreatorFactory {
             throw e;
         } catch (ReflectiveOperationException e) {
             //likely no CDI container is running or bean manager JNDI lookup fails.
-        	LOGGER.log(Level.FINEST, Messages.getMessage(MessageKeys.NO_CDI_ENVIRONMENT), e);
+            LOGGER.log(Level.FINEST, Messages.getMessage(MessageKeys.NO_CDI_ENVIRONMENT), e);
             return null;
         }
     }
