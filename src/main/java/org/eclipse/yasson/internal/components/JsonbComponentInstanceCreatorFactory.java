@@ -16,6 +16,7 @@ import java.lang.reflect.Constructor;
 import java.lang.reflect.Method;
 import java.security.AccessController;
 import java.security.PrivilegedAction;
+import java.util.logging.Level;
 import java.util.logging.Logger;
 
 import jakarta.json.bind.JsonbException;
@@ -134,10 +135,7 @@ public class JsonbComponentInstanceCreatorFactory {
             throw e;
         } catch (ReflectiveOperationException e) {
             //likely no CDI container is running or bean manager JNDI lookup fails.
-            if (e.getCause() != null) {
-                LOGGER.finest(e.getMessage());
-            }
-            LOGGER.finest(Messages.getMessage(MessageKeys.NO_CDI_ENVIRONMENT));
+            LOGGER.log(Level.FINEST, Messages.getMessage(MessageKeys.NO_CDI_ENVIRONMENT), e);
             return null;
         }
     }
