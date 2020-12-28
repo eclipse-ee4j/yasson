@@ -51,9 +51,9 @@ import org.eclipse.yasson.internal.serializer.UserSerializerSerializer;
  * Property is JavaBean alike meta information field / getter / setter of a property in class.
  */
 public final class PropertyModel implements Comparable<PropertyModel> {
-    
+
     private static final MethodHandles.Lookup LOOKUP = MethodHandles.lookup();
-    
+
     /**
      * Field propertyName as in class by java bean convention.
      */
@@ -78,7 +78,7 @@ public final class PropertyModel implements Comparable<PropertyModel> {
      * Model of the class this field belongs to.
      */
     private final ClassModel classModel;
-    
+
     private final Property property;
 
     /**
@@ -91,17 +91,17 @@ public final class PropertyModel implements Comparable<PropertyModel> {
     private final MethodHandle getValueHandle;
 
     private final MethodHandle setValueHandle;
-    
+
     private final Field field;
 
     private final Method getter;
 
     private final Method setter;
-    
+
     private final Type getterMethodType;
 
     private final Type setterMethodType;
-    
+
     /**
      * Create a new PropertyModel that merges two existing PropertyModel that have identical read/write names.
      * The input PropertyModel objects MUST be equal (a.equals(b) == true)
@@ -112,7 +112,7 @@ public final class PropertyModel implements Comparable<PropertyModel> {
         if (!a.equals(b)) {
             throw new IllegalStateException("Property models " + a + " and " + b + " cannot be merged");
         }
-        
+
         // Initial cloning steps
         this.classModel = a.classModel;
         this.propertyName = a.propertyName;
@@ -120,7 +120,7 @@ public final class PropertyModel implements Comparable<PropertyModel> {
         this.writeName = a.writeName;
         this.propertyType = a.propertyType;
         this.customization = a.customization;
-        
+
         // Merging steps
         this.getterMethodType = a.getterMethodType != null ? a.getterMethodType : b.getterMethodType;
         this.setterMethodType = a.setterMethodType != null ? a.setterMethodType : b.setterMethodType;
@@ -137,7 +137,7 @@ public final class PropertyModel implements Comparable<PropertyModel> {
         this.field = property.getField();
         this.getter = property.getGetter();
         this.setter = property.getSetter();
-        
+
         PropertyVisibilityStrategy strategy = classModel.getClassCustomization().getPropertyVisibilityStrategy();
         this.getValueHandle = createReadHandle(field, getter, isMethodVisible(getter, strategy), strategy);
         this.setValueHandle = createWriteHandle(field, setter, isMethodVisible(setter, strategy), strategy);
@@ -159,16 +159,16 @@ public final class PropertyModel implements Comparable<PropertyModel> {
         this.field = property.getField();
         this.getter = property.getGetter();
         this.setter = property.getSetter();
-        
+
         PropertyVisibilityStrategy strategy = classModel.getClassCustomization().getPropertyVisibilityStrategy();
         boolean getterVisible = isMethodVisible(getter, strategy);
         boolean setterVisible = isMethodVisible(setter, strategy);
-        
+
         this.getValueHandle = createReadHandle(field, getter, getterVisible, strategy);
         this.setValueHandle = createWriteHandle(field, setter, setterVisible, strategy);
         this.getterMethodType = getterVisible ? property.getGetterType() : null;
         this.setterMethodType = setterVisible ? property.getSetterType() : null;
-        this.customization = introspectCustomization(property, jsonbContext);
+        this.customization = introspectCustomization(property, jsonbContext, classModel);
         this.readName = calculateReadWriteName(customization.getJsonReadName(), propertyName,
                                                jsonbContext.getConfigProperties().getPropertyNamingStrategy());
         this.writeName = calculateReadWriteName(customization.getJsonWriteName(), propertyName,
@@ -229,11 +229,28 @@ public final class PropertyModel implements Comparable<PropertyModel> {
         return jsonbContext.getComponentMatcher().getSerializerBinding(getPropertySerializationType(), null).orElse(null);
     }
 
-    private PropertyCustomization introspectCustomization(Property property, JsonbContext jsonbContext) {
+    private PropertyCustomization introspectCustomization(Property property, JsonbContext jsonbContext, ClassModel model) {
         final AnnotationIntrospector introspector = jsonbContext.getAnnotationIntrospector();
         final PropertyCustomizationBuilder builder = new PropertyCustomizationBuilder();
         //drop all other annotations for transient properties
         EnumSet<AnnotationTarget> transientInfo = introspector.getJsonbTransientCategorized(property);
+
+        ClassModel optionalParentClassModel = model.getParentClassModel();
+        if (optionalParentClassModel != null) {
+            Map<String, PropertyModel> parentClassProperties = optionalParentClassModel.getProperties();
+            PropertyModel optionalParentClassProp = parentClassProperties.get(property.getName());
+
+            if (optionalParentClassProp != null) {
+                if (optionalParentClassProp.customization.isReadTransient()) {
+                    transientInfo.add(AnnotationTarget.GETTER);
+                }
+
+                if (optionalParentClassProp.customization.isWriteTransient()) {
+                    transientInfo.add(AnnotationTarget.SETTER);
+                }
+            }
+        }
+
         if (transientInfo.size() != 0) {
             builder.setReadTransient(transientInfo.contains(AnnotationTarget.GETTER));
             builder.setWriteTransient(transientInfo.contains(AnnotationTarget.SETTER));
@@ -499,7 +516,7 @@ public final class PropertyModel implements Comparable<PropertyModel> {
     private static String calculateReadWriteName(String readWriteName, String propertyName, PropertyNamingStrategy strategy) {
         return readWriteName != null ? readWriteName : strategy.translateName(propertyName);
     }
-    
+
     /**
      * Field of a javabean property.
      *
@@ -526,15 +543,15 @@ public final class PropertyModel implements Comparable<PropertyModel> {
     public Method getSetter() {
         return setter;
     }
-    
+
     // Used in ClassParser
     public static boolean isPropertyReadable(Field field, Method getter, PropertyVisibilityStrategy strategy) {
         return createReadHandle(field, getter, isMethodVisible(getter, strategy), strategy) != null;
     }
-    
+
     private static MethodHandle createReadHandle(Field field, Method getter, boolean getterVisible, PropertyVisibilityStrategy strategy) {
         boolean fieldReadable = field == null || (field.getModifiers() & (Modifier.TRANSIENT | Modifier.STATIC)) == 0;
-        
+
         if (fieldReadable) {
             if (getter != null && getterVisible) {
                 try {
@@ -551,13 +568,13 @@ public final class PropertyModel implements Comparable<PropertyModel> {
                 }
             }
         }
-        
+
         return null;
     }
-    
+
     private static MethodHandle createWriteHandle(Field field, Method setter, boolean setterVisible, PropertyVisibilityStrategy strategy) {
         boolean fieldWritable = field == null || (field.getModifiers() & (Modifier.TRANSIENT | Modifier.STATIC | Modifier.FINAL)) == 0;
-        
+
         if (fieldWritable) {
             if (setter != null && setterVisible && !setter.getDeclaringClass().isAnonymousClass()) {
                 try {
@@ -574,7 +591,7 @@ public final class PropertyModel implements Comparable<PropertyModel> {
                 }
             }
         }
-        
+
         return null;
     }
 

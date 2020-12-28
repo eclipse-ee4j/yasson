@@ -167,4 +167,11 @@ public class JsonbTransientTest {
         TransientGetterNoField pojo = new TransientGetterNoField();
         assertEquals("{}", defaultJsonb.toJson(pojo));
     }
+
+    // Issue #454
+    @Test
+    public void testTransientPropertyInSubclass() {
+        TransientPropertyChildClass inst = new TransientPropertyChildClass();
+        assertEquals("{\"field2\":\"bbb\"}", defaultJsonb.toJson(inst));
+    }
 }
