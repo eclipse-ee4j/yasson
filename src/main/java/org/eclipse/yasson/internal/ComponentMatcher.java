@@ -15,11 +15,11 @@ package org.eclipse.yasson.internal;
 import java.lang.reflect.ParameterizedType;
 import java.lang.reflect.Type;
 import java.lang.reflect.TypeVariable;
-import java.util.Objects;
-import java.util.Optional;
+import java.util.*;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ConcurrentMap;
 import java.util.function.Function;
+import java.util.stream.Collectors;
 
 import jakarta.json.bind.JsonbConfig;
 import jakarta.json.bind.adapter.JsonbAdapter;
@@ -206,7 +206,7 @@ public class ComponentMatcher {
         if (runtimeType instanceof Class) {
             Class<?> runtimeClass = (Class<?>) runtimeType;
             // Check if any interfaces have a match
-            for (Class<?> ifc : runtimeClass.getInterfaces()) {
+            for (Class<?> ifc : getInterfaces(runtimeClass)) {
                 ComponentBindings ifcBinding = userComponents.get(ifc);
                 if (ifcBinding != null) {
                   Optional<T> match = getMatchingBinding(ifc, ifcBinding, supplier);
@@ -217,16 +217,60 @@ public class ComponentMatcher {
             }
             
             // check if the superclass has a match
-            Class<?> superClass = runtimeClass.getSuperclass();
-            if (superClass != null && superClass != Object.class) {
-                Optional<T> superBinding = searchComponentBinding(superClass, supplier);
-                if (superBinding.isPresent()) {
-                    return superBinding;
+            for(Class<?> superClass : getSuperclasses(runtimeClass)) {
+                if (superClass != Object.class) {
+                    Optional<T> superBinding = searchComponentBinding(superClass, supplier);
+                    if (superBinding.isPresent()) {
+                        return superBinding;
+                    }
                 }
             }
         }
         
         return Optional.empty();
+    }
+
+    /**
+     * List all interfaces and super-interfaces (recursively) of a class.
+     * Interfaces are listed with direct parents first, then parents of those parents, then parents of those, and so on
+     *
+     * @param runtimeClass
+     *     The class to return interfaces of
+     * @return
+     *     List of Interfaces, or an empty list if there are no interfaces
+     */
+    static List<Class<?>> getInterfaces(Class<?> runtimeClass){
+        List<Class<?>> interfaces = new ArrayList<>(Arrays.asList(runtimeClass.getInterfaces()));
+
+        interfaces.addAll(interfaces.stream()
+          .flatMap(c -> getInterfaces(c).stream())
+          .collect(Collectors.toList()));
+
+        return interfaces;
+    }
+
+    /**
+     * List all superclasses of a class (recursively)
+     * Classes are listed in order starting with the direct parent
+     *
+     * @param runtimeClass
+     *     The class to return superclasses of
+     * @return
+     *     List of Superclasses
+     */
+    static List<Class<?>> getSuperclasses(Class<?> runtimeClass){
+        List<Class<?>> superclasses = new ArrayList<>();
+
+        Class<?> superclass = runtimeClass;
+        while(true){
+            superclass = superclass.getSuperclass();
+            if(superclass == null)
+                break;
+
+            superclasses.add(superclass);
+        }
+
+        return superclasses;
     }
     
     private <T> Optional<T> getMatchingBinding(Type runtimeType, ComponentBindings binding, Function<ComponentBindings, T> supplier) {
