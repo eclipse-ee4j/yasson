@@ -15,7 +15,11 @@ package org.eclipse.yasson.internal;
 import java.lang.reflect.ParameterizedType;
 import java.lang.reflect.Type;
 import java.lang.reflect.TypeVariable;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.List;
+import java.util.Objects;
+import java.util.Optional;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ConcurrentMap;
 import java.util.function.Function;
@@ -217,7 +221,7 @@ public class ComponentMatcher {
             }
             
             // check if the superclass has a match
-            for(Class<?> superClass : getSuperclasses(runtimeClass)) {
+            for (Class<?> superClass : getSuperclasses(runtimeClass)) {
                 if (superClass != Object.class) {
                     Optional<T> superBinding = searchComponentBinding(superClass, supplier);
                     if (superBinding.isPresent()) {
@@ -250,7 +254,7 @@ public class ComponentMatcher {
     }
 
     /**
-     * List all superclasses of a class (recursively)
+     * List all superclasses of a class (recursively).
      * Classes are listed in order starting with the direct parent
      *
      * @param runtimeClass
@@ -262,10 +266,11 @@ public class ComponentMatcher {
         List<Class<?>> superclasses = new ArrayList<>();
 
         Class<?> superclass = runtimeClass;
-        while(true){
+        while (true) {
             superclass = superclass.getSuperclass();
-            if(superclass == null)
+            if (superclass == null) {
                 break;
+            }
 
             superclasses.add(superclass);
         }
