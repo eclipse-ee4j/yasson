@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2015, 2020 Oracle and/or its affiliates. All rights reserved.
+ * Copyright (c) 2015, 2021 Oracle and/or its affiliates. All rights reserved.
  *
  * This program and the accompanying materials are made available under the
  * terms of the Eclipse Public License v. 2.0 which is available at
@@ -536,6 +536,7 @@ public final class PropertyModel implements Comparable<PropertyModel> {
         boolean fieldReadable = field == null || (field.getModifiers() & (Modifier.TRANSIENT | Modifier.STATIC)) == 0;
         
         if (fieldReadable) {
+            ModulesUtil.addModuleRead(field);
             if (getter != null && getterVisible) {
                 try {
                     return LOOKUP.unreflect(getter);
@@ -559,6 +560,7 @@ public final class PropertyModel implements Comparable<PropertyModel> {
         boolean fieldWritable = field == null || (field.getModifiers() & (Modifier.TRANSIENT | Modifier.STATIC | Modifier.FINAL)) == 0;
         
         if (fieldWritable) {
+            ModulesUtil.addModuleRead(field);
             if (setter != null && setterVisible && !setter.getDeclaringClass().isAnonymousClass()) {
                 try {
                     return LOOKUP.unreflect(setter);
