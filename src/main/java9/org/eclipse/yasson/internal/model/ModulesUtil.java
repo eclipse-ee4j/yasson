@@ -12,16 +12,14 @@
 
 package org.eclipse.yasson.internal.model;
 
-import java.lang.reflect.Field;
+import java.lang.invoke.MethodHandles;
 
 class ModulesUtil {
     
     private ModulesUtil() {
     }
 
-    static void addModuleRead(Field field) {
-        if (field != null) {
-            ModulesUtil.class.getModule().addReads(field.getDeclaringClass().getModule());
-        }
+    static MethodHandles.Lookup lookup(){
+        return MethodHandles.publicLookup();
     }
 }

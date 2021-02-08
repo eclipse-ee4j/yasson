@@ -52,7 +52,7 @@ import org.eclipse.yasson.internal.serializer.UserSerializerSerializer;
  */
 public final class PropertyModel implements Comparable<PropertyModel> {
     
-    private static final MethodHandles.Lookup LOOKUP = MethodHandles.lookup();
+    private static final MethodHandles.Lookup LOOKUP = ModulesUtil.lookup();
     
     /**
      * Field propertyName as in class by java bean convention.
@@ -536,7 +536,6 @@ public final class PropertyModel implements Comparable<PropertyModel> {
         boolean fieldReadable = field == null || (field.getModifiers() & (Modifier.TRANSIENT | Modifier.STATIC)) == 0;
         
         if (fieldReadable) {
-            ModulesUtil.addModuleRead(field);
             if (getter != null && getterVisible) {
                 try {
                     return LOOKUP.unreflect(getter);
@@ -560,7 +559,6 @@ public final class PropertyModel implements Comparable<PropertyModel> {
         boolean fieldWritable = field == null || (field.getModifiers() & (Modifier.TRANSIENT | Modifier.STATIC | Modifier.FINAL)) == 0;
         
         if (fieldWritable) {
-            ModulesUtil.addModuleRead(field);
             if (setter != null && setterVisible && !setter.getDeclaringClass().isAnonymousClass()) {
                 try {
                     return LOOKUP.unreflect(setter);
