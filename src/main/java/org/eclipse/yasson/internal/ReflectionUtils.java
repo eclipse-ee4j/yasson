@@ -62,6 +62,20 @@ public class ReflectionUtils {
             return Optional.of((Class<?>) ((ParameterizedType) type).getRawType());
         } else if (type instanceof GenericArrayType) {
             return Optional.of(((GenericArrayType) type).getClass());
+        } else if (type instanceof TypeVariable) {
+            TypeVariable<?> typeVariable = TypeVariable.class.cast(type);
+            if (Objects.nonNull(typeVariable.getBounds())) {
+                Optional<Class<?>> specializedClass = Optional.empty();
+                for (Type bound : typeVariable.getBounds()) {
+                    Optional<Class<?>> boundRawType = getOptionalRawType(bound);
+                    if (boundRawType.isPresent() && !Object.class.equals(boundRawType.get())) {
+                        if (!specializedClass.isPresent() || specializedClass.get().isAssignableFrom(boundRawType.get())) {
+                            specializedClass = Optional.of(boundRawType.get());
+                        }
+                    }
+                }
+                return specializedClass;
+            }
         }
         return Optional.empty();
     }
@@ -152,6 +166,11 @@ public class ReflectionUtils {
      */
     static Type resolveItemVariableType(RuntimeTypeInfo item, TypeVariable<?> typeVariable, boolean warn) {
         if (item == null) {
+            Optional<Class<?>> optionalRawType = getOptionalRawType(typeVariable);
+            if (optionalRawType.isPresent()) {
+                return optionalRawType.get();
+            }
+            
             //Bound not found, treat it as an Object.class
             if (warn) {
                 LOGGER.warning(Messages.getMessage(MessageKeys.GENERIC_BOUND_NOT_FOUND,
