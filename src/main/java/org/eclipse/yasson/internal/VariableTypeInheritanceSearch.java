@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2015, 2019 Oracle and/or its affiliates. All rights reserved.
+ * Copyright (c) 2015, 2021 Oracle and/or its affiliates. All rights reserved.
  *
  * This program and the accompanying materials are made available under the
  * terms of the Eclipse Public License v. 2.0 which is available at
@@ -96,7 +96,7 @@ public class VariableTypeInheritanceSearch {
 
     private Type searchRuntimeTypeArgument(ParameterizedType runtimeType, TypeVariable<?> typeVar) {
         if (ReflectionUtils.getRawType(runtimeType) != typeVar.getGenericDeclaration()) {
-            return ReflectionUtils.getOptionalRawType(typeVar).orElse(null);
+            return ReflectionUtils.getOptionalRawType(typeVar).filter(rawType -> !Object.class.equals(rawType)).orElse(null);
         }
         TypeVariable[] bounds = typeVar.getGenericDeclaration().getTypeParameters();
         for (int i = 0; i < bounds.length; i++) {
