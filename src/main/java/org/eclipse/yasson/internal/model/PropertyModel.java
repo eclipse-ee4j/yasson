@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2015, 2020 Oracle and/or its affiliates. All rights reserved.
+ * Copyright (c) 2015, 2021 Oracle and/or its affiliates. All rights reserved.
  *
  * This program and the accompanying materials are made available under the
  * terms of the Eclipse Public License v. 2.0 which is available at
@@ -52,7 +52,7 @@ import org.eclipse.yasson.internal.serializer.UserSerializerSerializer;
  */
 public final class PropertyModel implements Comparable<PropertyModel> {
 
-    private static final MethodHandles.Lookup LOOKUP = MethodHandles.lookup();
+    private static final MethodHandles.Lookup LOOKUP = ModulesUtil.lookup();
 
     /**
      * Field propertyName as in class by java bean convention.
