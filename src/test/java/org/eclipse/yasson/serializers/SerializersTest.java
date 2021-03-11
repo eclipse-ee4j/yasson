@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2016, 2020 Oracle and/or its affiliates. All rights reserved.
+ * Copyright (c) 2016, 2021 Oracle and/or its affiliates. All rights reserved.
  *
  * This program and the accompanying materials are made available under the
  * terms of the Eclipse Public License v. 2.0 which is available at
@@ -472,6 +472,25 @@ public class SerializersTest {
         public SimplePojo deserialize(JsonParser parser, DeserializationContext ctx, Type rtType) {
             //parser.getObject advances the parser to END_OBJECT.
             JsonObject json = parser.getObject();
+            SimplePojo simplePojo = new SimplePojo();
+            simplePojo.setStringProperty(json.getString("stringProperty"));
+            return simplePojo;
+        }
+    }
+
+    @Test
+    public void testDeserializeArrayWithAdvancingParserAfterObjectEndUsingValue() {
+        String json = "[{\"stringProperty\":\"Property 1 value\"},{\"stringProperty\":\"Property 2 value\"}]";
+        Jsonb jsonb = JsonbBuilder.create(new JsonbConfig().withDeserializers(new SimplePojoValueDeserializer()));
+        SimplePojo[] result = jsonb.fromJson(json, SimplePojo[].class);
+        assertEquals(2, result.length);
+    }
+
+    public class SimplePojoValueDeserializer implements JsonbDeserializer<SimplePojo> {
+        @Override
+        public SimplePojo deserialize(JsonParser parser, DeserializationContext ctx, Type rtType) {
+            //parser.getValue advances the parser to END_OBJECT in case of object.
+            JsonObject json = parser.getValue().asJsonObject();
             SimplePojo simplePojo = new SimplePojo();
             simplePojo.setStringProperty(json.getString("stringProperty"));
             return simplePojo;
