@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2016, 2020 Oracle and/or its affiliates. All rights reserved.
+ * Copyright (c) 2016, 2021 Oracle and/or its affiliates. All rights reserved.
  *
  * This program and the accompanying materials are made available under the
  * terms of the Eclipse Public License v. 2.0 which is available at
@@ -21,13 +21,18 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.junit.jupiter.api.Assertions.fail;
 
 import java.io.StringReader;
+import java.lang.reflect.ParameterizedType;
 import java.lang.reflect.Type;
 import java.math.BigDecimal;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Calendar;
+import java.util.Collection;
 import java.util.Date;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
+import java.util.Objects;
 import java.util.SortedMap;
 import java.util.TimeZone;
 import java.util.TreeMap;
@@ -69,6 +74,8 @@ import org.eclipse.yasson.serializers.model.SimpleAnnotatedSerializedArrayContai
 import org.eclipse.yasson.serializers.model.SimpleContainer;
 import org.eclipse.yasson.serializers.model.StringWrapper;
 import org.eclipse.yasson.serializers.model.SupertypeSerializerPojo;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 import org.junit.jupiter.api.Test;
 
 /**
@@ -595,6 +602,94 @@ public class SerializersTest {
           .withSerializers(new ThreeSerializer(), new TwoSerializer()));
       assertEquals("\"two\"", jsonb.toJson(new OneTwo()));
       assertEquals("\"two\"", jsonb.toJson(new OneTwoThree()));
+    }
+
+    public class GenericBean<T> {
+
+        public T value;
+
+        @Override
+        public boolean equals(Object obj) {
+            if (obj instanceof GenericBean){
+                return Objects.equals(GenericBean.class.cast(obj).value, this.value);
+            }
+            return Boolean.FALSE;
+        }
+
+    }
+
+    public class GenericBeanSerializer implements JsonbSerializer<GenericBean> {
+
+        private Boolean called = Boolean.FALSE;
+
+        @Override
+        public void serialize(GenericBean t, JsonGenerator jg, SerializationContext sc) {
+            called = Boolean.TRUE;
+            jg.writeStartObject();
+            sc.serialize("value", t.value, jg);
+            jg.writeEnd();
+        }
+    }
+
+    public class GenericBeanDeserializer implements JsonbDeserializer<GenericBean> {
+
+        private Boolean called = Boolean.FALSE;
+
+        @Override
+        public GenericBean deserialize(JsonParser parser, DeserializationContext ctx, Type rtType) {
+            called = Boolean.TRUE;
+            JsonObject json = parser.getObject();
+            GenericBean<String> bean = new GenericBean<>();
+            bean.value = json.getString("value");
+            return bean;
+        }
+    }
+
+    @Test
+    public void testCustomDeserializerWithParameterizedType() {
+
+        GenericBeanSerializer genericBeanSerializer = new GenericBeanSerializer();
+        GenericBeanDeserializer genericBeanDeserializer = new GenericBeanDeserializer();
+
+        Jsonb jsonb = JsonbBuilder.create(new JsonbConfig().withDeserializers(genericBeanDeserializer).withSerializers(genericBeanSerializer));
+
+        GenericBean<String> bean1 = new GenericBean<>();
+        bean1.value = "test1";
+        GenericBean<String> bean2 = new GenericBean<>();
+        bean2.value = "test2";
+        GenericBean<String> bean3 = new GenericBean<>();
+        bean3.value = "test3";
+
+        Collection<GenericBean<String>> asList = Arrays.asList(bean1, bean2, bean3);
+
+        String toJson = jsonb.toJson(asList);
+
+        assertEquals(toJson, "[{\"value\":\"test1\"},{\"value\":\"test2\"},{\"value\":\"test3\"}]");
+        assertTrue(genericBeanSerializer.called);
+
+        List<GenericBean<String>> fromJson = jsonb.fromJson(
+                toJson,
+                new ParameterizedType() {
+            @Override
+            public Type[] getActualTypeArguments() {
+                return new Type[]{GenericBean.class};
+            }
+
+            @Override
+            public Type getRawType() {
+                return Collection.class;
+            }
+
+            @Override
+            public Type getOwnerType() {
+                return null;
+            }
+        }
+        );
+
+        assertEquals(asList, fromJson);
+        assertTrue(genericBeanDeserializer.called);
+
     }
     
 }
