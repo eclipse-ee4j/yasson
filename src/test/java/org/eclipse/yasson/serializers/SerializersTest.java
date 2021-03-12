@@ -485,6 +485,25 @@ public class SerializersTest {
         }
     }
 
+    @Test
+    public void testDeserializeArrayWithAdvancingParserAfterObjectEndUsingValue() {
+        String json = "[{\"stringProperty\":\"Property 1 value\"},{\"stringProperty\":\"Property 2 value\"}]";
+        Jsonb jsonb = JsonbBuilder.create(new JsonbConfig().withDeserializers(new SimplePojoValueDeserializer()));
+        SimplePojo[] result = jsonb.fromJson(json, SimplePojo[].class);
+        assertEquals(2, result.length);
+    }
+
+    public class SimplePojoValueDeserializer implements JsonbDeserializer<SimplePojo> {
+        @Override
+        public SimplePojo deserialize(JsonParser parser, DeserializationContext ctx, Type rtType) {
+            //parser.getValue advances the parser to END_OBJECT in case of object.
+            JsonObject json = parser.getValue().asJsonObject();
+            SimplePojo simplePojo = new SimplePojo();
+            simplePojo.setStringProperty(json.getString("stringProperty"));
+            return simplePojo;
+        }
+    }
+
     public class SimplePojo {
         private String stringProperty;
 
