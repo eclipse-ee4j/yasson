@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2016, 2020 Oracle and/or its affiliates. All rights reserved.
+ * Copyright (c) 2016, 2021 Oracle and/or its affiliates. All rights reserved.
  *
  * This program and the accompanying materials are made available under the
  * terms of the Eclipse Public License v. 2.0 which is available at
@@ -203,10 +203,10 @@ public class ComponentMatcher {
             }
         }
         
-        if (runtimeType instanceof Class) {
-            Class<?> runtimeClass = (Class<?>) runtimeType;
+        Optional<Class<?>> runtimeClass = ReflectionUtils.getOptionalRawType(runtimeType);
+        if (runtimeClass.isPresent()) {
             // Check if any interfaces have a match
-            for (Class<?> ifc : runtimeClass.getInterfaces()) {
+            for (Class<?> ifc : runtimeClass.get().getInterfaces()) {
                 ComponentBindings ifcBinding = userComponents.get(ifc);
                 if (ifcBinding != null) {
                   Optional<T> match = getMatchingBinding(ifc, ifcBinding, supplier);
@@ -217,7 +217,7 @@ public class ComponentMatcher {
             }
             
             // check if the superclass has a match
-            Class<?> superClass = runtimeClass.getSuperclass();
+            Class<?> superClass = runtimeClass.get().getSuperclass();
             if (superClass != null && superClass != Object.class) {
                 Optional<T> superBinding = searchComponentBinding(superClass, supplier);
                 if (superBinding.isPresent()) {
