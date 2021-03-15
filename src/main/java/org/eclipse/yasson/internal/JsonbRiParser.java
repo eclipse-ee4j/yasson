@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2016, 2019 Oracle and/or its affiliates. All rights reserved.
+ * Copyright (c) 2016, 2021 Oracle and/or its affiliates. All rights reserved.
  *
  * This program and the accompanying materials are made available under the
  * terms of the Eclipse Public License v. 2.0 which is available at
@@ -271,7 +271,17 @@ public class JsonbRiParser implements JsonParser, JsonbParser {
 
     @Override
     public JsonValue getValue() {
-        return jsonParser.getValue();
+        if (level.isEmpty() || getLastEvent() == null) {
+            return jsonParser.getValue();
+        }
+        switch (getLastEvent()) {
+            case START_ARRAY:
+                return getArray();
+            case START_OBJECT:
+                return getObject();
+            default:
+                return jsonParser.getValue();
+        }
     }
 
     @Override
