@@ -14,7 +14,6 @@ package org.eclipse.yasson.internal.serializer;
 
 import java.time.Instant;
 import java.time.MonthDay;
-import java.time.YearMonth;
 import java.time.format.DateTimeFormatter;
 import java.util.Locale;
 
