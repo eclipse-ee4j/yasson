@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2016, 2020 Oracle and/or its affiliates. All rights reserved.
+ * Copyright (c) 2016, 2021 Oracle and/or its affiliates. All rights reserved.
  *
  * This program and the accompanying materials are made available under the
  * terms of the Eclipse Public License v. 2.0 which is available at
@@ -22,9 +22,11 @@ import java.time.Instant;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.LocalTime;
+import java.time.MonthDay;
 import java.time.OffsetDateTime;
 import java.time.OffsetTime;
 import java.time.Period;
+import java.time.YearMonth;
 import java.time.ZoneId;
 import java.time.ZoneOffset;
 import java.time.ZonedDateTime;
@@ -143,6 +145,10 @@ public class DefaultSerializers {
         serializers.put(XMLGregorianCalendar.class,
                         new SerializerProviderWrapper(XMLGregorianCalendarTypeSerializer::new,
                                                       XMLGregorianCalendarTypeDeserializer::new));
+        serializers.put(YearMonth.class,
+                        new SerializerProviderWrapper(YearMonthTypeSerializer::new, YearMonthTypeDeserializer::new));
+        serializers.put(MonthDay.class,
+                        new SerializerProviderWrapper(MonthDayTypeSerializer::new, MonthDayTypeDeserializer::new));
 
         return serializers;
     }
