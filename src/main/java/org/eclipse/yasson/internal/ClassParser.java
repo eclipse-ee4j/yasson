@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2015, 2020 Oracle and/or its affiliates. All rights reserved.
+ * Copyright (c) 2015, 2021 Oracle and/or its affiliates. All rights reserved.
  *
  * This program and the accompanying materials are made available under the
  * terms of the Eclipse Public License v. 2.0 which is available at
@@ -100,14 +100,22 @@ class ClassParser {
     }
 
     private static void mergePropertyModels(List<PropertyModel> unsortedMerged) {
-        PropertyModel[] clone = unsortedMerged.toArray(new PropertyModel[unsortedMerged.size()]);
+        PropertyModel[] clone = unsortedMerged.toArray(new PropertyModel[0]);
         for (int i = 0; i < clone.length; i++) {
             for (int j = i + 1; j < clone.length; j++) {
-                if (clone[i].equals(clone[j])) {
+                PropertyModel firstPropertyModel = clone[i];
+                PropertyModel secondPropertyModel = clone[j];
+                if (firstPropertyModel.equals(secondPropertyModel)) {
                     // Need to merge two properties
-                    unsortedMerged.remove(clone[i]);
-                    unsortedMerged.remove(clone[j]);
-                    unsortedMerged.add(new PropertyModel(clone[i], clone[j]));
+                    unsortedMerged.remove(firstPropertyModel);
+                    unsortedMerged.remove(secondPropertyModel);
+                    if (!firstPropertyModel.isReadable() && !firstPropertyModel.isWritable()) {
+                        unsortedMerged.add(secondPropertyModel);
+                    } else if (!secondPropertyModel.isReadable() && !secondPropertyModel.isWritable()) {
+                        unsortedMerged.add(firstPropertyModel);
+                    } else {
+                        unsortedMerged.add(new PropertyModel(firstPropertyModel, secondPropertyModel));
+                    }
                 }
             }
         }
