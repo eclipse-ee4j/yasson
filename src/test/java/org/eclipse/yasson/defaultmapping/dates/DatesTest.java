@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2015, 2020 Oracle and/or its affiliates. All rights reserved.
+ * Copyright (c) 2015, 2021 Oracle and/or its affiliates. All rights reserved.
  *
  * This program and the accompanying materials are made available under the
  * terms of the Eclipse Public License v. 2.0 which is available at
@@ -12,6 +12,8 @@
 
 package org.eclipse.yasson.defaultmapping.dates;
 
+import org.eclipse.yasson.defaultmapping.dates.model.MonthDayPojo;
+import org.eclipse.yasson.defaultmapping.dates.model.YearMonthPojo;
 import org.junit.jupiter.api.*;
 import static org.junit.jupiter.api.Assertions.*;
 import static org.eclipse.yasson.Jsonbs.*;
@@ -52,9 +54,11 @@ import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.LocalTime;
 import java.time.Month;
+import java.time.MonthDay;
 import java.time.OffsetDateTime;
 import java.time.OffsetTime;
 import java.time.Period;
+import java.time.YearMonth;
 import java.time.ZoneId;
 import java.time.ZoneOffset;
 import java.time.ZonedDateTime;
@@ -610,6 +614,34 @@ public class DatesTest {
         DateInMapPojo result = jsonb.fromJson("{\"dateMap\":{\"first\":\"01.01.2017\"},\"localDate\":\"01.01.2017\"}", DateInMapPojo.class);
         assertEquals(LocalDate.of(2017,1,1), result.localDate);
         assertEquals(LocalDate.of(2017,1,1), result.dateMap.get("first"));
+    }
+
+    @Test
+    public void testYearMonth() {
+        YearMonthPojo yearMonthPojo = new YearMonthPojo();
+        yearMonthPojo.yearMonth = YearMonth.of(2019, Month.MAY);
+        yearMonthPojo.yearMonthWithFormatter = YearMonth.of(2019, Month.MAY);
+
+        String expected = "{\"yearMonth\":\"2019-05\",\"yearMonthWithFormatter\":\"05-2019\"}";
+        String serialized = bindingJsonb.toJson(yearMonthPojo);
+        assertEquals(expected, serialized);
+
+        YearMonthPojo deserialized = bindingJsonb.fromJson(expected, YearMonthPojo.class);
+        assertEquals(yearMonthPojo, deserialized);
+    }
+
+    @Test
+    public void testMonthDay() {
+        MonthDayPojo monthDay = new MonthDayPojo();
+        monthDay.monthDay = MonthDay.of(Month.MAY, 2);
+        monthDay.monthDayWithFormatter = MonthDay.of(Month.MAY, 2);
+
+        String expected = "{\"monthDay\":\"--05-02\",\"monthDayWithFormatter\":\"02-05\"}";
+        String serialized = bindingJsonb.toJson(monthDay);
+        assertEquals(expected, serialized);
+
+        MonthDayPojo deserialized = bindingJsonb.fromJson(expected, MonthDayPojo.class);
+        assertEquals(monthDay, deserialized);
     }
 
     @Test
