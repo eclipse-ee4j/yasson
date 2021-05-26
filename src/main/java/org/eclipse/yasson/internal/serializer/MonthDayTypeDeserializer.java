@@ -24,7 +24,7 @@ import org.eclipse.yasson.internal.model.customization.Customization;
  */
 public class MonthDayTypeDeserializer extends AbstractDateTimeDeserializer<MonthDay> {
 
-    private static final DateTimeFormatter DEFAULT_FORMAT = DateTimeFormatter.ofPattern("MM-dd").withZone(UTC);
+    private static final DateTimeFormatter DEFAULT_FORMAT = DateTimeFormatter.ofPattern("--MM-dd").withZone(UTC);
 
     /**
      * Creates an instance.

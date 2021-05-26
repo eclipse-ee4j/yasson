@@ -27,7 +27,7 @@ public class MonthDayTypeSerializer extends AbstractDateTimeSerializer<MonthDay>
 
     private static final int YEAR_NUMBER = Year.now().getValue();
 
-    private static final DateTimeFormatter DEFAULT_FORMAT = DateTimeFormatter.ofPattern("MM-dd").withZone(UTC);
+    private static final DateTimeFormatter DEFAULT_FORMAT = DateTimeFormatter.ofPattern("--MM-dd").withZone(UTC);
 
     /**
      * Creates a new instance.

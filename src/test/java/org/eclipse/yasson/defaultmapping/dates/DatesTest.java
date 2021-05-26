@@ -636,7 +636,7 @@ public class DatesTest {
         monthDay.monthDay = MonthDay.of(Month.MAY, 2);
         monthDay.monthDayWithFormatter = MonthDay.of(Month.MAY, 2);
 
-        String expected = "{\"monthDay\":\"05-02\",\"monthDayWithFormatter\":\"02-05\"}";
+        String expected = "{\"monthDay\":\"--05-02\",\"monthDayWithFormatter\":\"02-05\"}";
         String serialized = bindingJsonb.toJson(monthDay);
         assertEquals(expected, serialized);
 
