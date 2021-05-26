@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2016, 2020 Oracle and/or its affiliates. All rights reserved.
+ * Copyright (c) 2016, 2021 Oracle and/or its affiliates. All rights reserved.
  *
  * This program and the accompanying materials are made available under the
  * terms of the Eclipse Public License v. 2.0 which is available at
@@ -12,17 +12,20 @@
 
 package org.eclipse.yasson.defaultmapping.basic;
 
-import org.junit.jupiter.api.*;
-import static org.junit.jupiter.api.Assertions.*;
-import static org.eclipse.yasson.Jsonbs.*;
-
+import java.net.URI;
 import java.time.Instant;
 import java.util.HashMap;
 import java.util.HashSet;
+import java.util.Objects;
 
+import jakarta.json.bind.annotation.JsonbProperty;
 import jakarta.json.bind.annotation.JsonbTransient;
-
 import org.jboss.weld.exceptions.IllegalStateException;
+import org.junit.jupiter.api.Test;
+
+import static org.eclipse.yasson.Jsonbs.defaultJsonb;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertNotNull;
 
 /**
  * Tests to verify that read-only properties (properties with no field or setter)
@@ -128,7 +131,65 @@ public class PropertyMismatchTest {
             this.internalInstantProperty = instant;
         }
     }
-    
+
+    @Test
+    public void testTransientAndPropertyAnnotationMerge() {
+        TransientAndPropertyAnnotationMerge object = new TransientAndPropertyAnnotationMerge();
+        String expected = "{\"number\":\"http://localhost/\"}";
+        String json = defaultJsonb.toJson(object);
+        assertEquals(expected, json);
+        TransientAndPropertyAnnotationMerge deserialized = defaultJsonb.fromJson(expected,
+                                                                                 TransientAndPropertyAnnotationMerge.class);
+        assertEquals(object, deserialized);
+    }
+
+    public static class TransientAndPropertyAnnotationMerge {
+
+        @JsonbTransient
+        private Integer number;
+
+        @JsonbProperty("number")
+        private URI someLink;
+
+        public TransientAndPropertyAnnotationMerge() {
+            number = -1;
+            someLink = URI.create("http://localhost/");
+        }
+
+        public Integer getNumber() {
+            return number;
+        }
+
+        public void setNumber(Integer number) {
+            this.number = number;
+        }
+
+        public URI getSomeLink() {
+            return someLink;
+        }
+
+        public void setSomeLink(URI someLink) {
+            this.someLink = someLink;
+        }
+
+        @Override
+        public boolean equals(Object o) {
+            if (this == o) {
+                return true;
+            }
+            if (o == null || getClass() != o.getClass()) {
+                return false;
+            }
+            TransientAndPropertyAnnotationMerge that = (TransientAndPropertyAnnotationMerge) o;
+            return Objects.equals(number, that.number) && Objects.equals(someLink, that.someLink);
+        }
+
+        @Override
+        public int hashCode() {
+            return Objects.hash(number, someLink);
+        }
+    }
+
     /**
      * Test that properties of the same name with different
      * field/getter/setter types behave properly and that we don't
