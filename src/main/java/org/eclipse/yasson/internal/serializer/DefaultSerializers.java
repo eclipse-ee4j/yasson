@@ -142,9 +142,11 @@ public class DefaultSerializers {
                         new SerializerProviderWrapper(BigDecimalTypeSerializer::new, BigDecimalTypeDeserializer::new));
         serializers.put(ZoneOffset.class,
                         new SerializerProviderWrapper(ZoneOffsetTypeSerializer::new, ZoneOffsetTypeDeserializer::new));
-        serializers.put(XMLGregorianCalendar.class,
-                        new SerializerProviderWrapper(XMLGregorianCalendarTypeSerializer::new,
-                                                      XMLGregorianCalendarTypeDeserializer::new));
+        if(isClassAvailable("javax.xml.datatype.XMLGregorianCalendar")) {
+            serializers.put(XMLGregorianCalendar.class,
+                    new SerializerProviderWrapper(XMLGregorianCalendarTypeSerializer::new,
+                                                  XMLGregorianCalendarTypeDeserializer::new));        	
+        }
         serializers.put(YearMonth.class,
                         new SerializerProviderWrapper(YearMonthTypeSerializer::new, YearMonthTypeDeserializer::new));
         serializers.put(MonthDay.class,
