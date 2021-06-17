@@ -281,7 +281,7 @@
                             <configuration>
                                 <!-- compile everything to ensure module-info contains right entries -->
                                 <!-- required when JAVA_HOME is JDK 8 or below -->
-                                <release>9</release>
+                                <release>16</release>
                                 <compilerArgs>
                                     <!--Remove when CDI is updated to support modules-->
                                     <arg>--add-reads</arg>
@@ -290,7 +290,7 @@
                             </configuration>
                         </execution>
                         <execution>
-                            <id>multi-release-compile</id>
+                            <id>multi-release-compile-9</id>
                             <goals>
                                 <goal>compile</goal>
                             </goals>
@@ -298,6 +298,19 @@
                                 <release>9</release>
                                 <compileSourceRoots>
                                     <compileSourceRoot>${project.basedir}/src/main/java9</compileSourceRoot>
+                                </compileSourceRoots>
+                                <multiReleaseOutput>true</multiReleaseOutput>
+                            </configuration>
+                        </execution>
+                        <execution>
+                            <id>multi-release-compile-16</id>
+                            <goals>
+                                <goal>compile</goal>
+                            </goals>
+                            <configuration>
+                                <release>16</release>
+                                <compileSourceRoots>
+                                    <compileSourceRoot>${project.basedir}/src/main/java16</compileSourceRoot>
                                 </compileSourceRoots>
                                 <multiReleaseOutput>true</multiReleaseOutput>
                             </configuration>
@@ -318,7 +331,7 @@
                         <execution>
                             <id>default-testCompile</id>
                             <configuration>
-                                <release>11</release>
+                                <release>16</release>
                             </configuration>
                         </execution>
                     </executions>

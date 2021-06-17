@@ -27,7 +27,6 @@ import java.util.stream.Collectors;
 
 import jakarta.json.bind.JsonbException;
 import jakarta.json.bind.config.PropertyVisibilityStrategy;
-
 import org.eclipse.yasson.internal.model.ClassModel;
 import org.eclipse.yasson.internal.model.CreatorModel;
 import org.eclipse.yasson.internal.model.JsonbAnnotatedElement;
@@ -201,7 +200,9 @@ class ClassParser {
             if (!isPropertyMethod(method) || method.isBridge() || isSpecialCaseMethod(clazz, method)) {
                 continue;
             }
-            final String propertyName = toPropertyMethod(name);
+            final String propertyName = ClassMultiReleaseExtension.shouldTransformToPropertyName(method)
+                    ? toPropertyMethod(name)
+                    : name;
 
             registerMethod(propertyName, method, classElement, classProperties);
         }
@@ -230,6 +231,9 @@ class ClassParser {
     }
 
     private static boolean isGetter(Method m) {
+        if (ClassMultiReleaseExtension.isGetAccessorMethod(m)) {
+            return true;
+        }
         return (m.getName().startsWith(GET_PREFIX) || m.getName().startsWith(IS_PREFIX)) && m.getParameterCount() == 0;
     }
 
@@ -238,7 +242,7 @@ class ClassParser {
     }
 
     private static String toPropertyMethod(String name) {
-        return lowerFirstLetter(name.substring(name.startsWith(IS_PREFIX) ? 2 : 3, name.length()));
+        return lowerFirstLetter(name.substring(name.startsWith(IS_PREFIX) ? 2 : 3));
     }
 
     private static String lowerFirstLetter(String name) {
