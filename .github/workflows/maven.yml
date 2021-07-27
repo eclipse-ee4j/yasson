@@ -35,11 +35,11 @@ jobs:
         with:
           distribution: 'zulu'
           java-version: ${{ matrix.java_version }}
-      - name: Chestyle
+      - name: Checkstyle
         run: mvn -B -Pstaging checkstyle:checkstyle
       - name: Copyright
         run: bash etc/copyright.sh
       - name: Yasson install
         run: mvn -U -C -Pstaging clean install
       - name: Yasson TCK
-        run: cd yasson-tck && mvn -U -B -Pstaging test
+        run: cd yasson-tck && mvn -U -B test
