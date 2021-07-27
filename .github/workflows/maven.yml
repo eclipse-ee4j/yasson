@@ -40,6 +40,7 @@ jobs:
         with:
           path:
             ~/.m2
+          key: build-${{ env.cache-name }}
       - name: Checkstyle
         run: mvn -B -Pstaging checkstyle:checkstyle
       - name: Copyright
