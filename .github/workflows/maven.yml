@@ -33,7 +33,7 @@ jobs:
       uses: actions/setup-java@v2
       with:
         distribution: 'zulu'
-          ava-version: ${{ matrix.java_version }}
+        java-version: ${{ matrix.java_version }}
     - name: Chestyle
       run: cd yasson && mvn -B -Pstaging checkstyle:checkstyle
     - name: Copyright
