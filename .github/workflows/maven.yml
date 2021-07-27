@@ -35,6 +35,8 @@ jobs:
           java-version: ${{ matrix.java_version }}
       - name: Maven cache
         uses: actions/cache@v2
+        env:
+          cache-name: maven-cache
         with:
           path:
             ~/.m2
