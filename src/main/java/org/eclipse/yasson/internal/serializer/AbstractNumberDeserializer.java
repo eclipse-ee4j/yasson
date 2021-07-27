@@ -18,10 +18,8 @@ import java.text.NumberFormat;
 import java.text.ParseException;
 import java.util.Locale;
 import java.util.Optional;
-import java.util.function.Function;
 
 import jakarta.json.bind.JsonbException;
-
 import org.eclipse.yasson.internal.JsonbContext;
 import org.eclipse.yasson.internal.model.customization.Customization;
 import org.eclipse.yasson.internal.properties.MessageKeys;
