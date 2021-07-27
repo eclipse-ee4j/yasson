@@ -30,10 +30,10 @@ jobs:
       with:
         fetch-depth: 0
     - name: Set up JDK
-        uses: actions/setup-java@v2
-        with:
-          distribution: 'zulu'
-          java-version: ${{ matrix.java_version }}
+      uses: actions/setup-java@v2
+      with:
+        distribution: 'zulu'
+          ava-version: ${{ matrix.java_version }}
     - name: Chestyle
       run: cd yasson && mvn -B -Pstaging checkstyle:checkstyle
     - name: Copyright
