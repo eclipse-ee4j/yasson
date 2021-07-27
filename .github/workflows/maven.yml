@@ -52,7 +52,7 @@ jobs:
         with:
           distribution: 'adopt'
           java-version: ${{ matrix.java_version }}
-      - name: Yasson install
+      - name: Yasson tests
         run: mvn -U -C -Pstaging test
-      - name: Yasson TCK
+      - name: JSONB-API TCK
         run: cd yasson-tck && mvn -U -B test
