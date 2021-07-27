@@ -17,28 +17,29 @@ on:
   push:
 
 jobs:
-  name: Test on JDK ${{ matrix.java_version }}
-  runs-on: ubuntu-latest
+  build:
+    name: Test on JDK ${{ matrix.java_version }}
+    runs-on: ubuntu-latest
 
-  strategy:
-    matrix:
-      java_version: [ 11, 17-ea ]
+    strategy:
+      matrix:
+        java_version: [ 11, 17-ea ]
 
-  steps:
-    - name: Checkout for build
-      uses: actions/checkout@v2.3.4
-      with:
-        fetch-depth: 0
-    - name: Set up JDK
-      uses: actions/setup-java@v2
-      with:
-        distribution: 'zulu'
-        java-version: ${{ matrix.java_version }}
-    - name: Chestyle
-      run: cd yasson && mvn -B -Pstaging checkstyle:checkstyle
-    - name: Copyright
-      run: bash etc/copyright.sh
-    - name: Yasson install
-      run: mvn -U -C -Pstaging clean install
-    - name: Yasson TCK
-      run: cd yasson-tck && mvn -U -B -Pstaging test
+    steps:
+      - name: Checkout for build
+        uses: actions/checkout@v2.3.4
+        with:
+          fetch-depth: 0
+      - name: Set up JDK
+        uses: actions/setup-java@v2
+        with:
+          distribution: 'zulu'
+          java-version: ${{ matrix.java_version }}
+      - name: Chestyle
+        run: cd yasson && mvn -B -Pstaging checkstyle:checkstyle
+      - name: Copyright
+        run: bash etc/copyright.sh
+      - name: Yasson install
+        run: mvn -U -C -Pstaging clean install
+      - name: Yasson TCK
+        run: cd yasson-tck && mvn -U -B -Pstaging test
