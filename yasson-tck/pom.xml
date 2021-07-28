@@ -30,12 +30,16 @@
       <groupId>jakarta.json.bind</groupId>
       <artifactId>jakarta.json.bind-tck</artifactId>
       <version>${jsonb.tck.version}</version>
-<!--      <scope>test</scope>-->
+<!--      Limitation to the test scope has been temporarily removed due to NumberFormatCustomizationTest, once it is removed,
+  test scope will be enabled again-->
+      <!--      <scope>test</scope>-->
     </dependency>
     <dependency>
       <groupId>org.eclipse</groupId>
       <artifactId>yasson</artifactId>
       <version>${yasson.version}</version>
+      <!--      Limitation to the test scope has been temporarily removed due to NumberFormatCustomizationTest, once it is removed,
+        test scope will be enabled again-->
 <!--      <scope>test</scope>-->
     </dependency>
     <dependency>

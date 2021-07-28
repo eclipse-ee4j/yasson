@@ -44,9 +44,9 @@ import jakarta.json.bind.tck.customizedmapping.numberformat.model.customized.Pac
 import jakarta.json.bind.tck.customizedmapping.numberformat.model.customized.PackageCustomizedTypeOverriddenFieldOverriddenDoubleContainer;
 
 /**
- * @test
- * @sources NumberFormatCustomizationTest.java
- * @executeClass com.sun.ts.tests.jsonb.customizedmapping.numberformat.NumberFormatCustomizationTest
+ * This is just temporal work around for failing test testNumberFormatField.
+ *
+ * It is failing due to changed FR number format separator.
  **/
 @RunWith(Arquillian.class)
 public class NumberFormatCustomizationTest {
@@ -135,6 +135,7 @@ public class NumberFormatCustomizationTest {
      */
     @Test
     public void testNumberFormatField() {
+        //Franch group separator has been changed in JDK 13 and it is now backwords incompatible.
         char frenchGroupingSeparator = DecimalFormatSymbols.getInstance(Locale.FRENCH).getGroupingSeparator();
         String jsonString = jsonb.toJson(new FieldCustomizedDoubleContainer() {
             {
