@@ -23,6 +23,10 @@ import org.eclipse.yasson.internal.model.JsonbCreator;
  */
 class ClassMultiReleaseExtension {
 
+    private ClassMultiReleaseExtension() {
+        throw new IllegalStateException("This class cannot be instantiated");
+    }
+
     static boolean shouldTransformToPropertyName(Method method) {
         return true;
     }

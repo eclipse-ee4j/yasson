@@ -26,6 +26,10 @@ class ClassMultiReleaseExtension {
 
     private static final Set<String> NOT_VALID_ACCESSOR_METHODS = Set.of("equals", "hashCode", "toString");
 
+    private ClassMultiReleaseExtension() {
+        throw new IllegalStateException("This class cannot be instantiated");
+    }
+
     static boolean shouldTransformToPropertyName(Method method) {
         return !method.getDeclaringClass().isRecord();
     }

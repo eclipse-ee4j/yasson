@@ -27,6 +27,7 @@ import java.util.stream.Collectors;
 
 import jakarta.json.bind.JsonbException;
 import jakarta.json.bind.config.PropertyVisibilityStrategy;
+
 import org.eclipse.yasson.internal.model.ClassModel;
 import org.eclipse.yasson.internal.model.CreatorModel;
 import org.eclipse.yasson.internal.model.JsonbAnnotatedElement;
