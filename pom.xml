@@ -331,7 +331,7 @@
                         <execution>
                             <id>default-testCompile</id>
                             <configuration>
-                                <release>16</release>
+                                <release>11</release>
                             </configuration>
                         </execution>
                     </executions>
