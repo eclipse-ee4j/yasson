@@ -22,7 +22,7 @@ For whom it's not enough it provides rich customization abilities through a set 
 // Create custom configuration
 JsonbConfig config = new JsonbConfig()
   .withNullValues(true)
-  .withFormating(true);
+  .withFormatting(true);
 
 // Create Jsonb with custom configuration
 Jsonb jsonb = JsonbBuilder.create(config);
