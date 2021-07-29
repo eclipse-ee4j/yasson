@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2016, 2020 Oracle and/or its affiliates. All rights reserved.
+ * Copyright (c) 2016, 2021 Oracle and/or its affiliates. All rights reserved.
  *
  * This program and the accompanying materials are made available under the
  * terms of the Eclipse Public License v. 2.0 which is available at
@@ -13,8 +13,10 @@
 package org.eclipse.yasson.internal.serializer;
 
 import java.text.DecimalFormat;
+import java.text.DecimalFormatSymbols;
 import java.text.NumberFormat;
 import java.text.ParseException;
+import java.util.Locale;
 import java.util.Optional;
 
 import jakarta.json.bind.JsonbException;
@@ -56,14 +58,24 @@ public abstract class AbstractNumberDeserializer<T extends Number> extends Abstr
 
         final JsonbNumberFormatter numberFormat = getCustomization().getDeserializeNumberFormatter();
         //consider synchronizing on format instance or per thread cache.
-        final NumberFormat format = NumberFormat
-                .getInstance(jsonbContext.getConfigProperties().getLocale(numberFormat.getLocale()));
+        Locale locale = jsonbContext.getConfigProperties().getLocale(numberFormat.getLocale());
+        final NumberFormat format = NumberFormat.getInstance(locale);
         ((DecimalFormat) format).applyPattern(numberFormat.getFormat());
         format.setParseIntegerOnly(integerOnly);
         try {
-            return Optional.of(format.parse(jsonValue));
+            return Optional.of(format.parse(compatibilityChanger(jsonValue, locale)));
         } catch (ParseException e) {
             throw new JsonbException(Messages.getMessage(MessageKeys.PARSING_NUMBER, jsonValue, numberFormat.getFormat()));
         }
+    }
+
+    private String compatibilityChanger(String value, Locale locale) {
+        char beforeJdk13GroupSeparator = '\u00A0';
+        char frenchGroupingSeparator = DecimalFormatSymbols.getInstance(Locale.FRENCH).getGroupingSeparator();
+        if (locale.getLanguage().equals(Locale.FRENCH.getLanguage()) && beforeJdk13GroupSeparator != frenchGroupingSeparator) {
+            //JDK-8225245
+            return value.replace(beforeJdk13GroupSeparator, frenchGroupingSeparator);
+        }
+        return value;
     }
 }
