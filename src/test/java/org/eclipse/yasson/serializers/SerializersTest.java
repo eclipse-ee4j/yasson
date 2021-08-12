@@ -51,7 +51,9 @@ import org.eclipse.yasson.serializers.model.CrateInner;
 import org.eclipse.yasson.serializers.model.CrateJsonObjectDeserializer;
 import org.eclipse.yasson.serializers.model.CrateSerializer;
 import org.eclipse.yasson.serializers.model.CrateSerializerWithConversion;
+import org.eclipse.yasson.serializers.model.ExplicitJsonbSerializer;
 import org.eclipse.yasson.serializers.model.GenericPropertyPojo;
+import org.eclipse.yasson.serializers.model.ImplicitJsonbSerializer;
 import org.eclipse.yasson.serializers.model.NumberDeserializer;
 import org.eclipse.yasson.serializers.model.NumberSerializer;
 import org.eclipse.yasson.serializers.model.RecursiveDeserializer;
@@ -709,6 +711,18 @@ public class SerializersTest {
         assertEquals(asList, fromJson);
         assertTrue(genericBeanDeserializer.called);
 
+    }
+
+    @Test
+    public void testImplicitJsonbSerializers() {
+        Jsonb jsonb = JsonbBuilder.create(new JsonbConfig().withSerializers(new ExplicitJsonbSerializer()));
+        String expected = "{\"value\":\"123\"}";
+        Box box = new Box();
+        box.boxStr = "Box";
+        assertEquals(expected, jsonb.toJson(box));
+
+        jsonb = JsonbBuilder.create(new JsonbConfig().withSerializers(new ImplicitJsonbSerializer()));
+        assertEquals(expected, jsonb.toJson(box));
     }
     
 }
