@@ -334,7 +334,7 @@ public class ComponentMatcher {
     SerializerBinding introspectSerializerBinding(Class<? extends JsonbSerializer> serializerClass, JsonbSerializer instance) {
         final ParameterizedType serializerRuntimeType = ReflectionUtils
                 .findParameterizedType(serializerClass, JsonbSerializer.class);
-        Type serBindingType = resolveTypeArg(serializerRuntimeType.getActualTypeArguments()[0], serializerClass.getClass());
+        Type serBindingType = resolveTypeArg(serializerRuntimeType.getActualTypeArguments()[0], serializerClass);
         final ComponentBindings componentBindings = getBindingInfo(serBindingType);
         if (componentBindings.getSerializer() != null && componentBindings.getSerializer().getClass().equals(serializerClass)) {
             return componentBindings.getSerializer();
