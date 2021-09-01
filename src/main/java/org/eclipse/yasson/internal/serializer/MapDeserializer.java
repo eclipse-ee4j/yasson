@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2015, 2020 Oracle and/or its affiliates. All rights reserved.
+ * Copyright (c) 2015, 2021 Oracle and/or its affiliates. All rights reserved.
  *
  * This program and the accompanying materials are made available under the
  * terms of the Eclipse Public License v. 2.0 which is available at
@@ -43,6 +43,7 @@ public class MapDeserializer<T extends Map<?, ?>> extends AbstractContainerDeser
     /**
      * Type of value in the map. (Keys must always be Strings, because of JSON spec)
      */
+    private final Type mapKeyRuntimeType;
     private final Type mapValueRuntimeType;
 
     private final T instance;
@@ -54,6 +55,9 @@ public class MapDeserializer<T extends Map<?, ?>> extends AbstractContainerDeser
      */
     protected MapDeserializer(DeserializerBuilder builder) {
         super(builder);
+        mapKeyRuntimeType = getRuntimeType() instanceof ParameterizedType
+                ? ReflectionUtils.resolveType(this, ((ParameterizedType) getRuntimeType()).getActualTypeArguments()[0])
+                : String.class;
         mapValueRuntimeType = getRuntimeType() instanceof ParameterizedType
                 ? ReflectionUtils.resolveType(this, ((ParameterizedType) getRuntimeType()).getActualTypeArguments()[1])
                 : Object.class;
@@ -94,12 +98,12 @@ public class MapDeserializer<T extends Map<?, ?>> extends AbstractContainerDeser
 
     @Override
     public void appendResult(Object result) {
-        appendCaptor(getParserContext().getLastKeyName(), convertNullToOptionalEmpty(mapValueRuntimeType, result));
+        appendCaptor(convertKey(mapKeyRuntimeType, getParserContext().getLastKeyName()), convertNullToOptionalEmpty(mapValueRuntimeType, result));
     }
 
     @SuppressWarnings("unchecked")
-    private <V> void appendCaptor(String key, V value) {
-        ((Map<String, V>) getInstance(null)).put(key, value);
+    private <K, V> void appendCaptor(K key, V value) {
+        ((Map<K, V>) getInstance(null)).put(key, value);
     }
 
     @Override

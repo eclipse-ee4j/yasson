@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2016, 2020 Oracle and/or its affiliates. All rights reserved.
+ * Copyright (c) 2016, 2021 Oracle and/or its affiliates. All rights reserved.
  *
  * This program and the accompanying materials are made available under the
  * terms of the Eclipse Public License v. 2.0 which is available at
@@ -181,6 +181,37 @@ public abstract class AbstractContainerDeserializer<T> extends AbstractItem<T> i
             return OptionalDouble.empty();
         } else {
             return null;
+        }
+    }
+
+    /**
+     * Converts the given key to the correct type.
+     * @param keyType       property type
+     * @param key           value to set
+     * @return the supplied key value
+     */
+    protected Object convertKey(Type keyType, String key) {
+        if (key == null) {
+            return null;
+        }
+        if (keyType == String.class) {
+            return key;
+        } else if (keyType == Byte.class) {
+            return Byte.valueOf(key);
+        } else if (keyType == Double.class) {
+            return Double.valueOf(key);
+        } else if (keyType == Integer.class) {
+            return Integer.valueOf(key);
+        } else if (keyType == Float.class) {
+            return Float.valueOf(key);
+        } else if (keyType == Long.class) {
+            return Long.valueOf(key);
+        } else if (keyType == Short.class) {
+            return Short.valueOf(key);
+        } else if (keyType instanceof Class &&  Enum.class.isAssignableFrom((Class<?>) keyType)) {
+            return Enum.valueOf((Class<? extends Enum>) keyType, key);
+        } else {
+            return key;
         }
     }
 
