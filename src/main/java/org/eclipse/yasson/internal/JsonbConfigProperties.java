@@ -1,6 +1,6 @@
 /*
- * Copyright (c) 2017, 2020 Oracle and/or its affiliates. All rights reserved.
- * Copyright (c) 2019, 2020 Payara Foundation and/or its affiliates. All rights reserved.
+ * Copyright (c) 2017, 2021 Oracle and/or its affiliates. All rights reserved.
+ * Copyright (c) 2019, 2021 Payara Foundation and/or its affiliates. All rights reserved.
  *
  * This program and the accompanying materials are made available under the
  * terms of the Eclipse Public License v. 2.0 which is available at
@@ -82,6 +82,8 @@ public class JsonbConfigProperties {
     
     private final Set<Class<?>> eagerInitClasses;
 
+    private final boolean forceMapArraySerializerForNullKeys;
+
     /**
      * Creates new resolved JSONB config.
      *
@@ -103,6 +105,7 @@ public class JsonbConfigProperties {
         this.defaultMapImplType = initDefaultMapImplType();
         this.nullSerializer = initNullSerializer();
         this.eagerInitClasses = initEagerInitClasses();
+        this.forceMapArraySerializerForNullKeys = initForceMapArraySerializerForNullKeys();
     }
 
     private Class<?> initDefaultMapImplType() {
@@ -262,6 +265,10 @@ public class JsonbConfigProperties {
             throw new JsonbException("YassonConfig.EAGER_PARSE_CLASSES must be instance of Class<?>[]");
         }
         return new HashSet<Class<?>>(Arrays.asList((Class<?>[]) eagerInitClasses));
+    }
+
+    private boolean initForceMapArraySerializerForNullKeys() {
+        return getBooleanConfigProperty(YassonConfig.FORCE_MAP_ARRAY_SERIALIZER_FOR_NULL_KEYS, false);
     }
 
     /**
@@ -427,5 +434,14 @@ public class JsonbConfigProperties {
     
     public Set<Class<?>> getEagerInitClasses() {
         return eagerInitClasses;
+    }
+
+    /**
+     * Whether the MapToEntriesArraySerializer is selected when a null key
+     * is detected in a map.
+     * @return  false or true
+     */
+    public boolean isForceMapArraySerializerForNullKeys() {
+        return forceMapArraySerializerForNullKeys;
     }
 }

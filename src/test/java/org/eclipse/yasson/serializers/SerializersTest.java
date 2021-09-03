@@ -38,6 +38,7 @@ import java.util.TimeZone;
 import java.util.TreeMap;
 
 import org.eclipse.yasson.TestTypeToken;
+import org.eclipse.yasson.YassonConfig;
 import org.eclipse.yasson.internal.model.ReverseTreeMap;
 import org.eclipse.yasson.serializers.model.AnnotatedGenericWithSerializerType;
 import org.eclipse.yasson.serializers.model.AnnotatedWithSerializerType;
@@ -60,8 +61,6 @@ import org.eclipse.yasson.serializers.model.SimpleAnnotatedSerializedArrayContai
 import org.eclipse.yasson.serializers.model.SimpleContainer;
 import org.eclipse.yasson.serializers.model.StringWrapper;
 import org.eclipse.yasson.serializers.model.SupertypeSerializerPojo;
-import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertTrue;
 import org.junit.jupiter.api.Test;
 
 import jakarta.json.Json;
@@ -446,6 +445,16 @@ public class SerializersTest {
         assertEquals("{\"null\":null}", nullableJsonb.toJson(singletonMap(null, null)));
         assertEquals("{\"key\":null}", nullableJsonb.toJson(singletonMap("key", null)));
         assertEquals("{\"null\":\"value\"}", nullableJsonb.toJson(singletonMap(null, "value")));
+    }
+
+    @Test
+    public void testSerializeMapWithNullsForceArraySerializer() {
+        Jsonb jsonb = JsonbBuilder.create(new YassonConfig()
+                .withForceMapArraySerializerForNullKeys(Boolean.TRUE)
+                .withNullValues(Boolean.TRUE));
+        assertEquals("[{\"key\":null,\"value\":null}]", jsonb.toJson(singletonMap(null, null)));
+        assertEquals("{\"key\":null}", jsonb.toJson(singletonMap("key", null)));
+        assertEquals("[{\"key\":null,\"value\":\"value\"}]", jsonb.toJson(singletonMap(null, "value")));
     }
 
     /**

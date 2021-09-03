@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2016, 2020 Oracle and/or its affiliates. All rights reserved.
+ * Copyright (c) 2016, 2021 Oracle and/or its affiliates. All rights reserved.
  *
  * This program and the accompanying materials are made available under the
  * terms of the Eclipse Public License v. 2.0 which is available at
@@ -67,7 +67,7 @@ public abstract class AbstractArrayDeserializer<T> extends AbstractContainerDese
     }
 
     @Override
-    public void appendResult(Object result) {
+    public void appendResult(Object result, Unmarshaller context) {
         appendCaptor(convertNullToOptionalEmpty(componentClass, result));
     }
 
@@ -80,7 +80,7 @@ public abstract class AbstractArrayDeserializer<T> extends AbstractContainerDese
     protected void deserializeNext(JsonParser parser, Unmarshaller context) {
         final JsonbDeserializer<?> deserializer = newUnmarshallerItemBuilder(context.getJsonbContext()).withType(componentClass)
                 .withCustomization(componentClassModel == null ? null : componentClassModel.getClassCustomization()).build();
-        appendResult(deserializer.deserialize(parser, context, componentClass));
+        appendResult(deserializer.deserialize(parser, context, componentClass), context);
     }
 
     /**

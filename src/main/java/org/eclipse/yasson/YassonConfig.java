@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2019, 2020 IBM and/or its affiliates. All rights reserved.
+ * Copyright (c) 2019, 2021 IBM and/or its affiliates. All rights reserved.
  *
  * This program and the accompanying materials are made available under the
  * terms of the Eclipse Public License v. 2.0 which is available at
@@ -45,6 +45,11 @@ public class YassonConfig extends JsonbConfig {
      * @see #withEagerParsing(Class...)
      */
     public static final String EAGER_PARSE_CLASSES = "yasson.eager-parse-classes";
+
+    /**
+     * @see #withForceMapArraySerializerForNullKeys(boolean)
+     */
+    public static final String FORCE_MAP_ARRAY_SERIALIZER_FOR_NULL_KEYS = "yasson.force-map-array-serializer-for-null-keys";
     
     /**
      * Property used to specify behaviour on deserialization when JSON document contains properties
@@ -103,5 +108,16 @@ public class YassonConfig extends JsonbConfig {
         setProperty(EAGER_PARSE_CLASSES, classes);
         return this;
     }
-    
+
+    /**
+     * Property needed to make MapToEntriesArraySerializer the serializer used
+     * when a null key is found in the map. Default value is false.
+     * @param value true to force the use of the MapToEntriesArraySerializer if
+     *              a null key is detected in the map, false to work as before
+     * @return This YassonConfig instance
+     */
+    public YassonConfig withForceMapArraySerializerForNullKeys(boolean value) {
+        setProperty(FORCE_MAP_ARRAY_SERIALIZER_FOR_NULL_KEYS, value);
+        return this;
+    }
 }
