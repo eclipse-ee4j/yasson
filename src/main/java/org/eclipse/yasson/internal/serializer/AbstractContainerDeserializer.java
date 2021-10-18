@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2016, 2019 Oracle and/or its affiliates. All rights reserved.
+ * Copyright (c) 2016, 2021 Oracle and/or its affiliates. All rights reserved.
  *
  * This program and the accompanying materials are made available under the
  * terms of the Eclipse Public License v. 2.0 which is available at
@@ -104,7 +104,7 @@ public abstract class AbstractContainerDeserializer<T> extends AbstractItem<T> i
             case KEY_NAME:
                 break;
             case VALUE_NULL:
-                appendResult(null);
+                appendResult(null, context);
                 break;
             case END_OBJECT:
             case END_ARRAY:
@@ -190,8 +190,9 @@ public abstract class AbstractContainerDeserializer<T> extends AbstractItem<T> i
      * or other embedded objects use methods provided.
      *
      * @param result An instance result of an item.
+     * @param context Current unmarshalling context.
      */
-    public abstract void appendResult(Object result);
+    public abstract void appendResult(Object result, Unmarshaller context);
 
     /**
      * Returns parser context.
