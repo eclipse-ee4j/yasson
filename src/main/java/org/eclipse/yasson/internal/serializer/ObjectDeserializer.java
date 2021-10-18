@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2015, 2020 Oracle and/or its affiliates. All rights reserved.
+ * Copyright (c) 2015, 2021 Oracle and/or its affiliates. All rights reserved.
  *
  * This program and the accompanying materials are made available under the
  * terms of the Eclipse Public License v. 2.0 which is available at
@@ -137,9 +137,10 @@ class ObjectDeserializer<T> extends AbstractContainerDeserializer<T> {
      * Set populated instance of current object to its unfinished wrapper values map.
      *
      * @param result An instance result of an item.
+     * @param context Current unmarshalling context.
      */
     @Override
-    public void appendResult(Object result) {
+    public void appendResult(Object result, Unmarshaller context) {
         final PropertyModel model = getModel();
         //missing property for null values
         if (model == null) {

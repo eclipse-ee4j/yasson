@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2016, 2020 Oracle and/or its affiliates. All rights reserved.
+ * Copyright (c) 2016, 2021 Oracle and/or its affiliates. All rights reserved.
  *
  * This program and the accompanying materials are made available under the
  * terms of the Eclipse Public License v. 2.0 which is available at
@@ -83,6 +83,8 @@ public class MapSerializer<K, V> extends AbstractContainerSerializer<Map<K, V>> 
      */
     private final boolean nullable;
 
+    private final boolean forceMapArraySerializerForNullKeys;
+
     /**
      * Instance that is responsible for serialization.
      */
@@ -96,6 +98,7 @@ public class MapSerializer<K, V> extends AbstractContainerSerializer<Map<K, V>> 
     protected MapSerializer(SerializerBuilder builder) {
         super(builder);
         nullable = builder.getJsonbContext().getConfigProperties().getConfigNullable();
+        forceMapArraySerializerForNullKeys = builder.getJsonbContext().getConfigProperties().isForceMapArraySerializerForNullKeys();
         serializer = null;
     }
 
@@ -110,7 +113,8 @@ public class MapSerializer<K, V> extends AbstractContainerSerializer<Map<K, V>> 
         if (serializer == null) {
             // All keys can be serialized as String
             boolean allStrings = true;
-            boolean first = true;
+            // if forceMapArraySerializerForNullKeys is set do not allow map serializer on first null
+            boolean first = !forceMapArraySerializerForNullKeys;
             Class<? extends Object> cls = null;
             // Cycle shall exit on first negative check
             for (Iterator<? extends Object> i = obj.keySet().iterator(); allStrings && i.hasNext(); ) {

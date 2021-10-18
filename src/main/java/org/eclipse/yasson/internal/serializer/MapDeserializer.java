@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2015, 2020 Oracle and/or its affiliates. All rights reserved.
+ * Copyright (c) 2015, 2021 Oracle and/or its affiliates. All rights reserved.
  *
  * This program and the accompanying materials are made available under the
  * terms of the Eclipse Public License v. 2.0 which is available at
@@ -12,6 +12,7 @@
 
 package org.eclipse.yasson.internal.serializer;
 
+import java.io.StringReader;
 import java.lang.reflect.ParameterizedType;
 import java.lang.reflect.Type;
 import java.util.HashMap;
@@ -33,15 +34,22 @@ import org.eclipse.yasson.internal.Unmarshaller;
 
 /**
  * Item implementation for {@link java.util.Map} fields.
- * According to JSON specification object can have only string keys, given that maps could only be parsed
- * from JSON objects, implementation is bound to String type.
+ * According to JSON specification object can have only string keys.
+ * Nevertheless the implementation lets the key be a basic object that was
+ * serialized into a string representation. Therefore the key is also parsed to
+ * convert it into its parametrized type.
  *
  * @param <T> map type
  */
 public class MapDeserializer<T extends Map<?, ?>> extends AbstractContainerDeserializer<T> implements EmbeddedItem {
 
     /**
-     * Type of value in the map. (Keys must always be Strings, because of JSON spec)
+     * Type of the key in the map.
+     */
+    private final Type mapKeyRuntimeType;
+
+    /**
+     * Type of value in the map.
      */
     private final Type mapValueRuntimeType;
 
@@ -54,6 +62,9 @@ public class MapDeserializer<T extends Map<?, ?>> extends AbstractContainerDeser
      */
     protected MapDeserializer(DeserializerBuilder builder) {
         super(builder);
+        mapKeyRuntimeType = getRuntimeType() instanceof ParameterizedType
+                ? ReflectionUtils.resolveType(this, ((ParameterizedType) getRuntimeType()).getActualTypeArguments()[0])
+                : Object.class;
         mapValueRuntimeType = getRuntimeType() instanceof ParameterizedType
                 ? ReflectionUtils.resolveType(this, ((ParameterizedType) getRuntimeType()).getActualTypeArguments()[1])
                 : Object.class;
@@ -93,19 +104,23 @@ public class MapDeserializer<T extends Map<?, ?>> extends AbstractContainerDeser
     }
 
     @Override
-    public void appendResult(Object result) {
-        appendCaptor(getParserContext().getLastKeyName(), convertNullToOptionalEmpty(mapValueRuntimeType, result));
+    public void appendResult(Object result, Unmarshaller context) {
+        // try to deserialize the string key into its type, JaxbException if not possible
+        final Object key = context.deserialize(mapKeyRuntimeType, new JsonbRiParser(
+                context.getJsonbContext().getJsonProvider().createParser(
+                        new StringReader("\"" + getParserContext().getLastKeyName() + "\""))));
+        appendCaptor(key, convertNullToOptionalEmpty(mapValueRuntimeType, result));
     }
 
     @SuppressWarnings("unchecked")
-    private <V> void appendCaptor(String key, V value) {
-        ((Map<String, V>) getInstance(null)).put(key, value);
+    private <K, V> void appendCaptor(K key, V value) {
+        ((Map<K, V>) getInstance(null)).put(key, value);
     }
 
     @Override
     protected void deserializeNext(JsonParser parser, Unmarshaller context) {
         final JsonbDeserializer<?> deserializer = newCollectionOrMapItem(mapValueRuntimeType, context.getJsonbContext());
-        appendResult(deserializer.deserialize(parser, context, mapValueRuntimeType));
+        appendResult(deserializer.deserialize(parser, context, mapValueRuntimeType), context);
     }
 
     @Override
