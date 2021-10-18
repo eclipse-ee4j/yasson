@@ -32,7 +32,7 @@ jobs:
         uses: actions/setup-java@v2
         with:
           distribution: 'adopt'
-          java-version: ${{ matrix.java }}
+          java-version: ${{ matrix.java_version }}
       - name: Maven cache
         uses: actions/cache@v2
         env:
