@@ -21,7 +21,7 @@ jobs:
 
     strategy:
       matrix:
-        java_version: [ 11, 16 ]
+        java_version: [ 11, 17 ]
 
     steps:
       - name: Checkout for build
@@ -30,9 +30,9 @@ jobs:
           fetch-depth: 0
       - name: Set up compile JDK
         uses: actions/setup-java@v2
-        with:
+        with: #Compile java needs to be the highest to ensure proper compilation of the multi-release jar
           distribution: 'adopt'
-          java-version: 16
+          java-version: 17
       - name: Maven cache
         uses: actions/cache@v2
         env:
@@ -41,10 +41,10 @@ jobs:
           path:
             ~/.m2
           key: build-${{ env.cache-name }}
-      - name: Checkstyle
-        run: mvn -B -Pstaging checkstyle:checkstyle
       - name: Copyright
         run: bash etc/copyright.sh
+      - name: Checkstyle
+        run: mvn -B -Pstaging checkstyle:checkstyle
       - name: Yasson install
         run: mvn -U -C -Pstaging clean install -DskipTests
       - name: Set up JDK for tests
