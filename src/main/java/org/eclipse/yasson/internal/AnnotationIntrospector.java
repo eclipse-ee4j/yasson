@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2016, 2020 Oracle and/or its affiliates. All rights reserved.
+ * Copyright (c) 2016, 2021 Oracle and/or its affiliates. All rights reserved.
  *
  * This program and the accompanying materials are made available under the
  * terms of the Eclipse Public License v. 2.0 which is available at
@@ -148,9 +148,11 @@ public class AnnotationIntrospector {
      * @return JsonbCreator metadata object
      */
     public JsonbCreator getCreator(Class<?> clazz) {
-        JsonbCreator jsonbCreator = null;
+        JsonbCreator jsonbCreator;
         Constructor<?>[] declaredConstructors =
                 AccessController.doPrivileged((PrivilegedAction<Constructor<?>[]>) clazz::getDeclaredConstructors);
+
+        jsonbCreator = ClassMultiReleaseExtension.findJsonbCreator(clazz, declaredConstructors, this);
 
         for (Constructor<?> constructor : declaredConstructors) {
             final jakarta.json.bind.annotation.JsonbCreator annot = findAnnotation(constructor.getDeclaredAnnotations(),
@@ -180,7 +182,7 @@ public class AnnotationIntrospector {
         return jsonbCreator;
     }
 
-    private JsonbCreator createJsonbCreator(Executable executable, JsonbCreator existing, Class<?> clazz) {
+    JsonbCreator createJsonbCreator(Executable executable, JsonbCreator existing, Class<?> clazz) {
         if (existing != null) {
             throw new JsonbException(Messages.getMessage(MessageKeys.MULTIPLE_JSONB_CREATORS, clazz));
         }
