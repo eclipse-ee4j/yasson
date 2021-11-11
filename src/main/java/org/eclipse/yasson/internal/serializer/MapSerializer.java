@@ -12,11 +12,16 @@
 
 package org.eclipse.yasson.internal.serializer;
 
+import java.lang.reflect.ParameterizedType;
+import java.lang.reflect.Type;
 import java.util.Iterator;
 import java.util.Map;
+import java.util.Optional;
 
 import jakarta.json.bind.serializer.SerializationContext;
 import jakarta.json.stream.JsonGenerator;
+
+import org.eclipse.yasson.internal.ReflectionUtils;
 
 /**
  * Serialize {@link Map}.
@@ -91,12 +96,18 @@ public class MapSerializer<K, V> extends AbstractContainerSerializer<Map<K, V>> 
     private Delegate<K, V> serializer;
 
     /**
+     * Flag to know if the process is for the key (0) or the value (1).
+     */
+    private int actualTypeArgument;
+
+    /**
      * Creates an instance of {@link Map} serialization.
      *
      * @param builder current instance of {@link SerializerBuilder}
      */
     protected MapSerializer(SerializerBuilder builder) {
         super(builder);
+        actualTypeArgument = 0;
         nullable = builder.getJsonbContext().getConfigProperties().getConfigNullable();
         forceMapArraySerializerForNullKeys = builder.getJsonbContext().getConfigProperties().isForceMapArraySerializerForNullKeys();
         serializer = null;
@@ -203,4 +214,35 @@ public class MapSerializer<K, V> extends AbstractContainerSerializer<Map<K, V>> 
         return nullable;
     }
 
+    /**
+     * Flag to serialize the key in the map.
+     */
+    protected void serializeKey() {
+        this.actualTypeArgument = 0;
+    }
+
+    /**
+     * Flag to serialize the value in the map.
+     */
+    protected void serializeValue() {
+        this.actualTypeArgument = 1;
+    }
+
+    /**
+     * In a map the type can refer to the key or the value type depending which
+     * one is currently being processed. The field <em>actualTypeArgument</em>
+     * controls which one is being serialized at the moment.
+     *
+     * @param valueType The value type which should be of type Map&lt;K,V&gt;
+     * @return The type for the key or the value
+     */
+    @Override
+    protected Type getValueType(Type valueType) {
+        if (valueType instanceof ParameterizedType && ((ParameterizedType) valueType).getActualTypeArguments().length > actualTypeArgument) {
+            Optional<Type> runtimeTypeOptional = ReflectionUtils
+                    .resolveOptionalType(this, ((ParameterizedType) valueType).getActualTypeArguments()[actualTypeArgument]);
+            return runtimeTypeOptional.orElse(Object.class);
+        }
+        return Object.class;
+    }
 }
