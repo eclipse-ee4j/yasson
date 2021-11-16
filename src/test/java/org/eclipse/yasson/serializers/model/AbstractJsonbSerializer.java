@@ -12,11 +12,11 @@
 
 package org.eclipse.yasson.serializers.model;
 
-import jakarta.json.Json;
-import jakarta.json.JsonStructure;
-import jakarta.json.bind.serializer.JsonbSerializer;
-import jakarta.json.bind.serializer.SerializationContext;
-import jakarta.json.stream.JsonGenerator;
+import javax.json.Json;
+import javax.json.JsonStructure;
+import javax.json.bind.serializer.JsonbSerializer;
+import javax.json.bind.serializer.SerializationContext;
+import javax.json.stream.JsonGenerator;
 
 /**
  * Abstract serializer.

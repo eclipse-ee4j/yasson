@@ -12,7 +12,7 @@
 
 package org.eclipse.yasson.serializers.model;
 
-import jakarta.json.bind.serializer.JsonbSerializer;
+import javax.json.bind.serializer.JsonbSerializer;
 
 /**
  * Explicit serializer.
