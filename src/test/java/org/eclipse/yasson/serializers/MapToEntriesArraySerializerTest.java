@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2019 Oracle and/or its affiliates. All rights reserved.
+ * Copyright (c) 2019, 2021 Oracle and/or its affiliates. All rights reserved.
  *
  * This program and the accompanying materials are made available under the
  * terms of the Eclipse Public License v. 2.0 which is available at
@@ -21,16 +21,25 @@ import java.lang.reflect.Type;
 import java.math.BigDecimal;
 import java.util.Comparator;
 import java.util.HashMap;
+import java.util.Locale;
 import java.util.Map;
+import java.util.Objects;
 import java.util.Set;
 import java.util.TreeMap;
 
 import javax.json.Json;
 import javax.json.JsonArray;
 import javax.json.JsonObject;
+import javax.json.JsonValue;
 import javax.json.bind.Jsonb;
 import javax.json.bind.JsonbBuilder;
 import javax.json.bind.JsonbConfig;
+import javax.json.bind.serializer.DeserializationContext;
+import javax.json.bind.serializer.JsonbDeserializer;
+import javax.json.bind.serializer.JsonbSerializer;
+import javax.json.bind.serializer.SerializationContext;
+import javax.json.stream.JsonGenerator;
+import javax.json.stream.JsonParser;
 
 import org.eclipse.yasson.serializers.model.Pokemon;
 import org.eclipse.yasson.serializers.model.Trainer;
@@ -827,4 +836,103 @@ public class MapToEntriesArraySerializerTest {
         }
     }
 
+    public static class LocaleSerializer implements JsonbSerializer<Locale> {
+
+        @Override
+        public void serialize(Locale obj, JsonGenerator generator, SerializationContext ctx) {
+            generator.write(obj.toLanguageTag());
+        }
+    }
+
+    public static class LocaleDeserializer implements JsonbDeserializer<Locale> {
+
+        @Override
+        public Locale deserialize(JsonParser parser, DeserializationContext ctx, Type rtType) {
+            return Locale.forLanguageTag(parser.getString());
+        }
+    }
+
+    public static class MapObject<K, V> {
+
+        private Map<K, V> values;
+
+        public MapObject() {
+            this.values = new HashMap<>();
+        }
+
+        public Map<K, V> getValues() {
+            return values;
+        }
+
+        public void setValues(Map<K, V> values) {
+            if (values == null) {
+                throw new IllegalArgumentException("values cannot be null");
+            }
+            this.values = values;
+        }
+
+        @Override
+        public boolean equals(Object o) {
+            if (o instanceof MapObject) {
+                MapObject<?,?> to = (MapObject<?,?>) o;
+                return values.equals(to.values);
+            }
+            return false;
+        }
+
+        @Override
+        public int hashCode() {
+            return Objects.hashCode(this.values);
+        }
+
+        @Override
+        public String toString() {
+            return values.toString();
+        }
+    }
+
+    public static class MapObjectLocaleString extends MapObject<Locale, String> {};
+
+    private void verifyMapObjectLocaleStringSerialization(JsonObject jsonObject, MapObjectLocaleString mapObject) {
+        // Expected serialization is: {"values":[{"key":"lang-tag","value":"string"},...]}
+        assertEquals(1, jsonObject.size());
+        assertNotNull(jsonObject.get("values"));
+        assertEquals(JsonValue.ValueType.ARRAY, jsonObject.get("values").getValueType());
+        JsonArray jsonArray = jsonObject.getJsonArray("values");
+        assertEquals(mapObject.getValues().size(), jsonArray.size());
+        MapObjectLocaleString resObject = new MapObjectLocaleString();
+        for (JsonValue jsonValue : jsonArray) {
+            assertEquals(JsonValue.ValueType.OBJECT, jsonValue.getValueType());
+            JsonObject entry = jsonValue.asJsonObject();
+            assertEquals(2, entry.size());
+            assertNotNull(entry.get("key"));
+            assertEquals(JsonValue.ValueType.STRING, entry.get("key").getValueType());
+            assertNotNull(entry.get("value"));
+            assertEquals(JsonValue.ValueType.STRING, entry.get("value").getValueType());
+            resObject.getValues().put(Locale.forLanguageTag(entry.getString("key")), entry.getString("value"));
+        }
+        assertEquals(mapObject, resObject);
+    }
+
+    /**
+     * Test a Locale/String map with custom Locale serializer and deserializer.
+     */
+    @Test
+    public void testMapLocaleString() {
+        Jsonb jsonb = JsonbBuilder.create(new JsonbConfig()
+                .withSerializers(new LocaleSerializer())
+                .withDeserializers(new LocaleDeserializer()));
+
+        MapObjectLocaleString mapObject = new MapObjectLocaleString();
+        mapObject.getValues().put(Locale.US, "us");
+        mapObject.getValues().put(Locale.ENGLISH, "en");
+        mapObject.getValues().put(Locale.JAPAN, "jp");
+
+        String json = jsonb.toJson(mapObject);
+        JsonObject jsonObject = Json.createReader(new StringReader(json)).read().asJsonObject();
+        verifyMapObjectLocaleStringSerialization(jsonObject, mapObject);
+
+        MapObjectLocaleString resObject = jsonb.fromJson(json, MapObjectLocaleString.class);
+        assertEquals(mapObject, resObject);
+    }
 }
