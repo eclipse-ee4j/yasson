@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2015, 2019 Oracle and/or its affiliates. All rights reserved.
+ * Copyright (c) 2015, 2021 Oracle and/or its affiliates. All rights reserved.
  *
  * This program and the accompanying materials are made available under the
  * terms of the Eclipse Public License v. 2.0 which is available at
@@ -12,6 +12,8 @@
 
 package org.eclipse.yasson.defaultmapping.generics;
 
+import org.eclipse.yasson.defaultmapping.generics.model.FinalMember;
+import org.eclipse.yasson.defaultmapping.generics.model.FinalGenericWrapper;
 import org.junit.jupiter.api.*;
 import static org.junit.jupiter.api.Assertions.*;
 import static org.eclipse.yasson.Jsonbs.*;
@@ -426,6 +428,20 @@ public class GenericsTest {
         collectionWrapper.setWrappedCollection(new ArrayList<>());
         collectionWrapper.setWrappedMap(new HashMap<>());
         String s = defaultJsonb.toJson(collectionWrapper);
+    }
+
+    @Test
+    public void multipleGenericLevels() {
+        FinalMember member = new FinalMember();
+        member.setName("Jason");
+        FinalGenericWrapper concreteContainer = new FinalGenericWrapper();
+        concreteContainer.setMember(member);
+
+        String expected = "{\"member\":{\"name\":\"Jason\"}}";
+        Jsonb jsonb = JsonbBuilder.create();
+        assertEquals(expected, jsonb.toJson(concreteContainer));
+        FinalGenericWrapper finalGenericWrapper = jsonb.fromJson(expected, FinalGenericWrapper.class);
+        assertEquals(concreteContainer, finalGenericWrapper);
     }
 
     public interface FunctionalInterface<T> {
