@@ -45,9 +45,9 @@ public class ClassMultiReleaseExtension {
                 && classProperties.containsKey(method.getName());
     }
 
-    static JsonbCreator finCreator(Class<?> clazz,
-                                   Constructor<?>[] declaredConstructors,
-                                   AnnotationIntrospector introspector) {
+    static JsonbCreator findCreator(Class<?> clazz,
+                                    Constructor<?>[] declaredConstructors,
+                                    AnnotationIntrospector introspector) {
         if (clazz.isRecord()) {
             if (declaredConstructors.length == 1) {
                 return introspector.createJsonbCreator(declaredConstructors[0], null, clazz);

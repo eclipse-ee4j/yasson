@@ -40,9 +40,9 @@ public class ClassMultiReleaseExtension {
         return false;
     }
 
-    static JsonbCreator finCreator(Class<?> clazz,
-                                   Constructor<?>[] declaredConstructors,
-                                   AnnotationIntrospector introspector) {
+    static JsonbCreator findCreator(Class<?> clazz,
+                                    Constructor<?>[] declaredConstructors,
+                                    AnnotationIntrospector introspector) {
         return null;
     }
 

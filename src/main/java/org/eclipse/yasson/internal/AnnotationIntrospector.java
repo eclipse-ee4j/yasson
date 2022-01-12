@@ -175,7 +175,7 @@ public class AnnotationIntrospector {
             }
         }
         if (jsonbCreator == null) {
-            jsonbCreator = ClassMultiReleaseExtension.finCreator(clazz, declaredConstructors, this);
+            jsonbCreator = ClassMultiReleaseExtension.findCreator(clazz, declaredConstructors, this);
             if (jsonbCreator == null) {
                 jsonbCreator = constructorPropertiesIntrospector.getCreator(declaredConstructors);
             }
