@@ -19,8 +19,6 @@ import org.eclipse.yasson.internal.properties.MessageKeys;
 import org.eclipse.yasson.internal.properties.Messages;
 import org.junit.jupiter.api.Test;
 
-import static org.hamcrest.MatcherAssert.assertThat;
-import static org.hamcrest.Matchers.is;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 
@@ -54,9 +52,9 @@ public class RecordTest {
         String expected = "{\"color\":\"green\",\"type\":\"skoda\"}";
 
         String json = Jsonbs.defaultJsonb.toJson(car);
-        assertThat(json, is(expected));
+        assertEquals(expected, json);
         CarWithExtraMethod deserialized = Jsonbs.defaultJsonb.fromJson(expected, CarWithExtraMethod.class);
-        assertThat(deserialized, is(car));
+        assertEquals(car, deserialized);
     }
 
     @Test
@@ -65,12 +63,12 @@ public class RecordTest {
         String expected = "{\"color\":\"red\",\"type\":\"skoda\"}";
 
         String json = Jsonbs.defaultJsonb.toJson(car);
-        assertThat(json, is(expected));
+        assertEquals(expected, json);
         JsonbException jsonbException = assertThrows(JsonbException.class,
                                                      () -> Jsonbs.defaultJsonb.fromJson(expected,
                                                                                         CarWithMultipleConstructors.class));
         String expectedMessage = Messages.getMessage(MessageKeys.RECORD_MULTIPLE_CONSTRUCTORS, CarWithMultipleConstructors.class);
-        assertThat(jsonbException.getMessage(), is(expectedMessage));
+        assertEquals(expectedMessage, jsonbException.getMessage());
     }
 
     @Test
@@ -79,10 +77,10 @@ public class RecordTest {
         String expected = "{\"color\":\"red\",\"type\":\"skoda\"}";
 
         String json = Jsonbs.defaultJsonb.toJson(car);
-        assertThat(json, is(expected));
+        assertEquals(expected, json);
         CarWithMultipleConstructorsAndCreator deserialized =  Jsonbs.defaultJsonb
                 .fromJson(expected, CarWithMultipleConstructorsAndCreator.class);
-        assertThat(car, is(deserialized));
+        assertEquals(car, deserialized);
     }
 
     @Test
@@ -91,9 +89,9 @@ public class RecordTest {
         String expected = "{\"color\":\"red\",\"type\":\"skoda\"}";
 
         String json = Jsonbs.defaultJsonb.toJson(car);
-        assertThat(json, is(expected));
+        assertEquals(expected, json);
         CarWithCreator deserialized = Jsonbs.defaultJsonb.fromJson(expected, CarWithCreator.class);
-        assertThat(deserialized, is(car));
+        assertEquals(car, deserialized);
     }
 
 }
