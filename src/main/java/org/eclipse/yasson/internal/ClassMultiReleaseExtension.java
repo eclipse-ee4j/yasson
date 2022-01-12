@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2021 Oracle and/or its affiliates. All rights reserved.
+ * Copyright (c) 2021, 2022 Oracle and/or its affiliates. All rights reserved.
  *
  * This program and the accompanying materials are made available under the
  * terms of the Eclipse Public License v. 2.0 which is available at
@@ -14,14 +14,19 @@ package org.eclipse.yasson.internal;
 
 import java.lang.reflect.Constructor;
 import java.lang.reflect.Method;
+import java.util.Map;
+import java.util.Optional;
+
+import jakarta.json.bind.JsonbException;
 
 import org.eclipse.yasson.internal.model.JsonbCreator;
+import org.eclipse.yasson.internal.model.Property;
 
 /**
  * Search for instance creator from other sources.
  * Mainly intended to add extensibility for different java versions and new features.
  */
-class ClassMultiReleaseExtension {
+public class ClassMultiReleaseExtension {
 
     private ClassMultiReleaseExtension() {
         throw new IllegalStateException("This class cannot be instantiated");
@@ -31,12 +36,18 @@ class ClassMultiReleaseExtension {
         return true;
     }
 
-    static boolean isGetAccessorMethod(Method method) {
+    static boolean isSpecialAccessorMethod(Method method, Map<String, Property> classProperties) {
         return false;
     }
 
-    static JsonbCreator findJsonbCreator(Class<?> clazz, Constructor<?>[] declaredConstructors, AnnotationIntrospector introspector) {
+    static JsonbCreator finCreator(Class<?> clazz,
+                                   Constructor<?>[] declaredConstructors,
+                                   AnnotationIntrospector introspector) {
         return null;
+    }
+
+    public static Optional<JsonbException> exceptionToThrow(Class<?> clazz) {
+        return Optional.empty();
     }
 
 }

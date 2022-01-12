@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2015, 2021 Oracle and/or its affiliates. All rights reserved.
+ * Copyright (c) 2015, 2022 Oracle and/or its affiliates. All rights reserved.
  *
  * This program and the accompanying materials are made available under the
  * terms of the Eclipse Public License v. 2.0 which is available at
@@ -23,6 +23,7 @@ import jakarta.json.bind.JsonbException;
 import jakarta.json.bind.serializer.JsonbDeserializer;
 import jakarta.json.stream.JsonParser;
 
+import org.eclipse.yasson.internal.ClassMultiReleaseExtension;
 import org.eclipse.yasson.internal.JsonbContext;
 import org.eclipse.yasson.internal.JsonbParser;
 import org.eclipse.yasson.internal.JsonbRiParser;
@@ -98,7 +99,8 @@ class ObjectDeserializer<T> extends AbstractContainerDeserializer<T> {
         } else {
             Constructor<T> defaultConstructor = (Constructor<T>) getClassModel().getDefaultConstructor();
             if (defaultConstructor == null) {
-                throw new JsonbException(Messages.getMessage(MessageKeys.NO_DEFAULT_CONSTRUCTOR, rawType));
+                throw ClassMultiReleaseExtension.exceptionToThrow(rawType)
+                        .orElse(new JsonbException(Messages.getMessage(MessageKeys.NO_DEFAULT_CONSTRUCTOR, rawType)));
             }
             instance = ReflectionUtils.createNoArgConstructorInstance(defaultConstructor);
         }
