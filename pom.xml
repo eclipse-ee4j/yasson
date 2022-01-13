@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <!--
 
-    Copyright (c) 2016, 2021 Oracle and/or its affiliates. All rights reserved.
+    Copyright (c) 2016, 2022 Oracle and/or its affiliates. All rights reserved.
 
     This program and the accompanying materials are made available under the
     terms of the Eclipse Public License v. 2.0 which is available at
@@ -462,7 +462,7 @@
                 <plugin>
                     <groupId>org.apache.felix</groupId>
                     <artifactId>maven-bundle-plugin</artifactId>
-                    <version>3.5.0</version>
+                    <version>5.1.1</version>
                     <executions>
                         <execution>
                             <id>osgi-bundle</id>
@@ -471,13 +471,14 @@
                                 <goal>manifest</goal>
                             </goals>
                             <configuration>
+                                <niceManifest>true</niceManifest>
                                 <instructions>
-                                    <_failok>true</_failok>
                                     <Bundle-Name>${project.name}</Bundle-Name>
                                     <Bundle-SymbolicName>${project.artifactId}</Bundle-SymbolicName>
                                     <Bundle-Version>${project.version}</Bundle-Version>
                                     <Export-Package>org.eclipse.yasson;version=${project.version}</Export-Package>
                                     <Private-Package>org.eclipse.yasson.*;version=${project.version}</Private-Package>
+                                    <Multi-Release>true</Multi-Release>
                                     <Import-Package>
                                         jakarta.enterprise.context.spi;version=!;resolution:="optional",
                                         jakarta.enterprise.inject.spi;version=!;resolution:="optional",
