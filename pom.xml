@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <!--
 
-    Copyright (c) 2016, 2020 Oracle and/or its affiliates. All rights reserved.
+    Copyright (c) 2016, 2022 Oracle and/or its affiliates. All rights reserved.
 
     This program and the accompanying materials are made available under the
     terms of the Eclipse Public License v. 2.0 which is available at
@@ -484,6 +484,7 @@
                                     (Yasson does read CDI which is on CP, CDI access yasson's classes with reflection)
                                     -->
                                     --add-reads org.eclipse.yasson=ALL-UNNAMED --add-opens org.eclipse.yasson/org.eclipse.yasson.internal.cdi=ALL-UNNAMED
+                                    --add-opens=java.base/java.lang=ALL-UNNAMED
 
                                     --add-exports org.eclipse.yasson/org.eclipse.yasson.internal.cdi=java.naming
                                 </argLine>
