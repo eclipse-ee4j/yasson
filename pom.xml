@@ -432,7 +432,7 @@
                 <plugin>
                     <groupId>org.apache.felix</groupId>
                     <artifactId>maven-bundle-plugin</artifactId>
-                    <version>3.5.0</version>
+                    <version>5.1.1</version>
                     <executions>
                         <execution>
                             <id>osgi-bundle</id>
@@ -441,13 +441,14 @@
                                 <goal>manifest</goal>
                             </goals>
                             <configuration>
+                                <niceManifest>true</niceManifest>
                                 <instructions>
-                                    <_failok>true</_failok>
                                     <Bundle-Name>${project.name}</Bundle-Name>
                                     <Bundle-SymbolicName>${project.artifactId}</Bundle-SymbolicName>
                                     <Bundle-Version>${project.version}</Bundle-Version>
                                     <Export-Package>org.eclipse.yasson;version=${project.version}</Export-Package>
                                     <Private-Package>org.eclipse.yasson.*;version=${project.version}</Private-Package>
+                                    <Multi-Release>true</Multi-Release>
                                     <Import-Package>
                                         javax.enterprise.context.spi;version=!;resolution:="optional",
                                         javax.enterprise.inject.spi;version=!;resolution:="optional",
