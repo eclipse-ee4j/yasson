@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2015, 2021 Oracle and/or its affiliates. All rights reserved.
+ * Copyright (c) 2015, 2022 Oracle and/or its affiliates. All rights reserved.
  *
  * This program and the accompanying materials are made available under the
  * terms of the Eclipse Public License v. 2.0 which is available at
@@ -198,7 +198,9 @@ class ClassParser {
         for (Method method : declaredMethods) {
             String name = method.getName();
             //isBridge method filters out methods inherited from interfaces
-            if (!isPropertyMethod(method) || method.isBridge() || isSpecialCaseMethod(clazz, method)) {
+            boolean isAccessorMethod = ClassMultiReleaseExtension.isSpecialAccessorMethod(method, classProperties)
+                    || isPropertyMethod(method);
+            if (!isAccessorMethod || method.isBridge() || isSpecialCaseMethod(clazz, method)) {
                 continue;
             }
             final String propertyName = ClassMultiReleaseExtension.shouldTransformToPropertyName(method)
@@ -232,9 +234,6 @@ class ClassParser {
     }
 
     private static boolean isGetter(Method m) {
-        if (ClassMultiReleaseExtension.isGetAccessorMethod(m)) {
-            return true;
-        }
         return (m.getName().startsWith(GET_PREFIX) || m.getName().startsWith(IS_PREFIX)) && m.getParameterCount() == 0;
     }
 
