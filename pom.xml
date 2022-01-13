@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <!--
 
-    Copyright (c) 2016, 2020 Oracle and/or its affiliates. All rights reserved.
+    Copyright (c) 2016, 2022 Oracle and/or its affiliates. All rights reserved.
 
     This program and the accompanying materials are made available under the
     terms of the Eclipse Public License v. 2.0 which is available at
@@ -36,6 +36,7 @@
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
         <jakarta.json.version>1.1.6</jakarta.json.version>
         <jakarta.json.bind.version>1.0.2</jakarta.json.bind.version>
+        <jakarta.enterprise.cdi-api.version>2.0.2</jakarta.enterprise.cdi-api.version>
         <netbeans.hint.jdkPlatform>JDK_9</netbeans.hint.jdkPlatform>
     </properties>
 
@@ -62,7 +63,7 @@
         <dependency>
             <groupId>jakarta.enterprise</groupId>
             <artifactId>jakarta.enterprise.cdi-api</artifactId>
-            <version>2.0.2</version>
+            <version>${jakarta.enterprise.cdi-api.version}</version>
             <optional>true</optional>
             <scope>provided</scope>
         </dependency>
@@ -222,6 +223,50 @@
                 </plugins>
             </build>
         </profile>
+        <profile>
+            <id>jdk16</id>
+            <activation>
+                <jdk>[16,)</jdk>
+            </activation>
+            <build>
+                <plugins>
+                    <plugin>
+                        <groupId>org.apache.maven.plugins</groupId>
+                        <artifactId>maven-compiler-plugin</artifactId>
+                        <version>3.8.1</version>
+                        <executions>
+                            <execution>
+                                <id>default-testCompile</id>
+                                <configuration>
+                                    <release>16</release>
+                                    <compileSourceRoots>
+                                        <compileSourceRoot>${project.basedir}/src/test/java</compileSourceRoot>
+                                        <compileSourceRoot>${project.basedir}/src/test/java16</compileSourceRoot>
+                                    </compileSourceRoots>
+                                </configuration>
+                            </execution>
+                        </executions>
+                    </plugin>
+                    <plugin>
+                        <groupId>org.apache.maven.plugins</groupId>
+                        <artifactId>maven-failsafe-plugin</artifactId>
+                        <executions>
+                            <execution>
+                                <goals>
+                                    <goal>integration-test</goal>
+                                    <goal>verify</goal>
+                                </goals>
+                            </execution>
+                        </executions>
+                        <configuration>
+                            <includes>
+                                <include>**/RecordTest.java</include>
+                            </includes>
+                        </configuration>
+                    </plugin>
+                </plugins>
+            </build>
+        </profile>
     </profiles>
 
     <build>
@@ -255,6 +300,11 @@
                 </plugin>
                 <plugin>
                     <groupId>org.apache.maven.plugins</groupId>
+                    <artifactId>maven-failsafe-plugin</artifactId>
+                    <version>3.0.0-M3</version>
+                </plugin>
+                <plugin>
+                    <groupId>org.apache.maven.plugins</groupId>
                     <artifactId>maven-compiler-plugin</artifactId>
                     <version>3.8.1</version>
                     <executions>
@@ -269,6 +319,19 @@
                                     <arg>--add-reads</arg>
                                     <arg>org.eclipse.yasson=ALL-UNNAMED</arg>
                                 </compilerArgs>
+                            </configuration>
+                        </execution>
+                        <execution>
+                            <id>multi-release-compile-16</id>
+                            <goals>
+                                <goal>compile</goal>
+                            </goals>
+                            <configuration>
+                                <release>16</release>
+                                <compileSourceRoots>
+                                    <compileSourceRoot>${project.basedir}/src/main/java16</compileSourceRoot>
+                                </compileSourceRoots>
+                                <multiReleaseOutput>true</multiReleaseOutput>
                             </configuration>
                         </execution>
                         <execution>
@@ -305,6 +368,9 @@
                     <configuration>
                         <archive>
                             <manifestFile>${project.build.outputDirectory}/META-INF/MANIFEST.MF</manifestFile>
+                            <manifestEntries>
+                                <Multi-Release>true</Multi-Release>
+                            </manifestEntries>
                         </archive>
                     </configuration>
                 </plugin>
@@ -366,7 +432,7 @@
                 <plugin>
                     <groupId>org.apache.felix</groupId>
                     <artifactId>maven-bundle-plugin</artifactId>
-                    <version>3.5.0</version>
+                    <version>5.1.1</version>
                     <executions>
                         <execution>
                             <id>osgi-bundle</id>
@@ -375,13 +441,14 @@
                                 <goal>manifest</goal>
                             </goals>
                             <configuration>
+                                <niceManifest>true</niceManifest>
                                 <instructions>
-                                    <_failok>true</_failok>
                                     <Bundle-Name>${project.name}</Bundle-Name>
                                     <Bundle-SymbolicName>${project.artifactId}</Bundle-SymbolicName>
                                     <Bundle-Version>${project.version}</Bundle-Version>
                                     <Export-Package>org.eclipse.yasson;version=${project.version}</Export-Package>
                                     <Private-Package>org.eclipse.yasson.*;version=${project.version}</Private-Package>
+                                    <Multi-Release>true</Multi-Release>
                                     <Import-Package>
                                         javax.enterprise.context.spi;version=!;resolution:="optional",
                                         javax.enterprise.inject.spi;version=!;resolution:="optional",
@@ -396,6 +463,7 @@
                     </executions>
                 </plugin>
                 <plugin>
+                    <groupId>org.apache.maven.plugins</groupId>
                     <artifactId>maven-surefire-plugin</artifactId>
                     <version>3.0.0-M3</version>
                     <executions>
@@ -410,12 +478,14 @@
                                 <excludes>
                                     <exclude>**/JavaxNamingExcludedTest.class</exclude>
                                     <exclude>**/AnnotationIntrospectorWithoutOptionalModulesTest.class</exclude>
+                                    <exclude>**/*Record*</exclude>
                                 </excludes>
                                 <argLine>
                                     <!--Remove when CDI is updated to support modules
                                     (Yasson does read CDI which is on CP, CDI access yasson's classes with reflection)
                                     -->
                                     --add-reads org.eclipse.yasson=ALL-UNNAMED --add-opens org.eclipse.yasson/org.eclipse.yasson.internal.cdi=ALL-UNNAMED
+                                    --add-opens=java.base/java.lang=ALL-UNNAMED
 
                                     --add-exports org.eclipse.yasson/org.eclipse.yasson.internal.cdi=java.naming
                                 </argLine>

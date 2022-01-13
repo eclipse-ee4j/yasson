@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2016, 2020 Oracle and/or its affiliates. All rights reserved.
+ * Copyright (c) 2016, 2022 Oracle and/or its affiliates. All rights reserved.
  *
  * This program and the accompanying materials are made available under the
  * terms of the Eclipse Public License v. 2.0 which is available at
@@ -175,12 +175,15 @@ public class AnnotationIntrospector {
             }
         }
         if (jsonbCreator == null) {
-            jsonbCreator = constructorPropertiesIntrospector.getCreator(declaredConstructors);
+            jsonbCreator = ClassMultiReleaseExtension.findCreator(clazz, declaredConstructors, this);
+            if (jsonbCreator == null) {
+                jsonbCreator = constructorPropertiesIntrospector.getCreator(declaredConstructors);
+            }
         }
         return jsonbCreator;
     }
 
-    private JsonbCreator createJsonbCreator(Executable executable, JsonbCreator existing, Class<?> clazz) {
+    JsonbCreator createJsonbCreator(Executable executable, JsonbCreator existing, Class<?> clazz) {
         if (existing != null) {
             throw new JsonbException(Messages.getMessage(MessageKeys.MULTIPLE_JSONB_CREATORS, clazz));
         }
