@@ -53,4 +53,4 @@ jobs:
           distribution: 'adopt'
           java-version: ${{ matrix.java_version }}
       - name: Yasson tests
-        run: mvn -U -C -Pstaging verify
+        run: mvn -U -C -Dmaven.javadoc.skip=true -Pstaging verify
