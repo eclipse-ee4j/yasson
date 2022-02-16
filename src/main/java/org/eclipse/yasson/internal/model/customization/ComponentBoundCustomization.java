@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2016, 2020 Oracle and/or its affiliates. All rights reserved.
+ * Copyright (c) 2016, 2022 Oracle and/or its affiliates. All rights reserved.
  *
  * This program and the accompanying materials are made available under the
  * terms of the Eclipse Public License v. 2.0 which is available at
@@ -36,12 +36,12 @@ public interface ComponentBoundCustomization {
      *
      * @return serializer wrapper
      */
-    SerializerBinding getSerializerBinding();
+    SerializerBinding<?> getSerializerBinding();
 
     /**
      * Deserializer wrapper with resolved generic info.
      *
      * @return deserializer wrapper
      */
-    DeserializerBinding getDeserializerBinding();
+    DeserializerBinding<?> getDeserializerBinding();
 }

@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2016, 2020 Oracle and/or its affiliates. All rights reserved.
+ * Copyright (c) 2016, 2022 Oracle and/or its affiliates. All rights reserved.
  *
  * This program and the accompanying materials are made available under the
  * terms of the Eclipse Public License v. 2.0 which is available at
@@ -12,9 +12,11 @@
 
 package org.eclipse.yasson;
 
-import org.junit.jupiter.api.*;
-import static org.junit.jupiter.api.Assertions.*;
-import static org.eclipse.yasson.Jsonbs.*;
+import org.junit.jupiter.api.Test;
+
+import static org.eclipse.yasson.Jsonbs.bindingJsonb;
+import static org.eclipse.yasson.Jsonbs.defaultJsonb;
+import static org.junit.jupiter.api.Assertions.assertEquals;
 
 /**
  * @author Roman Grigoriadi
@@ -25,7 +27,6 @@ public class SimpleTest {
     public void testSimpleSerialize() {
         final StringWrapper wrapper = new StringWrapper();
         wrapper.setValue("abc");
-        bindingJsonb.toJson(wrapper);
         final String val = bindingJsonb.toJson(wrapper);
         assertEquals("{\"value\":\"abc\"}", val);
     }
@@ -33,11 +34,11 @@ public class SimpleTest {
     @Test
     public void testSimpleDeserializer() {
         final StringWrapper stringWrapper = defaultJsonb.fromJson("{\"value\":\"abc\"}", StringWrapper.class);
-        assertEquals("abc", stringWrapper.getValue());
+        assertEquals("abc", stringWrapper.value);
     }
-    
-    
+
     public static class StringWrapper {
+
         public String value;
 
         public String getValue() {

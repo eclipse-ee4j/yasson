@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2015, 2020 Oracle and/or its affiliates. All rights reserved.
+ * Copyright (c) 2015, 2022 Oracle and/or its affiliates. All rights reserved.
  *
  * This program and the accompanying materials are made available under the
  * terms of the Eclipse Public License v. 2.0 which is available at
@@ -111,7 +111,8 @@ public class ClassModel {
     }
 
     /**
-     * Check if name is equal according to property strategy. In case of {@link CaseInsensitiveStrategy} ignore case.
+     * Check if name is equal according to property strategy.
+     * In case of {@link StrategiesProvider#CASE_INSENSITIVE_STRATEGY} ignore case.
      * User can provide own strategy implementation, cast to custom interface is not an option.
      *
      * @return True if names are equal.

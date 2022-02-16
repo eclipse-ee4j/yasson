@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2019, 2020 Oracle and/or its affiliates. All rights reserved.
+ * Copyright (c) 2019, 2022 Oracle and/or its affiliates. All rights reserved.
  *
  * This program and the accompanying materials are made available under the
  * terms of the Eclipse Public License v. 2.0 which is available at
@@ -28,13 +28,7 @@ import java.util.function.Supplier;
  */
 public class InstanceCreator {
 
-    private static final InstanceCreator INSTANCE = new InstanceCreator();
-
-    static InstanceCreator getSingleton() {
-        return INSTANCE;
-    }
-
-    private static final Map<Class, Supplier> CREATORS = new HashMap<>();
+    private static final Map<Class<?>, Supplier<?>> CREATORS = new HashMap<>();
 
     static {
         CREATORS.put(ArrayList.class, ArrayList::new);
@@ -46,9 +40,7 @@ public class InstanceCreator {
     }
 
     private InstanceCreator() {
-        if (INSTANCE != null) {
-            throw new IllegalStateException("This class should never be instantiated");
-        }
+        throw new IllegalStateException("This class should never be instantiated");
     }
 
     /**
@@ -60,7 +52,7 @@ public class InstanceCreator {
      */
     @SuppressWarnings("unchecked")
     public static <T> T createInstance(Class<T> tClass) {
-        Supplier<T> creator = CREATORS.get(tClass);
+        Supplier<T> creator = (Supplier<T>) CREATORS.get(tClass);
         //No worries for race conditions here, instance may be replaced during first attempt.
         if (creator == null) {
             Constructor<T> constructor = ReflectionUtils.getDefaultConstructor(tClass, true);

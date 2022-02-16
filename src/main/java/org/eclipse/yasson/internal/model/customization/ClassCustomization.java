@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2015, 2020 Oracle and/or its affiliates. All rights reserved.
+ * Copyright (c) 2015, 2022 Oracle and/or its affiliates. All rights reserved.
  *
  * This program and the accompanying materials are made available under the
  * terms of the Eclipse Public License v. 2.0 which is available at
@@ -14,51 +14,45 @@ package org.eclipse.yasson.internal.model.customization;
 
 import jakarta.json.bind.config.PropertyVisibilityStrategy;
 
+import org.eclipse.yasson.internal.JsonbDateFormatter;
+import org.eclipse.yasson.internal.JsonbNumberFormatter;
 import org.eclipse.yasson.internal.model.JsonbCreator;
-import org.eclipse.yasson.internal.serializer.JsonbDateFormatter;
-import org.eclipse.yasson.internal.serializer.JsonbNumberFormatter;
 
 /**
- * Customization, which could be applied on a class or package level.
+ * Customization which could be applied on a class or package level.
  */
 public class ClassCustomization extends CustomizationBase {
 
+    private static final ClassCustomization EMPTY = new ClassCustomization(new Builder());
+
     private final JsonbCreator creator;
-
-    private String[] propertyOrder;
-
+    private final String[] propertyOrder;
     private final JsonbNumberFormatter numberFormatter;
-
     private final JsonbDateFormatter dateTimeFormatter;
-
     private final PropertyVisibilityStrategy propertyVisibilityStrategy;
+    private final TypeInheritanceConfiguration typeInheritanceConfiguration;
 
     /**
      * Copies properties from builder an creates immutable instance.
      *
      * @param builder not null
      */
-    ClassCustomization(ClassCustomizationBuilder builder) {
+    private ClassCustomization(Builder builder) {
         super(builder);
-        this.creator = builder.getCreator();
-        this.propertyOrder = builder.getPropertyOrder();
-        this.numberFormatter = builder.getNumberFormatter();
-        this.dateTimeFormatter = builder.getDateFormatter();
-        this.propertyVisibilityStrategy = builder.getPropertyVisibilityStrategy();
+        this.creator = builder.creator;
+        this.propertyOrder = builder.propertyOrder;
+        this.numberFormatter = builder.numberFormatter;
+        this.dateTimeFormatter = builder.dateTimeFormatter;
+        this.propertyVisibilityStrategy = builder.propertyVisibilityStrategy;
+        this.typeInheritanceConfiguration = builder.typeInheritanceConfiguration;
     }
 
-    /**
-     * Copy constructor.
-     *
-     * @param other other customization instance
-     */
-    public ClassCustomization(ClassCustomization other) {
-        super(other);
-        this.creator = other.getCreator();
-        this.propertyOrder = other.getPropertyOrder();
-        this.numberFormatter = other.getSerializeNumberFormatter();
-        this.dateTimeFormatter = other.getSerializeDateFormatter();
-        this.propertyVisibilityStrategy = other.getPropertyVisibilityStrategy();
+    public static ClassCustomization empty() {
+        return EMPTY;
+    }
+
+    public static Builder builder() {
+        return new Builder();
     }
 
     /**
@@ -77,15 +71,6 @@ public class ClassCustomization extends CustomizationBase {
      */
     public String[] getPropertyOrder() {
         return propertyOrder;
-    }
-
-    /**
-     * Sets sorted properties.
-     *
-     * @param propertyOrder sorted names of properties
-     */
-    public void setPropertyOrder(String[] propertyOrder) {
-        this.propertyOrder = propertyOrder;
     }
 
     /**
@@ -115,6 +100,73 @@ public class ClassCustomization extends CustomizationBase {
     @Override
     public JsonbDateFormatter getDeserializeDateFormatter() {
         return dateTimeFormatter;
+    }
+
+    public TypeInheritanceConfiguration getPolymorphismConfig() {
+        return typeInheritanceConfiguration;
+    }
+
+    /**
+     * The customization builder that would be used to build an instance of {@link ClassCustomization} to ensure its immutability.
+     */
+    public static class Builder extends CustomizationBase.Builder<Builder, ClassCustomization> {
+
+        private JsonbCreator creator;
+        private String[] propertyOrder;
+        private JsonbNumberFormatter numberFormatter;
+        private JsonbDateFormatter dateTimeFormatter;
+        private PropertyVisibilityStrategy propertyVisibilityStrategy;
+        private TypeInheritanceConfiguration typeInheritanceConfiguration;
+
+        private Builder() {
+        }
+
+        @Override
+        public Builder of(ClassCustomization customization) {
+            super.of(customization);
+            creator(customization.creator);
+            propertyOrder(customization.propertyOrder);
+            numberFormatter(customization.numberFormatter);
+            dateTimeFormatter(customization.dateTimeFormatter);
+            propertyVisibilityStrategy(customization.propertyVisibilityStrategy);
+            return this;
+        }
+
+        public Builder creator(JsonbCreator creator) {
+            this.creator = creator;
+            return this;
+        }
+
+        public Builder propertyOrder(String[] propertyOrder) {
+            this.propertyOrder = propertyOrder;
+            return this;
+        }
+
+        public Builder numberFormatter(JsonbNumberFormatter numberFormatter) {
+            this.numberFormatter = numberFormatter;
+            return this;
+        }
+
+        public Builder dateTimeFormatter(JsonbDateFormatter dateTimeFormatter) {
+            this.dateTimeFormatter = dateTimeFormatter;
+            return this;
+        }
+
+        public Builder propertyVisibilityStrategy(PropertyVisibilityStrategy propertyVisibilityStrategy) {
+            this.propertyVisibilityStrategy = propertyVisibilityStrategy;
+            return this;
+        }
+
+        public Builder polymorphismConfig(TypeInheritanceConfiguration typeInheritanceConfiguration) {
+            this.typeInheritanceConfiguration = typeInheritanceConfiguration;
+            return this;
+        }
+
+        @Override
+        public ClassCustomization build() {
+            return new ClassCustomization(this);
+        }
+
     }
 
 }

@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2015, 2020 Oracle and/or its affiliates. All rights reserved.
+ * Copyright (c) 2015, 2022 Oracle and/or its affiliates. All rights reserved.
  *
  * This program and the accompanying materials are made available under the
  * terms of the Eclipse Public License v. 2.0 which is available at
@@ -186,19 +186,19 @@ public class UnmarshallingUnsupportedTypesTest {
     @Test
     public void testEmptyStringAsOptionalDouble() {
         Type type = new TestTypeToken<GenericTestClass<OptionalDouble, OptionalDouble>>(){}.getType();
-        assertFail("{\"field1\":\"\"}", type,"field1", OptionalDouble.class);
+        assertFail("{\"field1\":\"\"}", type,"field1", Double.class); //We are reusing Double deserializer
     }
 
     @Test
     public void testEmptyStringAsOptionalInt() {
         Type type = new TestTypeToken<GenericTestClass<OptionalInt, OptionalInt>>(){}.getType();
-        assertFail("{\"field1\":\"\"}", type, "field1", OptionalInt.class);
+        assertFail("{\"field1\":\"\"}", type, "field1", Integer.class); //We are reusing Integer deserializer
     }
 
     @Test
     public void testEmptyStringAsOptionalLong() {
         Type type = new TestTypeToken<GenericTestClass<OptionalLong, OptionalLong>>(){}.getType();
-        assertFail("{\"field1\":\"\"}", type,"field1", OptionalLong.class);
+        assertFail("{\"field1\":\"\"}", type,"field1", Long.class); //We are reusing Long deserializer
     }
 
     private void assertFail(String json, Type type, String failureProperty, Class<?> failurePropertyClass) {

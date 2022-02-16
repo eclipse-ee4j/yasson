@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2019, 2021 Oracle and/or its affiliates. All rights reserved.
+ * Copyright (c) 2019, 2022 Oracle and/or its affiliates. All rights reserved.
  *
  * This program and the accompanying materials are made available under the
  * terms of the Eclipse Public License v. 2.0 which is available at
@@ -25,7 +25,6 @@ import java.util.Locale;
 import java.util.Map;
 import java.util.Objects;
 import java.util.Set;
-import java.util.TreeMap;
 
 import jakarta.json.Json;
 import jakarta.json.JsonArray;
@@ -221,8 +220,8 @@ public class MapToEntriesArraySerializerTest {
     /**
      * Build Map key as an array. Get corresponding key from source Map.
      *
-     * @param keyArray Map key parsed as JsonArray
-     * @param source source Map
+     * @param jentry Map key parsed as JsonArray
+     * @param sourceEntry source Map
      */
     @SuppressWarnings("unchecked")
     private static final <K,V> void verifyMapArrayValue(JsonObject jentry, final JsonArray valueArray, Map.Entry<K[],V> sourceEntry) {
@@ -369,21 +368,21 @@ public class MapToEntriesArraySerializerTest {
         assertTrue(keys.isEmpty());
     }
 
-
-    /**
-     * Test serialization of Map with Number keys and String values.
-     */
-    @Test
-    public void testSerializeNumberStringMapToEntriesArray() {
-        Map<Number, String> map = new TreeMap<>(CMP_NUM);
-        Jsonb jsonb = JsonbBuilder.create(new JsonbConfig().withFormatting(true));
-        map.put(Integer.valueOf(12), "twelve");
-        map.put(Short.valueOf((short)48), "forty eight");
-        map.put(Long.valueOf(256), "two hundred fifty-six");
-        String json = jsonb.toJson(map);
-        JsonArray jarr = Json.createReader(new StringReader(json)).read().asJsonArray();
-        verifySerialization(map, jarr);
-    }
+//No longer valid test
+//    /**
+//     * Test serialization of Map with Number keys and String values.
+//     */
+//    @Test
+//    public void testSerializeNumberStringMapToEntriesArray() {
+//        Map<Number, String> map = new TreeMap<>(CMP_NUM);
+//        Jsonb jsonb = JsonbBuilder.create(new JsonbConfig().withFormatting(true));
+//        map.put(Integer.valueOf(12), "twelve");
+//        map.put(Short.valueOf((short)48), "forty eight");
+//        map.put(Long.valueOf(256), "two hundred fifty-six");
+//        String json = jsonb.toJson(map);
+//        JsonArray jarr = Json.createReader(new StringReader(json)).read().asJsonArray();
+//        verifySerialization(map, jarr);
+//    }
 
     /**
      * Test serialization of Map with PoJo keys and PoJo values.
@@ -406,14 +405,14 @@ public class MapToEntriesArraySerializerTest {
      */
     @Test
     public void testSerializeSimpleSimpleMapToEntriesArray() {
+        String expected = "{\"false\":true,\"10\":24,\"Name\":\"John Smith\"}";
         Map<Object, Object> map = new HashMap<>();
-        Jsonb jsonb = JsonbBuilder.create(new JsonbConfig().withFormatting(true));
+        Jsonb jsonb = JsonbBuilder.create(new JsonbConfig());
         map.put("Name", "John Smith");
         map.put(Integer.valueOf(10), Long.valueOf(24l));
         map.put(Boolean.FALSE, Boolean.TRUE);
         String json = jsonb.toJson(map);
-        JsonArray jarr = Json.createReader(new StringReader(json)).read().asJsonArray();
-        verifySerialization(map, jarr);
+        assertEquals(expected, json);
     }
 
     /**
@@ -460,15 +459,15 @@ public class MapToEntriesArraySerializerTest {
         // Make sure that all 3 pokemons were checked.
         int valueCheck = 0x00;
         for (Map.Entry<?, ?> entry : map.entrySet()) {
-            if ((entry.getKey() instanceof String) && "first".equals((String) entry.getKey())) {
+            if ((entry.getKey() instanceof String) && "first".equals(entry.getKey())) {
                 assertEquals("Peter Parker", entry.getValue());
                 valueCheck |= 0x01;
             }
-            if ((entry.getKey() instanceof Number) && ((Number) entry.getKey()).equals(new BigDecimal(42))) {
+            if ((entry.getKey() instanceof Number) && entry.getKey().equals(new BigDecimal(42))) {
                 assertEquals(true, entry.getValue());
                 valueCheck |= 0x02;
             }
-            if ((entry.getKey() instanceof Boolean) && ((Boolean) entry.getKey()).equals(false)) {
+            if ((entry.getKey() instanceof Boolean) && entry.getKey().equals(false)) {
                 assertEquals(new BigDecimal(21), entry.getValue());
                 valueCheck |= 0x04;
             }

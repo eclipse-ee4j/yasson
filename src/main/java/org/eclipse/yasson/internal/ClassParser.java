@@ -170,8 +170,8 @@ class ClassParser {
                     ? property.getGetterElement() : property.getSetterElement();
             //Only push iface annotations if not overridden on impl classes
             for (Annotation ann : method.getDeclaredAnnotations()) {
-                if (methodElement.getAnnotation(ann.annotationType()) == null) {
-                    methodElement.putAnnotation(ann);
+                if (methodElement.getAnnotation(ann.annotationType()).isEmpty()) {
+                    methodElement.putAnnotation(ann, true, null);
                 }
             }
         }
@@ -322,8 +322,9 @@ class ClassParser {
                 } else {
                     //merge
                     final Property merged = mergeProperty(current, parentProp, classElement);
-                    PropertyVisibilityStrategy propertyVisibilityStrategy = classModel.getClassCustomization().getPropertyVisibilityStrategy();
-                    
+                    PropertyVisibilityStrategy propertyVisibilityStrategy = classModel.getClassCustomization()
+                            .getPropertyVisibilityStrategy();
+
                     if (PropertyModel.isPropertyReadable(current.getField(), current.getGetter(), propertyVisibilityStrategy)) {
                         classProperties.replace(current.getName(), merged);
                     } else {
@@ -364,7 +365,9 @@ class ClassParser {
                                 && !parent.isDefault() ? parent : current) : parent);
     }
 
-    private static Property mergeProperty(Property current, PropertyModel parentProp, JsonbAnnotatedElement<Class<?>> classElement) {
+    private static Property mergeProperty(Property current,
+                                          PropertyModel parentProp,
+                                          JsonbAnnotatedElement<Class<?>> classElement) {
         Field field = current.getField() != null
                 ? current.getField() : parentProp.getField();
         Method getter = selectMostSpecificNonDefaultMethod(current.getGetter(),

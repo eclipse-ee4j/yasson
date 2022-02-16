@@ -14,7 +14,7 @@
 
     <properties>
         <jmh.version>1.21</jmh.version>
-        <yasson.version>1.0.7-SNAPSHOT</yasson.version>
+        <yasson.version>2.0.2-SNAPSHOT</yasson.version>
     </properties>
 
 

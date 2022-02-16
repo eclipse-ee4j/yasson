@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2016, 2020 Oracle and/or its affiliates. All rights reserved.
+ * Copyright (c) 2021, 2022 Oracle and/or its affiliates. All rights reserved.
  *
  * This program and the accompanying materials are made available under the
  * terms of the Eclipse Public License v. 2.0 which is available at
@@ -14,39 +14,28 @@ package org.eclipse.yasson.internal.serializer;
 
 import java.util.Collection;
 
-import jakarta.json.bind.serializer.SerializationContext;
 import jakarta.json.stream.JsonGenerator;
 
+import org.eclipse.yasson.internal.SerializationContextImpl;
+
 /**
- * Serializer for collections.
- *
- * @param <V> type of {@code Collection} value
+ * Collection container serializer.
  */
-public class CollectionSerializer<V> extends AbstractContainerSerializer<Collection<V>> implements EmbeddedItem {
+class CollectionSerializer implements ModelSerializer {
 
-    /**
-     * Creates new collection serializer.
-     *
-     * @param builder serializer builder
-     */
-    protected CollectionSerializer(SerializerBuilder builder) {
-        super(builder);
+    private final ModelSerializer delegate;
+
+    CollectionSerializer(ModelSerializer delegate) {
+        this.delegate = delegate;
     }
 
+    @SuppressWarnings("unchecked")
     @Override
-    protected void serializeInternal(Collection<V> collection, JsonGenerator generator, SerializationContext ctx) {
-        for (Object item : collection) {
-            serializeItem(item, generator, ctx);
-        }
-    }
-
-    @Override
-    protected void writeStart(JsonGenerator generator) {
+    public void serialize(Object value, JsonGenerator generator, SerializationContextImpl context) {
+        Collection<Object> collection = (Collection<Object>) value;
         generator.writeStartArray();
+        collection.forEach(object -> delegate.serialize(object, generator, context));
+        generator.writeEnd();
     }
 
-    @Override
-    protected void writeStart(String key, JsonGenerator generator) {
-        generator.writeStartArray(key);
-    }
 }

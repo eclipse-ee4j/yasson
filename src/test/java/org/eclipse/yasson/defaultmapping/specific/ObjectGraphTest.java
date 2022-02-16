@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2015, 2020 Oracle and/or its affiliates. All rights reserved.
+ * Copyright (c) 2015, 2022 Oracle and/or its affiliates. All rights reserved.
  *
  * This program and the accompanying materials are made available under the
  * terms of the Eclipse Public License v. 2.0 which is available at
@@ -46,5 +46,23 @@ public class ObjectGraphTest extends CustomerTest {
         assertEquals(2, customer.getFriends().size());
         assertCustomerValues(customer.getFriends().get("firstFriend"), "Jasons first friend");
         assertCustomerValues(customer.getFriends().get("secondFriend"), "Jasons second friend");
+    }
+
+    @Test
+    public void testSimpleObject() {
+        Person person = new Person();
+        person.name = "David";
+        person.surname = "Kral";
+        String json = bindingJsonb.toJson(person);
+        Person deser = bindingJsonb.fromJson(json, Person.class);
+        System.out.println();
+    }
+
+    public static class Person {
+
+        public String name;
+
+        public String surname;
+
     }
 }

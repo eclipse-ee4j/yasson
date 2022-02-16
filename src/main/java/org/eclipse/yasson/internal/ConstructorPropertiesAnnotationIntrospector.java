@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2019, 2020 Oracle and/or its affiliates. All rights reserved.
+ * Copyright (c) 2019, 2022 Oracle and/or its affiliates. All rights reserved.
  *
  * This program and the accompanying materials are made available under the
  * terms of the Eclipse Public License v. 2.0 which is available at
@@ -31,7 +31,7 @@ class ConstructorPropertiesAnnotationIntrospector {
     private final JsonbContext jsonbContext;
     private final AnnotationFinder constructorProperties;
 
-    public static final ConstructorPropertiesAnnotationIntrospector forContext(JsonbContext jsonbContext) {
+    public static ConstructorPropertiesAnnotationIntrospector forContext(JsonbContext jsonbContext) {
         return new ConstructorPropertiesAnnotationIntrospector(jsonbContext, AnnotationFinder.findConstructorProperties());
     }
 
@@ -83,7 +83,7 @@ class ConstructorPropertiesAnnotationIntrospector {
         CreatorModel[] creatorModels = new CreatorModel[parameters.length];
         for (int i = 0; i < parameters.length; i++) {
             final Parameter parameter = parameters[i];
-            creatorModels[i] = new CreatorModel(properties[i], parameter, jsonbContext);
+            creatorModels[i] = new CreatorModel(properties[i], parameter, executable, jsonbContext);
         }
         return new JsonbCreator(executable, creatorModels);
     }

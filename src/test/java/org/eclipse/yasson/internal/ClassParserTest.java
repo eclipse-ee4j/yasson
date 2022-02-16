@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2015, 2020 Oracle and/or its affiliates. All rights reserved.
+ * Copyright (c) 2015, 2022 Oracle and/or its affiliates. All rights reserved.
  *
  * This program and the accompanying materials are made available under the
  * terms of the Eclipse Public License v. 2.0 which is available at
@@ -12,6 +12,7 @@
 
 package org.eclipse.yasson.internal;
 
+import org.eclipse.yasson.internal.model.customization.ClassCustomization;
 import org.junit.jupiter.api.*;
 import static org.junit.jupiter.api.Assertions.*;
 
@@ -38,7 +39,8 @@ public class ClassParserTest {
     @Test
     public void testDefaultMappingFieldModifiers() {
         final JsonbAnnotatedElement<Class<?>> clsElement = introspector.collectAnnotations(FieldModifiersClass.class);
-        ClassModel model = new ClassModel(FieldModifiersClass.class, introspector.introspectCustomization(clsElement), null, null);
+        ClassModel model = new ClassModel(FieldModifiersClass.class, introspector.introspectCustomization(clsElement,
+                                                                                                          ClassCustomization.empty()), null, null);
         classParser.parseProperties(model, clsElement);
         assertTrue(model.getPropertyModel("finalString").isReadable());
         assertFalse(model.getPropertyModel("finalString").isWritable());
@@ -51,7 +53,8 @@ public class ClassParserTest {
     @Test
     public void testDefaultMappingMethodModifiers() {
         final JsonbAnnotatedElement<Class<?>> clsElement = introspector.collectAnnotations(MethodModifiersClass.class);
-        ClassModel model = new ClassModel(FieldModifiersClass.class, introspector.introspectCustomization(clsElement), null, null);
+        ClassModel model = new ClassModel(FieldModifiersClass.class, introspector.introspectCustomization(clsElement,
+                                                                                                          ClassCustomization.empty()), null, null);
         classParser.parseProperties(model, clsElement);
         assertFalse(model.getPropertyModel("publicFieldWithPrivateMethods").isReadable());
         assertFalse(model.getPropertyModel("publicFieldWithPrivateMethods").isWritable());

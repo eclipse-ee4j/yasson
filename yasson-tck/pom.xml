@@ -10,12 +10,12 @@
   <version>1.0.0-SNAPSHOT</version>
 
   <properties>
-    <jsonb.tck.version>2.0.0-SNAPSHOT</jsonb.tck.version>
-    <yasson.version>2.0.3-SNAPSHOT</yasson.version>
-    <maven.compiler.source>1.8</maven.compiler.source>
-    <maven.compiler.target>1.8</maven.compiler.target>
+    <jsonb.tck.version>3.0.0-SNAPSHOT</jsonb.tck.version>
+    <yasson.version>3.0.0-SNAPSHOT</yasson.version>
+    <maven.compiler.source>11</maven.compiler.source>
+    <maven.compiler.target>11</maven.compiler.target>
   </properties>
-  
+
   <!-- TODO: Temporarily enable snapshot repository -->
   <!-- This can be removed once an official release of jakarta.json.bind-tck is available -->
   <repositories>
