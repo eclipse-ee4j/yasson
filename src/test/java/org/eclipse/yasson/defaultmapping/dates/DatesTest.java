@@ -12,36 +12,6 @@
 
 package org.eclipse.yasson.defaultmapping.dates;
 
-import org.eclipse.yasson.defaultmapping.dates.model.MonthDayPojo;
-import org.eclipse.yasson.defaultmapping.dates.model.YearMonthPojo;
-import org.junit.jupiter.api.*;
-import static org.junit.jupiter.api.Assertions.*;
-import static org.eclipse.yasson.Jsonbs.*;
-
-import org.eclipse.yasson.TestTypeToken;
-import org.eclipse.yasson.defaultmapping.dates.model.CalendarPojo;
-import org.eclipse.yasson.defaultmapping.dates.model.ClassLevelDateAnnotation;
-import org.eclipse.yasson.defaultmapping.dates.model.DatePojo;
-import org.eclipse.yasson.defaultmapping.dates.model.DateWithZonePojo;
-import org.eclipse.yasson.defaultmapping.dates.model.InstantPojo;
-import org.eclipse.yasson.defaultmapping.dates.model.LocalDatePojo;
-import org.eclipse.yasson.defaultmapping.dates.model.LocalDateTimePojo;
-import org.eclipse.yasson.defaultmapping.dates.model.LocalTimePojo;
-import org.eclipse.yasson.defaultmapping.dates.model.OffsetDateTimePojo;
-import org.eclipse.yasson.defaultmapping.dates.model.OffsetTimePojo;
-import org.eclipse.yasson.defaultmapping.dates.model.ZonedDateTimePojo;
-import org.eclipse.yasson.defaultmapping.generics.model.ScalarValueWrapper;
-import org.eclipse.yasson.internal.serializer.SqlDateTypeDeserializer;
-
-import jakarta.json.bind.Jsonb;
-import jakarta.json.bind.JsonbBuilder;
-import jakarta.json.bind.JsonbConfig;
-import jakarta.json.bind.annotation.JsonbDateFormat;
-import jakarta.json.bind.annotation.JsonbTypeDeserializer;
-import jakarta.json.bind.config.PropertyVisibilityStrategy;
-import javax.xml.datatype.DatatypeConfigurationException;
-import javax.xml.datatype.DatatypeFactory;
-import javax.xml.datatype.XMLGregorianCalendar;
 import java.io.Serializable;
 import java.lang.reflect.Field;
 import java.lang.reflect.Method;
@@ -63,7 +33,6 @@ import java.time.ZoneId;
 import java.time.ZoneOffset;
 import java.time.ZonedDateTime;
 import java.time.format.DateTimeFormatter;
-import java.time.temporal.ChronoField;
 import java.util.Calendar;
 import java.util.Date;
 import java.util.GregorianCalendar;
@@ -72,6 +41,39 @@ import java.util.Locale;
 import java.util.Map;
 import java.util.SimpleTimeZone;
 import java.util.TimeZone;
+
+import javax.xml.datatype.DatatypeConfigurationException;
+import javax.xml.datatype.DatatypeFactory;
+import javax.xml.datatype.XMLGregorianCalendar;
+
+import jakarta.json.bind.Jsonb;
+import jakarta.json.bind.JsonbBuilder;
+import jakarta.json.bind.JsonbConfig;
+import jakarta.json.bind.annotation.JsonbDateFormat;
+import jakarta.json.bind.annotation.JsonbTypeDeserializer;
+import jakarta.json.bind.config.PropertyVisibilityStrategy;
+import org.eclipse.yasson.TestTypeToken;
+import org.eclipse.yasson.defaultmapping.dates.model.CalendarPojo;
+import org.eclipse.yasson.defaultmapping.dates.model.ClassLevelDateAnnotation;
+import org.eclipse.yasson.defaultmapping.dates.model.DatePojo;
+import org.eclipse.yasson.defaultmapping.dates.model.DateWithZonePojo;
+import org.eclipse.yasson.defaultmapping.dates.model.InstantPojo;
+import org.eclipse.yasson.defaultmapping.dates.model.LocalDatePojo;
+import org.eclipse.yasson.defaultmapping.dates.model.LocalDateTimePojo;
+import org.eclipse.yasson.defaultmapping.dates.model.LocalTimePojo;
+import org.eclipse.yasson.defaultmapping.dates.model.MonthDayPojo;
+import org.eclipse.yasson.defaultmapping.dates.model.OffsetDateTimePojo;
+import org.eclipse.yasson.defaultmapping.dates.model.OffsetTimePojo;
+import org.eclipse.yasson.defaultmapping.dates.model.YearMonthPojo;
+import org.eclipse.yasson.defaultmapping.dates.model.ZonedDateTimePojo;
+import org.eclipse.yasson.defaultmapping.generics.model.ScalarValueWrapper;
+import org.eclipse.yasson.internal.deserializer.types.SqlDateDeserializer;
+import org.junit.jupiter.api.Test;
+
+import static org.eclipse.yasson.Jsonbs.bindingJsonb;
+import static org.eclipse.yasson.Jsonbs.defaultJsonb;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.fail;
 
 /**
  * This class contains tests for marshalling/unmarshalling dates.
@@ -91,7 +93,7 @@ public class DatesTest {
 	public static class SqlDateObj implements Serializable {
         public java.sql.Date sqlDate = java.sql.Date.valueOf("2018-01-31");
         //no way for runtime to choose java.sql.Date deserializer here without a hint
-        @JsonbTypeDeserializer(SqlDateTypeDeserializer.class)
+        @JsonbTypeDeserializer(SqlDateDeserializer.class)
         public java.util.Date utilDate = java.sql.Date.valueOf("2018-01-31");
 
     }

@@ -12,36 +12,6 @@
 
 package org.eclipse.yasson.defaultmapping.generics;
 
-import org.eclipse.yasson.defaultmapping.generics.model.FinalMember;
-import org.eclipse.yasson.defaultmapping.generics.model.FinalGenericWrapper;
-import org.junit.jupiter.api.*;
-import static org.junit.jupiter.api.Assertions.*;
-import static org.eclipse.yasson.Jsonbs.*;
-
-import org.eclipse.yasson.TestTypeToken;
-import org.eclipse.yasson.adapters.model.GenericBox;
-import org.eclipse.yasson.defaultmapping.generics.model.AnotherGenericTestClass;
-import org.eclipse.yasson.defaultmapping.generics.model.BoundedGenericClass;
-import org.eclipse.yasson.defaultmapping.generics.model.Circle;
-import org.eclipse.yasson.defaultmapping.generics.model.CollectionWrapper;
-import org.eclipse.yasson.defaultmapping.generics.model.ColoredCircle;
-import org.eclipse.yasson.defaultmapping.generics.model.CyclicSubClass;
-import org.eclipse.yasson.defaultmapping.generics.model.GenericArrayClass;
-import org.eclipse.yasson.defaultmapping.generics.model.GenericTestClass;
-import org.eclipse.yasson.defaultmapping.generics.model.GenericWithUnboundedWildcardClass;
-import org.eclipse.yasson.defaultmapping.generics.model.MultiLevelExtendedGenericTestClass;
-import org.eclipse.yasson.defaultmapping.generics.model.MultipleBoundsContainer;
-import org.eclipse.yasson.defaultmapping.generics.model.MyCyclicGenericClass;
-import org.eclipse.yasson.defaultmapping.generics.model.PropagatedGenericClass;
-import org.eclipse.yasson.defaultmapping.generics.model.Shape;
-import org.eclipse.yasson.defaultmapping.generics.model.WildCardClass;
-import org.eclipse.yasson.defaultmapping.generics.model.WildcardMultipleBoundsClass;
-import org.eclipse.yasson.serializers.model.Box;
-import org.eclipse.yasson.serializers.model.Crate;
-
-import jakarta.json.bind.Jsonb;
-import jakarta.json.bind.JsonbBuilder;
-import jakarta.json.bind.JsonbConfig;
 import java.lang.reflect.Type;
 import java.math.BigDecimal;
 import java.text.ParseException;
@@ -55,6 +25,38 @@ import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 import java.util.TimeZone;
+
+import jakarta.json.bind.Jsonb;
+import jakarta.json.bind.JsonbBuilder;
+import jakarta.json.bind.JsonbConfig;
+import org.eclipse.yasson.TestTypeToken;
+import org.eclipse.yasson.adapters.model.GenericBox;
+import org.eclipse.yasson.defaultmapping.generics.model.AnotherGenericTestClass;
+import org.eclipse.yasson.defaultmapping.generics.model.BoundedGenericClass;
+import org.eclipse.yasson.defaultmapping.generics.model.Circle;
+import org.eclipse.yasson.defaultmapping.generics.model.CollectionWrapper;
+import org.eclipse.yasson.defaultmapping.generics.model.ColoredCircle;
+import org.eclipse.yasson.defaultmapping.generics.model.CyclicSubClass;
+import org.eclipse.yasson.defaultmapping.generics.model.FinalGenericWrapper;
+import org.eclipse.yasson.defaultmapping.generics.model.FinalMember;
+import org.eclipse.yasson.defaultmapping.generics.model.GenericArrayClass;
+import org.eclipse.yasson.defaultmapping.generics.model.GenericTestClass;
+import org.eclipse.yasson.defaultmapping.generics.model.GenericWithUnboundedWildcardClass;
+import org.eclipse.yasson.defaultmapping.generics.model.MultiLevelExtendedGenericTestClass;
+import org.eclipse.yasson.defaultmapping.generics.model.MultipleBoundsContainer;
+import org.eclipse.yasson.defaultmapping.generics.model.MyCyclicGenericClass;
+import org.eclipse.yasson.defaultmapping.generics.model.PropagatedGenericClass;
+import org.eclipse.yasson.defaultmapping.generics.model.Shape;
+import org.eclipse.yasson.defaultmapping.generics.model.WildCardClass;
+import org.eclipse.yasson.defaultmapping.generics.model.WildcardMultipleBoundsClass;
+import org.eclipse.yasson.serializers.model.Box;
+import org.eclipse.yasson.serializers.model.Crate;
+import org.junit.jupiter.api.Test;
+
+import static org.eclipse.yasson.Jsonbs.defaultJsonb;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertThrows;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 
 /**
  * This class contains JSONB default mapping generics tests.

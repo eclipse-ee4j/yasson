@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2015, 2020 Oracle and/or its affiliates. All rights reserved.
+ * Copyright (c) 2015, 2021 Oracle and/or its affiliates. All rights reserved.
  *
  * This program and the accompanying materials are made available under the
  * terms of the Eclipse Public License v. 2.0 which is available at
@@ -21,8 +21,6 @@ import java.util.function.Function;
 import org.eclipse.yasson.internal.model.ClassModel;
 import org.eclipse.yasson.internal.model.JsonbAnnotatedElement;
 import org.eclipse.yasson.internal.model.customization.ClassCustomization;
-import org.eclipse.yasson.internal.serializer.ContainerSerializerProvider;
-import org.eclipse.yasson.internal.serializer.DefaultSerializers;
 
 /**
  * JSONB mappingContext. Created once per {@link jakarta.json.bind.Jsonb} instance. Represents a global scope.
@@ -34,8 +32,6 @@ public class MappingContext {
     private final JsonbContext jsonbContext;
 
     private final ConcurrentHashMap<Class<?>, ClassModel> classes = new ConcurrentHashMap<>();
-
-    private final ConcurrentHashMap<Class<?>, ContainerSerializerProvider> serializers = new ConcurrentHashMap<>();
 
     private final ClassParser classParser;
 
@@ -71,7 +67,7 @@ public class MappingContext {
             newClassModels.push(classToParse);
         }
         if (clazz == Object.class) {
-            return classes.computeIfAbsent(clazz, (c) -> new ClassModel(c, null, null, null));
+            return classes.computeIfAbsent(clazz, (c) -> new ClassModel(c, ClassCustomization.empty(), null, null));
         }
 
         ClassModel parentClassModel = null;
@@ -88,17 +84,62 @@ public class MappingContext {
                                                                                 JsonbContext jsonbContext) {
         return aClass -> {
             JsonbAnnotatedElement<Class<?>> clsElement = jsonbContext.getAnnotationIntrospector().collectAnnotations(aClass);
-            ClassCustomization customization = jsonbContext.getAnnotationIntrospector().introspectCustomization(clsElement);
+            ClassCustomization customization = jsonbContext.getAnnotationIntrospector()
+                    .introspectCustomization(clsElement,
+                                             parentClassModel == null
+                                                     ? ClassCustomization.empty()
+                                                     : parentClassModel.getClassCustomization());
+            //            PolymorphismSupport configPolymorphism = jsonbContext.getConfigProperties().getPolymorphismSupport();
+//            if (configPolymorphism != null) {
+//                customization = mergeConfigAndAnnotationPolymorphism(configPolymorphism,
+//                                                                     configPolymorphism.getClassPolymorphism(aClass),
+//                                                                     customization,
+//                                                                     aClass);
+//            }
             ClassModel newClassModel = new ClassModel(aClass,
                                                       customization,
                                                       parentClassModel,
                                                       jsonbContext.getConfigProperties().getPropertyNamingStrategy());
-            if (!DefaultSerializers.isKnownType(aClass)) {
+            if (!BuiltInTypes.isKnownType(aClass)) {
                 classParser.parseProperties(newClassModel, clsElement);
             }
             return newClassModel;
         };
     }
+
+//    private static ClassCustomization mergeConfigAndAnnotationPolymorphism(PolymorphismSupport generalPolymorphism,
+//                                                                           Optional<Polymorphism> maybeClassPolymorphism,
+//                                                                           ClassCustomization customization,
+//                                                                           Class<?> aClass) {
+//        PolymorphismConfig polymorphismConfig = customization.getPolymorphismConfig();
+//        PolymorphismConfig.Builder polyConfigBuilder;
+//        if (polymorphismConfig != null) {
+//            polyConfigBuilder = PolymorphismConfig.builder().of(polymorphismConfig);
+//        } else {
+//            polyConfigBuilder = PolymorphismConfig.builder();
+//            maybeClassPolymorphism.ifPresent(classPolymorphism -> polyConfigBuilder
+//                    .inherited(!classPolymorphism.getBoundClass().equals(aClass)));
+//        }
+//        generalPolymorphism.getKeyName().filter(s -> !s.isEmpty()).ifPresent(polyConfigBuilder::fieldName);
+//        generalPolymorphism.useClassNames().ifPresent(polyConfigBuilder::useClassNames);
+//        polyConfigBuilder.whitelistedPackages(generalPolymorphism.getWhitelistedPackages());
+//
+//        maybeClassPolymorphism.ifPresent(classPolymorphism -> {
+//            classPolymorphism.getKeyName().filter(s -> !s.isEmpty()).ifPresent(polyConfigBuilder::fieldName);
+//            classPolymorphism.useClassNames().ifPresent(polyConfigBuilder::useClassNames);
+//            classPolymorphism.getFormat().ifPresent(polyConfigBuilder::format);
+//            classPolymorphism.getAliases().forEach(polyConfigBuilder::alias);
+//            polyConfigBuilder.whitelistedPackages(classPolymorphism.getWhitelistedPackages());
+//        });
+//        PolymorphismConfig polyConfigMerged = polyConfigBuilder.build();
+//        if (polyConfigMerged.getFieldName() == null || polyConfigMerged.getFieldName().isEmpty()) {
+//            throw new JsonbException("Polymorphism type field name cannot be null or empty: " + aClass);
+//        }
+//        return ClassCustomization.builder()
+//                .of(customization)
+//                .polymorphismConfig(polyConfigMerged)
+//                .build();
+//    }
 
     /**
      * Search for class model, without parsing if not found.
@@ -110,23 +151,4 @@ public class MappingContext {
         return classes.get(clazz);
     }
 
-    /**
-     * Gets serializer provider for given class.
-     *
-     * @param clazz Class to get serializer provider for.
-     * @return Serializer provider.
-     */
-    public ContainerSerializerProvider getSerializerProvider(Class<?> clazz) {
-        return serializers.get(clazz);
-    }
-
-    /**
-     * Adds given serializer provider for given class.
-     *
-     * @param clazz              Class to add serializer provider for.
-     * @param serializerProvider Serializer provider to add.
-     */
-    public void addSerializerProvider(Class<?> clazz, ContainerSerializerProvider serializerProvider) {
-        serializers.putIfAbsent(clazz, serializerProvider);
-    }
 }

@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2019, 2020 Oracle and/or its affiliates. All rights reserved.
+ * Copyright (c) 2019, 2021 Oracle and/or its affiliates. All rights reserved.
  *
  * This program and the accompanying materials are made available under the
  * terms of the Eclipse Public License v. 2.0 which is available at
@@ -172,13 +172,16 @@ public class PreinstantiatedJsonpTest {
         assertEquals("Adapted string", result.getValue());
     }
 
+    /**
+     * This test tests that provided generator is actually used.
+     */
     @Test
     public void testRuntimeTypeGenerator() {
         Wrapper<String> stringWrapper = new Wrapper<>();
         stringWrapper.setValue("String value");
         ByteArrayOutputStream out = new ByteArrayOutputStream();
         JsonGenerator generator = new SuffixJsonGenerator("Appended value.", out);
-        bindingYassonJsonb.toJson(stringWrapper, new TestTypeToken<List<String>>(){}.getType(), generator);
+        bindingYassonJsonb.toJson(stringWrapper, new TestTypeToken<Wrapper<String>>(){}.getType(), generator);
         generator.close();
         assertEquals("{\"value\":\"String value\",\"suffix\":\"Appended value.\"}", out.toString());
     }

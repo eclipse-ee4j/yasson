@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2015, 2020 Oracle and/or its affiliates. All rights reserved.
+ * Copyright (c) 2015, 2021 Oracle and/or its affiliates. All rights reserved.
  *
  * This program and the accompanying materials are made available under the
  * terms of the Eclipse Public License v. 2.0 which is available at
@@ -220,5 +220,45 @@ public class InheritanceTest {
         String result = defaultJsonb.toJson(pojo);
         assertEquals("{\"zero\":\"ZERO\",\"zeroPartiallyOverriddenInFirst\":\"ZERO_PARTIALLY_OVERRIDDEN_IN_FIRST\",\"first\":\"FIRST\",\"second\":\"SECOND\",\"zeroOverriddenInSecond\":\"ZERO_OVERRIDDEN_IN_SECOND\"}",
                 result);
+    }
+
+    @Test
+    public void testInheritanceSerialization() {
+        AnimalWrapper animalWrapper = new AnimalWrapper();
+        animalWrapper.animal = new Dog();
+        //Just initialize serializer cache for Animal and Dog
+        defaultJsonb.toJson(animalWrapper);
+
+        //Check if the Dog instance is dynamically resolved even though Dog serializer has been created before
+        DogWrapper dogWrapper = new DogWrapper();
+        dogWrapper.dog = new Dog();
+        assertEquals("{\"dog\":{\"isDog\":true}}", defaultJsonb.toJson(dogWrapper));
+        dogWrapper.dog = new SmallDog();
+        assertEquals("{\"dog\":{\"isDog\":true,\"isSmallDog\":true}}", defaultJsonb.toJson(dogWrapper));
+
+    }
+
+    public static class AnimalWrapper {
+
+        public Animal animal;
+
+    }
+
+    public static class DogWrapper {
+
+        public Dog dog;
+
+    }
+
+    public static class Animal {
+
+    }
+
+    public static class Dog extends Animal {
+        public boolean isDog = true;
+    }
+
+    public static class SmallDog extends Dog {
+        public boolean isSmallDog = true;
     }
 }

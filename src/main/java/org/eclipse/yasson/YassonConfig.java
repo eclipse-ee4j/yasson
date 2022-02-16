@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2019, 2021 IBM and/or its affiliates. All rights reserved.
+ * Copyright (c) 2019, 2022 IBM and/or its affiliates. All rights reserved.
  *
  * This program and the accompanying materials are made available under the
  * terms of the Eclipse Public License v. 2.0 which is available at
@@ -9,6 +9,7 @@
  *
  * SPDX-License-Identifier: EPL-2.0 OR BSD-3-Clause
  */
+
 package org.eclipse.yasson;
 
 import java.util.Map;
@@ -50,7 +51,12 @@ public class YassonConfig extends JsonbConfig {
      * @see #withForceMapArraySerializerForNullKeys(boolean)
      */
     public static final String FORCE_MAP_ARRAY_SERIALIZER_FOR_NULL_KEYS = "yasson.force-map-array-serializer-for-null-keys";
-    
+
+    /**
+     * @see #withJsonbParametersRequired(boolean)
+     */
+    public static final String JSONB_CREATOR_PARAMETERS_REQUIRED = "yasson.jsonb-creator-parameters-required";
+
     /**
      * Property used to specify behaviour on deserialization when JSON document contains properties
      * which doesn't exist in the target class. Default value is 'false'.
@@ -120,4 +126,21 @@ public class YassonConfig extends JsonbConfig {
         setProperty(FORCE_MAP_ARRAY_SERIALIZER_FOR_NULL_KEYS, value);
         return this;
     }
+
+
+    /**
+     * {@link jakarta.json.bind.annotation.JsonbCreator} parameters are required to be optional since the spec 3.0.0.
+     * However, if it is needed to revert functionality as it used to be before, it is possible to use this switch
+     * which globally turns the requirement of the {@link jakarta.json.bind.annotation.JsonbCreator} parameters
+     * to be required.
+     *
+     * @param value whether to treat {@link jakarta.json.bind.annotation.JsonbCreator} parameters
+     *              as required. Default value is {@code false}.
+     * @return This YassonConfig instance
+     */
+    public YassonConfig withJsonbParametersRequired(boolean value) {
+        setProperty(JSONB_CREATOR_PARAMETERS_REQUIRED, value);
+        return this;
+    }
+
 }

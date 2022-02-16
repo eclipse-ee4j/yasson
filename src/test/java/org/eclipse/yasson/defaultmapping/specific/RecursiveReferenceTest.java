@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2019, 2020 Oracle and/or its affiliates. All rights reserved.
+ * Copyright (c) 2019, 2021 Oracle and/or its affiliates. All rights reserved.
  *
  * This program and the accompanying materials are made available under the
  * terms of the Eclipse Public License v. 2.0 which is available at
@@ -34,10 +34,12 @@ import org.junit.jupiter.api.Test;
 public class RecursiveReferenceTest {
 
     private static final Jsonb userSerializerJsonb = JsonbBuilder.create(new JsonbConfig()
-            .withSerializers(new ChainSerializer(), new FooSerializer()));
+                                                                                 .withSerializers(new ChainSerializer(),
+                                                                                                  new FooSerializer()));
     private static final Jsonb adapterSerializerJsonb = JsonbBuilder.create(new JsonbConfig()
-            .withAdapters(new ChainAdapter(), new FooAdapter()));
-    
+                                                                                    .withAdapters(new ChainAdapter(),
+                                                                                                  new FooAdapter()));
+
     @Test
     public void testSerializeRecursiveReference() {
         Chain recursive = new Chain("test");
@@ -54,7 +56,7 @@ public class RecursiveReferenceTest {
                     e.getCause().getMessage());
         }
     }
-    
+
     @Test
     public void testSerializeRecursiveReferenceCustomAdapter() {
         Chain recursive = new Chain("test");
@@ -63,12 +65,12 @@ public class RecursiveReferenceTest {
             adapterSerializerJsonb.toJson(recursive);
             fail("Exception should be caught");
         } catch (JsonbException e) {
-            assertEquals(
-                    "Problem adapting object of type class org.eclipse.yasson.adapters.model.Chain to java.util.Map<java.lang.String, java.lang.Object> in class class org.eclipse.yasson.adapters.model.ChainAdapter",
+            assertEquals("Problem adapting object of type class org.eclipse.yasson.adapters.model.Chain to java.util.Map<java.lang"
+                            + ".String, java.lang.Object> in class class org.eclipse.yasson.adapters.model.ChainAdapter",
                     e.getMessage());
         }
     }
-    
+
     @Test
     public void testSerializeRecursiveReferenceCustomSerializer() {
         Chain recursive = new Chain("test");
@@ -77,22 +79,28 @@ public class RecursiveReferenceTest {
             userSerializerJsonb.toJson(recursive);
             fail("Exception should be caught");
         } catch (JsonbException e) {
-            assertEquals("Recursive reference has been found in class class org.eclipse.yasson.adapters.model.Chain.", e.getMessage());
+            assertEquals("Recursive reference has been found in class class org.eclipse.yasson.adapters.model.Chain.",
+                         e.getMessage());
         }
     }
 
     @Test
     public void testSerializeRepeatedInstance() {
-        checkSerializeRepeatedInstance(Jsonbs.defaultJsonb);
-        checkSerializeRepeatedInstance(adapterSerializerJsonb);
-        checkSerializeRepeatedInstance(userSerializerJsonb);
+        String noNulls = "[{\"linksTo\":{\"name\":\"test\"},\"name\":\"test\"},{\"linksTo\":{\"name\":\"test\"},"
+                + "\"name\":\"test\"}]";
+        String withNulls = "[{\"has\":null,\"linksTo\":{\"has\":null,\"linksTo\":null,\"name\":\"test\"},\"name\":\"test\"},"
+                + "{\"has\":null,\"linksTo\":{\"has\":null,\"linksTo\":null,\"name\":\"test\"},\"name\":\"test\"}]";
+        checkSerializeRepeatedInstance(Jsonbs.defaultJsonb, noNulls);
+        //Since ChainAdapter is adapting Chain to Map<String, Object>, the produced json will contain nulls
+        checkSerializeRepeatedInstance(adapterSerializerJsonb, withNulls);
+        checkSerializeRepeatedInstance(userSerializerJsonb, noNulls);
     }
-    
-    private void checkSerializeRepeatedInstance(Jsonb jsonb) {
+
+    private void checkSerializeRepeatedInstance(Jsonb jsonb, String expected) {
         Chain recursive = new Chain("test");
         recursive.setLinksTo(new Chain("test"));
         String result = jsonb.toJson(Arrays.asList(recursive, recursive));
-        assertEquals("[{\"linksTo\":{\"name\":\"test\"},\"name\":\"test\"},{\"linksTo\":{\"name\":\"test\"},\"name\":\"test\"}]", result);
+        assertEquals(expected, result);
     }
 
     @Test
@@ -104,15 +112,19 @@ public class RecursiveReferenceTest {
         String result = Jsonbs.defaultJsonb.toJson(a);
         assertEquals("{\"ref1\":{\"bar\":\"foo\"},\"ref2\":{\"bar\":\"foo\"}}", result);
     }
-    
+
     @Test
     public void testChain() {
-        checkChain(Jsonbs.defaultJsonb);
-        checkChain(adapterSerializerJsonb);
-        checkChain(userSerializerJsonb);
+        String noNulls = "{\"has\":{\"bar\":\"foo\"},\"linksTo\":{\"has\":{\"bar\":\"foo\"},\"name\":\"c2\"},\"name\":\"c1\"}";
+        String withNulls = "{\"has\":{\"bar\":\"foo\"},\"linksTo\":{\"has\":{\"bar\":\"foo\"},\"linksTo\":null,"
+                + "\"name\":\"c2\"},\"name\":\"c1\"}";
+        checkChain(Jsonbs.defaultJsonb, noNulls);
+        //Since ChainAdapter is adapting Chain to Map<String, Object>, the produced json will contain nulls
+        checkChain(adapterSerializerJsonb, withNulls);
+        checkChain(userSerializerJsonb, noNulls);
     }
-    
-    private void checkChain(Jsonb jsonb) {
+
+    private void checkChain(Jsonb jsonb, String expected) {
         Foo foo = new Foo("foo");
         Chain c1 = new Chain("c1");
         Chain c2 = new Chain("c2");
@@ -120,17 +132,22 @@ public class RecursiveReferenceTest {
         c1.setHas(foo);
         c2.setHas(foo);
         String result = jsonb.toJson(c1);
-        assertEquals("{\"has\":{\"bar\":\"foo\"},\"linksTo\":{\"has\":{\"bar\":\"foo\"},\"name\":\"c2\"},\"name\":\"c1\"}", result);
+        assertEquals(expected, result);
     }
-    
+
     @Test
     public void testDeeperChain() {
-        checkDeeperChain(Jsonbs.defaultJsonb);
-        checkDeeperChain(adapterSerializerJsonb);
-        checkDeeperChain(userSerializerJsonb);
+        String noNulls = "{\"has\":{\"bar\":\"foo\"},\"linksTo\":{\"has\":{\"bar\":\"foo\"},\"linksTo\":{\"name\":\"c3\"},"
+                + "\"name\":\"c2\"},\"name\":\"c1\"}";
+        String withNulls = "{\"has\":{\"bar\":\"foo\"},\"linksTo\":{\"has\":{\"bar\":\"foo\"},\"linksTo\":{\"has\":null,"
+                + "\"linksTo\":null,\"name\":\"c3\"},\"name\":\"c2\"},\"name\":\"c1\"}";
+        checkDeeperChain(Jsonbs.defaultJsonb, noNulls);
+        //Since ChainAdapter is adapting Chain to Map<String, Object>, the produced json will contain nulls
+        checkDeeperChain(adapterSerializerJsonb, withNulls);
+        checkDeeperChain(userSerializerJsonb, noNulls);
     }
-    
-    private void checkDeeperChain(Jsonb jsonb) {
+
+    private void checkDeeperChain(Jsonb jsonb, String expected) {
         Foo foo = new Foo("foo");
         Chain c1 = new Chain("c1");
         Chain c2 = new Chain("c2");
@@ -140,7 +157,7 @@ public class RecursiveReferenceTest {
         c2.setHas(foo);
         c2.setLinksTo(c3);
         String result = jsonb.toJson(c1);
-        assertEquals("{\"has\":{\"bar\":\"foo\"},\"linksTo\":{\"has\":{\"bar\":\"foo\"},\"linksTo\":{\"name\":\"c3\"},\"name\":\"c2\"},\"name\":\"c1\"}", result);
+        assertEquals(expected, result);
     }
 
     public static class A {

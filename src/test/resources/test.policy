@@ -8,4 +8,6 @@ grant {
       permission java.lang.RuntimePermission "setSecurityManager";
       permission "java.lang.RuntimePermission" "getProtectionDomain";
       permission "java.util.PropertyPermission" "*", "write";
+
+      permission "java.util.PropertyPermission" "jsonb.creator-parameters-required", "read";
 };

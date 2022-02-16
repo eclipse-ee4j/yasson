@@ -311,7 +311,11 @@ public enum MessageKeys {
     /**
      * Target json value is not valid {@link JsonNumber}.
      */
-    NUMBER_INCOMPATIBLE_VALUE_TYPE_OBJECT("numberIncompatibleValueTypeObject");
+    NUMBER_INCOMPATIBLE_VALUE_TYPE_OBJECT("numberIncompatibleValueTypeObject"),
+    /**
+     * Unknown visibility strategy.
+     */
+    UNKNOWN_VISIBILITY_STRATEGY("unknownVisibilityStrategy");
 
     /**
      * Message bundle key.

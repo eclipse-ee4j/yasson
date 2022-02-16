@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2016, 2020 Oracle and/or its affiliates. All rights reserved.
+ * Copyright (c) 2016, 2022 Oracle and/or its affiliates. All rights reserved.
  *
  * This program and the accompanying materials are made available under the
  * terms of the Eclipse Public License v. 2.0 which is available at
@@ -22,11 +22,8 @@ import org.eclipse.yasson.internal.components.SerializerBinding;
 abstract class CustomizationBase implements Customization, ComponentBoundCustomization {
 
     private final AdapterBinding adapterBinding;
-
-    private final SerializerBinding serializerBinding;
-
-    private final DeserializerBinding deserializerBinding;
-
+    private final SerializerBinding<?> serializerBinding;
+    private final DeserializerBinding<?> deserializerBinding;
     private final boolean nillable;
 
     /**
@@ -34,23 +31,11 @@ abstract class CustomizationBase implements Customization, ComponentBoundCustomi
      *
      * @param builder not null
      */
-    CustomizationBase(CustomizationBuilder builder) {
-        this.nillable = builder.isNillable();
-        this.adapterBinding = builder.getAdapterInfo();
-        this.serializerBinding = builder.getSerializerBinding();
-        this.deserializerBinding = builder.getDeserializerBinding();
-    }
-
-    /**
-     * Copy constructor.
-     *
-     * @param other other customization instance
-     */
-    CustomizationBase(CustomizationBase other) {
-        this.nillable = other.isNillable();
-        this.adapterBinding = other.getSerializeAdapterBinding();
-        this.serializerBinding = other.getSerializerBinding();
-        this.deserializerBinding = other.getDeserializerBinding();
+    CustomizationBase(Builder<?, ?> builder) {
+        this.nillable = builder.nillable;
+        this.adapterBinding = builder.adapterBinding;
+        this.serializerBinding = builder.serializerBinding;
+        this.deserializerBinding = builder.deserializerBinding;
     }
 
     /**
@@ -76,7 +61,7 @@ abstract class CustomizationBase implements Customization, ComponentBoundCustomi
      *
      * @return serializer wrapper
      */
-    public SerializerBinding getSerializerBinding() {
+    public SerializerBinding<?> getSerializerBinding() {
         return serializerBinding;
     }
 
@@ -85,8 +70,51 @@ abstract class CustomizationBase implements Customization, ComponentBoundCustomi
      *
      * @return deserializer wrapper
      */
-    public DeserializerBinding getDeserializerBinding() {
+    public DeserializerBinding<?> getDeserializerBinding() {
         return deserializerBinding;
+    }
+
+    @SuppressWarnings("unchecked")
+    abstract static class Builder<T extends Builder<T, B>, B extends CustomizationBase> {
+
+        private AdapterBinding adapterBinding;
+        private SerializerBinding<?> serializerBinding;
+        private DeserializerBinding<?> deserializerBinding;
+        private boolean nillable;
+
+        Builder() {
+        }
+
+        public T of(B customization) {
+            adapterBinding = customization.getDeserializeAdapterBinding();
+            serializerBinding = customization.getSerializerBinding();
+            deserializerBinding = customization.getDeserializerBinding();
+            nillable = customization.isNillable();
+            return (T) this;
+        }
+
+        public T adapterBinding(AdapterBinding adapterBinding) {
+            this.adapterBinding = adapterBinding;
+            return (T) this;
+        }
+
+        public T serializerBinding(SerializerBinding<?> serializerBinding) {
+            this.serializerBinding = serializerBinding;
+            return (T) this;
+        }
+
+        public T deserializerBinding(DeserializerBinding<?> deserializerBinding) {
+            this.deserializerBinding = deserializerBinding;
+            return (T) this;
+        }
+
+        public T nillable(boolean nillable) {
+            this.nillable = nillable;
+            return (T) this;
+        }
+
+        public abstract B build();
+
     }
 
 }

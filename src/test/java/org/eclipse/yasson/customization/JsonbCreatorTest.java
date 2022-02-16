@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2016, 2020 Oracle and/or its affiliates. All rights reserved.
+ * Copyright (c) 2016, 2021 Oracle and/or its affiliates. All rights reserved.
  *
  * This program and the accompanying materials are made available under the
  * terms of the Eclipse Public License v. 2.0 which is available at
@@ -12,20 +12,34 @@
 
 package org.eclipse.yasson.customization;
 
-import org.junit.jupiter.api.*;
-import static org.junit.jupiter.api.Assertions.*;
-import static org.eclipse.yasson.Jsonbs.*;
-
-import org.eclipse.yasson.customization.model.*;
+import java.math.BigDecimal;
+import java.time.LocalDate;
+import java.util.Set;
 
 import jakarta.json.bind.JsonbException;
 import jakarta.json.bind.annotation.JsonbCreator;
 import jakarta.json.bind.annotation.JsonbDateFormat;
 import jakarta.json.bind.annotation.JsonbNumberFormat;
 import jakarta.json.bind.annotation.JsonbProperty;
-import java.math.BigDecimal;
-import java.time.LocalDate;
-import java.util.Set;
+
+import org.eclipse.yasson.customization.model.CreatorConstructorPojo;
+import org.eclipse.yasson.customization.model.CreatorFactoryMethodPojo;
+import org.eclipse.yasson.customization.model.CreatorIncompatibleTypePojo;
+import org.eclipse.yasson.customization.model.CreatorMultipleDeclarationErrorPojo;
+import org.eclipse.yasson.customization.model.CreatorPackagePrivateConstructor;
+import org.eclipse.yasson.customization.model.CreatorWithoutJavabeanProperty;
+import org.eclipse.yasson.customization.model.CreatorWithoutJsonbProperty1;
+import org.eclipse.yasson.customization.model.ParameterNameTester;
+import org.junit.jupiter.api.Test;
+
+import static org.eclipse.yasson.Jsonbs.defaultJsonb;
+import static org.hamcrest.MatcherAssert.assertThat;
+import static org.hamcrest.Matchers.is;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertNull;
+import static org.junit.jupiter.api.Assertions.assertThrows;
+import static org.junit.jupiter.api.Assertions.assertTrue;
+import static org.junit.jupiter.api.Assertions.fail;
 
 /**
  * @author Roman Grigoriadi
@@ -86,7 +100,11 @@ public class JsonbCreatorTest {
     @Test
     public void testCreatorWithoutJsonbParameters1() {
         //arg2 is missing in json document
-    	assertThrows(JsonbException.class, () -> defaultJsonb.fromJson("{\"arg0\":\"abc\", \"s2\":\"def\"}", CreatorWithoutJsonbProperty1.class));
+        CreatorWithoutJsonbProperty1 object = defaultJsonb.fromJson("{\"arg0\":\"abc\", \"s2\":\"def\"}",
+                                                                    CreatorWithoutJsonbProperty1.class);
+        assertThat(object.getPar1(), is("abc"));
+        assertThat(object.getPar2(), is("def"));
+        assertThat(object.getPar3(), is((byte) 0));
     }
 
     @Test

@@ -37,6 +37,8 @@ import java.util.SortedMap;
 import java.util.TimeZone;
 import java.util.TreeMap;
 
+import jakarta.json.bind.annotation.JsonbTypeDeserializer;
+import jakarta.json.bind.annotation.JsonbTypeSerializer;
 import org.eclipse.yasson.TestTypeToken;
 import org.eclipse.yasson.YassonConfig;
 import org.eclipse.yasson.internal.model.ReverseTreeMap;
@@ -370,7 +372,7 @@ public class SerializersTest {
     }
     
     @Test
-    public void testObjectDerializerWithLexOrderStrategy() {
+    public void testObjectDeserializerWithLexOrderStrategy() {
         Jsonb jsonb = JsonbBuilder.create(new JsonbConfig().withPropertyOrderStrategy(PropertyOrderStrategy.LEXICOGRAPHICAL));
         Object pojo = jsonb.fromJson("{\"first\":{},\"third\":{},\"second\":{\"second\":2,\"first\":1}}", Object.class);
         assertTrue(pojo instanceof TreeMap, "Pojo is not of type TreeMap");
@@ -381,7 +383,7 @@ public class SerializersTest {
     }
     
     @Test
-    public void testObjectDerializerWithReverseOrderStrategy() {
+    public void testObjectDeserializerWithReverseOrderStrategy() {
         Jsonb jsonb = JsonbBuilder.create(new JsonbConfig().withPropertyOrderStrategy(PropertyOrderStrategy.REVERSE));
         Object pojo = jsonb.fromJson("{\"first\":{},\"second\":{\"first\":1,\"second\":2},\"third\":{}}", Object.class);
         assertTrue(pojo instanceof ReverseTreeMap, "Pojo is not of type ReverseTreeMap");
@@ -392,7 +394,7 @@ public class SerializersTest {
     }
 
     @Test
-    public void testObjectDerializerWithAnyOrNoneOrderStrategy() {
+    public void testObjectDeserializerWithAnyOrNoneOrderStrategy() {
         String json = "{\"first\":{},\"second\":{\"first\":1,\"second\":2},\"third\":{}}";
         // ANY
         Jsonb jsonb = JsonbBuilder.create(new JsonbConfig().withPropertyOrderStrategy(PropertyOrderStrategy.ANY));

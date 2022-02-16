@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2016, 2020 Oracle and/or its affiliates. All rights reserved.
+ * Copyright (c) 2016, 2022 Oracle and/or its affiliates. All rights reserved.
  *
  * This program and the accompanying materials are made available under the
  * terms of the Eclipse Public License v. 2.0 which is available at
@@ -16,15 +16,25 @@ import java.security.AccessController;
 import java.security.PrivilegedAction;
 import java.util.ArrayList;
 import java.util.Comparator;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.Objects;
+import java.util.Optional;
 import java.util.ServiceLoader;
 import java.util.logging.Logger;
 
 import jakarta.json.bind.JsonbConfig;
+import jakarta.json.bind.JsonbException;
 import jakarta.json.spi.JsonProvider;
+import jakarta.json.stream.JsonGenerator;
+import jakarta.json.stream.JsonParserFactory;
 
 import org.eclipse.yasson.internal.components.JsonbComponentInstanceCreatorFactory;
+import org.eclipse.yasson.internal.deserializer.DeserializationModelCreator;
+import org.eclipse.yasson.internal.properties.MessageKeys;
+import org.eclipse.yasson.internal.properties.Messages;
+import org.eclipse.yasson.internal.serializer.SerializationModelCreator;
 import org.eclipse.yasson.spi.JsonbComponentInstanceCreator;
 
 /**
@@ -38,17 +48,21 @@ public class JsonbContext {
 
     private final MappingContext mappingContext;
 
+    private final DeserializationModelCreator deserializationModelCreator;
+
+    private final SerializationModelCreator serializationModelCreator;
+
     private final JsonbComponentInstanceCreator componentInstanceCreator;
 
     private final JsonProvider jsonProvider;
+
+    private final JsonParserFactory jsonParserFactory;
 
     private final ComponentMatcher componentMatcher;
 
     private final AnnotationIntrospector annotationIntrospector;
 
     private final JsonbConfigProperties configProperties;
-
-    private final InstanceCreator instanceCreator;
 
     /**
      * Creates and initialize context.
@@ -60,12 +74,14 @@ public class JsonbContext {
         Objects.requireNonNull(jsonbConfig);
         this.jsonbConfig = jsonbConfig;
         this.mappingContext = new MappingContext(this);
-        this.instanceCreator = InstanceCreator.getSingleton();
-        this.componentInstanceCreator = initComponentInstanceCreator(instanceCreator);
+        this.componentInstanceCreator = initComponentInstanceCreator();
         this.componentMatcher = new ComponentMatcher(this);
         this.annotationIntrospector = new AnnotationIntrospector(this);
         this.jsonProvider = jsonProvider;
+        this.jsonParserFactory = initJsonParserFactory();
         this.configProperties = new JsonbConfigProperties(jsonbConfig);
+        this.deserializationModelCreator = new DeserializationModelCreator(this);
+        this.serializationModelCreator = new SerializationModelCreator(this);
     }
 
     /**
@@ -84,6 +100,24 @@ public class JsonbContext {
      */
     public MappingContext getMappingContext() {
         return mappingContext;
+    }
+
+    /**
+     * Get chain model creator.
+     *
+     * @return chain model creator
+     */
+    public DeserializationModelCreator getChainModelCreator() {
+        return deserializationModelCreator;
+    }
+
+    /**
+     * Get serialization model creator.
+     *
+     * @return serialization model creator
+     */
+    public SerializationModelCreator getSerializationModelCreator() {
+        return serializationModelCreator;
     }
 
     /**
@@ -126,16 +160,38 @@ public class JsonbContext {
         return configProperties;
     }
 
-    /**
-     * Returns component for creating instances of non-parsed types.
-     *
-     * @return InstanceCreator
-     */
-    public InstanceCreator getInstanceCreator() {
-        return instanceCreator;
+    public JsonParserFactory getJsonParserFactory() {
+        return jsonParserFactory;
     }
 
-    private JsonbComponentInstanceCreator initComponentInstanceCreator(InstanceCreator instanceCreator) {
+    private JsonParserFactory initJsonParserFactory() {
+        return jsonProvider.createParserFactory(createJsonpProperties(jsonbConfig));
+    }
+
+    /**
+     * Propagates properties from JsonbConfig to JSONP generator / parser factories.
+     *
+     * @param jsonbConfig jsonb config
+     * @return properties for JSONP generator / parser
+     */
+    protected Map<String, ?> createJsonpProperties(JsonbConfig jsonbConfig) {
+        //JSONP 1.0 actually ignores the value, just checks the key is present. Only set if JsonbConfig.FORMATTING is true.
+        final Optional<Object> property = jsonbConfig.getProperty(JsonbConfig.FORMATTING);
+        final Map<String, Object> factoryProperties = new HashMap<>();
+        if (property.isPresent()) {
+            final Object value = property.get();
+            if (!(value instanceof Boolean)) {
+                throw new JsonbException(Messages.getMessage(MessageKeys.JSONB_CONFIG_FORMATTING_ILLEGAL_VALUE));
+            }
+            if ((Boolean) value) {
+                factoryProperties.put(JsonGenerator.PRETTY_PRINTING, Boolean.TRUE);
+            }
+            return factoryProperties;
+        }
+        return factoryProperties;
+    }
+
+    private JsonbComponentInstanceCreator initComponentInstanceCreator() {
         ServiceLoader<JsonbComponentInstanceCreator> loader = AccessController
                 .doPrivileged((PrivilegedAction<ServiceLoader<JsonbComponentInstanceCreator>>) () -> ServiceLoader
                         .load(JsonbComponentInstanceCreator.class));
@@ -145,7 +201,7 @@ public class JsonbContext {
         }
         if (creators.isEmpty()) {
             // No service provider found - use the defaults
-            return JsonbComponentInstanceCreatorFactory.getComponentInstanceCreator(instanceCreator);
+            return JsonbComponentInstanceCreatorFactory.getComponentInstanceCreator();
         }
         creators.sort(Comparator.comparingInt(JsonbComponentInstanceCreator::getPriority).reversed());
         JsonbComponentInstanceCreator creator = creators.get(0);

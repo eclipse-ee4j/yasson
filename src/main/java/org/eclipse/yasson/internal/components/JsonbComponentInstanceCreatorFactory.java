@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2016, 2020 Oracle and/or its affiliates. All rights reserved.
+ * Copyright (c) 2016, 2022 Oracle and/or its affiliates. All rights reserved.
  *
  * This program and the accompanying materials are made available under the
  * terms of the Eclipse Public License v. 2.0 which is available at
@@ -21,7 +21,6 @@ import java.util.logging.Logger;
 
 import jakarta.json.bind.JsonbException;
 
-import org.eclipse.yasson.internal.InstanceCreator;
 import org.eclipse.yasson.internal.properties.MessageKeys;
 import org.eclipse.yasson.internal.properties.Messages;
 import org.eclipse.yasson.spi.JsonbComponentInstanceCreator;
@@ -54,17 +53,16 @@ public class JsonbComponentInstanceCreatorFactory {
      * If one of the above is found {@link BeanManagerInstanceCreator} is returned,
      * or {@link DefaultConstructorCreator} otherwise.
      *
-     * @param creator Instance creator
      * @return Component instance creator, either CDI or default constructor.
      */
-    public static JsonbComponentInstanceCreator getComponentInstanceCreator(InstanceCreator creator) {
+    public static JsonbComponentInstanceCreator getComponentInstanceCreator() {
         Object beanManager = getCdiBeanManager();
         if (beanManager == null) {
             beanManager = getJndiBeanManager();
         }
         if (beanManager == null) {
             LOGGER.finest(Messages.getMessage(MessageKeys.BEAN_MANAGER_NOT_FOUND_USING_DEFAULT));
-            return new DefaultConstructorCreator(creator);
+            return new DefaultConstructorCreator();
         }
         return new BeanManagerInstanceCreator(beanManager);
     }

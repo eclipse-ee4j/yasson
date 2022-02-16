@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2016, 2021 Oracle and/or its affiliates. All rights reserved.
+ * Copyright (c) 2016, 2022 Oracle and/or its affiliates. All rights reserved.
  *
  * This program and the accompanying materials are made available under the
  * terms of the Eclipse Public License v. 2.0 which is available at
@@ -15,6 +15,7 @@ package org.eclipse.yasson.internal;
 import java.lang.reflect.ParameterizedType;
 import java.lang.reflect.Type;
 import java.lang.reflect.TypeVariable;
+import java.util.LinkedList;
 import java.util.Objects;
 import java.util.Optional;
 import java.util.concurrent.ConcurrentHashMap;
@@ -65,14 +66,14 @@ public class ComponentMatcher {
     void init() {
         final JsonbSerializer<?>[] serializers = (JsonbSerializer<?>[]) jsonbContext.getConfig()
                 .getProperty(JsonbConfig.SERIALIZERS).orElseGet(() -> new JsonbSerializer<?>[] {});
-        for (JsonbSerializer serializer : serializers) {
-            SerializerBinding serializerBinding = introspectSerializerBinding(serializer.getClass(), serializer);
+        for (JsonbSerializer<?> serializer : serializers) {
+            SerializerBinding<?> serializerBinding = introspectSerializerBinding(serializer.getClass(), serializer);
             addSerializer(serializerBinding.getBindingType(), serializerBinding);
         }
         final JsonbDeserializer<?>[] deserializers = (JsonbDeserializer<?>[]) jsonbContext.getConfig()
                 .getProperty(JsonbConfig.DESERIALIZERS).orElseGet(() -> new JsonbDeserializer<?>[] {});
-        for (JsonbDeserializer deserializer : deserializers) {
-            DeserializerBinding deserializerBinding = introspectDeserializerBinding(deserializer.getClass(), deserializer);
+        for (JsonbDeserializer<?> deserializer : deserializers) {
+            DeserializerBinding<?> deserializerBinding = introspectDeserializerBinding(deserializer.getClass(), deserializer);
             addDeserializer(deserializerBinding.getBindingType(), deserializerBinding);
         }
 
@@ -89,7 +90,7 @@ public class ComponentMatcher {
                 .compute(type, (type1, bindingInfo) -> bindingInfo != null ? bindingInfo : new ComponentBindings(type1));
     }
 
-    private void addSerializer(Type bindingType, SerializerBinding serializer) {
+    private void addSerializer(Type bindingType, SerializerBinding<?> serializer) {
         userComponents.computeIfPresent(bindingType, (type, bindings) -> {
             if (bindings.getSerializer() != null) {
                 return bindings;
@@ -99,7 +100,7 @@ public class ComponentMatcher {
         });
     }
 
-    private void addDeserializer(Type bindingType, DeserializerBinding deserializer) {
+    private void addDeserializer(Type bindingType, DeserializerBinding<?> deserializer) {
         userComponents.computeIfPresent(bindingType, (type, bindings) -> {
             if (bindings.getDeserializer() != null) {
                 return bindings;
@@ -243,7 +244,7 @@ public class ComponentMatcher {
         }
 
         if (componentBindingType instanceof Class && runtimeType instanceof Class) {
-            return ((Class<?>) componentBindingType).isAssignableFrom((Class) runtimeType);
+            return ((Class<?>) componentBindingType).isAssignableFrom((Class<?>) runtimeType);
         }
 
         //don't try to runtime generic scan if not needed
@@ -350,8 +351,9 @@ public class ComponentMatcher {
         if (adapterTypeArg instanceof ParameterizedType) {
             return ReflectionUtils.resolveTypeArguments((ParameterizedType) adapterTypeArg, adapterType);
         } else if (adapterTypeArg instanceof TypeVariable) {
-            return ReflectionUtils
-                    .resolveItemVariableType(new RuntimeTypeHolder(null, adapterType), (TypeVariable<?>) adapterTypeArg, true);
+            LinkedList<Type> chain = new LinkedList<>();
+            chain.add(adapterType);
+            return ReflectionUtils.resolveItemVariableType(chain, (TypeVariable<?>) adapterTypeArg, true);
         } else {
             return adapterTypeArg;
         }
