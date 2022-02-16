@@ -14,29 +14,29 @@
 -->
 
 <project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-         xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+        xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
 
     <parent>
         <groupId>org.eclipse.ee4j</groupId>
         <artifactId>project</artifactId>
-        <version>1.0.6</version>
+        <version>1.0.7</version>
     </parent>
 
     <modelVersion>4.0.0</modelVersion>
     <groupId>org.eclipse</groupId>
     <artifactId>yasson</artifactId>
-    <version>2.0.5-SNAPSHOT</version>
+    <version>3.0.0-SNAPSHOT</version>
     <packaging>jar</packaging>
-    <name>org.eclipse.yasson</name>
+    <name>Yasson</name>
 
     <description>Eclipse Yasson. Reference implementation of JSR-367 (JSON-B).</description>
     <url>https://projects.eclipse.org/projects/ee4j.yasson</url>
 
     <properties>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
-        <jakarta.json.version>2.0.0</jakarta.json.version>
-        <jakarta.json.bind.version>2.0.0</jakarta.json.bind.version>
-        <jakarta.enterprise.cdi-api.version>3.0.0</jakarta.enterprise.cdi-api.version>
+        <jakarta.json.version>2.0.1</jakarta.json.version>
+        <jakarta.json.bind.version>3.0.0-RC1</jakarta.json.bind.version>
+        <jakarta.enterprise.cdi-api.version>4.0.0-RC2</jakarta.enterprise.cdi-api.version>
         <netbeans.hint.jdkPlatform>JDK_9</netbeans.hint.jdkPlatform>
     </properties>
 
@@ -69,24 +69,12 @@
         <dependency>
             <groupId>org.jboss.weld.se</groupId>
             <artifactId>weld-se-core</artifactId>
-            <version>4.0.0.Beta2</version>
+            <version>5.0.0.Beta1</version>
             <scope>test</scope>
             <exclusions>
                 <exclusion>
                     <groupId>jakarta.el</groupId>
                     <artifactId>jakarta.el-api</artifactId>
-                </exclusion>
-                <exclusion>
-                    <groupId>jakarta.annotation</groupId>
-                    <artifactId>jakarta.annotation-api</artifactId>
-                </exclusion>
-                <exclusion>
-                    <groupId>jakarta.enterprise</groupId>
-                    <artifactId>jakarta.enterprise.cdi-api</artifactId>
-                </exclusion>
-                <exclusion>
-                    <groupId>jakarta.interceptor</groupId>
-                    <artifactId>jakarta.interceptor-api</artifactId>
                 </exclusion>
             </exclusions>
         </dependency>
@@ -101,6 +89,11 @@
             <artifactId>junit-jupiter-engine</artifactId>
             <version>5.6.2</version>
             <scope>test</scope>
+        </dependency>
+        <dependency>
+            <groupId>org.hamcrest</groupId>
+            <artifactId>hamcrest-all</artifactId>
+            <version>1.3</version>
         </dependency>
     </dependencies>
 
@@ -284,15 +277,49 @@
                 </plugins>
             </build>
         </profile>
+
+        <!-- remove when not needed -->
+        <profile>
+            <id>staging</id>
+            <activation>
+                <activeByDefault>false</activeByDefault>
+            </activation>
+            <repositories>
+                <repository>
+                    <id>sonatype-nexus-staging</id>
+                    <name>Sonatype Nexus Staging</name>
+                    <url>${sonatypeOssDistMgmtStagingUrl}</url>
+                    <releases>
+                        <enabled>true</enabled>
+                    </releases>
+                    <snapshots>
+                        <enabled>true</enabled>
+                    </snapshots>
+                </repository>
+            </repositories>
+            <pluginRepositories>
+                <pluginRepository>
+                    <id>sonatype-nexus-staging</id>
+                    <name>Sonatype Nexus Staging</name>
+                    <url>${sonatypeOssDistMgmtStagingUrl}</url>
+                    <releases>
+                        <enabled>true</enabled>
+                    </releases>
+                    <snapshots>
+                        <enabled>true</enabled>
+                    </snapshots>
+                </pluginRepository>
+            </pluginRepositories>
+        </profile>
     </profiles>
 
     <build>
-        <testResources>
-            <testResource>
-                <directory>src/test/resources</directory>
-                <filtering>true</filtering>
-            </testResource>
-        </testResources>
+<!--        <testResources>-->
+<!--            <testResource>-->
+<!--                <directory>src/test/resources</directory>-->
+<!--                <filtering>true</filtering>-->
+<!--            </testResource>-->
+<!--        </testResources>-->
         <finalName>${project.artifactId}</finalName>
         <pluginManagement>
             <plugins>
@@ -327,28 +354,19 @@
                     <executions>
                         <execution>
                             <id>default-compile</id>
-                            <configuration>
-                                <!-- compile everything to ensure module-info contains right entries -->
-                                <!-- required when JAVA_HOME is JDK 8 or below -->
-                                <release>9</release>
-                                <compilerArgs>
-                                    <!--Remove when CDI is updated to support modules-->
-                                    <arg>--add-reads</arg>
-                                    <arg>org.eclipse.yasson=ALL-UNNAMED</arg>
-                                </compilerArgs>
-                            </configuration>
-                        </execution>
-                        <execution>
-                            <id>multi-release-compile-9</id>
                             <goals>
                                 <goal>compile</goal>
                             </goals>
                             <configuration>
-                                <release>9</release>
-                                <compileSourceRoots>
-                                    <compileSourceRoot>${project.basedir}/src/main/java9</compileSourceRoot>
-                                </compileSourceRoots>
-                                <multiReleaseOutput>true</multiReleaseOutput>
+                                <release>11</release>
+                                <source>11</source>
+                                <target>11</target>
+                            </configuration>
+                        </execution>
+                        <execution>
+                            <id>default-testCompile</id>
+                            <configuration>
+                                <release>11</release>
                             </configuration>
                         </execution>
                         <execution>
@@ -364,29 +382,11 @@
                                 <multiReleaseOutput>true</multiReleaseOutput>
                             </configuration>
                         </execution>
-                        <execution>
-                            <id>base-compile</id>
-                            <goals>
-                                <goal>compile</goal>
-                            </goals>
-                            <!-- recompile everything for 1.8 except the module-info.java -->
-                            <configuration>
-                                <release>8</release>
-                                <excludes>
-                                    <exclude>module-info.java</exclude>
-                                </excludes>
-                            </configuration>
-                        </execution>
-                        <execution>
-                            <id>default-testCompile</id>
-                            <configuration>
-                                <release>11</release>
-                            </configuration>
-                        </execution>
                     </executions>
                     <!-- defaults for compile and testCompile -->
                     <configuration>
                         <compilerArgs>
+                            <compilerArgument>-proc:none</compilerArgument>
                             <arg>-Xlint:all</arg>
                         </compilerArgs>
                     </configuration>
@@ -486,7 +486,7 @@
                                         java.beans;resolution:="optional",
                                         *
                                     </Import-Package>
-                                    <Require-Capability>osgi.ee;filter:="(&amp;(osgi.ee=JavaSE)(version=1.8))"</Require-Capability>
+                                    <Require-Capability>osgi.ee;filter:="(&amp;(osgi.ee=JavaSE)(version=11))"</Require-Capability>
                                 </instructions>
                             </configuration>
                         </execution>
@@ -555,7 +555,7 @@
                     <configuration>
                         <rules>
                             <requireJavaVersion>
-                                <version>[9,)</version>
+                                <version>[11,)</version>
                             </requireJavaVersion>
                             <requireMavenVersion>
                                 <version>[3.3.9,)</version>
