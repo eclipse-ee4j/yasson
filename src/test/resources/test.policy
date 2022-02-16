@@ -1,13 +1,16 @@
 grant {
+      //needed to be able to read all files including META-INF entries
+      permission "java.io.FilePermission" "<<ALL FILES>>", "read";
 
-      permission java.io.FilePermission "${build.directory}/-", "read";
       permission "java.lang.reflect.ReflectPermission" "suppressAccessChecks";
       permission "java.lang.RuntimePermission" "accessDeclaredMembers";
 
       permission "java.lang.RuntimePermission" "createSecurityManager";
       permission java.lang.RuntimePermission "setSecurityManager";
       permission "java.lang.RuntimePermission" "getProtectionDomain";
+      permission "java.lang.RuntimePermission" "getClassLoader";
       permission "java.util.PropertyPermission" "*", "write";
 
       permission "java.util.PropertyPermission" "jsonb.creator-parameters-required", "read";
+      permission "java.util.PropertyPermission" "jakarta.json.provider", "read";
 };
