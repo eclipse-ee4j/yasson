@@ -53,7 +53,6 @@ jobs:
           distribution: 'adopt'
           java-version: ${{ matrix.java_version }}
       - name: Yasson tests
-        run: mvn -U -C -Dmaven.javadoc.skip=true -Pstaging verify
-#        TMP removal
-#      - name: JSONB-API TCK
-#        run: cd yasson-tck && mvn -U -B test
+        run: mvn -U -B -C -Dmaven.javadoc.skip=true -Pstaging verify
+      - name: JSONB-API TCK
+        run: cd yasson-tck && mvn -U -B test -DargLine="-Djava.locale.providers=COMPAT"
