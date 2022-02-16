@@ -10,7 +10,7 @@
   <version>1.0.0-SNAPSHOT</version>
 
   <properties>
-    <jsonb.tck.version>3.0.0</jsonb.tck.version>
+    <jsonb.tck.version>3.0.0-SNAPSHOT</jsonb.tck.version>
     <yasson.version>3.0.0-SNAPSHOT</yasson.version>
     <maven.compiler.source>11</maven.compiler.source>
     <maven.compiler.target>11</maven.compiler.target>
