@@ -14,7 +14,7 @@ following is a summary of the TCK results for releases of Eclipse Yasson.
 - [x] Specification Name, Version and download URL\
   [Jakarta JSON Binding 3.0](https://jakarta.ee/specifications/jsonb/3.0/)
 - [x] TCK Version, digital SHA-256 fingerprint and download URL\
-  [Jakarta JSON Binding TCK 3.0.0](https://download.eclipse.org/ee4j/jakartaee-tck/jakartaee10/promoted/eftl/jakarta-jsonb-tck-3.0.0.zip), SHA-256: 9db96681fb58237ce4ed0cd6a019ca63857763f2ce4aedb9f0cafa179b189447
+  [Jakarta JSON Binding TCK 3.0.0](https://download.eclipse.org/ee4j/jakartaee-tck/jakartaee10/promoted/eftl/jakarta-jsonb-tck-3.0.0.zip), SHA-256: 954fd9a3a67059ddeabe5f51462a6a3b542c94fc798094dd8c312a6a28ef2d0b
 - [x] Public URL of TCK Results Summary\
   [TCK results summary](https://eclipse-ee4j.github.io/yasson/tck/TCK-Results.html)
 - [x] Any Additional Specification Certification Requirements\
