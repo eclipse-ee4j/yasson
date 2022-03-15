@@ -36,6 +36,10 @@ public class ClassMultiReleaseExtension {
         return true;
     }
 
+    public static boolean isRecord(Class<?> clazz) {
+        return false;
+    }
+
     static boolean isSpecialAccessorMethod(Method method, Map<String, Property> classProperties) {
         return false;
     }

@@ -94,4 +94,19 @@ public class RecordTest {
         assertEquals(car, deserialized);
     }
 
+    @Test
+    public void testRecordParameterOptionality() {
+        CarCreatorOptionalTest car = new CarCreatorOptionalTest("skoda", 123, "red");
+        String expected = "{\"color\":\"red\",\"somePrimitive\":123,\"type\":\"skoda\"}";
+
+        String json = Jsonbs.defaultJsonb.toJson(car);
+        assertEquals(expected, json);
+
+        String toDeserialize = "{}";
+        String expectedDefaultValues = "{\"color\":null,\"somePrimitive\":0,\"type\":\"typeDefaultValue\"}";
+        CarCreatorOptionalTest deserialized = Jsonbs.defaultJsonb.fromJson(toDeserialize, CarCreatorOptionalTest.class);
+        json = Jsonbs.nullableJsonb.toJson(deserialized);
+        assertEquals(expectedDefaultValues, json);
+    }
+
 }
