@@ -15,6 +15,7 @@ package org.eclipse.yasson.internal.serializer;
 import java.lang.reflect.Constructor;
 import java.lang.reflect.Type;
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.LinkedHashMap;
 import java.util.List;
@@ -67,7 +68,7 @@ class ObjectDeserializer<T> extends AbstractContainerDeserializer<T> {
         tmpValuesMap.put(OptionalLong.class, OptionalLong::empty);
         tmpValuesMap.put(OptionalDouble.class, OptionalDouble::empty);
 
-        DEFAULT_CREATOR_VALUES = Map.copyOf(tmpValuesMap);
+        DEFAULT_CREATOR_VALUES = Collections.unmodifiableMap(tmpValuesMap);
     }
 
     /**
