@@ -36,6 +36,12 @@ public class ClassMultiReleaseExtension {
         return true;
     }
 
+    /**
+     * Whether the class is Record or not.
+     *
+     * @param clazz class to check
+     * @return is record
+     */
     public static boolean isRecord(Class<?> clazz) {
         return false;
     }
