@@ -36,6 +36,16 @@ public class ClassMultiReleaseExtension {
         return true;
     }
 
+    /**
+     * Whether the class is Record or not.
+     *
+     * @param clazz class to check
+     * @return is record
+     */
+    public static boolean isRecord(Class<?> clazz) {
+        return false;
+    }
+
     static boolean isSpecialAccessorMethod(Method method, Map<String, Property> classProperties) {
         return false;
     }

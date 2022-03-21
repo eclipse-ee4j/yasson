@@ -35,7 +35,11 @@ public class ClassMultiReleaseExtension {
     }
 
     static boolean shouldTransformToPropertyName(Method method) {
-        return !method.getDeclaringClass().isRecord();
+        return !isRecord(method.getDeclaringClass());
+    }
+
+    public static boolean isRecord(Class<?> clazz) {
+        return clazz.isRecord();
     }
 
     static boolean isSpecialAccessorMethod(Method method, Map<String, Property> classProperties) {

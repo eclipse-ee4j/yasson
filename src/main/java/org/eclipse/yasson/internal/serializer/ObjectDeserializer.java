@@ -15,9 +15,16 @@ package org.eclipse.yasson.internal.serializer;
 import java.lang.reflect.Constructor;
 import java.lang.reflect.Type;
 import java.util.ArrayList;
+import java.util.Collections;
+import java.util.HashMap;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Optional;
+import java.util.OptionalDouble;
+import java.util.OptionalInt;
+import java.util.OptionalLong;
+import java.util.function.Supplier;
 
 import jakarta.json.bind.JsonbException;
 import jakarta.json.bind.serializer.JsonbDeserializer;
@@ -41,6 +48,28 @@ import org.eclipse.yasson.internal.properties.Messages;
  * @param <T> object type
  */
 class ObjectDeserializer<T> extends AbstractContainerDeserializer<T> {
+
+    private static final Map<Class<?>, Supplier<Object>> DEFAULT_CREATOR_VALUES;
+    private static final Supplier<Object> NULL_PROVIDER = () -> null;
+
+    static {
+        Map<Class<?>, Supplier<Object>> tmpValuesMap = new HashMap<>();
+
+        tmpValuesMap.put(byte.class, () -> (byte) 0);
+        tmpValuesMap.put(short.class, () -> (short) 0);
+        tmpValuesMap.put(int.class, () -> 0);
+        tmpValuesMap.put(long.class, () -> 0L);
+        tmpValuesMap.put(float.class, () -> 0.0F);
+        tmpValuesMap.put(double.class, () -> 0.0);
+        tmpValuesMap.put(char.class, () -> '\u0000');
+        tmpValuesMap.put(boolean.class, () -> false);
+        tmpValuesMap.put(Optional.class, Optional::empty);
+        tmpValuesMap.put(OptionalInt.class, OptionalInt::empty);
+        tmpValuesMap.put(OptionalLong.class, OptionalLong::empty);
+        tmpValuesMap.put(OptionalDouble.class, OptionalDouble::empty);
+
+        DEFAULT_CREATOR_VALUES = Collections.unmodifiableMap(tmpValuesMap);
+    }
 
     /**
      * Last property model cache to avoid lookup by jsonKey on every access.
@@ -123,13 +152,18 @@ class ObjectDeserializer<T> extends AbstractContainerDeserializer<T> {
     private T createInstance(Class<T> rawType, JsonbCreator creator) {
         final T instance;
         final List<Object> paramValues = new ArrayList<>();
+        boolean isRecord = ClassMultiReleaseExtension.isRecord(rawType);
         for (CreatorModel param : creator.getParams()) {
             final ValueWrapper valueWrapper = values.get(param.getName());
             //required by spec
-            if (valueWrapper == null) {
+            if (!isRecord && valueWrapper == null) {
                 throw new JsonbException(Messages.getMessage(MessageKeys.JSONB_CREATOR_MISSING_PROPERTY, param.getName()));
+            } else if (valueWrapper == null) {
+                Class<?> rawParamType = ReflectionUtils.getRawType(param.getType());
+                paramValues.add(DEFAULT_CREATOR_VALUES.getOrDefault(rawParamType, NULL_PROVIDER).get());
+            } else {
+                paramValues.add(valueWrapper.getValue());
             }
-            paramValues.add(valueWrapper.getValue());
         }
         instance = creator.call(paramValues.toArray(), rawType);
         return instance;
