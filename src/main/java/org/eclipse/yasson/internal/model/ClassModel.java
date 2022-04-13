@@ -195,4 +195,11 @@ public class ClassModel {
         }
         return defaultConstructor;
     }
+
+    @Override
+    public String toString() {
+        return "ClassModel{"
+                + "clazz=" + clazz
+                + '}';
+    }
 }

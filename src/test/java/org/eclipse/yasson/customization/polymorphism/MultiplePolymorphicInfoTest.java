@@ -43,6 +43,21 @@ public class MultiplePolymorphicInfoTest {
         assertThat(JSONB.fromJson(json, Labrador.class), instanceOf(Labrador.class));
     }
 
+    @Test
+    public void testPolymorphicParentInstanceSerialization() {
+        String expected = "{\"@type\":\"area\",\"name\":\"North America\",\"population\":600000000}";
+        Area northAmerica = new Area();
+        northAmerica.name = "North America";
+        northAmerica.population = 600000000;
+        assertThat(JSONB.toJson(northAmerica), is(expected));
+    }
+
+    @Test
+    public void testPolymorphicParentInstanceDeserialization() {
+        String json = "{\"@type\":\"area\",\"name\":\"North America\",\"population\":600000000}";
+        assertThat(JSONB.fromJson(json, Location.class), instanceOf(Area.class));
+    }
+
     @JsonbTypeInfo(key = "@something", value = {
             @JsonbSubtype(alias = "animal", type = Animal.class)
     })
@@ -65,4 +80,28 @@ public class MultiplePolymorphicInfoTest {
         public boolean isLabrador = true;
 
     }
+
+    @JsonbTypeInfo({
+            @JsonbSubtype(alias = "area", type = Area.class)
+    })
+    public interface Location {
+    }
+
+    @JsonbTypeInfo(key = "@area", value = {
+            @JsonbSubtype(alias = "city", type = City.class),
+            @JsonbSubtype(alias = "state", type = State.class)
+    })
+    public static class Area implements Location {
+        public String name;
+        public long population;
+    }
+
+    public static class City extends Area {
+        public String state;
+    }
+
+    public static class State extends Area {
+        public String capital;
+    }
+
 }

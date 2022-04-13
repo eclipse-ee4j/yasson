@@ -87,7 +87,7 @@ class InheritanceInstanceCreator implements ModelDeserializer<JsonParser> {
                 return entry.getKey();
             }
         }
-        throw new JsonbException("Unknown alias \"" + alias + "\" known aliases: "
+        throw new JsonbException("Unknown alias \"" + alias + "\" of the type " + processedType.getName() + ". Known aliases: "
                                          + typeInheritanceConfiguration.getAliases().values());
     }
 

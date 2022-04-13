@@ -233,10 +233,10 @@ public class SerializationModelCreator {
         Class<?> rawType = classModel.getType();
         String alias = typeInheritanceConfiguration.getAliases().get(rawType);
         ModelSerializer serializer = createPolymorphismPropertySerializer(typeInheritanceConfiguration, alias);
+        if ((!typeInheritanceConfiguration.isInherited() || alias != null) && typeInheritanceConfiguration.getParentConfig() != null) {
+            addParentPolymorphismProperty(typeInheritanceConfiguration.getParentConfig(), propertySerializers, classModel);
+        }
         if (serializer != null) {
-            if (typeInheritanceConfiguration.getParentConfig() != null) {
-                addParentPolymorphismProperty(typeInheritanceConfiguration.getParentConfig(), propertySerializers, classModel);
-            }
             propertySerializers.put(typeInheritanceConfiguration.getFieldName(), serializer);
         }
         for (PropertyModel propertyModel : classModel.getSortedProperties()) {
@@ -273,10 +273,9 @@ public class SerializationModelCreator {
         }
     }
 
-    private ModelSerializer createPolymorphismPropertySerializer(TypeInheritanceConfiguration typeConfiguration,
-                                                                 String alias) {
+    private ModelSerializer createPolymorphismPropertySerializer(TypeInheritanceConfiguration configuration, String alias) {
         if (alias != null) {
-            return (value, generator, context) -> generator.write(typeConfiguration.getFieldName(), alias);
+            return (value, generator, context) -> generator.write(configuration.getFieldName(), alias);
         }
         return null;
     }
