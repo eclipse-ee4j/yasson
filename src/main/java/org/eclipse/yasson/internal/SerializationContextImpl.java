@@ -132,10 +132,8 @@ public class SerializationContextImpl extends ProcessingContext implements Seria
         try {
             serializeObject(object, jsonGenerator);
         } catch (JsonbException e) {
-            LOGGER.severe(e.getMessage());
             throw e;
-        } catch (Exception e) {
-            LOGGER.severe(e.getMessage());
+        } catch (RuntimeException e) {
             throw new JsonbException(Messages.getMessage(MessageKeys.INTERNAL_ERROR, e.getMessage()), e);
         } finally {
             try {

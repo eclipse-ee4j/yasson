@@ -15,11 +15,6 @@ package org.eclipse.yasson.internal;
 import java.lang.reflect.Type;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.logging.Logger;
-
-import jakarta.json.bind.JsonbException;
-import jakarta.json.bind.serializer.DeserializationContext;
-import jakarta.json.stream.JsonParser;
 
 import org.eclipse.yasson.internal.deserializer.ModelDeserializer;
 import org.eclipse.yasson.internal.model.customization.ClassCustomization;
@@ -27,13 +22,14 @@ import org.eclipse.yasson.internal.model.customization.Customization;
 import org.eclipse.yasson.internal.properties.MessageKeys;
 import org.eclipse.yasson.internal.properties.Messages;
 
+import jakarta.json.bind.JsonbException;
+import jakarta.json.bind.serializer.DeserializationContext;
+import jakarta.json.stream.JsonParser;
+
 /**
  * Deserialization context implementation.
  */
 public class DeserializationContextImpl extends ProcessingContext implements DeserializationContext {
-
-    private static final Logger LOGGER = Logger.getLogger(DeserializationContextImpl.class.getName());
-
     private final List<Runnable> delayedSetters = new ArrayList<>();
     private JsonParser.Event lastValueEvent;
     private Customization customization = ClassCustomization.empty();
@@ -141,10 +137,8 @@ public class DeserializationContextImpl extends ProcessingContext implements Des
             ModelDeserializer<JsonParser> modelDeserializer = getJsonbContext().getChainModelCreator().deserializerChain(type);
             return (T) modelDeserializer.deserialize(parser, this);
         } catch (JsonbException e) {
-            LOGGER.severe(e.getMessage());
             throw e;
-        } catch (Exception e) {
-            LOGGER.severe(e.getMessage());
+        } catch (RuntimeException e) {
             throw new JsonbException(Messages.getMessage(MessageKeys.INTERNAL_ERROR, e.getMessage()), e);
         }
     }
