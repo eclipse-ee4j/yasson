@@ -69,7 +69,8 @@ public class AnnotationPolymorphismTest {
         JsonbException exception = assertThrows(JsonbException.class,
                                                 () -> Jsonbs.defaultJsonb.fromJson("{\"@type\":\"rat\",\"isDog\":false}",
                                                                                    Animal.class));
-        assertThat(exception.getMessage(), startsWith("Unknown alias \"rat\" known aliases: ["));
+        assertThat(exception.getMessage(), startsWith("Unknown alias \"rat\" of the type org.eclipse.yasson.customization."
+                                                              + "polymorphism.AnnotationPolymorphismTest$Animal. Known aliases: ["));
     }
 
     @Test
