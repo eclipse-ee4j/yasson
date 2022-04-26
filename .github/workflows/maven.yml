@@ -44,9 +44,10 @@ jobs:
       - name: Copyright
         run: bash etc/copyright.sh
       - name: Checkstyle
-        run: mvn -B -Pstaging checkstyle:checkstyle
+        run: mvn -B checkstyle:checkstyle
       - name: Yasson install
-        run: mvn -U -C -Pstaging clean install -DskipTests
+#        run: mvn -U -C -Pstaging clean install -DskipTests
+        run: mvn -U -C clean install -DskipTests
       - name: Set up JDK for tests
         uses: actions/setup-java@v2
         with:
