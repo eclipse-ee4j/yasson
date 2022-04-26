@@ -65,6 +65,13 @@
             <version>${jakarta.enterprise.cdi-api.version}</version>
             <optional>true</optional>
             <scope>provided</scope>
+            <exclusions>
+                <!-- el api version 5.0.0 was not yet in the central -->
+                <exclusion>
+                    <groupId>jakarta.el</groupId>
+                    <artifactId>jakarta.el-api</artifactId>
+                </exclusion>
+            </exclusions>
         </dependency>
         <dependency>
             <groupId>org.jboss.weld.se</groupId>
@@ -72,9 +79,22 @@
             <version>5.0.0.Beta1</version>
             <scope>test</scope>
             <exclusions>
+                <!-- current weld does nto depend on the final API yet and there are dependency version mismatches -->
+<!--                <exclusion>-->
+<!--                    <groupId>jakarta.el</groupId>-->
+<!--                    <artifactId>jakarta.el-api</artifactId>-->
+<!--                </exclusion>-->
                 <exclusion>
-                    <groupId>jakarta.el</groupId>
-                    <artifactId>jakarta.el-api</artifactId>
+                    <groupId>jakarta.enterprise</groupId>
+                    <artifactId>jakarta.enterprise.cdi-api</artifactId>
+                </exclusion>
+                <exclusion>
+                    <groupId>jakarta.interceptor</groupId>
+                    <artifactId>jakarta.interceptor-api</artifactId>
+                </exclusion>
+                <exclusion>
+                    <groupId>jakarta.annotation</groupId>
+                    <artifactId>jakarta.annotation-api</artifactId>
                 </exclusion>
             </exclusions>
         </dependency>
