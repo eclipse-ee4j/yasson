@@ -69,6 +69,7 @@ public class JsonbConfigProperties {
     private final boolean strictIJson;
     private final boolean zeroTimeDefaulting;
     private final boolean requiredCreatorParameters;
+    private final boolean dateInMillisecondsAsString;
     private final Map<Class<?>, Class<?>> userTypeMapping;
     private final Class<?> defaultMapImplType;
     private final JsonbSerializer<Object> nullSerializer;
@@ -98,6 +99,7 @@ public class JsonbConfigProperties {
         this.eagerInitClasses = initEagerInitClasses();
         this.requiredCreatorParameters = initRequiredCreatorParameters();
         this.forceMapArraySerializerForNullKeys = initForceMapArraySerializerForNullKeys();
+        this.dateInMillisecondsAsString = initDateInMillisecondsAsString();
     }
 
     private Class<? extends Map> initDefaultMapImplType() {
@@ -190,6 +192,13 @@ public class JsonbConfigProperties {
             return Boolean.parseBoolean(System.getProperty(YassonConfig.CREATOR_PARAMETERS_REQUIRED));
         }
         return getConfigProperty(YassonConfig.CREATOR_PARAMETERS_REQUIRED, Boolean.class, false);
+    }
+
+    private boolean initDateInMillisecondsAsString() {
+        if (System.getProperty(YassonConfig.DATE_TIME_IN_MILLIS_AS_A_STRING) != null) {
+            return Boolean.parseBoolean(System.getProperty(YassonConfig.DATE_TIME_IN_MILLIS_AS_A_STRING));
+        }
+        return getConfigProperty(YassonConfig.DATE_TIME_IN_MILLIS_AS_A_STRING, Boolean.class, false);
     }
 
     @SuppressWarnings("unchecked")
@@ -386,5 +395,9 @@ public class JsonbConfigProperties {
      */
     public boolean isForceMapArraySerializerForNullKeys() {
         return forceMapArraySerializerForNullKeys;
+    }
+
+    public boolean isDateInMillisecondsAsString() {
+        return dateInMillisecondsAsString;
     }
 }

@@ -58,6 +58,11 @@ public class YassonConfig extends JsonbConfig {
     public static final String JSONB_CREATOR_PARAMETERS_REQUIRED = "yasson.jsonb-creator-parameters-required";
 
     /**
+     * @see #withTimeInMillisAsAString(boolean)
+     */
+    public static final String DATE_TIME_IN_MILLIS_AS_A_STRING = "yasson.time-in-millis-as-a-string";
+
+    /**
      * Property used to specify behaviour on deserialization when JSON document contains properties
      * which doesn't exist in the target class. Default value is 'false'.
      * @param failOnUnknownProperties Whether or not to fail if unknown properties are encountered
@@ -140,6 +145,21 @@ public class YassonConfig extends JsonbConfig {
      */
     public YassonConfig withJsonbParametersRequired(boolean value) {
         setProperty(JSONB_CREATOR_PARAMETERS_REQUIRED, value);
+        return this;
+    }
+
+    /**
+     * It is required to handle time millisecond format as a number. See
+     * {@link jakarta.json.bind.annotation.JsonbDateFormat#TIME_IN_MILLIS}. It is possible to override this and force
+     * Yasson to handle it as a String, by using this method.
+     *
+     * @param value whether to treat dates formatted by {@link jakarta.json.bind.annotation.JsonbDateFormat#TIME_IN_MILLIS}
+     *              as a String. Default value is {@code false}.
+     * @return This YassonConfig instance
+     * @since 3.0.0
+     */
+    public YassonConfig withTimeInMillisAsAString(boolean value) {
+        setProperty(DATE_TIME_IN_MILLIS_AS_A_STRING, value);
         return this;
     }
 
