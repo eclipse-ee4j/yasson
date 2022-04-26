@@ -96,4 +96,14 @@ public class RecordTest {
         assertThat(deserialized, is(car));
     }
 
+    @Test
+    public void testRecordWithDefaultConstructor() {
+        CarWithDefaultConstructor car = new CarWithDefaultConstructor("skoda", "red");
+        String expected = "{\"color\":\"red\",\"type\":\"skoda\"}";
+
+        String json = Jsonbs.defaultJsonb.toJson(car);
+        assertThat(json, is(expected));
+        assertThrows(JsonbException.class, () -> Jsonbs.defaultJsonb.fromJson(expected, CarWithDefaultConstructor.class));
+    }
+
 }

@@ -46,6 +46,10 @@ public class ClassMultiReleaseExtension {
         return null;
     }
 
+    public static boolean isRecord(Class<?> clazz) {
+        return false;
+    }
+
     public static Optional<JsonbException> exceptionToThrow(Class<?> clazz) {
         return Optional.empty();
     }

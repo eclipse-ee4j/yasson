@@ -39,7 +39,7 @@ public class ClassMultiReleaseExtension {
     }
 
     static boolean isSpecialAccessorMethod(Method method, Map<String, Property> classProperties) {
-        return method.getDeclaringClass().isRecord()
+        return isRecord(method.getDeclaringClass())
                 && method.getParameterCount() == 0
                 && !void.class.equals(method.getReturnType())
                 && classProperties.containsKey(method.getName());
@@ -54,6 +54,10 @@ public class ClassMultiReleaseExtension {
             }
         }
         return null;
+    }
+
+    public static boolean isRecord(Class<?> clazz) {
+        return clazz.isRecord();
     }
 
     public static Optional<JsonbException> exceptionToThrow(Class<?> clazz) {
