@@ -12,5 +12,6 @@ grant {
       permission "java.util.PropertyPermission" "*", "write";
 
       permission "java.util.PropertyPermission" "jsonb.creator-parameters-required", "read";
+      permission "java.util.PropertyPermission" "yasson.time-in-millis-as-a-string", "read";
       permission "java.util.PropertyPermission" "jakarta.json.provider", "read";
 };

@@ -18,6 +18,7 @@ import java.time.format.DateTimeFormatter;
 import java.time.temporal.TemporalAccessor;
 import java.util.Locale;
 import java.util.Optional;
+import java.util.function.BiConsumer;
 import java.util.function.Function;
 
 import jakarta.json.bind.annotation.JsonbDateFormat;
@@ -35,11 +36,20 @@ abstract class AbstractDateSerializer<T> extends TypeSerializer<T> {
 
     static final ZoneId UTC = ZoneId.of("UTC");
 
-    private final Function<T, String> valueSerializer;
+    private final Function<T, String> toStringSerializer;
+    private final BiConsumer<T, JsonGenerator> valueWriter;
 
     AbstractDateSerializer(TypeSerializerBuilder serializerBuilder) {
         super(serializerBuilder);
-        valueSerializer = valueSerializer(serializerBuilder);
+        Customization customization = serializerBuilder.getCustomization();
+        JsonbConfigProperties properties = serializerBuilder.getJsonbContext().getConfigProperties();
+        final JsonbDateFormatter formatter = getJsonbDateFormatter(properties, customization);
+        toStringSerializer = valueSerializer(serializerBuilder);
+        if (JsonbDateFormat.TIME_IN_MILLIS.equals(formatter.getFormat()) && !properties.isDateInMillisecondsAsString()) {
+            valueWriter = (value, generator) -> generator.write(toInstant(value).toEpochMilli());
+        } else {
+            valueWriter = (value, generator) -> generator.write(toStringSerializer.apply(value));
+        }
     }
 
     private Function<T, String> valueSerializer(TypeSerializerBuilder serializerBuilder) {
@@ -134,11 +144,11 @@ abstract class AbstractDateSerializer<T> extends TypeSerializer<T> {
 
     @Override
     void serializeValue(T value, JsonGenerator generator, SerializationContextImpl context) {
-        generator.write(valueSerializer.apply(value));
+        valueWriter.accept(value, generator);
     }
 
     @Override
     void serializeKey(T key, JsonGenerator generator, SerializationContextImpl context) {
-        generator.writeKey(valueSerializer.apply(key));
+        generator.writeKey(toStringSerializer.apply(key));
     }
 }
