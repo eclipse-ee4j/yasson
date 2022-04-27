@@ -192,7 +192,7 @@ public class ClassModel {
         // Note: Null is a valid result and needs to be cached.
         if (!isInitialized.get()) {
             if (ClassMultiReleaseExtension.isRecord(clazz)) {
-                //No default constructor should in case of records
+                //No default constructor should be used in case of records
                 defaultConstructor = null;
             } else {
                 defaultConstructor = ReflectionUtils.getDefaultConstructor(clazz, false);
