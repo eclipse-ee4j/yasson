@@ -189,9 +189,9 @@ public class JsonbConfigProperties {
 
     private boolean initRequiredCreatorParameters() {
         if (System.getProperty(JsonbConfig.CREATOR_PARAMETERS_REQUIRED) != null) {
-            return Boolean.parseBoolean(System.getProperty(YassonConfig.CREATOR_PARAMETERS_REQUIRED));
+            return Boolean.parseBoolean(System.getProperty(JsonbConfig.CREATOR_PARAMETERS_REQUIRED));
         }
-        return getConfigProperty(YassonConfig.CREATOR_PARAMETERS_REQUIRED, Boolean.class, false);
+        return getConfigProperty(JsonbConfig.CREATOR_PARAMETERS_REQUIRED, Boolean.class, false);
     }
 
     private boolean initDateInMillisecondsAsString() {

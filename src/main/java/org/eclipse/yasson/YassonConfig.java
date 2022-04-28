@@ -53,11 +53,6 @@ public class YassonConfig extends JsonbConfig {
     public static final String FORCE_MAP_ARRAY_SERIALIZER_FOR_NULL_KEYS = "yasson.force-map-array-serializer-for-null-keys";
 
     /**
-     * @see #withJsonbParametersRequired(boolean)
-     */
-    public static final String JSONB_CREATOR_PARAMETERS_REQUIRED = "yasson.jsonb-creator-parameters-required";
-
-    /**
      * @see #withTimeInMillisAsAString(boolean)
      */
     public static final String DATE_TIME_IN_MILLIS_AS_A_STRING = "yasson.time-in-millis-as-a-string";
@@ -129,22 +124,6 @@ public class YassonConfig extends JsonbConfig {
      */
     public YassonConfig withForceMapArraySerializerForNullKeys(boolean value) {
         setProperty(FORCE_MAP_ARRAY_SERIALIZER_FOR_NULL_KEYS, value);
-        return this;
-    }
-
-
-    /**
-     * {@link jakarta.json.bind.annotation.JsonbCreator} parameters are required to be optional since the spec 3.0.0.
-     * However, if it is needed to revert functionality as it used to be before, it is possible to use this switch
-     * which globally turns the requirement of the {@link jakarta.json.bind.annotation.JsonbCreator} parameters
-     * to be required.
-     *
-     * @param value whether to treat {@link jakarta.json.bind.annotation.JsonbCreator} parameters
-     *              as required. Default value is {@code false}.
-     * @return This YassonConfig instance
-     */
-    public YassonConfig withJsonbParametersRequired(boolean value) {
-        setProperty(JSONB_CREATOR_PARAMETERS_REQUIRED, value);
         return this;
     }
 
