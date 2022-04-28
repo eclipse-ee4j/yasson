@@ -41,6 +41,16 @@
         <netbeans.hint.jdkPlatform>JDK_9</netbeans.hint.jdkPlatform>
     </properties>
 
+    <dependencyManagement>
+        <dependencies>
+            <dependency>
+                <groupId>jakarta.enterprise</groupId>
+                <artifactId>jakarta.enterprise.cdi-api</artifactId>
+                <version>${jakarta.enterprise.cdi-api.version}</version>
+            </dependency>
+        </dependencies>
+    </dependencyManagement>
+
     <dependencies>
         <!-- Compile dependencies -->
         <dependency>
@@ -62,7 +72,6 @@
         <dependency>
             <groupId>jakarta.enterprise</groupId>
             <artifactId>jakarta.enterprise.cdi-api</artifactId>
-            <version>${jakarta.enterprise.cdi-api.version}</version>
             <optional>true</optional>
             <scope>provided</scope>
             <exclusions>
@@ -76,7 +85,7 @@
         <dependency>
             <groupId>org.jboss.weld.se</groupId>
             <artifactId>weld-se-core</artifactId>
-            <version>5.0.0.Beta1</version>
+            <version>5.0.0.CR2</version>
             <scope>test</scope>
             <exclusions>
                 <!-- current weld does nto depend on the final API yet and there are dependency version mismatches -->
@@ -84,10 +93,6 @@
 <!--                    <groupId>jakarta.el</groupId>-->
 <!--                    <artifactId>jakarta.el-api</artifactId>-->
 <!--                </exclusion>-->
-                <exclusion>
-                    <groupId>jakarta.enterprise</groupId>
-                    <artifactId>jakarta.enterprise.cdi-api</artifactId>
-                </exclusion>
                 <exclusion>
                     <groupId>jakarta.interceptor</groupId>
                     <artifactId>jakarta.interceptor-api</artifactId>
@@ -114,6 +119,7 @@
             <groupId>org.hamcrest</groupId>
             <artifactId>hamcrest-all</artifactId>
             <version>1.3</version>
+            <scope>test</scope>
         </dependency>
     </dependencies>
 
