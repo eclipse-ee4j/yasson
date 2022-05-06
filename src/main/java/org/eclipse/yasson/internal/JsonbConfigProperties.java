@@ -13,6 +13,8 @@
 
 package org.eclipse.yasson.internal;
 
+import java.security.AccessController;
+import java.security.PrivilegedAction;
 import java.time.format.DateTimeFormatterBuilder;
 import java.time.temporal.ChronoField;
 import java.util.Arrays;
@@ -188,15 +190,21 @@ public class JsonbConfigProperties {
     }
 
     private boolean initRequiredCreatorParameters() {
-        if (System.getProperty(JsonbConfig.CREATOR_PARAMETERS_REQUIRED) != null) {
-            return Boolean.parseBoolean(System.getProperty(JsonbConfig.CREATOR_PARAMETERS_REQUIRED));
+        String sysProp = AccessController.doPrivileged((PrivilegedAction<String>)
+                () -> System.getProperty(JsonbConfig.CREATOR_PARAMETERS_REQUIRED));
+
+        if (sysProp != null) {
+            return Boolean.parseBoolean(sysProp);
         }
         return getConfigProperty(JsonbConfig.CREATOR_PARAMETERS_REQUIRED, Boolean.class, false);
     }
 
     private boolean initDateInMillisecondsAsString() {
-        if (System.getProperty(YassonConfig.DATE_TIME_IN_MILLIS_AS_A_STRING) != null) {
-            return Boolean.parseBoolean(System.getProperty(YassonConfig.DATE_TIME_IN_MILLIS_AS_A_STRING));
+        String sysProp = AccessController.doPrivileged((PrivilegedAction<String>)
+                () -> System.getProperty(YassonConfig.DATE_TIME_IN_MILLIS_AS_A_STRING));
+
+        if (sysProp != null) {
+            return Boolean.parseBoolean(sysProp);
         }
         return getConfigProperty(YassonConfig.DATE_TIME_IN_MILLIS_AS_A_STRING, Boolean.class, false);
     }
