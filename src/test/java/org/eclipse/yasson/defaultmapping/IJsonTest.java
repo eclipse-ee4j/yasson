@@ -41,9 +41,9 @@ public class IJsonTest {
         calendar.setTimeZone(TimeZone.getTimeZone("Europe/Paris"));
 
         String jsonString = jsonb.toJson(new ScalarValueWrapper<>(calendar));
-        assertEquals("{\"value\":\"1970-01-01T00:00:00Z+01:00\"}", jsonString);
+        assertEquals("{\"value\":\"1970-01-01T00:00:00+01:00\"}", jsonString);
 
-        ScalarValueWrapper<Calendar> result = jsonb.fromJson("{\"value\":\"1970-01-01T00:00:00Z+01:00\"}", new TestTypeToken<ScalarValueWrapper<Calendar>>() {}.getType());
+        ScalarValueWrapper<Calendar> result = jsonb.fromJson("{\"value\":\"1970-01-01T00:00:00+01:00\"}", new TestTypeToken<ScalarValueWrapper<Calendar>>() {}.getType());
 
         assertEquals(calendar.toInstant(), result.getValue().toInstant());
     }
@@ -56,9 +56,9 @@ public class IJsonTest {
         calendar.clear(Calendar.MILLISECOND);
 
         String jsonString = jsonb.toJson(new ScalarValueWrapper<>(calendar.getTime()));
-        assertTrue(jsonString.matches("\\{\"value\":\"1970-01-01T00:00:00Z\\+[0-9]{2}:[0-9]{2}\"}"));
+        assertTrue(jsonString.matches("\\{\"value\":\"1970-01-01T00:00:00Z\"}"));
 
-        ScalarValueWrapper<Date> result = jsonb.fromJson("{\"value\":\"1970-01-01T00:00:00Z+00:00\"}", new TestTypeToken<ScalarValueWrapper<Date>>(){}.getType());
+        ScalarValueWrapper<Date> result = jsonb.fromJson("{\"value\":\"1970-01-01T00:00:00Z\"}", new TestTypeToken<ScalarValueWrapper<Date>>(){}.getType());
         assertEquals(0, result.getValue().compareTo(calendar.getTime()));
 
     }
@@ -67,8 +67,8 @@ public class IJsonTest {
     public void testStrictInstant() {
         Instant instant = LocalDateTime.of(2017, 3, 24, 12,0,0).toInstant(ZoneOffset.MIN);
         final String json = jsonb.toJson(new ScalarValueWrapper<>(instant));
-        assertEquals("{\"value\":\"2017-03-25T06:00:00Z+00:00\"}", json);
-        ScalarValueWrapper<Instant> result = jsonb.fromJson("{\"value\":\"2017-03-25T06:00:00Z+00:00\"}", new TestTypeToken<ScalarValueWrapper<Instant>>() {}.getType());
+        assertEquals("{\"value\":\"2017-03-25T06:00:00Z\"}", json);
+        ScalarValueWrapper<Instant> result = jsonb.fromJson("{\"value\":\"2017-03-25T06:00:00Z\"}", new TestTypeToken<ScalarValueWrapper<Instant>>() {}.getType());
         assertEquals(instant, result.getValue());
     }
 
@@ -76,9 +76,9 @@ public class IJsonTest {
     public void testLocalDate() {
         final LocalDate localDate = LocalDate.of(1970, 1, 1);
         final String json = jsonb.toJson(new ScalarValueWrapper<>(localDate));
-        assertEquals("{\"value\":\"1970-01-01T00:00:00Z+00:00\"}", json);
+        assertEquals("{\"value\":\"1970-01-01T00:00:00Z\"}", json);
 
-        ScalarValueWrapper<LocalDate> result = jsonb.fromJson("{\"value\":\"1970-01-01T00:00:00Z+00:00\"}", new TestTypeToken<ScalarValueWrapper<LocalDate>>() {
+        ScalarValueWrapper<LocalDate> result = jsonb.fromJson("{\"value\":\"1970-01-01T00:00:00Z\"}", new TestTypeToken<ScalarValueWrapper<LocalDate>>() {
         }.getType());
 
 
@@ -90,9 +90,9 @@ public class IJsonTest {
         final LocalDateTime localDateTime = LocalDateTime.of(1970, 1, 1, 1, 1, 1);
         final String json = jsonb.toJson(new ScalarValueWrapper<>(localDateTime));
 
-        assertEquals("{\"value\":\"1970-01-01T01:01:01Z+00:00\"}", json);
+        assertEquals("{\"value\":\"1970-01-01T01:01:01Z\"}", json);
 
-        ScalarValueWrapper<LocalDateTime> result = jsonb.fromJson("{\"value\":\"1970-01-01T01:01:01Z+00:00\"}", new TestTypeToken<ScalarValueWrapper<LocalDateTime>>() {
+        ScalarValueWrapper<LocalDateTime> result = jsonb.fromJson("{\"value\":\"1970-01-01T01:01:01Z\"}", new TestTypeToken<ScalarValueWrapper<LocalDateTime>>() {
         }.getType());
 
 

@@ -42,8 +42,7 @@ public class JsonbDateFormatter {
             .appendValue(MINUTE_OF_HOUR, 2)
             .appendLiteral(':')
             .appendValue(SECOND_OF_MINUTE, 2)
-            .appendLiteral('Z')
-            .appendOffset("+HH:MM", "+00:00")
+            .appendOffset("+HH:MM", "Z")
             .toFormatter();
 
     private final DateTimeFormatter dateTimeFormatter;
