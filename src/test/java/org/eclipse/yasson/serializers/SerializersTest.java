@@ -180,6 +180,23 @@ public class SerializersTest {
         assertEquals(pojo.crate.crateInner.crateInnerBigDec, result.crate.crateInner.crateInnerBigDec);
     }
 
+    @Test
+    public void testSerializerSerializationOfTypeWithExplicitType() {
+        JsonbConfig config = new JsonbConfig().withSerializers(new CrateSerializer());
+        Jsonb jsonb = JsonbBuilder.create(config);
+        String expected = "{\"boxStr\":\"Box string\",\"crate\":{\"crateStr\":\"REPLACED crate str\",\"crateInner\":{\"crateInnerBigDec\":10,\"crate_inner_str\":\"Single inner\"},\"crateInnerList\":[{\"crateInnerBigDec\":10,\"crate_inner_str\":\"List inner 0\"},{\"crateInnerBigDec\":10,\"crate_inner_str\":\"List inner 1\"}],\"crateBigDec\":54321},\"secondBoxStr\":\"Second box string\"}";
+        Box pojo = createPojo();
+
+        assertEquals(expected, jsonb.toJson(pojo, Box.class));
+
+        Box result = jsonb.fromJson(expected, Box.class);
+        assertEquals(new BigDecimal("54321"), result.crate.crateBigDec);
+        //result.crate.crateStr is mapped to crate_str by jsonb property
+        assertNull(result.crate.crateStr);
+        assertEquals(pojo.crate.crateInner.crateInnerStr, result.crate.crateInner.crateInnerStr);
+        assertEquals(pojo.crate.crateInner.crateInnerBigDec, result.crate.crateInner.crateInnerBigDec);
+    }
+
     /**
      * Tests jsonb type conversion, including property customization.
      */

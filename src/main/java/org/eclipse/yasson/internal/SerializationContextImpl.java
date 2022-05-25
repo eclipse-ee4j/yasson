@@ -192,9 +192,16 @@ public class SerializationContextImpl extends ProcessingContext implements Seria
      * @param generator JSON generator.
      */
     public <T> void serializeObject(T root, JsonGenerator generator) {
-        Type type = runtimeType == null ? (root == null ? Object.class : root.getClass()) : runtimeType;
+        Type type = determineSerializationType(root);
         final ModelSerializer rootSerializer = getRootSerializer(type);
         rootSerializer.serialize(root, generator, this);
+    }
+
+    private <T> Type determineSerializationType(T root) {
+        if (isRoot() && runtimeType != null) {
+            return runtimeType;
+        }
+        return root == null ? Object.class : root.getClass();
     }
 
     public ModelSerializer getRootSerializer(Type type) {
