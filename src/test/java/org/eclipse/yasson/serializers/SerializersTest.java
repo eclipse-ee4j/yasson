@@ -12,14 +12,6 @@
 
 package org.eclipse.yasson.serializers;
 
-import static java.util.Collections.singletonMap;
-import static org.eclipse.yasson.Jsonbs.defaultJsonb;
-import static org.eclipse.yasson.Jsonbs.nullableJsonb;
-import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertNull;
-import static org.junit.jupiter.api.Assertions.assertTrue;
-import static org.junit.jupiter.api.Assertions.fail;
-
 import java.io.StringReader;
 import java.lang.reflect.ParameterizedType;
 import java.lang.reflect.Type;
@@ -37,8 +29,20 @@ import java.util.SortedMap;
 import java.util.TimeZone;
 import java.util.TreeMap;
 
-import jakarta.json.bind.annotation.JsonbTypeDeserializer;
-import jakarta.json.bind.annotation.JsonbTypeSerializer;
+import jakarta.json.Json;
+import jakarta.json.JsonObject;
+import jakarta.json.bind.Jsonb;
+import jakarta.json.bind.JsonbBuilder;
+import jakarta.json.bind.JsonbConfig;
+import jakarta.json.bind.JsonbException;
+import jakarta.json.bind.config.PropertyOrderStrategy;
+import jakarta.json.bind.serializer.DeserializationContext;
+import jakarta.json.bind.serializer.JsonbDeserializer;
+import jakarta.json.bind.serializer.JsonbSerializer;
+import jakarta.json.bind.serializer.SerializationContext;
+import jakarta.json.stream.JsonGenerator;
+import jakarta.json.stream.JsonParser;
+
 import org.eclipse.yasson.TestTypeToken;
 import org.eclipse.yasson.YassonConfig;
 import org.eclipse.yasson.internal.model.ReverseTreeMap;
@@ -67,24 +71,39 @@ import org.eclipse.yasson.serializers.model.StringWrapper;
 import org.eclipse.yasson.serializers.model.SupertypeSerializerPojo;
 import org.junit.jupiter.api.Test;
 
-import jakarta.json.Json;
-import jakarta.json.JsonObject;
-import jakarta.json.bind.Jsonb;
-import jakarta.json.bind.JsonbBuilder;
-import jakarta.json.bind.JsonbConfig;
-import jakarta.json.bind.JsonbException;
-import jakarta.json.bind.config.PropertyOrderStrategy;
-import jakarta.json.bind.serializer.DeserializationContext;
-import jakarta.json.bind.serializer.JsonbDeserializer;
-import jakarta.json.bind.serializer.JsonbSerializer;
-import jakarta.json.bind.serializer.SerializationContext;
-import jakarta.json.stream.JsonGenerator;
-import jakarta.json.stream.JsonParser;
+import static java.util.Collections.singletonMap;
+
+import static org.eclipse.yasson.Jsonbs.defaultJsonb;
+import static org.eclipse.yasson.Jsonbs.nullableJsonb;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertNull;
+import static org.junit.jupiter.api.Assertions.assertTrue;
+import static org.junit.jupiter.api.Assertions.fail;
+import static org.hamcrest.CoreMatchers.is;
+import static org.hamcrest.MatcherAssert.assertThat;
 
 /**
  * @author Roman Grigoriadi
  */
 public class SerializersTest {
+
+    private static final JsonbSerializer<Box> BOX_ARRAY_SERIALIZER_CHAINED = new JsonbSerializer<>() {
+        public void serialize(Box box, JsonGenerator out, SerializationContext ctx) {
+            out.writeStartArray()
+                    .write(box.boxStr)
+                    .write(box.secondBoxStr)
+                    .writeEnd();
+        }
+    };
+
+    private static final JsonbSerializer<Box> BOX_ARRAY_SERIALIZER = new JsonbSerializer<>() {
+        public void serialize(Box box, JsonGenerator out, SerializationContext ctx) {
+            out.writeStartArray();
+            out.write(box.boxStr);
+            out.write(box.secondBoxStr);
+            out.writeEnd();
+        }
+    };
 
     @Test
     public void testClassLevelAnnotation() {
@@ -614,6 +633,7 @@ public class SerializersTest {
     
     public static interface One { }
     public static interface Two { }
+
     public static interface Three { }
     
     public static class OneTwo implements One, Two { }
@@ -752,5 +772,29 @@ public class SerializersTest {
         jsonb = JsonbBuilder.create(new JsonbConfig().withSerializers(new ImplicitJsonbSerializer()));
         assertEquals(expected, jsonb.toJson(box));
     }
-    
+
+    @Test
+    public void testBoxToArrayChained() {
+        JsonbConfig cfg = new JsonbConfig().withSerializers(BOX_ARRAY_SERIALIZER_CHAINED);
+        Jsonb jsonb = JsonbBuilder.create(cfg);
+        Box box = new Box();
+        box.boxStr = "str1";
+        box.secondBoxStr = "str2";
+        String expected = "[\"str1\",\"str2\"]";
+
+        assertThat(jsonb.toJson(box), is(expected));
+    }
+
+    @Test
+    public void testBoxToArray() {
+        JsonbConfig cfg = new JsonbConfig().withSerializers(BOX_ARRAY_SERIALIZER);
+        Jsonb jsonb = JsonbBuilder.create(cfg);
+        Box box = new Box();
+        box.boxStr = "str1";
+        box.secondBoxStr = "str2";
+        String expected = "[\"str1\",\"str2\"]";
+
+        assertThat(jsonb.toJson(box), is(expected));
+    }
+
 }
