@@ -151,7 +151,8 @@ class YassonGenerator implements JsonGenerator {
     @Override
     public JsonGenerator write(JsonValue value) {
         writeValidate("write(JsonValue value)");
-        return delegate.write(value);
+        delegate.write(value);
+        return this;
     }
 
     @Override
@@ -212,12 +213,12 @@ class YassonGenerator implements JsonGenerator {
 
     @Override
     public void close() {
-        throw new JsonbException("Unsupported operation in user defined deserializer.");
+        throw new JsonbException("Unsupported operation in user defined serializer.");
     }
 
     @Override
     public void flush() {
-        throw new JsonbException("Unsupported operation in user defined deserializer.");
+        throw new JsonbException("Unsupported operation in user defined serializer.");
     }
 
     private void writeValidate(String method) {
