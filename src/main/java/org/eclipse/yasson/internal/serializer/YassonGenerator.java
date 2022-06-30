@@ -37,89 +37,102 @@ class YassonGenerator implements JsonGenerator {
     public JsonGenerator writeStartObject() {
         writeValidate("writeStartObject()");
         level++;
-        return delegate.writeStartObject();
+        delegate.writeStartObject();
+        return this;
     }
 
     @Override
     public JsonGenerator writeStartObject(String name) {
         writeValidate("writeStartObject(String name)");
         level++;
-        return delegate.writeStartObject(name);
+        delegate.writeStartObject(name);
+        return this;
     }
 
     @Override
     public JsonGenerator writeKey(String name) {
         writeValidate("writeKey(String name)");
-        level++;
-        return delegate.writeKey(name);
+        delegate.writeKey(name);
+        return this;
     }
 
     @Override
     public JsonGenerator writeStartArray() {
         writeValidate("writeStartArray()");
         level++;
-        return delegate.writeStartArray();
+        delegate.writeStartArray();
+        return this;
     }
 
     @Override
     public JsonGenerator writeStartArray(String name) {
         writeValidate("writeStartArray(String name)");
         level++;
-        return delegate.writeStartArray(name);
+        delegate.writeStartArray(name);
+        return this;
     }
 
     @Override
     public JsonGenerator write(String name, JsonValue value) {
         writeValidate("write(String name, JsonValue value)");
-        return delegate.write(name, value);
+        delegate.write(name, value);
+        return this;
     }
 
     @Override
     public JsonGenerator write(String name, String value) {
         writeValidate("write(String name, String value)");
-        return delegate.write(name, value);
+        delegate.write(name, value);
+        return this;
     }
 
     @Override
     public JsonGenerator write(String name, BigInteger value) {
         writeValidate("write(String name, BigInteger value)");
-        return delegate.write(name, value);
+        delegate.write(name, value);
+        return this;
     }
 
     @Override
     public JsonGenerator write(String name, BigDecimal value) {
         writeValidate("write(String name, BigDecimal value)");
-        return delegate.write(name, value);
+        delegate.write(name, value);
+        return this;
     }
 
     @Override
     public JsonGenerator write(String name, int value) {
         writeValidate("write(String name, int value)");
-        return delegate.write(name, value);
+        delegate.write(name, value);
+        return this;
     }
 
     @Override
     public JsonGenerator write(String name, long value) {
         writeValidate("write(String name, long value)");
-        return delegate.write(name, value);
+        delegate.write(name, value);
+        return this;
     }
 
     @Override
     public JsonGenerator write(String name, double value) {
         writeValidate("write(String name, double value)");
-        return delegate.write(name, value);
+        delegate.write(name, value);
+        return this;
     }
 
     @Override
     public JsonGenerator write(String name, boolean value) {
         writeValidate("write(String name, boolean value)");
-        return delegate.write(name, value);
+        delegate.write(name, value);
+        return this;
     }
 
     @Override
     public JsonGenerator writeNull(String name) {
         writeValidate("writeNull(String name)");
-        return delegate.writeNull(name);
+        delegate.writeNull(name);
+        return this;
     }
 
     @Override
@@ -131,80 +144,81 @@ class YassonGenerator implements JsonGenerator {
         if (level == 0) {
             level--; //if user has closed array or object and is on the same level he started. There is no more allowed writing.
         }
-        return delegate.writeEnd();
+        delegate.writeEnd();
+        return this;
     }
 
     @Override
     public JsonGenerator write(JsonValue value) {
         writeValidate("write(JsonValue value)");
-        level--;
-        return delegate.write(value);
+        delegate.write(value);
+        return this;
     }
 
     @Override
     public JsonGenerator write(String value) {
         writeValidate("write(String value)");
-        level--;
-        return delegate.write(value);
+        delegate.write(value);
+        return this;
     }
 
     @Override
     public JsonGenerator write(BigDecimal value) {
         writeValidate("write(BigDecimal value)");
-        level--;
-        return delegate.write(value);
+        delegate.write(value);
+        return this;
     }
 
     @Override
     public JsonGenerator write(BigInteger value) {
         writeValidate("write(BigInteger value)");
-        level--;
-        return delegate.write(value);
+        delegate.write(value);
+        return this;
     }
 
     @Override
     public JsonGenerator write(int value) {
         writeValidate("write(int value)");
-        level--;
-        return delegate.write(value);
+        delegate.write(value);
+        return this;
     }
 
     @Override
     public JsonGenerator write(long value) {
         writeValidate("write(long value)");
-        level--;
-        return delegate.write(value);
+        delegate.write(value);
+        return this;
     }
 
     @Override
     public JsonGenerator write(double value) {
         writeValidate("write(double value)");
-        level--;
-        return delegate.write(value);
+        delegate.write(value);
+        return this;
     }
 
     @Override
     public JsonGenerator write(boolean value) {
         writeValidate("write(boolean value)");
-        level--;
-        return delegate.write(value);
+        delegate.write(value);
+        return this;
     }
 
     @Override
     public JsonGenerator writeNull() {
         writeValidate("writeNull()");
-        level--;
-        return delegate.writeNull();
+        delegate.writeNull();
+        return this;
     }
 
     @Override
     public void close() {
-        throw new JsonbException("Unsupported operation in user defined deserializer.");
+        throw new JsonbException("Unsupported operation in user defined serializer.");
     }
 
     @Override
     public void flush() {
-        throw new JsonbException("Unsupported operation in user defined deserializer.");
+        throw new JsonbException("Unsupported operation in user defined serializer.");
     }
 
     private void writeValidate(String method) {
