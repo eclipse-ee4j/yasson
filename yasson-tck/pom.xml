@@ -1,134 +1,136 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <project xmlns="http://maven.apache.org/POM/4.0.0"
-  xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-  xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+        xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+        xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
 
-  <modelVersion>4.0.0</modelVersion>
+    <modelVersion>4.0.0</modelVersion>
 
-  <groupId>org.eclipse</groupId>
-  <artifactId>yasson-tck</artifactId>
-  <version>1.0.0-SNAPSHOT</version>
+    <groupId>org.eclipse</groupId>
+    <artifactId>yasson-tck</artifactId>
+    <version>1.0.0-SNAPSHOT</version>
 
-  <properties>
-    <jsonb.tck.version>3.0.0-SNAPSHOT</jsonb.tck.version>
-    <yasson.version>3.0.0-SNAPSHOT</yasson.version>
-    <jakarta.json.bind.version>3.0.0-RC1</jakarta.json.bind.version>
-    <jakarta.json.version>2.1.0</jakarta.json.version>
-    <maven.compiler.source>11</maven.compiler.source>
-    <maven.compiler.target>11</maven.compiler.target>
-  </properties>
+    <properties>
+        <jsonb.tck.version>3.0.0</jsonb.tck.version>
+        <yasson.version>3.0.0-SNAPSHOT</yasson.version>
+        <jakarta.json.bind.version>3.0.0</jakarta.json.bind.version>
+        <jakarta.json.version>2.1.0</jakarta.json.version>
+        <maven.compiler.source>11</maven.compiler.source>
+        <maven.compiler.target>11</maven.compiler.target>
+    </properties>
 
-  <!-- TODO: Temporarily enable snapshot repository -->
-  <!-- This can be removed once an official release of jakarta.json.bind-tck is available -->
-  <repositories>
-    <repository>
-        <id>jakarta-snapshots</id>
-        <url>https://jakarta.oss.sonatype.org/content/repositories/staging/</url>
-    </repository>
-  </repositories>
+    <!-- TODO: Temporarily enable snapshot repository -->
+    <!-- This can be removed once an official release of jakarta.json.bind-tck is available -->
+    <repositories>
+        <repository>
+            <id>jakarta-snapshots</id>
+            <url>https://jakarta.oss.sonatype.org/content/repositories/staging/</url>
+        </repository>
+    </repositories>
 
-  <dependencies>
-    <dependency>
-      <groupId>jakarta.json.bind</groupId>
-      <artifactId>jakarta.json.bind-tck</artifactId>
-      <version>${jsonb.tck.version}</version>
-      <scope>test</scope>
-    </dependency>
-     <dependency>
+    <dependencies>
+        <dependency>
+            <groupId>jakarta.json.bind</groupId>
+            <artifactId>jakarta.json.bind-tck</artifactId>
+            <version>${jsonb.tck.version}</version>
+            <scope>test</scope>
+        </dependency>
+        <dependency>
             <groupId>jakarta.json.bind</groupId>
             <artifactId>jakarta.json.bind-api</artifactId>
-            <version>3.0.0-SNAPSHOT</version>
+            <version>3.0.0</version>
             <scope>provided</scope>
         </dependency>
-      <dependency>
+        <dependency>
             <groupId>jakarta.json</groupId>
             <artifactId>jakarta.json-api</artifactId>
             <version>2.1.0</version>
             <scope>provided</scope>
-    </dependency>
-    <dependency>
-      <groupId>org.eclipse</groupId>
-      <artifactId>yasson</artifactId>
-      <version>${yasson.version}</version>
-      <scope>test</scope>
-    </dependency>
-    <dependency>
-        <groupId>org.jboss.weld.se</groupId>
-        <artifactId>weld-se-core</artifactId>
-        <version>4.0.2.Final</version>
-        <scope>test</scope>
-    </dependency>
-     <dependency>
+        </dependency>
+        <dependency>
+            <groupId>org.eclipse</groupId>
+            <artifactId>yasson</artifactId>
+            <version>${yasson.version}</version>
+            <scope>test</scope>
+        </dependency>
+        <dependency>
+            <groupId>org.jboss.weld.se</groupId>
+            <artifactId>weld-se-core</artifactId>
+            <version>5.0.1.Final</version>
+            <scope>test</scope>
+        </dependency>
+        <dependency>
             <groupId>org.jboss.arquillian.junit5</groupId>
             <artifactId>arquillian-junit5-container</artifactId>
             <version>1.7.0.Alpha10</version>
         </dependency>
-  </dependencies>
+    </dependencies>
 
-  <build>
-    <plugins>
-      <plugin>
-        <groupId>org.apache.maven.plugins</groupId>
-        <artifactId>maven-dependency-plugin</artifactId>
-        <version>3.2.0</version>
-        <executions>
-          <execution>
-            <id>copy</id>
-            <phase>generate-test-sources</phase>
-            <goals>
-                <goal>copy</goal>
-            </goals>
-            <configuration>
-              <artifactItems>
-                   <artifactItem>
-                      <groupId>jakarta.json.bind</groupId>
-                      <artifactId>jakarta.json.bind-api</artifactId>
-                      <version>${jakarta.json.bind.version}</version>
-                      <type>jar</type>
-                      <overWrite>true</overWrite>
-                      <outputDirectory>${project.build.directory}/signaturedirectory</outputDirectory>
-                      <destFileName>jakarta.json.bind-api.jar</destFileName>
-                  </artifactItem>
-                  <artifactItem>
-                      <groupId>jakarta.json</groupId>
-                      <artifactId>jakarta.json-api</artifactId>
-                      <version>${jakarta.json.version}</version>
-                      <type>jar</type>
-                      <overWrite>true</overWrite>
-                      <outputDirectory>${project.build.directory}/signaturedirectory</outputDirectory>
-                      <destFileName>jakarta.json-api.jar</destFileName>
-                  </artifactItem>
-              </artifactItems>
-            </configuration>
-          </execution>
-        </executions>
-      </plugin>
-      <plugin>
-        <artifactId>maven-surefire-plugin</artifactId>
-        <version>3.0.0-M5</version>
-        <configuration>
-          <trimStackTrace>false</trimStackTrace>
-          <failIfNoTests>true</failIfNoTests>
-            <dependenciesToScan>jakarta.json.bind:jakarta.json.bind-tck</dependenciesToScan>
-            <systemPropertyVariables>
-                <jimage.dir>${project.build.directory}/jdk11-bundle</jimage.dir>
-                <signature.sigTestClasspath>${project.build.directory}/signaturedirectory/jakarta.json.bind-api.jar:${project.build.directory}/jdk11-bundle/java.base:${project.build.directory}/jdk11-bundle/java.rmi:${project.build.directory}/jdk11-bundle/java.sql:${project.build.directory}/jdk11-bundle/java.naming</signature.sigTestClasspath>
-            </systemPropertyVariables>
-          </configuration>
-      </plugin>
-      <plugin>
-        <artifactId>maven-surefire-report-plugin</artifactId>
-        <version>3.0.0-M4</version>
-        <executions>
-              <execution>
-                <id>post-unit-test</id>
-                <phase>test</phase>
-                <goals>
-                  <goal>report</goal>
-                </goals>
-              </execution>
-        </executions>
-      </plugin>
-    </plugins>
-  </build>
+    <build>
+        <plugins>
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-dependency-plugin</artifactId>
+                <version>3.2.0</version>
+                <executions>
+                    <execution>
+                        <id>copy</id>
+                        <phase>generate-test-sources</phase>
+                        <goals>
+                            <goal>copy</goal>
+                        </goals>
+                        <configuration>
+                            <artifactItems>
+                                <artifactItem>
+                                    <groupId>jakarta.json.bind</groupId>
+                                    <artifactId>jakarta.json.bind-api</artifactId>
+                                    <version>${jakarta.json.bind.version}</version>
+                                    <type>jar</type>
+                                    <overWrite>true</overWrite>
+                                    <outputDirectory>${project.build.directory}/signaturedirectory</outputDirectory>
+                                    <destFileName>jakarta.json.bind-api.jar</destFileName>
+                                </artifactItem>
+                                <artifactItem>
+                                    <groupId>jakarta.json</groupId>
+                                    <artifactId>jakarta.json-api</artifactId>
+                                    <version>${jakarta.json.version}</version>
+                                    <type>jar</type>
+                                    <overWrite>true</overWrite>
+                                    <outputDirectory>${project.build.directory}/signaturedirectory</outputDirectory>
+                                    <destFileName>jakarta.json-api.jar</destFileName>
+                                </artifactItem>
+                            </artifactItems>
+                        </configuration>
+                    </execution>
+                </executions>
+            </plugin>
+            <plugin>
+                <artifactId>maven-surefire-plugin</artifactId>
+                <version>3.0.0-M5</version>
+                <configuration>
+                    <trimStackTrace>false</trimStackTrace>
+                    <failIfNoTests>true</failIfNoTests>
+                    <dependenciesToScan>jakarta.json.bind:jakarta.json.bind-tck</dependenciesToScan>
+                    <systemPropertyVariables>
+                        <jimage.dir>${project.build.directory}/jdk11-bundle</jimage.dir>
+                        <signature.sigTestClasspath>
+                            ${project.build.directory}/signaturedirectory/jakarta.json.bind-api.jar:${project.build.directory}/jdk11-bundle/java.base:${project.build.directory}/jdk11-bundle/java.rmi:${project.build.directory}/jdk11-bundle/java.sql:${project.build.directory}/jdk11-bundle/java.naming
+                        </signature.sigTestClasspath>
+                    </systemPropertyVariables>
+                </configuration>
+            </plugin>
+            <plugin>
+                <artifactId>maven-surefire-report-plugin</artifactId>
+                <version>3.0.0-M4</version>
+                <executions>
+                    <execution>
+                        <id>post-unit-test</id>
+                        <phase>test</phase>
+                        <goals>
+                            <goal>report</goal>
+                        </goals>
+                    </execution>
+                </executions>
+            </plugin>
+        </plugins>
+    </build>
 </project>
