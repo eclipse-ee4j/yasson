@@ -12,8 +12,10 @@
 
 package org.eclipse.yasson.internal.deserializer;
 
+import java.util.EnumMap;
 import java.util.Map;
 import java.util.Set;
+import java.util.function.Consumer;
 import java.util.function.Function;
 
 import jakarta.json.bind.JsonbException;
@@ -27,6 +29,14 @@ import org.eclipse.yasson.internal.properties.Messages;
  * Object container deserializer.
  */
 class ObjectDeserializer implements ModelDeserializer<JsonParser> {
+
+    static final Consumer<JsonParser> NOOP = jsonParser -> {};
+    static final EnumMap<JsonParser.Event, Consumer<JsonParser>> VALUE_SKIPPERS = new EnumMap<>(JsonParser.Event.class);
+
+    static {
+        VALUE_SKIPPERS.put(JsonParser.Event.START_OBJECT, JsonParser::skipObject);
+        VALUE_SKIPPERS.put(JsonParser.Event.START_ARRAY, JsonParser::skipArray);
+    }
 
     private final Map<String, ModelDeserializer<JsonParser>> propertyDeserializerChains;
     private final Function<String, String> renamer;
@@ -71,6 +81,9 @@ class ObjectDeserializer implements ModelDeserializer<JsonParser> {
                     }
                 } else if (failOnUnknownProperty && !ignoredProperties.contains(key)) {
                     throw new JsonbException(Messages.getMessage(MessageKeys.UNKNOWN_JSON_PROPERTY, key, rawClass));
+                } else {
+                    //We need to skip the corresponding structure if property key was not found
+                    VALUE_SKIPPERS.getOrDefault(next, NOOP).accept(parser);
                 }
                 break;
             case END_ARRAY:

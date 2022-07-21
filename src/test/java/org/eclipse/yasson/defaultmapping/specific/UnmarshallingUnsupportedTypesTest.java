@@ -12,21 +12,6 @@
 
 package org.eclipse.yasson.defaultmapping.specific;
 
-import org.junit.jupiter.api.*;
-import static org.junit.jupiter.api.Assertions.*;
-import static org.eclipse.yasson.Jsonbs.*;
-
-import org.eclipse.yasson.TestTypeToken;
-import org.eclipse.yasson.defaultmapping.generics.model.GenericTestClass;
-import org.eclipse.yasson.defaultmapping.specific.model.ClassWithUnsupportedFields;
-import org.eclipse.yasson.defaultmapping.specific.model.CustomUnsupportedInterface;
-import org.eclipse.yasson.defaultmapping.specific.model.SupportedTypes;
-import org.eclipse.yasson.defaultmapping.specific.model.SupportedTypes.NestedPojo;
-
-import jakarta.json.bind.Jsonb;
-import jakarta.json.bind.JsonbBuilder;
-import jakarta.json.bind.JsonbConfig;
-import jakarta.json.bind.JsonbException;
 import java.lang.reflect.Type;
 import java.math.BigDecimal;
 import java.math.BigInteger;
@@ -38,7 +23,27 @@ import java.util.OptionalDouble;
 import java.util.OptionalInt;
 import java.util.OptionalLong;
 
+import jakarta.json.bind.Jsonb;
+import jakarta.json.bind.JsonbBuilder;
+import jakarta.json.bind.JsonbConfig;
+import jakarta.json.bind.JsonbException;
+
+import org.eclipse.yasson.TestTypeToken;
+import org.eclipse.yasson.defaultmapping.generics.model.GenericTestClass;
+import org.eclipse.yasson.defaultmapping.specific.model.ClassWithUnsupportedFields;
+import org.eclipse.yasson.defaultmapping.specific.model.CustomUnsupportedInterface;
+import org.eclipse.yasson.defaultmapping.specific.model.SupportedTypes;
+import org.eclipse.yasson.defaultmapping.specific.model.SupportedTypes.NestedPojo;
+import org.junit.jupiter.api.Test;
+
+import static org.eclipse.yasson.Jsonbs.defaultJsonb;
 import static org.eclipse.yasson.YassonConfig.FAIL_ON_UNKNOWN_PROPERTIES;
+import static org.hamcrest.MatcherAssert.assertThat;
+import static org.hamcrest.Matchers.is;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertThrows;
+import static org.junit.jupiter.api.Assertions.assertTrue;
+import static org.junit.jupiter.api.Assertions.fail;
 
 /**
  * @author Roman Grigoriadi
@@ -133,6 +138,24 @@ public class UnmarshallingUnsupportedTypesTest {
 	        String json  = "{\"nestedPojo\":{\"integerValue\":10,\"missingField\":5},\"optionalLong\":11}";
 	        SupportedTypes result = defaultConfig.fromJson(json, SupportedTypes.class);
     	});
+    }
+
+    @Test
+    public void testMissingFieldWithObjectValue() {
+        String json  = "{\"missingProperty\":{\"optionalLong\":404},\"optionalLong\":11}";
+        SupportedTypes result = defaultJsonb.fromJson(json, SupportedTypes.class);
+
+        assertTrue(result.getOptionalLong().isPresent());
+        assertThat(result.getOptionalLong().getAsLong(), is(11L));
+    }
+
+    @Test
+    public void testMissingFieldWithArrayValue() {
+        String json  = "{\"missingProperty\":[404],\"optionalLong\":11}";
+        SupportedTypes result = defaultJsonb.fromJson(json, SupportedTypes.class);
+
+        assertTrue(result.getOptionalLong().isPresent());
+        assertThat(result.getOptionalLong().getAsLong(), is(11L));
     }
 
     @Test
