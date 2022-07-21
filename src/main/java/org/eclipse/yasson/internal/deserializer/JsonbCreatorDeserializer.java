@@ -29,6 +29,9 @@ import org.eclipse.yasson.internal.model.JsonbCreator;
 import org.eclipse.yasson.internal.properties.MessageKeys;
 import org.eclipse.yasson.internal.properties.Messages;
 
+import static org.eclipse.yasson.internal.deserializer.ObjectDeserializer.NOOP;
+import static org.eclipse.yasson.internal.deserializer.ObjectDeserializer.VALUE_SKIPPERS;
+
 /**
  * Creator of the Object instance with the usage of the {@link JsonbCreator}.
  */
@@ -89,6 +92,9 @@ class JsonbCreatorDeserializer implements ModelDeserializer<JsonParser> {
                     }
                 } else if (failOnUnknownProperties && !ignoredProperties.contains(key)) {
                     throw new JsonbException(Messages.getMessage(MessageKeys.UNKNOWN_JSON_PROPERTY, key, clazz));
+                } else {
+                    //We need to skip the corresponding structure if property key was not found
+                    VALUE_SKIPPERS.getOrDefault(next, NOOP).accept(parser);
                 }
                 break;
             case END_OBJECT:
