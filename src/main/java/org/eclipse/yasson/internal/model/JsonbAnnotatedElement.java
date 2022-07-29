@@ -131,5 +131,10 @@ public class JsonbAnnotatedElement<T extends AnnotatedElement> {
         public Class<?> getDefinedType() {
             return definedType;
         }
+
+        @Override
+        public String toString() {
+            return definedType.getName();
+        }
     }
 }

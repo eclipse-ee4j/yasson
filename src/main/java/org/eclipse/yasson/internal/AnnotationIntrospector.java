@@ -806,9 +806,11 @@ public class AnnotationIntrospector {
 
         if (parentPolyConfig != null) {
             if (annotations.size() == 1 && annotations.getFirst().isInherited()) {
-                throw new JsonbException("CHANGE");
+                throw new JsonbException("Cannot process type information from multiple sources! Sources: "
+                                                 + parentPolyConfig.getDefinedType().getName() + " and "
+                                                 + annotations.getFirst());
             } else if (annotations.size() > 1) {
-                throw new JsonbException("CHANGE");
+                throw new JsonbException("Cannot process type information from multiple sources! Sources: " + annotations);
             } else if (annotations.isEmpty()) {
                 return TypeInheritanceConfiguration.builder().of(parentPolyConfig)
                         .inherited(true)
@@ -920,7 +922,8 @@ public class AnnotationIntrospector {
                     .filter(entry -> !parents.containsKey(entry.getKey()) || REPEATABLE.contains(entry.getKey()))
                     .peek(entry -> {
                         if (parents.containsKey(entry.getKey())) {
-                            throw new JsonbException("CHANGE THIS EXCEPTION");
+                            throw new JsonbException("Cannot process annotation " + entry.getKey().getName() + " from multiple "
+                                                             + "parallel sources");
                         }
                     })
                     .forEach(entry -> {
