@@ -38,7 +38,7 @@ class ValueGetterSerializer implements ModelSerializer {
         try {
             object = valueGetter.invoke(value);
         } catch (Throwable e) {
-            throw new JsonbException("Error getting value on: " + value, e);
+            throw new JsonbException("Error getting value on: " + value.getClass().getName(), e);
         }
         delegate.serialize(object, generator, context);
     }
