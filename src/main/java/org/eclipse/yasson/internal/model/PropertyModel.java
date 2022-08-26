@@ -158,7 +158,7 @@ public final class PropertyModel implements Comparable<PropertyModel> {
         this.setValueHandle = createWriteHandle(field, setter, setterVisible, strategy);
         this.getterMethodType = getterVisible ? property.getGetterType() : null;
         this.setterMethodType = setterVisible ? property.getSetterType() : null;
-        this.customization = introspectCustomization(property, jsonbContext);
+        this.customization = introspectCustomization(property, jsonbContext, classModel);
         this.readName = calculateReadWriteName(customization.getJsonReadName(), propertyName,
                                                jsonbContext.getConfigProperties().getPropertyNamingStrategy());
         this.writeName = calculateReadWriteName(customization.getJsonWriteName(), propertyName,
@@ -191,11 +191,24 @@ public final class PropertyModel implements Comparable<PropertyModel> {
         return jsonbContext.getComponentMatcher().getSerializerBinding(getPropertySerializationType(), null).orElse(null);
     }
 
-    private PropertyCustomization introspectCustomization(Property property, JsonbContext jsonbContext) {
+    private PropertyCustomization introspectCustomization(Property property, JsonbContext jsonbContext, ClassModel classModel) {
         final AnnotationIntrospector introspector = jsonbContext.getAnnotationIntrospector();
         final PropertyCustomization.Builder builder = PropertyCustomization.builder();
         //drop all other annotations for transient properties
         EnumSet<AnnotationTarget> transientInfo = introspector.getJsonbTransientCategorized(property);
+        ClassModel parent = classModel;
+        // Check parent classes for transient annotations
+        while ((parent = parent.getParentClassModel()) != null) {
+            PropertyModel parentProperty = parent.getPropertyModel(property.getName());
+            if (parentProperty != null) {
+                if (parentProperty.customization.isReadTransient()) {
+                    transientInfo.add(AnnotationTarget.GETTER);
+                }
+                if (parentProperty.customization.isWriteTransient()) {
+                    transientInfo.add(AnnotationTarget.SETTER);
+                }
+            }
+        }
         if (transientInfo.size() != 0) {
             builder.readTransient(transientInfo.contains(AnnotationTarget.GETTER));
             builder.writeTransient(transientInfo.contains(AnnotationTarget.SETTER));
