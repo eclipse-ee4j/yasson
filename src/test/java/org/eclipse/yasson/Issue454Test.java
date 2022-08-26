@@ -25,8 +25,9 @@ public class Issue454Test {
 
     @Test
     public void test() {
+        final String EXPECTED = "{\"field2\":\"bbb\"}";
         Jsonb jsonb = JsonbBuilder.create(new JsonbConfig());
-        assertEquals("{\"field2\":\"bbb\"}", jsonb.toJson(new TheInterface() {
+        assertEquals(EXPECTED, jsonb.toJson(new TheInterface() {
 
             @Override
             public String getField1() {
@@ -37,7 +38,7 @@ public class Issue454Test {
             public String getField2() {
                 return "bbb";
             }}));
-        assertEquals("{\"field2\":\"bbb\"}", jsonb.toJson(new TheClass() {
+        assertEquals(EXPECTED, jsonb.toJson(new TheClass() {
             @Override
             public String getField1() {
                 return "aaa";
@@ -46,8 +47,8 @@ public class Issue454Test {
             public String getField2() {
                 return "bbb";
             }}));
-        assertEquals("{\"field2\":\"bbb\"}", jsonb.toJson(new TheClass2()));
-        assertEquals("{\"field2\":\"bbb\"}", jsonb.toJson(new TheClass2() {}));
+        assertEquals(EXPECTED, jsonb.toJson(new TheClass2()));
+        assertEquals(EXPECTED, jsonb.toJson(new TheClass2() {}));
     }
     
     public static abstract class TheClass {
