@@ -12,22 +12,29 @@
 
 package org.eclipse.yasson.defaultmapping.jsonp;
 
-import org.junit.jupiter.api.*;
+import java.math.BigDecimal;
 
-import static org.hamcrest.CoreMatchers.is;
-import static org.hamcrest.CoreMatchers.nullValue;
-import static org.hamcrest.MatcherAssert.assertThat;
-import static org.junit.jupiter.api.Assertions.*;
-import static org.eclipse.yasson.Jsonbs.*;
-
-import org.eclipse.yasson.defaultmapping.jsonp.model.JsonpPojo;
-
-import jakarta.json.*;
+import jakarta.json.Json;
+import jakarta.json.JsonArray;
+import jakarta.json.JsonArrayBuilder;
+import jakarta.json.JsonBuilderFactory;
+import jakarta.json.JsonObject;
+import jakarta.json.JsonObjectBuilder;
+import jakarta.json.JsonString;
+import jakarta.json.JsonValue;
 import jakarta.json.bind.Jsonb;
 import jakarta.json.bind.JsonbBuilder;
 import jakarta.json.bind.JsonbConfig;
 import jakarta.json.spi.JsonProvider;
-import java.math.BigDecimal;
+import org.eclipse.yasson.defaultmapping.jsonp.model.JsonpPojo;
+import org.junit.jupiter.api.Test;
+
+import static org.eclipse.yasson.Jsonbs.defaultJsonb;
+import static org.hamcrest.CoreMatchers.is;
+import static org.hamcrest.CoreMatchers.nullValue;
+import static org.hamcrest.MatcherAssert.assertThat;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 
 /**
  * Default mapping JSONP integration tests.
@@ -252,6 +259,24 @@ public class JsonpTest {
         JsonValueWrapper deserialized = defaultJsonb.fromJson(expected, JsonValueWrapper.class);
         assertThat(deserialized.jsonValue, nullValue());
         deserialized = defaultJsonb.fromJson("{\"jsonValue\":null}", JsonValueWrapper.class);
+        assertThat(deserialized.jsonValue, is(JsonValue.NULL));
+    }
+
+    @Test
+    public void testJsonpNullValues() {
+        JsonpPojo pojo = new JsonpPojo();
+        String expected = "{}";
+        String nullValues = "{\"jsonObject\":null, \"jsonArray\":null, \"jsonNumber\":null, \"jsonString\":null, "
+                + "\"jsonValue\":null }";
+        String json = defaultJsonb.toJson(pojo);
+        assertThat(json, is(expected));
+        JsonpPojo deserialized = defaultJsonb.fromJson(expected, JsonpPojo.class);
+        assertThat(deserialized.jsonObject, nullValue());
+        deserialized = defaultJsonb.fromJson(nullValues, JsonpPojo.class);
+        assertThat(deserialized.jsonObject, nullValue());
+        assertThat(deserialized.jsonArray, nullValue());
+        assertThat(deserialized.jsonNumber, nullValue());
+        assertThat(deserialized.jsonString, nullValue());
         assertThat(deserialized.jsonValue, is(JsonValue.NULL));
     }
 }
