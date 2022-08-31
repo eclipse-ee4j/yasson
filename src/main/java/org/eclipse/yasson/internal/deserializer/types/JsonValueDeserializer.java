@@ -27,9 +27,11 @@ import org.eclipse.yasson.internal.properties.Messages;
 class JsonValueDeserializer implements ModelDeserializer<JsonParser> {
 
     private final ModelDeserializer<Object> delegate;
+    private final JsonValue nullValue;
 
-    JsonValueDeserializer(TypeDeserializerBuilder builder) {
-        delegate = builder.getDelegate();
+    JsonValueDeserializer(TypeDeserializerBuilder builder, JsonValue nullValue) {
+        this.delegate = builder.getDelegate();
+        this.nullValue = nullValue;
     }
 
     @Override
@@ -45,7 +47,7 @@ class JsonValueDeserializer implements ModelDeserializer<JsonParser> {
         case VALUE_FALSE:
             return JsonValue.FALSE;
         case VALUE_NULL:
-            return JsonValue.NULL;
+            return nullValue;
         case VALUE_STRING:
         case VALUE_NUMBER:
             return parser.getValue();
