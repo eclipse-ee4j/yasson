@@ -33,7 +33,7 @@ class OptionalSerializer implements ModelSerializer {
     @Override
     public void serialize(Object value, JsonGenerator generator, SerializationContextImpl context) {
         Optional<Object> optional = (Optional<Object>) value;
-        delegate.serialize(optional.orElse(null), generator, context);
+        delegate.serialize(optional == null ? null : optional.orElse(null), generator, context);
     }
 
 }

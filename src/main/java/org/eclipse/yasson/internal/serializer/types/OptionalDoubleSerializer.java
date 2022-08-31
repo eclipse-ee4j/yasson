@@ -33,7 +33,7 @@ class OptionalDoubleSerializer implements ModelSerializer {
     @Override
     public void serialize(Object value, JsonGenerator generator, SerializationContextImpl context) {
         OptionalDouble optionalDouble = (OptionalDouble) value;
-        if (optionalDouble.isPresent()) {
+        if (optionalDouble != null && optionalDouble.isPresent()) {
             typeSerializer.serialize(optionalDouble.getAsDouble(), generator, context);
         } else {
             typeSerializer.serialize(null, generator, context);
