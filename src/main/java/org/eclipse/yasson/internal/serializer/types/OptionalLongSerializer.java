@@ -33,7 +33,7 @@ class OptionalLongSerializer implements ModelSerializer {
     @Override
     public void serialize(Object value, JsonGenerator generator, SerializationContextImpl context) {
         OptionalLong optionalLong = (OptionalLong) value;
-        if (optionalLong.isPresent()) {
+        if (optionalLong != null && optionalLong.isPresent()) {
             typeSerializer.serialize(optionalLong.getAsLong(), generator, context);
         } else {
             typeSerializer.serialize(null, generator, context);

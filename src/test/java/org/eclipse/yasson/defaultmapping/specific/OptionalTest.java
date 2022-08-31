@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2015, 2020 Oracle and/or its affiliates. All rights reserved.
+ * Copyright (c) 2015, 2022 Oracle and/or its affiliates. All rights reserved.
  * Copyright (c) 2019, 2020 Payara Foundation and/or its affiliates. All rights reserved.
  *
  * This program and the accompanying materials are made available under the
@@ -13,7 +13,11 @@
 
 package org.eclipse.yasson.defaultmapping.specific;
 
+import org.eclipse.yasson.defaultmapping.specific.model.SpecificOptionalWrapper;
 import org.junit.jupiter.api.*;
+
+import static org.hamcrest.CoreMatchers.is;
+import static org.hamcrest.MatcherAssert.assertThat;
 import static org.junit.jupiter.api.Assertions.*;
 import static org.eclipse.yasson.Jsonbs.*;
 
@@ -187,6 +191,20 @@ public class OptionalTest {
     @Test
     public void testUnmarshalEmptyDouble() {
         assertEquals(OptionalDouble.empty(), bindingJsonb.fromJson("null", OptionalDouble.class));
+    }
+
+    @Test
+    public void testNullInsteadOfOptional() {
+        OptionalWrapper optionalWrapper = new OptionalWrapper();
+        String expected = "{}";
+        assertThat(bindingJsonb.toJson(optionalWrapper), is(expected));
+    }
+
+    @Test
+    public void testNullInsteadOfOptionalInSpecificOptionals() {
+        SpecificOptionalWrapper optionalWrapper = new SpecificOptionalWrapper();
+        String expected = "{}";
+        assertThat(bindingJsonb.toJson(optionalWrapper), is(expected));
     }
 
     public static class Customer {

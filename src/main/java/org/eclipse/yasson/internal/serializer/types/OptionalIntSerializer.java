@@ -33,7 +33,7 @@ class OptionalIntSerializer implements ModelSerializer {
     @Override
     public void serialize(Object value, JsonGenerator generator, SerializationContextImpl context) {
         OptionalInt optionalInt = (OptionalInt) value;
-        if (optionalInt.isPresent()) {
+        if (optionalInt != null && optionalInt.isPresent()) {
             typeSerializer.serialize(optionalInt.getAsInt(), generator, context);
         } else {
             typeSerializer.serialize(null, generator, context);
