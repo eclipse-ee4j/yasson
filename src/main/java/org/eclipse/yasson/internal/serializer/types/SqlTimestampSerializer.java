@@ -14,7 +14,9 @@ package org.eclipse.yasson.internal.serializer.types;
 
 import java.sql.Timestamp;
 import java.time.Instant;
+import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
+import java.time.temporal.TemporalAccessor;
 import java.util.Locale;
 
 /**
@@ -29,6 +31,12 @@ class SqlTimestampSerializer extends AbstractDateSerializer<Timestamp> {
 
     SqlTimestampSerializer(TypeSerializerBuilder serializerBuilder) {
         super(serializerBuilder);
+    }
+
+    @Override
+    protected TemporalAccessor toTemporalAccessor(Timestamp value) {
+        // convert SQL Timestamp into a LocalDateTime to unlock TemporalAccessor access
+        return LocalDateTime.ofInstant(value.toInstant(), UTC);
     }
 
     @Override
