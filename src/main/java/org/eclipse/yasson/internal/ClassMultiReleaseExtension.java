@@ -18,6 +18,7 @@ import java.util.Map;
 import java.util.Optional;
 
 import jakarta.json.bind.JsonbException;
+import jakarta.json.bind.config.PropertyNamingStrategy;
 
 import org.eclipse.yasson.internal.model.JsonbCreator;
 import org.eclipse.yasson.internal.model.Property;
@@ -42,7 +43,8 @@ public class ClassMultiReleaseExtension {
 
     static JsonbCreator findCreator(Class<?> clazz,
                                     Constructor<?>[] declaredConstructors,
-                                    AnnotationIntrospector introspector) {
+                                    AnnotationIntrospector introspector,
+                                    PropertyNamingStrategy propertyNamingStrategy) {
         return null;
     }
 

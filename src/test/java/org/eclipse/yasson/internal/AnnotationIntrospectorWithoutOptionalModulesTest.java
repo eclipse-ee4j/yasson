@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2019, 2020 Oracle and/or its affiliates. All rights reserved.
+ * Copyright (c) 2019, 2022 Oracle and/or its affiliates. All rights reserved.
  *
  * This program and the accompanying materials are made available under the
  * terms of the Eclipse Public License v. 2.0 which is available at
@@ -12,19 +12,21 @@
 
 package org.eclipse.yasson.internal;
 
-import org.junit.jupiter.api.*;
-import static org.junit.jupiter.api.Assertions.*;
-
 import static org.eclipse.yasson.internal.AnnotationIntrospectorTestAsserts.assertCreatedInstanceContainsAllParameters;
 import static org.eclipse.yasson.internal.AnnotationIntrospectorTestAsserts.assertParameters;
+import static org.junit.jupiter.api.Assertions.assertNull;
+import static org.junit.jupiter.api.Assertions.fail;
+
+import jakarta.json.bind.JsonbConfig;
+import jakarta.json.bind.config.PropertyNamingStrategy;
+import jakarta.json.spi.JsonProvider;
 
 import org.eclipse.yasson.internal.AnnotationIntrospectorTestFixtures.ObjectWithJsonbCreatorAnnotatedConstructor;
 import org.eclipse.yasson.internal.AnnotationIntrospectorTestFixtures.ObjectWithJsonbCreatorAnnotatedFactoryMethod;
 import org.eclipse.yasson.internal.AnnotationIntrospectorTestFixtures.ObjectWithoutAnnotatedConstructor;
 import org.eclipse.yasson.internal.model.JsonbCreator;
 
-import jakarta.json.bind.JsonbConfig;
-import jakarta.json.spi.JsonProvider;
+import org.junit.jupiter.api.Test;
 
 /**
  * Tests the {@link AnnotationIntrospector} with missing optional module "java.deskop", <br>
@@ -41,6 +43,7 @@ public class AnnotationIntrospectorWithoutOptionalModulesTest {
      * class under test.
      */
     private static final AnnotationIntrospector instrospector = new AnnotationIntrospector(new JsonbContext(new JsonbConfig(), JsonProvider.provider()));
+    private final PropertyNamingStrategy propertyNamingStrategy = propertyName -> propertyName;
 
     @Test
     public void testNoConstructorPropertiesAnnotationWithoutOptionalModules() {
@@ -55,19 +58,19 @@ public class AnnotationIntrospectorWithoutOptionalModulesTest {
 
     @Test
     public void testCreatorShouldBeNullOnMissingConstructorAnnotation() {
-        assertNull(instrospector.getCreator(ObjectWithoutAnnotatedConstructor.class));
+        assertNull(instrospector.getCreator(ObjectWithoutAnnotatedConstructor.class, propertyNamingStrategy));
     }
 
     @Test
     public void testObjectShouldBeCreateableFromJsonbAnnotatedConstructorWithoutOptionalModules() {
-        JsonbCreator creator = instrospector.getCreator(ObjectWithJsonbCreatorAnnotatedConstructor.class);
+        JsonbCreator creator = instrospector.getCreator(ObjectWithJsonbCreatorAnnotatedConstructor.class, propertyNamingStrategy);
         assertParameters(ObjectWithJsonbCreatorAnnotatedConstructor.parameters(), creator);
         assertCreatedInstanceContainsAllParameters(ObjectWithJsonbCreatorAnnotatedConstructor.example(), creator);
     }
 
     @Test
     public void testObjectShouldBeCreateableFromJsonbAnnotatedStaticFactoryMethodWithoutOptionalModules() {
-        JsonbCreator creator = instrospector.getCreator(ObjectWithJsonbCreatorAnnotatedFactoryMethod.class);
+        JsonbCreator creator = instrospector.getCreator(ObjectWithJsonbCreatorAnnotatedFactoryMethod.class, propertyNamingStrategy);
         assertParameters(ObjectWithJsonbCreatorAnnotatedFactoryMethod.parameters(), creator);
         assertCreatedInstanceContainsAllParameters(ObjectWithJsonbCreatorAnnotatedFactoryMethod.example(), creator);
     }

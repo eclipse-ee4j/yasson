@@ -40,7 +40,7 @@ public class ClassParserTest {
     public void testDefaultMappingFieldModifiers() {
         final JsonbAnnotatedElement<Class<?>> clsElement = introspector.collectAnnotations(FieldModifiersClass.class);
         ClassModel model = new ClassModel(FieldModifiersClass.class, introspector.introspectCustomization(clsElement,
-                                                                                                          ClassCustomization.empty()), null, null);
+                                                                                                          ClassCustomization.empty(), jsonbContext.getConfigProperties().getPropertyNamingStrategy()), null, null);
         classParser.parseProperties(model, clsElement);
         assertTrue(model.getPropertyModel("finalString").isReadable());
         assertFalse(model.getPropertyModel("finalString").isWritable());
@@ -54,7 +54,7 @@ public class ClassParserTest {
     public void testDefaultMappingMethodModifiers() {
         final JsonbAnnotatedElement<Class<?>> clsElement = introspector.collectAnnotations(MethodModifiersClass.class);
         ClassModel model = new ClassModel(FieldModifiersClass.class, introspector.introspectCustomization(clsElement,
-                                                                                                          ClassCustomization.empty()), null, null);
+                                                                                                          ClassCustomization.empty(), jsonbContext.getConfigProperties().getPropertyNamingStrategy()), null, null);
         classParser.parseProperties(model, clsElement);
         assertFalse(model.getPropertyModel("publicFieldWithPrivateMethods").isReadable());
         assertFalse(model.getPropertyModel("publicFieldWithPrivateMethods").isWritable());
