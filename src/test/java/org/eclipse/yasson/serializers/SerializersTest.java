@@ -800,7 +800,7 @@ public class SerializersTest {
     }
 
     @Test
-    void testCustomSerializersInContainer(){
+    public void testCustomSerializersInContainer(){
         Jsonb jsonb = JsonbBuilder.create();
 
         Container expected = new Container(List.of(new Containee("k", "v")));
