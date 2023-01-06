@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2021, 2022 Oracle and/or its affiliates. All rights reserved.
+ * Copyright (c) 2021, 2023 Oracle and/or its affiliates. All rights reserved.
  *
  * This program and the accompanying materials are made available under the
  * terms of the Eclipse Public License v. 2.0 which is available at
@@ -269,9 +269,10 @@ public class DeserializationModelCreator {
                 ? ((ParameterizedType) type).getActualTypeArguments()[0]
                 : Object.class;
         colType = ReflectionUtils.resolveType(chain, colType);
+        ClassModel classModel = jsonbContext.getMappingContext().getOrCreateClassModel(ReflectionUtils.getRawType(colType));
         ModelDeserializer<JsonParser> typeProcessor = typeProcessor(chain,
                                                                     colType,
-                                                                    propertyCustomization,
+                                                                    classModel.getClassCustomization(),
                                                                     JustReturn.instance());
         CollectionDeserializer collectionDeserializer = new CollectionDeserializer(typeProcessor);
         CollectionInstanceCreator instanceDeserializer = new CollectionInstanceCreator(collectionDeserializer, type);
