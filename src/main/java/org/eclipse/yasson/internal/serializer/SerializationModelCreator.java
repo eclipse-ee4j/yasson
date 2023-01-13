@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2021, 2022 Oracle and/or its affiliates. All rights reserved.
+ * Copyright (c) 2021, 2023 Oracle and/or its affiliates. All rights reserved.
  *
  * This program and the accompanying materials are made available under the
  * terms of the Eclipse Public License v. 2.0 which is available at
@@ -286,7 +286,10 @@ public class SerializationModelCreator {
         Type colType = type instanceof ParameterizedType
                 ? ((ParameterizedType) type).getActualTypeArguments()[0]
                 : Object.class;
-        ModelSerializer typeSerializer = memberSerializer(chain, colType, customization, false);
+        Type resolvedKey = ReflectionUtils.resolveType(chain, colType);
+        Class<?> rawClass = ReflectionUtils.getRawType(resolvedKey);
+        ClassModel classModel = jsonbContext.getMappingContext().getOrCreateClassModel(rawClass);
+        ModelSerializer typeSerializer = memberSerializer(chain, colType, classModel.getClassCustomization(), false);
         CollectionSerializer collectionSerializer = new CollectionSerializer(typeSerializer);
         KeyWriter keyWriter = new KeyWriter(collectionSerializer);
         NullVisibilitySwitcher nullVisibilitySwitcher = new NullVisibilitySwitcher(true, keyWriter);

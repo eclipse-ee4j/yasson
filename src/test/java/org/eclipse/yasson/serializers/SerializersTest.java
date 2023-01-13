@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2016, 2022 Oracle and/or its affiliates. All rights reserved.
+ * Copyright (c) 2016, 2023 Oracle and/or its affiliates. All rights reserved.
  *
  * This program and the accompanying materials are made available under the
  * terms of the Eclipse Public License v. 2.0 which is available at
@@ -51,6 +51,8 @@ import org.eclipse.yasson.serializers.model.AnnotatedWithSerializerType;
 import org.eclipse.yasson.serializers.model.Author;
 import org.eclipse.yasson.serializers.model.Box;
 import org.eclipse.yasson.serializers.model.BoxWithAnnotations;
+import org.eclipse.yasson.serializers.model.Containee;
+import org.eclipse.yasson.serializers.model.Container;
 import org.eclipse.yasson.serializers.model.Crate;
 import org.eclipse.yasson.serializers.model.CrateDeserializer;
 import org.eclipse.yasson.serializers.model.CrateDeserializerWithConversion;
@@ -795,6 +797,19 @@ public class SerializersTest {
         String expected = "[\"str1\",\"str2\"]";
 
         assertThat(jsonb.toJson(box), is(expected));
+    }
+
+    @Test
+    public void testCustomSerializersInContainer(){
+        Jsonb jsonb = JsonbBuilder.create();
+
+        Container expected = new Container(List.of(new Containee("k", "v")));
+
+        String expectedJson = jsonb.toJson(expected);
+        System.out.println(expectedJson);
+
+        assertEquals(expected, jsonb.fromJson(expectedJson, Container.class));
+
     }
 
 }
