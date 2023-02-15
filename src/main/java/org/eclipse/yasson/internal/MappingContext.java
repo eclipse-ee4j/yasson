@@ -88,7 +88,8 @@ public class MappingContext {
                     .introspectCustomization(clsElement,
                                              parentClassModel == null
                                                      ? ClassCustomization.empty()
-                                                     : parentClassModel.getClassCustomization());
+                                                     : parentClassModel.getClassCustomization(),
+                                             jsonbContext.getConfigProperties().getPropertyNamingStrategy());
             //            PolymorphismSupport configPolymorphism = jsonbContext.getConfigProperties().getPolymorphismSupport();
 //            if (configPolymorphism != null) {
 //                customization = mergeConfigAndAnnotationPolymorphism(configPolymorphism,

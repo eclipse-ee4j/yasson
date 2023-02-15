@@ -59,6 +59,7 @@ import jakarta.json.bind.annotation.JsonbTypeDeserializer;
 import jakarta.json.bind.annotation.JsonbTypeInfo;
 import jakarta.json.bind.annotation.JsonbTypeSerializer;
 import jakarta.json.bind.annotation.JsonbVisibility;
+import jakarta.json.bind.config.PropertyNamingStrategy;
 import jakarta.json.bind.config.PropertyVisibilityStrategy;
 import jakarta.json.bind.serializer.JsonbDeserializer;
 import jakarta.json.bind.serializer.JsonbSerializer;
@@ -152,10 +153,12 @@ public class AnnotationIntrospector {
     /**
      * Searches for JsonbCreator annotation on constructors and static methods.
      *
-     * @param clazz class to search
+     * @param clazz                  class to search
+     * @param propertyNamingStrategy The naming strategy to use for the ${@code JsonbConstructor} annotation,
+     *                               if set and no {@code JsonbProperty} annotations are present.
      * @return JsonbCreator metadata object
      */
-    public JsonbCreator getCreator(Class<?> clazz) {
+    public JsonbCreator getCreator(Class<?> clazz, PropertyNamingStrategy propertyNamingStrategy) {
         JsonbCreator jsonbCreator = null;
         Constructor<?>[] declaredConstructors =
                 AccessController.doPrivileged((PrivilegedAction<Constructor<?>[]>) clazz::getDeclaredConstructors);
@@ -164,7 +167,7 @@ public class AnnotationIntrospector {
             final jakarta.json.bind.annotation.JsonbCreator annot = findAnnotation(constructor.getDeclaredAnnotations(),
                                                                                    jakarta.json.bind.annotation.JsonbCreator.class);
             if (annot != null) {
-                jsonbCreator = createJsonbCreator(constructor, jsonbCreator, clazz);
+                jsonbCreator = createJsonbCreator(constructor, jsonbCreator, clazz, propertyNamingStrategy);
             }
         }
 
@@ -179,11 +182,11 @@ public class AnnotationIntrospector {
                                                                  method,
                                                                  clazz));
                 }
-                jsonbCreator = createJsonbCreator(method, jsonbCreator, clazz);
+                jsonbCreator = createJsonbCreator(method, jsonbCreator, clazz, propertyNamingStrategy);
             }
         }
         if (jsonbCreator == null) {
-            jsonbCreator = ClassMultiReleaseExtension.findCreator(clazz, declaredConstructors, this);
+            jsonbCreator = ClassMultiReleaseExtension.findCreator(clazz, declaredConstructors, this, propertyNamingStrategy);
             if (jsonbCreator == null) {
                 jsonbCreator = constructorPropertiesIntrospector.getCreator(declaredConstructors);
             }
@@ -191,7 +194,7 @@ public class AnnotationIntrospector {
         return jsonbCreator;
     }
 
-    JsonbCreator createJsonbCreator(Executable executable, JsonbCreator existing, Class<?> clazz) {
+    JsonbCreator createJsonbCreator(Executable executable, JsonbCreator existing, Class<?> clazz, PropertyNamingStrategy propertyNamingStrategy) {
         if (existing != null) {
             throw new JsonbException(Messages.getMessage(MessageKeys.MULTIPLE_JSONB_CREATORS, clazz));
         }
@@ -205,7 +208,8 @@ public class AnnotationIntrospector {
             if (jsonbPropertyAnnotation != null && !jsonbPropertyAnnotation.value().isEmpty()) {
                 creatorModels[i] = new CreatorModel(jsonbPropertyAnnotation.value(), parameter, executable, jsonbContext);
             } else {
-                creatorModels[i] = new CreatorModel(parameter.getName(), parameter, executable, jsonbContext);
+                final String translatedParameterName = propertyNamingStrategy.translateName(parameter.getName());
+                creatorModels[i] = new CreatorModel(translatedParameterName, parameter, executable, jsonbContext);
             }
         }
 
@@ -779,16 +783,19 @@ public class AnnotationIntrospector {
     /**
      * Processes customizations.
      *
-     * @param clsElement Element to process.
+     * @param clsElement             Element to process.
+     * @param propertyNamingStrategy The naming strategy to use for the ${@code JsonbConstructor} annotation,
+     *                               if set and no {@code JsonbProperty} annotations are present.
      * @return Populated {@link ClassCustomization} instance.
      */
     public ClassCustomization introspectCustomization(JsonbAnnotatedElement<Class<?>> clsElement,
-                                                      ClassCustomization parentCustomization) {
+                                                      ClassCustomization parentCustomization,
+                                                      PropertyNamingStrategy propertyNamingStrategy) {
         return ClassCustomization.builder()
                 .nillable(isClassNillable(clsElement))
                 .dateTimeFormatter(getJsonbDateFormat(clsElement))
                 .numberFormatter(getJsonbNumberFormat(clsElement))
-                .creator(getCreator(clsElement.getElement()))
+                .creator(getCreator(clsElement.getElement(), propertyNamingStrategy))
                 .propertyOrder(getPropertyOrder(clsElement))
                 .adapterBinding(getAdapterBinding(clsElement))
                 .serializerBinding(getSerializerBinding(clsElement))
