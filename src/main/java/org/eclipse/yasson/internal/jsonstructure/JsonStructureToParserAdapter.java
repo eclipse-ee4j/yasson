@@ -121,6 +121,26 @@ public class JsonStructureToParserAdapter implements JsonParser {
     }
 
     @Override
+    public void skipArray() {
+        if (!iterators.isEmpty()) {
+            JsonStructureIterator current = iterators.peek();
+            if (current instanceof JsonArrayIterator) {
+                iterators.pop();
+            }
+        }
+    }
+
+    @Override
+    public void skipObject() {
+        if (!iterators.isEmpty()) {
+            JsonStructureIterator current = iterators.peek();
+            if (current instanceof JsonObjectIterator) {
+                iterators.pop();
+            }
+        }
+    }
+
+    @Override
     public void close() {
         //noop
     }
