@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2019, 2022 Oracle and/or its affiliates. All rights reserved.
+ * Copyright (c) 2019, 2023 Oracle and/or its affiliates. All rights reserved.
  *
  * This program and the accompanying materials are made available under the
  * terms of the Eclipse Public License v. 2.0 which is available at
@@ -125,6 +125,8 @@ public class PreinstantiatedJsonpTest {
         assertEquals(WRAPPED_JSON, new String(out.toByteArray()));
     }
 
+    @Disabled("JsonParser now provides access to current event. "
+            + "This test passes since Yasson 3.0.0 due to addition of JsonParser.currentEvent()")
     @Test
     public void testInvalidJsonParserAdvancedToCustomPosition() {
         ByteArrayInputStream in = new ByteArrayInputStream(WRAPPED_JSON.getBytes());

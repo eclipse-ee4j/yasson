@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2021, 2022 Oracle and/or its affiliates. All rights reserved.
+ * Copyright (c) 2021, 2023 Oracle and/or its affiliates. All rights reserved.
  *
  * This program and the accompanying materials are made available under the
  * terms of the Eclipse Public License v. 2.0 which is available at
@@ -68,9 +68,7 @@ class JsonbCreatorDeserializer implements ModelDeserializer<JsonParser> {
         String key = null;
         Map<String, Object> paramValues = new HashMap<>();
         while (parser.hasNext()) {
-            final JsonParser.Event next = parser.next();
-            context.setLastValueEvent(next);
-            switch (next) {
+            switch (parser.next()) {
             case KEY_NAME:
                 key = renamer.apply(parser.getString());
                 break;
@@ -94,7 +92,7 @@ class JsonbCreatorDeserializer implements ModelDeserializer<JsonParser> {
                     throw new JsonbException(Messages.getMessage(MessageKeys.UNKNOWN_JSON_PROPERTY, key, clazz));
                 } else {
                     //We need to skip the corresponding structure if property key was not found
-                    VALUE_SKIPPERS.getOrDefault(next, NOOP).accept(parser);
+                    VALUE_SKIPPERS.getOrDefault(parser.currentEvent(), NOOP).accept(parser);
                 }
                 break;
             case END_OBJECT:
@@ -112,7 +110,7 @@ class JsonbCreatorDeserializer implements ModelDeserializer<JsonParser> {
                 context.getDeferredDeserializers().clear();
                 return context.getInstance();
             default:
-                throw new JsonbException("Unexpected state: " + next);
+                throw new JsonbException("Unexpected state: " + parser.currentEvent());
             }
         }
         return context.getInstance();
