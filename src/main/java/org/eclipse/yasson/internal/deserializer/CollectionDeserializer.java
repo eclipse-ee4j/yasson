@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2021, 2022 Oracle and/or its affiliates. All rights reserved.
+ * Copyright (c) 2021, 2023 Oracle and/or its affiliates. All rights reserved.
  *
  * This program and the accompanying materials are made available under the
  * terms of the Eclipse Public License v. 2.0 which is available at
@@ -35,9 +35,7 @@ class CollectionDeserializer implements ModelDeserializer<JsonParser> {
     public Object deserialize(JsonParser parser, DeserializationContextImpl context) {
         Collection<Object> collection = (Collection<Object>) context.getInstance();
         while (parser.hasNext()) {
-            final JsonParser.Event next = parser.next();
-            context.setLastValueEvent(next);
-            switch (next) {
+            switch (parser.next()) {
             case VALUE_NULL:
             case START_OBJECT:
             case START_ARRAY:
@@ -51,7 +49,7 @@ class CollectionDeserializer implements ModelDeserializer<JsonParser> {
             case END_ARRAY:
                 return collection;
             default:
-                throw new JsonbException("Unexpected state: " + next);
+                throw new JsonbException("Unexpected state: " + parser.currentEvent());
             }
         }
         return collection;
