@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2019, 2022 Oracle and/or its affiliates. All rights reserved.
+ * Copyright (c) 2019, 2023 Oracle and/or its affiliates. All rights reserved.
  *
  * This program and the accompanying materials are made available under the
  * terms of the Eclipse Public License v. 2.0 which is available at
@@ -24,6 +24,9 @@ import jakarta.json.JsonValue;
 import jakarta.json.bind.JsonbException;
 import jakarta.json.stream.JsonLocation;
 import jakarta.json.stream.JsonParser;
+
+import org.eclipse.yasson.internal.properties.MessageKeys;
+import org.eclipse.yasson.internal.properties.Messages;
 
 /**
  * Adapter for {@link JsonParser}, that reads a {@link JsonStructure} content tree instead of JSON text.
@@ -66,9 +69,9 @@ public class JsonStructureToParserAdapter implements JsonParser {
         JsonStructureIterator current = iterators.peek();
         Event next = current.next();
         if (next == Event.START_OBJECT) {
-            iterators.push(new JsonObjectIterator((JsonObject) iterators.peek().getValue()));
+            iterators.push(new JsonObjectIterator((JsonObject) current.getValue()));
         } else if (next == Event.START_ARRAY) {
-            iterators.push(new JsonArrayIterator((JsonArray) iterators.peek().getValue()));
+            iterators.push(new JsonArrayIterator((JsonArray) current.getValue()));
         } else if (next == Event.END_OBJECT || next == Event.END_ARRAY) {
             iterators.pop();
         }
@@ -102,8 +105,14 @@ public class JsonStructureToParserAdapter implements JsonParser {
 
     @Override
     public JsonObject getObject() {
-//        ((JsonObjectIterator) iterators.peek()).jsonObject
-        return iterators.peek().getValue().asJsonObject();
+        JsonStructureIterator current = iterators.peek();
+        if (current instanceof JsonObjectIterator) {
+            //Remove child iterator as getObject() method contract says
+            iterators.pop();
+            return current.getValue().asJsonObject();
+        } else {
+            throw new JsonbException(Messages.getMessage(MessageKeys.INTERNAL_ERROR, "Outside of object context"));
+        }
     }
 
     private JsonNumber getJsonNumberValue() {
@@ -118,6 +127,26 @@ public class JsonStructureToParserAdapter implements JsonParser {
     @Override
     public JsonLocation getLocation() {
         throw new JsonbException("Operation not supported");
+    }
+
+    @Override
+    public void skipArray() {
+        if (!iterators.isEmpty()) {
+            JsonStructureIterator current = iterators.peek();
+            if (current instanceof JsonArrayIterator) {
+                iterators.pop();
+            }
+        }
+    }
+
+    @Override
+    public void skipObject() {
+        if (!iterators.isEmpty()) {
+            JsonStructureIterator current = iterators.peek();
+            if (current instanceof JsonObjectIterator) {
+                iterators.pop();
+            }
+        }
     }
 
     @Override
