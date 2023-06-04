@@ -24,7 +24,6 @@ import java.util.ListIterator;
 import java.util.Map;
 import java.util.Optional;
 import java.util.concurrent.ConcurrentHashMap;
-import java.util.stream.Stream;
 
 import jakarta.json.bind.JsonbException;
 
@@ -73,11 +72,8 @@ public class SerializationModelCreator {
     public static ModelSerializer wrapInCommonSet(ModelSerializer modelSerializer,
                                                   Customization customization,
                                                   JsonbContext jsonbContext) {
-        return Stream.of(modelSerializer)
-                .map(KeyWriter::new)
-                .map(serializer -> new NullSerializer(serializer, customization, jsonbContext))
-                .findFirst()
-                .get();
+        KeyWriter serializer = new KeyWriter(modelSerializer);
+        return new NullSerializer(serializer, customization, jsonbContext);
     }
 
     /**
