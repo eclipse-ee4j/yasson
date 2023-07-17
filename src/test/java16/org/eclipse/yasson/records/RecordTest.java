@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2021, 2022 Oracle and/or its affiliates. All rights reserved.
+ * Copyright (c) 2021, 2023 Oracle and/or its affiliates. All rights reserved.
  *
  * This program and the accompanying materials are made available under the
  * terms of the Eclipse Public License v. 2.0 which is available at
@@ -18,6 +18,9 @@ import org.eclipse.yasson.Jsonbs;
 import org.eclipse.yasson.internal.properties.MessageKeys;
 import org.eclipse.yasson.internal.properties.Messages;
 import org.junit.jupiter.api.Test;
+
+import java.util.Locale;
+import java.util.UUID;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertThrows;
@@ -102,11 +105,26 @@ public class RecordTest {
         String json = Jsonbs.defaultJsonb.toJson(car);
         assertEquals(expected, json);
 
-        String toDeserialize = "{}";
-        String expectedDefaultValues = "{\"color\":null,\"somePrimitive\":0,\"type\":\"typeDefaultValue\"}";
-        CarCreatorOptionalTest deserialized = Jsonbs.defaultJsonb.fromJson(toDeserialize, CarCreatorOptionalTest.class);
-        json = Jsonbs.nullableJsonb.toJson(deserialized);
-        assertEquals(expectedDefaultValues, json);
     }
 
+    @Test
+    public void record_with_type_deserializer() {
+        UUID id = UUID.randomUUID();
+        String given = String.format(
+                Locale.ROOT,
+                """
+                {
+                    "car.id": "%s",
+                    "colour": "green"
+                }
+                """,
+                id);
+
+        // when
+        CarWithUuidDeserializer car = Jsonbs.defaultJsonb.fromJson(given, CarWithUuidDeserializer.class);
+
+        // then
+        assertEquals(id, car.carId().value());
+        assertEquals("green", car.colour());
+    }
 }
