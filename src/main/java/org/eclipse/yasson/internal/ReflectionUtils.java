@@ -240,6 +240,14 @@ public class ReflectionUtils {
                 }
                 resolvedArgs[i] = new VariableTypeInheritanceSearch()
                         .searchParametrizedType(typeToSearch, (TypeVariable<?>) variableType);
+                
+                if (resolvedArgs[i] == null) {
+                    Type[] bounds = ((TypeVariable<?>) variableType).getBounds();
+                    if (Objects.nonNull(bounds) && bounds.length > 0) {
+                        resolvedArgs[i] = bounds[0];
+                    }
+                }
+                
                 if (resolvedArgs[i] == null) {
                     if (typeToSearch instanceof Class) {
                         return Object.class;

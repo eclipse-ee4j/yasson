@@ -29,6 +29,8 @@ import java.util.TimeZone;
 import jakarta.json.bind.Jsonb;
 import jakarta.json.bind.JsonbBuilder;
 import jakarta.json.bind.JsonbConfig;
+import java.lang.reflect.Field;
+import java.util.Collection;
 import org.eclipse.yasson.TestTypeToken;
 import org.eclipse.yasson.adapters.model.GenericBox;
 import org.eclipse.yasson.defaultmapping.generics.model.AnotherGenericTestClass;
@@ -54,6 +56,7 @@ import org.eclipse.yasson.serializers.model.Crate;
 import org.junit.jupiter.api.Test;
 
 import static org.eclipse.yasson.Jsonbs.defaultJsonb;
+import org.eclipse.yasson.defaultmapping.generics.model.LowerBoundTypeVariableWithCollectionAttributeClass;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.junit.jupiter.api.Assertions.assertTrue;
@@ -446,6 +449,32 @@ public class GenericsTest {
         assertEquals(concreteContainer, finalGenericWrapper);
     }
 
+    @Test
+    public void lowerBoundTypeVariableInCollectionAttribute() throws Exception {
+        
+        Shape shape = new Shape();
+        shape.setArea(5D);
+        
+        AnotherGenericTestClass<Integer, Shape> anotherGenericTestClass = new AnotherGenericTestClass<>();
+        anotherGenericTestClass.field1 = 6;
+        anotherGenericTestClass.field2 = shape;
+        
+        List<AnotherGenericTestClass<Integer, Shape>> asList = Arrays.asList(anotherGenericTestClass);
+        
+        Jsonb jsonb = JsonbBuilder.create();
+        String toJson = jsonb.toJson(asList);
+        
+        Field field = LowerBoundTypeVariableWithCollectionAttributeClass.class.getDeclaredField("value");
+        
+        Type genericType = field.getGenericType();
+        
+        List<AnotherGenericTestClass<Integer, Shape>> fromJson = jsonb.fromJson(toJson, genericType);
+
+        assertEquals(5, fromJson.get(0).field2.getArea());
+        assertEquals(6, fromJson.get(0).field1);
+        
+    }
+    
     public interface FunctionalInterface<T> {
         T getValue();
     }
