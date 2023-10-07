@@ -152,6 +152,17 @@ public class DeserializationModelCreator {
             models.put(cachedItem, deserializer);
             return deserializer;
         }
+
+        ClassCustomization classCustomization = classModel.getClassCustomization();
+        Optional<DeserializerBinding<?>> deserializerBinding = userDeserializer(type,
+                (ComponentBoundCustomization) propertyCustomization);
+        if (deserializerBinding.isPresent()) {
+            UserDefinedDeserializer user = new UserDefinedDeserializer(deserializerBinding.get().getJsonbDeserializer(),
+                    JustReturn.instance(), type, classCustomization);
+            models.put(cachedItem, user);
+            return user;
+        }
+
         Optional<AdapterBinding> adapterBinding = adapterBinding(type, (ComponentBoundCustomization) propertyCustomization);
         if (adapterBinding.isPresent()) {
             AdapterBinding adapter = adapterBinding.get();
@@ -201,14 +212,6 @@ public class DeserializationModelCreator {
                                                                    Class<?> rawType,
                                                                    CachedItem cachedItem) {
         ClassCustomization classCustomization = classModel.getClassCustomization();
-        Optional<DeserializerBinding<?>> deserializerBinding = userDeserializer(type,
-                                                                                (ComponentBoundCustomization) propertyCustomization);
-        if (deserializerBinding.isPresent()) {
-            UserDefinedDeserializer user = new UserDefinedDeserializer(deserializerBinding.get().getJsonbDeserializer(),
-                                                                       JustReturn.instance(), type, classCustomization);
-            models.put(cachedItem, user);
-            return user;
-        }
         JsonbCreator creator = classCustomization.getCreator();
         boolean hasCreator = creator != null;
         List<String> params = hasCreator ? creatorParamsList(creator) : Collections.emptyList();

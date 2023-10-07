@@ -51,6 +51,7 @@ import org.eclipse.yasson.serializers.model.AnnotatedWithSerializerType;
 import org.eclipse.yasson.serializers.model.Author;
 import org.eclipse.yasson.serializers.model.Box;
 import org.eclipse.yasson.serializers.model.BoxWithAnnotations;
+import org.eclipse.yasson.serializers.model.Colors;
 import org.eclipse.yasson.serializers.model.Containee;
 import org.eclipse.yasson.serializers.model.Container;
 import org.eclipse.yasson.serializers.model.Crate;
@@ -810,6 +811,17 @@ public class SerializersTest {
 
         assertEquals(expected, jsonb.fromJson(expectedJson, Container.class));
 
+    }
+
+    @Test
+    void testCustomSerializersAndDeserializersInEnum(){
+        Jsonb jsonb = JsonbBuilder.create();
+
+        Colors expected = Colors.GREEN;
+
+        String expectedJson = jsonb.toJson(expected);
+
+        assertEquals(expected, jsonb.fromJson(expectedJson, Colors.class));
     }
 
 }
