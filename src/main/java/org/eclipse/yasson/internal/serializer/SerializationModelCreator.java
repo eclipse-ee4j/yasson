@@ -317,6 +317,13 @@ public class SerializationModelCreator {
                                                   Class<?> raw,
                                                   Customization propertyCustomization) {
         Class<?> arrayComponent = raw.getComponentType();
+        return createArraySerializerInternal(chain, raw, propertyCustomization, arrayComponent);
+    }
+
+    private ModelSerializer createArraySerializerInternal(LinkedList<Type> chain,
+														  Class<?> raw,
+														  Customization propertyCustomization,
+														  Class<?> arrayComponent) {
         ModelSerializer modelSerializer = memberSerializer(chain, arrayComponent, propertyCustomization, false);
         ModelSerializer arraySerializer = ArraySerializer.create(raw, jsonbContext, modelSerializer);
         KeyWriter keyWriter = new KeyWriter(arraySerializer);
@@ -329,11 +336,7 @@ public class SerializationModelCreator {
                                                          Customization propertyCustomization) {
         Class<?> raw = ReflectionUtils.getRawType(type);
         Class<?> component = ReflectionUtils.getRawType(((GenericArrayType) type).getGenericComponentType());
-        ModelSerializer modelSerializer = memberSerializer(chain, component, propertyCustomization, false);
-        ModelSerializer arraySerializer = ArraySerializer.create(raw, jsonbContext, modelSerializer);
-        KeyWriter keyWriter = new KeyWriter(arraySerializer);
-        NullVisibilitySwitcher nullVisibilitySwitcher = new NullVisibilitySwitcher(true, keyWriter);
-        return new NullSerializer(nullVisibilitySwitcher, propertyCustomization, jsonbContext);
+        return createArraySerializerInternal(chain, raw, propertyCustomization, component);
     }
 
     private ModelSerializer createOptionalSerializer(LinkedList<Type> chain,
@@ -373,7 +376,7 @@ public class SerializationModelCreator {
         }
         ModelSerializer typeSerializer = TypeSerializers.getTypeSerializer(chain, rawType, customization, jsonbContext, key);
         if (typeSerializer == null) {
-            //Final classes dont have any child classes. It is safe to assume that there will be instance of that specific class.
+            //Final classes don't have any child classes. It is safe to assume that there will be instance of that specific class.
             boolean isFinal = Modifier.isFinal(rawType.getModifiers());
             if (isFinal
                     || Collection.class.isAssignableFrom(rawType)

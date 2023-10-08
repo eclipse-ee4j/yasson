@@ -191,7 +191,7 @@ public class DeserializationModelCreator {
             return typeDeserializer;
         }
         if (Collection.class.isAssignableFrom(rawType)) {
-            return createCollectionDeserializer(cachedItem, rawType, chain, propertyCustomization);
+            return createCollectionDeserializer(cachedItem, rawType, chain);
         } else if (Map.class.isAssignableFrom(rawType)) {
             return createMapDeserializer(cachedItem, rawType, chain, propertyCustomization);
         } else if (rawType.isArray()) {
@@ -201,13 +201,11 @@ public class DeserializationModelCreator {
         } else if (Optional.class.isAssignableFrom(rawType)) {
             return createOptionalDeserializer(chain, type, propertyCustomization, cachedItem);
         } else {
-            return createObjectDeserializer(chain, type, propertyCustomization, classModel, rawType, cachedItem);
+            return createObjectDeserializer(chain, classModel, rawType, cachedItem);
         }
     }
 
     private ModelDeserializer<JsonParser> createObjectDeserializer(LinkedList<Type> chain,
-                                                                   Type type,
-                                                                   Customization propertyCustomization,
                                                                    ClassModel classModel,
                                                                    Class<?> rawType,
                                                                    CachedItem cachedItem) {
@@ -265,8 +263,7 @@ public class DeserializationModelCreator {
 
     private ModelDeserializer<JsonParser> createCollectionDeserializer(CachedItem cachedItem,
                                                                        Class<?> rawType,
-                                                                       LinkedList<Type> chain,
-                                                                       Customization propertyCustomization) {
+                                                                       LinkedList<Type> chain) {
         Type type = cachedItem.type;
         Type colType = type instanceof ParameterizedType
                 ? ((ParameterizedType) type).getActualTypeArguments()[0]
