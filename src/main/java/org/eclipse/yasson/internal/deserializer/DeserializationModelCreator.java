@@ -503,7 +503,7 @@ public class DeserializationModelCreator {
                                                            ModelDeserializer<Object> delegate,
                                                            Set<JsonParser.Event> events) {
         return TypeDeserializers
-                .getTypeDeserializer(rawType, customization, jsonbContext.getConfigProperties(), delegate, events);
+                .getTypeDeserializer(rawType, customization, jsonbContext, delegate, events);
     }
 
     private Class<?> resolveImplClass(Class<?> rawType, Customization customization) {

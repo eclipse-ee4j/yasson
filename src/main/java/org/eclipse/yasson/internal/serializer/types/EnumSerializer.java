@@ -12,26 +12,56 @@
 
 package org.eclipse.yasson.internal.serializer.types;
 
-import jakarta.json.stream.JsonGenerator;
+import java.util.EnumMap;
 
 import org.eclipse.yasson.internal.SerializationContextImpl;
+import org.eclipse.yasson.internal.model.ClassModel;
+import org.eclipse.yasson.internal.model.PropertyModel;
+
+import jakarta.json.stream.JsonGenerator;
 
 /**
  * Serializer of the {@link Enum} types.
  */
 class EnumSerializer extends TypeSerializer<Enum<?>> {
 
-    EnumSerializer(TypeSerializerBuilder serializerBuilder) {
-        super(serializerBuilder);
-    }
+	private final EnumMap<? extends Enum<?>, String> constantToNameMap;
 
-    @Override
-    void serializeValue(Enum<?> value, JsonGenerator generator, SerializationContextImpl context) {
-        generator.write(value.name());
-    }
+	EnumSerializer(TypeSerializerBuilder serializerBuilder) {
+		super(serializerBuilder);
 
-    @Override
-    void serializeKey(Enum<?> key, JsonGenerator generator, SerializationContextImpl context) {
-        generator.writeKey(key.name());
-    }
+		constantToNameMap = createConstantToNameMap(serializerBuilder);
+	}
+
+	private static <E extends Enum<E>> EnumMap<E, String> createConstantToNameMap(TypeSerializerBuilder serializerBuilder) {
+		EnumMap<E, String> constantToNameMap = null;
+		Class<?> clazz = serializerBuilder.getClazz();
+
+		if (clazz.isEnum()) {
+			try{
+				@SuppressWarnings("unchecked")
+				Class<E> enumClazz = (Class<E>) clazz;
+				constantToNameMap = new EnumMap<>(enumClazz);
+				ClassModel classModel = serializerBuilder.getJsonbContext().getMappingContext().getOrCreateClassModel(clazz);
+
+				for (E enumConstant : enumClazz.getEnumConstants()) {
+					PropertyModel model = classModel.getPropertyModel(enumConstant.name());
+					constantToNameMap.put(enumConstant, model.getWriteName());
+				}
+			} catch (ClassCastException classCastException) {
+				throw new IllegalArgumentException("EnumSerializer can only be used with Enum types");
+			}
+		}
+		return constantToNameMap;
+	}
+
+	@Override
+	void serializeValue(Enum<?> value, JsonGenerator generator, SerializationContextImpl context) {
+		generator.write(constantToNameMap == null ? value.name() : constantToNameMap.get(value));
+	}
+
+	@Override
+	void serializeKey(Enum<?> key, JsonGenerator generator, SerializationContextImpl context) {
+		generator.writeKey(constantToNameMap == null ? key.name() : constantToNameMap.get(key));
+	}
 }

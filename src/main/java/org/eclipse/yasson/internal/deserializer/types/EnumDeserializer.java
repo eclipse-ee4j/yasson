@@ -13,21 +13,51 @@
 package org.eclipse.yasson.internal.deserializer.types;
 
 import java.lang.reflect.Type;
+import java.util.HashMap;
+import java.util.Map;
 
 import org.eclipse.yasson.internal.DeserializationContextImpl;
+import org.eclipse.yasson.internal.model.ClassModel;
+import org.eclipse.yasson.internal.model.PropertyModel;
 
 /**
  * Deserializer of the {@link Enum}.
  */
 class EnumDeserializer extends TypeDeserializer {
 
-    EnumDeserializer(TypeDeserializerBuilder builder) {
-        super(builder);
-    }
+	private final Map<String, ? extends Enum<?>> nameToConstantMap;
 
-    @SuppressWarnings("unchecked")
-    @Override
-    Object deserializeStringValue(String value, DeserializationContextImpl context, Type rType) {
-        return Enum.valueOf((Class<Enum>) rType, value);
-    }
+	EnumDeserializer(TypeDeserializerBuilder builder) {
+		super(builder);
+
+		nameToConstantMap = createNameToConstantMap(builder);
+	}
+
+	private static <E extends Enum<E>> Map<String, E> createNameToConstantMap(TypeDeserializerBuilder builder) {
+		Map<String, E> nameToConstantMap = null;
+		Class<?> clazz = builder.getClazz();
+
+		if (clazz.isEnum()) {
+			try {
+				@SuppressWarnings("unchecked")
+				Class<E> enumClazz = (Class<E>) clazz;
+				nameToConstantMap = new HashMap<>();
+				ClassModel classModel = builder.getJsonbContext().getMappingContext().getOrCreateClassModel(clazz);
+
+				for (E enumConstant : enumClazz.getEnumConstants()) {
+					PropertyModel model = classModel.getPropertyModel(enumConstant.name());
+					nameToConstantMap.put(model.getReadName(), enumConstant);
+				}
+			} catch (ClassCastException classCastException) {
+				throw new IllegalArgumentException("EnumDeserializer can only be used with Enum types");
+			}
+		}
+		return nameToConstantMap;
+	}
+
+	@SuppressWarnings({"unchecked", "rawtypes"})
+	@Override
+	Object deserializeStringValue(String value, DeserializationContextImpl context, Type rType) {
+		return nameToConstantMap == null ? Enum.valueOf((Class<Enum>) rType, value) : nameToConstantMap.get(value);
+	}
 }

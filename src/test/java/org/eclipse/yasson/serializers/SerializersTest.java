@@ -51,6 +51,7 @@ import org.eclipse.yasson.serializers.model.AnnotatedWithSerializerType;
 import org.eclipse.yasson.serializers.model.Author;
 import org.eclipse.yasson.serializers.model.Box;
 import org.eclipse.yasson.serializers.model.BoxWithAnnotations;
+import org.eclipse.yasson.serializers.model.Cars;
 import org.eclipse.yasson.serializers.model.Colors;
 import org.eclipse.yasson.serializers.model.Containee;
 import org.eclipse.yasson.serializers.model.Container;
@@ -822,6 +823,28 @@ public class SerializersTest {
         String expectedJson = jsonb.toJson(expected);
 
         assertEquals(expected, jsonb.fromJson(expectedJson, Colors.class));
+    }
+
+    @Test
+    void testJsonbPropertyInEnum(){
+        Jsonb jsonb = JsonbBuilder.create();
+
+        Cars expected = Cars.FORD;
+
+        String expectedJson = jsonb.toJson(expected);
+
+        assertEquals(expected, jsonb.fromJson(expectedJson, Cars.class));
+    }
+
+    @Test
+    void testNoJsonbPropertyInEnum(){
+        Jsonb jsonb = JsonbBuilder.create();
+
+        Cars expected = Cars.FIAT;
+
+        String expectedJson = jsonb.toJson(expected);
+
+        assertEquals(expected, jsonb.fromJson(expectedJson, Cars.class));
     }
 
 }
