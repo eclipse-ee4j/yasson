@@ -12,21 +12,12 @@
 
 package org.eclipse.yasson.adapters;
 
-import org.junit.jupiter.api.*;
-import static org.junit.jupiter.api.Assertions.*;
-import static org.eclipse.yasson.Jsonbs.*;
+import static java.util.Collections.unmodifiableMap;
 
-import org.eclipse.yasson.TestTypeToken;
-import org.eclipse.yasson.adapters.model.*;
-import org.eclipse.yasson.defaultmapping.generics.model.ScalarValueWrapper;
+import static org.eclipse.yasson.Jsonbs.defaultJsonb;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertNull;
 
-import jakarta.json.Json;
-import jakarta.json.JsonObject;
-import jakarta.json.JsonString;
-import jakarta.json.bind.Jsonb;
-import jakarta.json.bind.JsonbBuilder;
-import jakarta.json.bind.JsonbConfig;
-import jakarta.json.bind.adapter.JsonbAdapter;
 import java.lang.reflect.Type;
 import java.math.BigDecimal;
 import java.time.Instant;
@@ -38,7 +29,27 @@ import java.util.Map;
 import java.util.Optional;
 import java.util.UUID;
 
-import static java.util.Collections.unmodifiableMap;
+import org.eclipse.yasson.TestTypeToken;
+import org.eclipse.yasson.adapters.model.AdaptedPojo;
+import org.eclipse.yasson.adapters.model.Author;
+import org.eclipse.yasson.adapters.model.Box;
+import org.eclipse.yasson.adapters.model.BoxToCrateCompatibleGenericsAdapter;
+import org.eclipse.yasson.adapters.model.BoxToCratePropagatedIntegerStringAdapter;
+import org.eclipse.yasson.adapters.model.Crate;
+import org.eclipse.yasson.adapters.model.GenericBox;
+import org.eclipse.yasson.adapters.model.IntegerListToStringAdapter;
+import org.eclipse.yasson.adapters.model.JsonObjectPojo;
+import org.eclipse.yasson.adapters.model.ReturnNullAdapter;
+import org.eclipse.yasson.adapters.model.SupertypeAdapterPojo;
+import org.eclipse.yasson.adapters.model.UUIDContainer;
+import org.eclipse.yasson.adapters.model.Vegetables;
+import org.eclipse.yasson.defaultmapping.generics.model.ScalarValueWrapper;
+import org.junit.jupiter.api.Test;
+
+import jakarta.json.bind.Jsonb;
+import jakarta.json.bind.JsonbBuilder;
+import jakarta.json.bind.JsonbConfig;
+import jakarta.json.bind.adapter.JsonbAdapter;
 
 /**
  * Tests adapters to behave correctly.
@@ -582,5 +593,16 @@ public class AdaptersTest {
     	String original = "hello world!";
     	assertEquals("\"HELLO WORLD!\"", jsonb.toJson(original));
     	assertEquals(original, jsonb.fromJson("\"HELLO WORLD!\"", String.class));
+    }
+
+    @Test
+    void testCustomAdapterInEnum(){
+        Jsonb jsonb = JsonbBuilder.create();
+
+        Vegetables expected = Vegetables.TOMATO;
+
+        String expectedJson = jsonb.toJson(expected);
+
+        assertEquals(expected, jsonb.fromJson(expectedJson, Vegetables.class));
     }
 }
