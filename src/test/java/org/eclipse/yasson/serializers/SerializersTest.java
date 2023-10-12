@@ -107,6 +107,18 @@ public class SerializersTest {
             out.write(box.secondBoxStr);
             out.writeEnd();
         }
+	};
+
+    private static final JsonbSerializer<Box> BOX_ARRAY_SERIALIZER_CHAINED_AS_LAMBDA = (box, out, ctx) -> out.writeStartArray()
+            .write(box.boxStr)
+            .write(box.secondBoxStr)
+            .writeEnd();
+
+    private static final JsonbSerializer<Box> BOX_ARRAY_SERIALIZER_AS_LAMBDA = (box, out, ctx) -> {
+        out.writeStartArray();
+        out.write(box.boxStr);
+        out.write(box.secondBoxStr);
+        out.writeEnd();
     };
 
     @Test
@@ -799,6 +811,30 @@ public class SerializersTest {
         String expected = "[\"str1\",\"str2\"]";
 
         assertThat(jsonb.toJson(box), is(expected));
+    }
+
+    @Test
+    public void testBoxToArrayChainedWithLambda() {
+        JsonbConfig cfg = new JsonbConfig().withSerializers(BOX_ARRAY_SERIALIZER_CHAINED_AS_LAMBDA);
+        assertThrows(JsonbException.class, () -> JsonbBuilder.create(cfg));
+        /*Box box = new Box();
+        box.boxStr = "str1";
+        box.secondBoxStr = "str2";
+        String expected = "[\"str1\",\"str2\"]";
+
+        assertThat(jsonb.toJson(box), is(expected));*/
+    }
+
+    @Test
+    public void testBoxToArrayWithLambda() {
+        JsonbConfig cfg = new JsonbConfig().withSerializers(BOX_ARRAY_SERIALIZER_AS_LAMBDA);
+        assertThrows(JsonbException.class, () -> JsonbBuilder.create(cfg));
+        /*Box box = new Box();
+        box.boxStr = "str1";
+        box.secondBoxStr = "str2";
+        String expected = "[\"str1\",\"str2\"]";
+
+        assertThat(jsonb.toJson(box), is(expected));*/
     }
 
     @Test
