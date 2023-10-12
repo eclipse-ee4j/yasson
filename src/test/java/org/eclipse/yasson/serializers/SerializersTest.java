@@ -81,7 +81,6 @@ import static org.eclipse.yasson.Jsonbs.defaultJsonb;
 import static org.eclipse.yasson.Jsonbs.nullableJsonb;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNull;
-import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.junit.jupiter.api.Assertions.fail;
 import static org.hamcrest.CoreMatchers.is;
@@ -121,7 +120,6 @@ public class SerializersTest {
         out.write(box.secondBoxStr);
         out.writeEnd();
     };
-
 
     @Test
     public void testClassLevelAnnotation() {
@@ -175,50 +173,46 @@ public class SerializersTest {
      * Tests JSONB deserialization of arbitrary type invoked from a Deserializer.
      */
     @Test
-    public void testDeserializerDeserializationByType() throws Exception {
+    public void testDeserializerDeserializationByType() {
         JsonbConfig config = new JsonbConfig().withDeserializers(new CrateDeserializer());
-        try (Jsonb jsonb = JsonbBuilder.create(config)) {
+        Jsonb jsonb = JsonbBuilder.create(config);
 
-            Box box = createPojoWithDates();
+        Box box = createPojoWithDates();
 
-            String expected =
-                    "{\"boxStr\":\"Box string\",\"crate\":{\"crateInner\":{\"crateInnerBigDec\":10,\"crate_inner_str\":\"Single inner\",\"date\":\"14.05.2015 || 11:10:01\"},\"crateInnerList\":[{\"crateInnerBigDec\":10,\"crate_inner_str\":\"List inner 0\"},{\"crateInnerBigDec\":10,\"crate_inner_str\":\"List inner 1\"}],\"date\":\"2015-05-14T11:10:01\"},\"secondBoxStr\":\"Second box string\"}";
+        String expected = "{\"boxStr\":\"Box string\",\"crate\":{\"crateInner\":{\"crateInnerBigDec\":10,\"crate_inner_str\":\"Single inner\",\"date\":\"14.05.2015 || 11:10:01\"},\"crateInnerList\":[{\"crateInnerBigDec\":10,\"crate_inner_str\":\"List inner 0\"},{\"crateInnerBigDec\":10,\"crate_inner_str\":\"List inner 1\"}],\"date\":\"2015-05-14T11:10:01\"},\"secondBoxStr\":\"Second box string\"}";
 
-            Box result = jsonb.fromJson(expected, Box.class);
+        Box result = jsonb.fromJson(expected, Box.class);
 
-            //deserialized by deserializationContext.deserialize(Class c)
-            assertEquals(box.crate.crateInner.crateInnerBigDec, result.crate.crateInner.crateInnerBigDec);
-            assertEquals(box.crate.crateInner.crateInnerStr, result.crate.crateInner.crateInnerStr);
+        //deserialized by deserializationContext.deserialize(Class c)
+        assertEquals(box.crate.crateInner.crateInnerBigDec, result.crate.crateInner.crateInnerBigDec);
+        assertEquals(box.crate.crateInner.crateInnerStr, result.crate.crateInner.crateInnerStr);
 
-            assertEquals("List inner 0", result.crate.crateInnerList.get(0).crateInnerStr);
-            assertEquals("List inner 1", result.crate.crateInnerList.get(1).crateInnerStr);
+        assertEquals("List inner 0", result.crate.crateInnerList.get(0).crateInnerStr);
+        assertEquals("List inner 1", result.crate.crateInnerList.get(1).crateInnerStr);
 
-            //set by deserializer statically
-            assertEquals(new BigDecimal("123"), result.crate.crateBigDec);
-            assertEquals("abc", result.crate.crateStr);
-        }
+        //set by deserializer statically
+        assertEquals(new BigDecimal("123"), result.crate.crateBigDec);
+        assertEquals("abc", result.crate.crateStr);
     }
 
     /**
      * Tests JSONB serialization of arbitrary type invoked from a Serializer.
      */
     @Test
-    public void testSerializerSerializationOfType() throws Exception {
+    public void testSerializerSerializationOfType() {
         JsonbConfig config = new JsonbConfig().withSerializers(new CrateSerializer());
-        try (Jsonb jsonb = JsonbBuilder.create(config)) {
-            String expected =
-                    "{\"boxStr\":\"Box string\",\"crate\":{\"crateStr\":\"REPLACED crate str\",\"crateInner\":{\"crateInnerBigDec\":10,\"crate_inner_str\":\"Single inner\"},\"crateInnerList\":[{\"crateInnerBigDec\":10,\"crate_inner_str\":\"List inner 0\"},{\"crateInnerBigDec\":10,\"crate_inner_str\":\"List inner 1\"}],\"crateBigDec\":54321},\"secondBoxStr\":\"Second box string\"}";
-            Box pojo = createPojo();
+        Jsonb jsonb = JsonbBuilder.create(config);
+        String expected = "{\"boxStr\":\"Box string\",\"crate\":{\"crateStr\":\"REPLACED crate str\",\"crateInner\":{\"crateInnerBigDec\":10,\"crate_inner_str\":\"Single inner\"},\"crateInnerList\":[{\"crateInnerBigDec\":10,\"crate_inner_str\":\"List inner 0\"},{\"crateInnerBigDec\":10,\"crate_inner_str\":\"List inner 1\"}],\"crateBigDec\":54321},\"secondBoxStr\":\"Second box string\"}";
+        Box pojo = createPojo();
 
-            assertEquals(expected, jsonb.toJson(pojo));
+        assertEquals(expected, jsonb.toJson(pojo));
 
-            Box result = jsonb.fromJson(expected, Box.class);
-            assertEquals(new BigDecimal("54321"), result.crate.crateBigDec);
-            //result.crate.crateStr is mapped to crate_str by jsonb property
-            assertNull(result.crate.crateStr);
-            assertEquals(pojo.crate.crateInner.crateInnerStr, result.crate.crateInner.crateInnerStr);
-            assertEquals(pojo.crate.crateInner.crateInnerBigDec, result.crate.crateInner.crateInnerBigDec);
-        }
+        Box result = jsonb.fromJson(expected, Box.class);
+        assertEquals(new BigDecimal("54321"), result.crate.crateBigDec);
+        //result.crate.crateStr is mapped to crate_str by jsonb property
+        assertNull(result.crate.crateStr);
+        assertEquals(pojo.crate.crateInner.crateInnerStr, result.crate.crateInner.crateInnerStr);
+        assertEquals(pojo.crate.crateInner.crateInnerBigDec, result.crate.crateInner.crateInnerBigDec);
     }
 
     @Test
