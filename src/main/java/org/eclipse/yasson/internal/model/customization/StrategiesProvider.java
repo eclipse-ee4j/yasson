@@ -25,7 +25,6 @@ import org.eclipse.yasson.internal.properties.MessageKeys;
 import org.eclipse.yasson.internal.properties.Messages;
 
 import static java.util.Comparator.comparing;
-
 import static jakarta.json.bind.config.PropertyNamingStrategy.CASE_INSENSITIVE;
 import static jakarta.json.bind.config.PropertyNamingStrategy.IDENTITY;
 import static jakarta.json.bind.config.PropertyNamingStrategy.LOWER_CASE_WITH_DASHES;

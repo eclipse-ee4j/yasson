@@ -25,39 +25,39 @@ import org.eclipse.yasson.internal.model.PropertyModel;
  */
 class EnumDeserializer extends TypeDeserializer {
 
-	private final Map<String, ? extends Enum<?>> nameToConstantMap;
+    private final Map<String, ? extends Enum<?>> nameToConstantMap;
 
-	EnumDeserializer(TypeDeserializerBuilder builder) {
-		super(builder);
+    EnumDeserializer(TypeDeserializerBuilder builder) {
+        super(builder);
 
-		nameToConstantMap = createNameToConstantMap(builder);
-	}
+        nameToConstantMap = createNameToConstantMap(builder);
+    }
 
-	private static <E extends Enum<E>> Map<String, E> createNameToConstantMap(TypeDeserializerBuilder builder) {
-		Map<String, E> nameToConstantMap = null;
-		Class<?> clazz = builder.getClazz();
+    private static <E extends Enum<E>> Map<String, E> createNameToConstantMap(TypeDeserializerBuilder builder) {
+        Map<String, E> nameToConstantMap = null;
+        Class<?> clazz = builder.getClazz();
 
-		if (clazz.isEnum()) {
-			try {
-				@SuppressWarnings("unchecked")
-				Class<E> enumClazz = (Class<E>) clazz;
-				nameToConstantMap = new HashMap<>();
-				ClassModel classModel = builder.getJsonbContext().getMappingContext().getOrCreateClassModel(clazz);
+        if (clazz.isEnum()) {
+            try {
+                @SuppressWarnings("unchecked")
+                Class<E> enumClazz = (Class<E>) clazz;
+                nameToConstantMap = new HashMap<>();
+                ClassModel classModel = builder.getJsonbContext().getMappingContext().getOrCreateClassModel(clazz);
 
-				for (E enumConstant : enumClazz.getEnumConstants()) {
-					PropertyModel model = classModel.getPropertyModel(enumConstant.name());
-					nameToConstantMap.put(model.getReadName(), enumConstant);
-				}
-			} catch (ClassCastException classCastException) {
-				throw new IllegalArgumentException("EnumDeserializer can only be used with Enum types");
-			}
-		}
-		return nameToConstantMap;
-	}
+                for (E enumConstant : enumClazz.getEnumConstants()) {
+                    PropertyModel model = classModel.getPropertyModel(enumConstant.name());
+                    nameToConstantMap.put(model.getReadName(), enumConstant);
+                }
+            } catch (ClassCastException classCastException) {
+                throw new IllegalArgumentException("EnumDeserializer can only be used with Enum types");
+            }
+        }
+        return nameToConstantMap;
+    }
 
-	@SuppressWarnings({"unchecked", "rawtypes"})
-	@Override
-	Object deserializeStringValue(String value, DeserializationContextImpl context, Type rType) {
-		return nameToConstantMap == null ? Enum.valueOf((Class<Enum>) rType, value) : nameToConstantMap.get(value);
-	}
+    @SuppressWarnings({"unchecked", "rawtypes"})
+    @Override
+    Object deserializeStringValue(String value, DeserializationContextImpl context, Type rType) {
+        return nameToConstantMap == null ? Enum.valueOf((Class<Enum>) rType, value) : nameToConstantMap.get(value);
+    }
 }

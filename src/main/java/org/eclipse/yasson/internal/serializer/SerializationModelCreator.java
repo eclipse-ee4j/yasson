@@ -321,9 +321,9 @@ public class SerializationModelCreator {
     }
 
     private ModelSerializer createArraySerializerInternal(LinkedList<Type> chain,
-														  Class<?> raw,
-														  Customization propertyCustomization,
-														  Class<?> arrayComponent) {
+                                                          Class<?> raw,
+                                                          Customization propertyCustomization,
+                                                          Class<?> arrayComponent) {
         ModelSerializer modelSerializer = memberSerializer(chain, arrayComponent, propertyCustomization, false);
         ModelSerializer arraySerializer = ArraySerializer.create(raw, jsonbContext, modelSerializer);
         KeyWriter keyWriter = new KeyWriter(arraySerializer);
