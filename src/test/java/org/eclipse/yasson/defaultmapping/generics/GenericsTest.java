@@ -288,7 +288,7 @@ public class GenericsTest {
     }
 
     @Test
-    public void testBoundedGenerics() {
+    public void testBoundedGenerics() throws Exception {
         //bounded generics
         BoundedGenericClass<HashSet<Integer>, Circle> boundedGenericClass = new BoundedGenericClass<>();
         List<Shape> shapeList = new ArrayList<>();
@@ -311,18 +311,20 @@ public class GenericsTest {
         String expected = "{\"boundedSet\":[3],\"lowerBoundedList\":[{\"radius\":2.5}],\"upperBoundedList\":[{\"radius\":3.5,\"color\":\"0,0,255\"}]}";
         assertEquals(expected, defaultJsonb.toJson(boundedGenericClass));
 
-        Jsonb localJsonb = JsonbBuilder.create(new JsonbConfig());
-        BoundedGenericClass<HashSet<Integer>, Circle> result = localJsonb.fromJson(expected,
-                new TestTypeToken<BoundedGenericClass<HashSet<Integer>, Circle>>(){}.getType());
-        assertEquals(Circle.class, result.lowerBoundedList.get(0).getClass());
-        assertEquals(Double.valueOf(2.5), ((Circle) result.lowerBoundedList.get(0)).getRadius());
+        try (Jsonb localJsonb = JsonbBuilder.create(new JsonbConfig())) {
+            BoundedGenericClass<HashSet<Integer>, Circle> result = localJsonb.fromJson(expected,
+                    new TestTypeToken<BoundedGenericClass<HashSet<Integer>, Circle>>() {
+                    }.getType());
+            assertEquals(Circle.class, result.lowerBoundedList.get(0).getClass());
+            assertEquals(Double.valueOf(2.5), ((Circle) result.lowerBoundedList.get(0)).getRadius());
 
-        //There is no way of identifying precise class (ColoredCircle) during json unmarshalling.
-        //Fields that are missing in upper bounds are skipped.
-        assertEquals(Circle.class, result.upperBoundedList.get(0).getClass());
-        assertEquals(Double.valueOf(3.5), result.upperBoundedList.get(0).getRadius());
-        //If it was possible we could assert following, but it is not.
-        //assertEquals("0,0,255", ((ColoredCircle) result.upperBoundedList.get(0)).color);
+            //There is no way of identifying precise class (ColoredCircle) during json unmarshalling.
+            //Fields that are missing in upper bounds are skipped.
+            assertEquals(Circle.class, result.upperBoundedList.get(0).getClass());
+            assertEquals(Double.valueOf(3.5), result.upperBoundedList.get(0).getRadius());
+            //If it was possible we could assert following, but it is not.
+            //assertEquals("0,0,255", ((ColoredCircle) result.upperBoundedList.get(0)).color);
+        }
     }
 
     @Test
@@ -436,17 +438,18 @@ public class GenericsTest {
     }
 
     @Test
-    public void multipleGenericLevels() {
+    public void multipleGenericLevels() throws Exception {
         FinalMember member = new FinalMember();
         member.setName("Jason");
         FinalGenericWrapper concreteContainer = new FinalGenericWrapper();
         concreteContainer.setMember(member);
 
         String expected = "{\"member\":{\"name\":\"Jason\"}}";
-        Jsonb jsonb = JsonbBuilder.create();
-        assertEquals(expected, jsonb.toJson(concreteContainer));
-        FinalGenericWrapper finalGenericWrapper = jsonb.fromJson(expected, FinalGenericWrapper.class);
-        assertEquals(concreteContainer, finalGenericWrapper);
+        try (Jsonb jsonb = JsonbBuilder.create()) {
+            assertEquals(expected, jsonb.toJson(concreteContainer));
+            FinalGenericWrapper finalGenericWrapper = jsonb.fromJson(expected, FinalGenericWrapper.class);
+            assertEquals(concreteContainer, finalGenericWrapper);
+        }
     }
 
     @Test
@@ -461,18 +464,18 @@ public class GenericsTest {
         
         List<AnotherGenericTestClass<Integer, Shape>> asList = Arrays.asList(anotherGenericTestClass);
         
-        Jsonb jsonb = JsonbBuilder.create();
-        String toJson = jsonb.toJson(asList);
-        
-        Field field = LowerBoundTypeVariableWithCollectionAttributeClass.class.getDeclaredField("value");
-        
-        Type genericType = field.getGenericType();
-        
-        List<AnotherGenericTestClass<Integer, Shape>> fromJson = jsonb.fromJson(toJson, genericType);
+        try (Jsonb jsonb = JsonbBuilder.create()) {
+            String toJson = jsonb.toJson(asList);
 
-        assertEquals(5, fromJson.get(0).field2.getArea());
-        assertEquals(6, fromJson.get(0).field1);
-        
+            Field field = LowerBoundTypeVariableWithCollectionAttributeClass.class.getDeclaredField("value");
+
+            Type genericType = field.getGenericType();
+
+            List<AnotherGenericTestClass<Integer, Shape>> fromJson = jsonb.fromJson(toJson, genericType);
+
+            assertEquals(5, fromJson.get(0).field2.getArea());
+            assertEquals(6, fromJson.get(0).field1);
+        }
     }
     
     public interface FunctionalInterface<T> {

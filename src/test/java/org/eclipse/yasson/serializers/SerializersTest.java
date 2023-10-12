@@ -81,6 +81,7 @@ import static org.eclipse.yasson.Jsonbs.defaultJsonb;
 import static org.eclipse.yasson.Jsonbs.nullableJsonb;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNull;
+import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.junit.jupiter.api.Assertions.fail;
 import static org.hamcrest.CoreMatchers.is;
@@ -173,91 +174,100 @@ public class SerializersTest {
      * Tests JSONB deserialization of arbitrary type invoked from a Deserializer.
      */
     @Test
-    public void testDeserializerDeserializationByType() {
+    public void testDeserializerDeserializationByType() throws Exception {
         JsonbConfig config = new JsonbConfig().withDeserializers(new CrateDeserializer());
-        Jsonb jsonb = JsonbBuilder.create(config);
+        try (Jsonb jsonb = JsonbBuilder.create(config)) {
 
-        Box box = createPojoWithDates();
+            Box box = createPojoWithDates();
 
-        String expected = "{\"boxStr\":\"Box string\",\"crate\":{\"crateInner\":{\"crateInnerBigDec\":10,\"crate_inner_str\":\"Single inner\",\"date\":\"14.05.2015 || 11:10:01\"},\"crateInnerList\":[{\"crateInnerBigDec\":10,\"crate_inner_str\":\"List inner 0\"},{\"crateInnerBigDec\":10,\"crate_inner_str\":\"List inner 1\"}],\"date\":\"2015-05-14T11:10:01\"},\"secondBoxStr\":\"Second box string\"}";
+            String expected = "{\"boxStr\":\"Box string\",\"crate\":{\"crateInner\":{\"crateInnerBigDec\":10,\"crate_inner_str\":\"Single inner\",\"date\":\"14.05.2015 || 11:10:01\"},\"crateInnerList\":[{\"crateInnerBigDec\":10,\"crate_inner_str\":\"List inner 0\"},{\"crateInnerBigDec\":10,\"crate_inner_str\":\"List inner 1\"}],\"date\":\"2015-05-14T11:10:01\"},\"secondBoxStr\":\"Second box string\"}";
 
-        Box result = jsonb.fromJson(expected, Box.class);
+            Box result = jsonb.fromJson(expected, Box.class);
 
-        //deserialized by deserializationContext.deserialize(Class c)
-        assertEquals(box.crate.crateInner.crateInnerBigDec, result.crate.crateInner.crateInnerBigDec);
-        assertEquals(box.crate.crateInner.crateInnerStr, result.crate.crateInner.crateInnerStr);
+            //deserialized by deserializationContext.deserialize(Class c)
+            assertEquals(box.crate.crateInner.crateInnerBigDec, result.crate.crateInner.crateInnerBigDec);
+            assertEquals(box.crate.crateInner.crateInnerStr, result.crate.crateInner.crateInnerStr);
 
-        assertEquals("List inner 0", result.crate.crateInnerList.get(0).crateInnerStr);
-        assertEquals("List inner 1", result.crate.crateInnerList.get(1).crateInnerStr);
+            assertEquals("List inner 0", result.crate.crateInnerList.get(0).crateInnerStr);
+            assertEquals("List inner 1", result.crate.crateInnerList.get(1).crateInnerStr);
 
-        //set by deserializer statically
-        assertEquals(new BigDecimal("123"), result.crate.crateBigDec);
-        assertEquals("abc", result.crate.crateStr);
+            //set by deserializer statically
+            assertEquals(new BigDecimal("123"), result.crate.crateBigDec);
+            assertEquals("abc", result.crate.crateStr);
+        }
     }
 
     /**
      * Tests JSONB serialization of arbitrary type invoked from a Serializer.
      */
     @Test
-    public void testSerializerSerializationOfType() {
+    public void testSerializerSerializationOfType() throws Exception {
         JsonbConfig config = new JsonbConfig().withSerializers(new CrateSerializer());
-        Jsonb jsonb = JsonbBuilder.create(config);
-        String expected = "{\"boxStr\":\"Box string\",\"crate\":{\"crateStr\":\"REPLACED crate str\",\"crateInner\":{\"crateInnerBigDec\":10,\"crate_inner_str\":\"Single inner\"},\"crateInnerList\":[{\"crateInnerBigDec\":10,\"crate_inner_str\":\"List inner 0\"},{\"crateInnerBigDec\":10,\"crate_inner_str\":\"List inner 1\"}],\"crateBigDec\":54321},\"secondBoxStr\":\"Second box string\"}";
-        Box pojo = createPojo();
+        try (Jsonb jsonb = JsonbBuilder.create(config)) {
+                String expected =
+                        "{\"boxStr\":\"Box string\",\"crate\":{\"crateStr\":\"REPLACED crate str\",\"crateInner\":{\"crateInnerBigDec\":10,\"crate_inner_str\":\"Single inner\"},\"crateInnerList\":[{\"crateInnerBigDec\":10,\"crate_inner_str\":\"List inner 0\"},{\"crateInnerBigDec\":10,\"crate_inner_str\":\"List inner 1\"}],\"crateBigDec\":54321},\"secondBoxStr\":\"Second box string\"}";
+            Box pojo = createPojo();
 
-        assertEquals(expected, jsonb.toJson(pojo));
+            assertEquals(expected, jsonb.toJson(pojo));
 
-        Box result = jsonb.fromJson(expected, Box.class);
-        assertEquals(new BigDecimal("54321"), result.crate.crateBigDec);
-        //result.crate.crateStr is mapped to crate_str by jsonb property
-        assertNull(result.crate.crateStr);
-        assertEquals(pojo.crate.crateInner.crateInnerStr, result.crate.crateInner.crateInnerStr);
-        assertEquals(pojo.crate.crateInner.crateInnerBigDec, result.crate.crateInner.crateInnerBigDec);
+            Box result = jsonb.fromJson(expected, Box.class);
+            assertEquals(new BigDecimal("54321"), result.crate.crateBigDec);
+            //result.crate.crateStr is mapped to crate_str by jsonb property
+            assertNull(result.crate.crateStr);
+            assertEquals(pojo.crate.crateInner.crateInnerStr, result.crate.crateInner.crateInnerStr);
+            assertEquals(pojo.crate.crateInner.crateInnerBigDec, result.crate.crateInner.crateInnerBigDec);
+        }
     }
 
     @Test
-    public void testSerializerSerializationOfTypeWithExplicitType() {
+    public void testSerializerSerializationOfTypeWithExplicitType() throws Exception {
         JsonbConfig config = new JsonbConfig().withSerializers(new CrateSerializer());
-        Jsonb jsonb = JsonbBuilder.create(config);
-        String expected = "{\"boxStr\":\"Box string\",\"crate\":{\"crateStr\":\"REPLACED crate str\",\"crateInner\":{\"crateInnerBigDec\":10,\"crate_inner_str\":\"Single inner\"},\"crateInnerList\":[{\"crateInnerBigDec\":10,\"crate_inner_str\":\"List inner 0\"},{\"crateInnerBigDec\":10,\"crate_inner_str\":\"List inner 1\"}],\"crateBigDec\":54321},\"secondBoxStr\":\"Second box string\"}";
-        Box pojo = createPojo();
+        try (Jsonb jsonb = JsonbBuilder.create(config)) {
+            String expected =
+                    "{\"boxStr\":\"Box string\",\"crate\":{\"crateStr\":\"REPLACED crate str\",\"crateInner\":{\"crateInnerBigDec\":10,\"crate_inner_str\":\"Single inner\"},\"crateInnerList\":[{\"crateInnerBigDec\":10,\"crate_inner_str\":\"List inner 0\"},{\"crateInnerBigDec\":10,\"crate_inner_str\":\"List inner 1\"}],\"crateBigDec\":54321},\"secondBoxStr\":\"Second box string\"}";
+            Box pojo = createPojo();
 
-        assertEquals(expected, jsonb.toJson(pojo, Box.class));
+            assertEquals(expected, jsonb.toJson(pojo, Box.class));
 
-        Box result = jsonb.fromJson(expected, Box.class);
-        assertEquals(new BigDecimal("54321"), result.crate.crateBigDec);
-        //result.crate.crateStr is mapped to crate_str by jsonb property
-        assertNull(result.crate.crateStr);
-        assertEquals(pojo.crate.crateInner.crateInnerStr, result.crate.crateInner.crateInnerStr);
-        assertEquals(pojo.crate.crateInner.crateInnerBigDec, result.crate.crateInner.crateInnerBigDec);
+            Box result = jsonb.fromJson(expected, Box.class);
+            assertEquals(new BigDecimal("54321"), result.crate.crateBigDec);
+            //result.crate.crateStr is mapped to crate_str by jsonb property
+            assertNull(result.crate.crateStr);
+            assertEquals(pojo.crate.crateInner.crateInnerStr, result.crate.crateInner.crateInnerStr);
+            assertEquals(pojo.crate.crateInner.crateInnerBigDec, result.crate.crateInner.crateInnerBigDec);
+        }
     }
 
     /**
      * Tests jsonb type conversion, including property customization.
      */
     @Test
-    public void testDeserializersUsingConversion() {
+    public void testDeserializersUsingConversion() throws Exception {
         JsonbConfig config = new JsonbConfig().withDeserializers(new CrateDeserializerWithConversion());
-        Jsonb jsonb = JsonbBuilder.create(config);
+        try (Jsonb jsonb = JsonbBuilder.create(config)) {
 
-        String json = "{\"boxStr\":\"Box string\",\"crate\":{\"date-converted\":\"2015-05-14T11:10:01\",\"crateStr\":\"REPLACED crate str\",\"crateInner\":{\"crateInnerBigDec\":10,\"crate_inner_str\":\"Single inner\",\"date\":\"14.05.2015 || 11:10:01\"},\"crateBigDec\":54321},\"secondBoxStr\":\"Second box string\"}";
-        Box result = jsonb.fromJson(json, Box.class);
-        final Date expected = getExpectedDate();
-        assertEquals(expected, result.crate.date);
-        assertEquals("Box string", result.boxStr);
-        assertEquals("Second box string", result.secondBoxStr);
+            String json =
+                    "{\"boxStr\":\"Box string\",\"crate\":{\"date-converted\":\"2015-05-14T11:10:01\",\"crateStr\":\"REPLACED crate str\",\"crateInner\":{\"crateInnerBigDec\":10,\"crate_inner_str\":\"Single inner\",\"date\":\"14.05.2015 || 11:10:01\"},\"crateBigDec\":54321},\"secondBoxStr\":\"Second box string\"}";
+            Box result = jsonb.fromJson(json, Box.class);
+            final Date expected = getExpectedDate();
+            assertEquals(expected, result.crate.date);
+            assertEquals("Box string", result.boxStr);
+            assertEquals("Second box string", result.secondBoxStr);
+        }
     }
 
     @Test
-    public void testCrateJsonObjectDeserializer() {
+    public void testCrateJsonObjectDeserializer() throws Exception {
         JsonbConfig config = new JsonbConfig().withDeserializers(new CrateJsonObjectDeserializer());
-        Jsonb jsonb = JsonbBuilder.create(config);
-        String expected = "{\"boxStr\":\"Box string\",\"crate\":{\"date-converted\":\"2015-05-14T11:10:01\",\"crateStr\":\"REPLACED crate str\",\"crateInner\":{\"crateInnerBigDec\":10,\"crateInnerStr\":\"Single inner\"},\"crateInnerList\":[{\"crateInnerBigDec\":10,\"crate_inner_str\":\"List inner 0\"},{\"crateInnerBigDec\":10,\"crate_inner_str\":\"List inner 1\"}],\"crateBigDec\":54321},\"secondBoxStr\":\"Second box string\"}";
-        Box result = jsonb.fromJson(expected, Box.class);
-        assertEquals(new BigDecimal("54321"), result.crate.crateBigDec);
-        assertEquals("REPLACED crate str", result.crate.crateStr);
-        assertEquals("Single inner", result.crate.crateInner.crateInnerStr);
-        assertEquals(BigDecimal.TEN, result.crate.crateInner.crateInnerBigDec);
+        try (Jsonb jsonb = JsonbBuilder.create(config)) {
+            String expected =
+                    "{\"boxStr\":\"Box string\",\"crate\":{\"date-converted\":\"2015-05-14T11:10:01\",\"crateStr\":\"REPLACED crate str\",\"crateInner\":{\"crateInnerBigDec\":10,\"crateInnerStr\":\"Single inner\"},\"crateInnerList\":[{\"crateInnerBigDec\":10,\"crate_inner_str\":\"List inner 0\"},{\"crateInnerBigDec\":10,\"crate_inner_str\":\"List inner 1\"}],\"crateBigDec\":54321},\"secondBoxStr\":\"Second box string\"}";
+            Box result = jsonb.fromJson(expected, Box.class);
+            assertEquals(new BigDecimal("54321"), result.crate.crateBigDec);
+            assertEquals("REPLACED crate str", result.crate.crateStr);
+            assertEquals("Single inner", result.crate.crateInner.crateInnerStr);
+            assertEquals(BigDecimal.TEN, result.crate.crateInner.crateInnerBigDec);
+        }
     }
 
     private static Date getExpectedDate() {
@@ -265,12 +275,14 @@ public class SerializersTest {
     }
 
     @Test
-    public void testSerializationUsingConversion() {
+    public void testSerializationUsingConversion() throws Exception {
         JsonbConfig config = new JsonbConfig().withSerializers(new CrateSerializerWithConversion());
-        Jsonb jsonb = JsonbBuilder.create(config);
+        try (Jsonb jsonb = JsonbBuilder.create(config)) {
 
-        String json = "{\"boxStr\":\"Box string\",\"crate\":{\"crateStr\":\"REPLACED crate str\",\"crateInner\":{\"crateInnerBigDec\":10,\"crate_inner_str\":\"Single inner\",\"date\":\"14.05.2015 || 11:10:01\"},\"crateInnerList\":[{\"crateInnerBigDec\":10,\"crate_inner_str\":\"List inner 0\"},{\"crateInnerBigDec\":10,\"crate_inner_str\":\"List inner 1\"}],\"crateBigDec\":54321,\"date-converted\":\"2015-05-14T11:10:01Z[UTC]\"},\"secondBoxStr\":\"Second box string\"}";
-        assertEquals(json, jsonb.toJson(createPojoWithDates()));
+            String json =
+                    "{\"boxStr\":\"Box string\",\"crate\":{\"crateStr\":\"REPLACED crate str\",\"crateInner\":{\"crateInnerBigDec\":10,\"crate_inner_str\":\"Single inner\",\"date\":\"14.05.2015 || 11:10:01\"},\"crateInnerList\":[{\"crateInnerBigDec\":10,\"crate_inner_str\":\"List inner 0\"},{\"crateInnerBigDec\":10,\"crate_inner_str\":\"List inner 1\"}],\"crateBigDec\":54321,\"date-converted\":\"2015-05-14T11:10:01Z[UTC]\"},\"secondBoxStr\":\"Second box string\"}";
+            assertEquals(json, jsonb.toJson(createPojoWithDates()));
+        }
     }
 
     @Test
@@ -306,38 +318,40 @@ public class SerializersTest {
     }
 
     @Test
-    public void testAnnotationsOverride() {
+    public void testAnnotationsOverride() throws Exception {
         JsonbConfig config = new JsonbConfig().withDeserializers(new CrateJsonObjectDeserializer()).withSerializers(new CrateSerializer());
-        Jsonb jsonb = JsonbBuilder.create(config);
+        try (Jsonb jsonb = JsonbBuilder.create(config)) {
 
-        BoxWithAnnotations box = new BoxWithAnnotations();
-        box.boxStr = "Box string";
-        box.secondBoxStr = "Second box string";
-        box.crate = new Crate();
-        box.crate.crateInner = createCrateInner("Single inner");
-        box.crate.date = getExpectedDate();
+            BoxWithAnnotations box = new BoxWithAnnotations();
+            box.boxStr = "Box string";
+            box.secondBoxStr = "Second box string";
+            box.crate = new Crate();
+            box.crate.crateInner = createCrateInner("Single inner");
+            box.crate.date = getExpectedDate();
 
-        box.crate.crateInnerList = new ArrayList<>();
-        box.crate.crateInnerList.add(createCrateInner("List inner 0"));
-        box.crate.crateInnerList.add(createCrateInner("List inner 1"));
+            box.crate.crateInnerList = new ArrayList<>();
+            box.crate.crateInnerList.add(createCrateInner("List inner 0"));
+            box.crate.crateInnerList.add(createCrateInner("List inner 1"));
 
-        String expected = "{\"boxStr\":\"Box string\",\"crate\":{\"crateStr\":\"REPLACED crate str\",\"crateInner\":{\"crateInnerBigDec\":10,\"crate_inner_str\":\"Single inner\"},\"crateInnerList\":[{\"crateInnerBigDec\":10,\"crate_inner_str\":\"List inner 0\"},{\"crateInnerBigDec\":10,\"crate_inner_str\":\"List inner 1\"}],\"crateBigDec\":54321,\"date-converted\":\"2015-05-14T11:10:01Z[UTC]\"},\"secondBoxStr\":\"Second box string\"}";
+            String expected =
+                    "{\"boxStr\":\"Box string\",\"crate\":{\"crateStr\":\"REPLACED crate str\",\"crateInner\":{\"crateInnerBigDec\":10,\"crate_inner_str\":\"Single inner\"},\"crateInnerList\":[{\"crateInnerBigDec\":10,\"crate_inner_str\":\"List inner 0\"},{\"crateInnerBigDec\":10,\"crate_inner_str\":\"List inner 1\"}],\"crateBigDec\":54321,\"date-converted\":\"2015-05-14T11:10:01Z[UTC]\"},\"secondBoxStr\":\"Second box string\"}";
 
-        assertEquals(expected, jsonb.toJson(box));
+            assertEquals(expected, jsonb.toJson(box));
 
-        BoxWithAnnotations result = jsonb.fromJson(expected, BoxWithAnnotations.class);
+            BoxWithAnnotations result = jsonb.fromJson(expected, BoxWithAnnotations.class);
 
-        //deserialized by deserializationContext.deserialize(Class c)
-        assertEquals(box.crate.crateInner.crateInnerBigDec, result.crate.crateInner.crateInnerBigDec);
-        assertEquals(box.crate.crateInner.crateInnerStr, result.crate.crateInner.crateInnerStr);
+            //deserialized by deserializationContext.deserialize(Class c)
+            assertEquals(box.crate.crateInner.crateInnerBigDec, result.crate.crateInner.crateInnerBigDec);
+            assertEquals(box.crate.crateInner.crateInnerStr, result.crate.crateInner.crateInnerStr);
 
-        assertEquals(2L, result.crate.crateInnerList.size());
-        assertEquals("List inner 0", result.crate.crateInnerList.get(0).crateInnerStr);
-        assertEquals("List inner 1", result.crate.crateInnerList.get(1).crateInnerStr);
+            assertEquals(2L, result.crate.crateInnerList.size());
+            assertEquals("List inner 0", result.crate.crateInnerList.get(0).crateInnerStr);
+            assertEquals("List inner 1", result.crate.crateInnerList.get(1).crateInnerStr);
 
-        //set by deserializer statically
-        assertEquals(new BigDecimal("123"), result.crate.crateBigDec);
-        assertEquals("abc", result.crate.crateStr);
+            //set by deserializer statically
+            assertEquals(new BigDecimal("123"), result.crate.crateBigDec);
+            assertEquals("abc", result.crate.crateStr);
+        }
     }
 
     @Test
@@ -377,21 +391,22 @@ public class SerializersTest {
      * Tests avoiding StackOverflowError.
      */
     @Test
-    public void testRecursiveSerializer() {
-        Jsonb jsonb = JsonbBuilder.create(new JsonbConfig().withSerializers(new RecursiveSerializer()).withDeserializers(new RecursiveDeserializer()));
+    public void testRecursiveSerializer() throws Exception {
+        try (Jsonb jsonb = JsonbBuilder.create(new JsonbConfig().withSerializers(new RecursiveSerializer()).withDeserializers(new RecursiveDeserializer()))) {
 
-        Box box = new Box();
-        box.boxStr = "Box to serialize";
-        try {
-            jsonb.toJson(box);
-            fail();
-        } catch (JsonbException ex) {
-        }
+            Box box = new Box();
+            box.boxStr = "Box to serialize";
+            try {
+                jsonb.toJson(box);
+                fail();
+            } catch (JsonbException ex) {
+            }
 
-        try {
-            jsonb.fromJson("{\"boxStr\":\"Box to deserialize\"}", Box.class);
-            fail();
-        } catch (StackOverflowError error){
+            try {
+                jsonb.fromJson("{\"boxStr\":\"Box to deserialize\"}", Box.class);
+                fail();
+            } catch (StackOverflowError error) {
+            }
         }
     }
 
@@ -409,75 +424,82 @@ public class SerializersTest {
     }
 
     @Test
-    public void testSupertypeSerializer() {
-        Jsonb jsonb = JsonbBuilder.create(
+    public void testSupertypeSerializer() throws Exception {
+        try (Jsonb jsonb = JsonbBuilder.create(
                 new JsonbConfig().withSerializers(new NumberSerializer())
-                        .withDeserializers(new NumberDeserializer()));
-        SupertypeSerializerPojo pojo = new SupertypeSerializerPojo();
-        pojo.setNumberInteger(10);
-        pojo.setAnotherNumberInteger(11);
-        assertEquals("{\"anotherNumberInteger\":\"12\",\"numberInteger\":\"11\"}", jsonb.toJson(pojo));
+                        .withDeserializers(new NumberDeserializer()))) {
+            SupertypeSerializerPojo pojo = new SupertypeSerializerPojo();
+            pojo.setNumberInteger(10);
+            pojo.setAnotherNumberInteger(11);
+            assertEquals("{\"anotherNumberInteger\":\"12\",\"numberInteger\":\"11\"}", jsonb.toJson(pojo));
 
-        pojo = jsonb.fromJson("{\"anotherNumberInteger\":\"12\",\"numberInteger\":\"11\"}", SupertypeSerializerPojo.class);
-        assertEquals(Integer.valueOf(10), pojo.getNumberInteger());
-        assertEquals(Integer.valueOf(11), pojo.getAnotherNumberInteger());
+            pojo = jsonb.fromJson("{\"anotherNumberInteger\":\"12\",\"numberInteger\":\"11\"}", SupertypeSerializerPojo.class);
+            assertEquals(Integer.valueOf(10), pojo.getNumberInteger());
+            assertEquals(Integer.valueOf(11), pojo.getAnotherNumberInteger());
+        }
     }
     
     @Test
-    public void testObjectDeserializerWithLexOrderStrategy() {
-        Jsonb jsonb = JsonbBuilder.create(new JsonbConfig().withPropertyOrderStrategy(PropertyOrderStrategy.LEXICOGRAPHICAL));
-        Object pojo = jsonb.fromJson("{\"first\":{},\"third\":{},\"second\":{\"second\":2,\"first\":1}}", Object.class);
-        assertTrue(pojo instanceof TreeMap, "Pojo is not of type TreeMap");
-        @SuppressWarnings("unchecked")
-        SortedMap<String, Object> pojoAsMap = (SortedMap<String, Object>) pojo;
-        assertTrue(pojoAsMap.get("second") instanceof TreeMap, "Pojo inner object is not of type TreeMap");
-        assertEquals("{\"first\":{},\"second\":{\"first\":1,\"second\":2},\"third\":{}}", jsonb.toJson(pojo));
+    public void testObjectDeserializerWithLexOrderStrategy() throws Exception {
+        try (Jsonb jsonb = JsonbBuilder.create(new JsonbConfig().withPropertyOrderStrategy(PropertyOrderStrategy.LEXICOGRAPHICAL))) {
+            Object pojo = jsonb.fromJson("{\"first\":{},\"third\":{},\"second\":{\"second\":2,\"first\":1}}", Object.class);
+            assertTrue(pojo instanceof TreeMap, "Pojo is not of type TreeMap");
+            @SuppressWarnings("unchecked")
+            SortedMap<String, Object> pojoAsMap = (SortedMap<String, Object>) pojo;
+            assertTrue(pojoAsMap.get("second") instanceof TreeMap, "Pojo inner object is not of type TreeMap");
+            assertEquals("{\"first\":{},\"second\":{\"first\":1,\"second\":2},\"third\":{}}", jsonb.toJson(pojo));
+        }
     }
     
     @Test
-    public void testObjectDeserializerWithReverseOrderStrategy() {
-        Jsonb jsonb = JsonbBuilder.create(new JsonbConfig().withPropertyOrderStrategy(PropertyOrderStrategy.REVERSE));
-        Object pojo = jsonb.fromJson("{\"first\":{},\"second\":{\"first\":1,\"second\":2},\"third\":{}}", Object.class);
-        assertTrue(pojo instanceof ReverseTreeMap, "Pojo is not of type ReverseTreeMap");
-        @SuppressWarnings("unchecked")
-        SortedMap<String, Object> pojoAsMap = (SortedMap<String, Object>) pojo;
-        assertTrue(pojoAsMap.get("second") instanceof TreeMap, "Pojo inner object is not of type TreeMap");
-        assertEquals("{\"third\":{},\"second\":{\"second\":2,\"first\":1},\"first\":{}}", jsonb.toJson(pojo));
+    public void testObjectDeserializerWithReverseOrderStrategy() throws Exception {
+        try (Jsonb jsonb = JsonbBuilder.create(new JsonbConfig().withPropertyOrderStrategy(PropertyOrderStrategy.REVERSE))) {
+            Object pojo = jsonb.fromJson("{\"first\":{},\"second\":{\"first\":1,\"second\":2},\"third\":{}}", Object.class);
+            assertTrue(pojo instanceof ReverseTreeMap, "Pojo is not of type ReverseTreeMap");
+            @SuppressWarnings("unchecked")
+            SortedMap<String, Object> pojoAsMap = (SortedMap<String, Object>) pojo;
+            assertTrue(pojoAsMap.get("second") instanceof TreeMap, "Pojo inner object is not of type TreeMap");
+            assertEquals("{\"third\":{},\"second\":{\"second\":2,\"first\":1},\"first\":{}}", jsonb.toJson(pojo));
+        }
     }
 
     @Test
-    public void testObjectDeserializerWithAnyOrNoneOrderStrategy() {
+    public void testObjectDeserializerWithAnyOrNoneOrderStrategy() throws Exception {
         String json = "{\"first\":{},\"second\":{\"first\":1,\"second\":2},\"third\":{}}";
         // ANY
-        Jsonb jsonb = JsonbBuilder.create(new JsonbConfig().withPropertyOrderStrategy(PropertyOrderStrategy.ANY));
-        Object pojo = jsonb.fromJson(json, Object.class);
-        assertTrue(pojo instanceof HashMap, "Pojo is not of type HashMap with \"ANY\" strategy");
-        // none
-        pojo = defaultJsonb.fromJson(json, Object.class);
-        assertTrue(pojo instanceof HashMap, "Pojo is not of type HashMap with no strategy");
+        try (Jsonb jsonb = JsonbBuilder.create(new JsonbConfig().withPropertyOrderStrategy(PropertyOrderStrategy.ANY))) {
+            Object pojo = jsonb.fromJson(json, Object.class);
+            assertTrue(pojo instanceof HashMap, "Pojo is not of type HashMap with \"ANY\" strategy");
+            // none
+            pojo = defaultJsonb.fromJson(json, Object.class);
+            assertTrue(pojo instanceof HashMap, "Pojo is not of type HashMap with no strategy");
+        }
     }
 
     @Test
-    public void testSortedMapDerializer() {
+    public void testSortedMapDerializer() throws Exception {
         String json = "{\"first\":1,\"third\":3,\"second\":2}";
 
-        Jsonb jsonb = JsonbBuilder.create(new JsonbConfig().withPropertyOrderStrategy(PropertyOrderStrategy.ANY));
-        SortedMap<?, ?> pojo = jsonb.fromJson(json, SortedMap.class);
-        assertTrue(pojo instanceof TreeMap, "Pojo is not of type TreeMap with \"ANY\" strategy");
+        try (Jsonb jsonb = JsonbBuilder.create(new JsonbConfig().withPropertyOrderStrategy(PropertyOrderStrategy.ANY))) {
+            SortedMap<?, ?> pojo = jsonb.fromJson(json, SortedMap.class);
+            assertTrue(pojo instanceof TreeMap, "Pojo is not of type TreeMap with \"ANY\" strategy");
+        }
 
-        jsonb = JsonbBuilder.create(new JsonbConfig().withPropertyOrderStrategy(PropertyOrderStrategy.LEXICOGRAPHICAL));
-        pojo = jsonb.fromJson(json, SortedMap.class);
-        assertTrue(pojo instanceof TreeMap, "Pojo is not of type TreeMap with no strategy");
-        assertEquals("{\"first\":1,\"second\":2,\"third\":3}", jsonb.toJson(pojo));
+        try (Jsonb jsonb = JsonbBuilder.create(new JsonbConfig().withPropertyOrderStrategy(PropertyOrderStrategy.LEXICOGRAPHICAL))){
+            SortedMap<?, ?> pojo = jsonb.fromJson(json, SortedMap.class);
+            assertTrue(pojo instanceof TreeMap, "Pojo is not of type TreeMap with no strategy");
+            assertEquals("{\"first\":1,\"second\":2,\"third\":3}", jsonb.toJson(pojo));
+        }
 
-        jsonb = JsonbBuilder.create(new JsonbConfig().withPropertyOrderStrategy(PropertyOrderStrategy.REVERSE));
-        pojo = jsonb.fromJson(json, SortedMap.class);
-        assertTrue(pojo instanceof ReverseTreeMap, "Pojo is not of type ReverseTreeMap with no strategy");
-        assertEquals("{\"third\":3,\"second\":2,\"first\":1}", jsonb.toJson(pojo));
+        try (Jsonb jsonb = JsonbBuilder.create(new JsonbConfig().withPropertyOrderStrategy(PropertyOrderStrategy.REVERSE))) {
+            SortedMap<?, ?> pojo = jsonb.fromJson(json, SortedMap.class);
+            assertTrue(pojo instanceof ReverseTreeMap, "Pojo is not of type ReverseTreeMap with no strategy");
+            assertEquals("{\"third\":3,\"second\":2,\"first\":1}", jsonb.toJson(pojo));
 
-        pojo = defaultJsonb.fromJson(json, SortedMap.class);
-        assertTrue(pojo instanceof TreeMap, "Pojo is not of type TreeMap with no strategy");
-        assertEquals("{\"first\":1,\"second\":2,\"third\":3}", defaultJsonb.toJson(pojo));
+            pojo = defaultJsonb.fromJson(json, SortedMap.class);
+            assertTrue(pojo instanceof TreeMap, "Pojo is not of type TreeMap with no strategy");
+            assertEquals("{\"first\":1,\"second\":2,\"third\":3}", defaultJsonb.toJson(pojo));
+        }
     }
 
     @Test
@@ -504,13 +526,14 @@ public class SerializersTest {
     }
 
     @Test
-    public void testSerializeMapWithNullsForceArraySerializer() {
-        Jsonb jsonb = JsonbBuilder.create(new YassonConfig()
+    public void testSerializeMapWithNullsForceArraySerializer() throws Exception {
+        try (Jsonb jsonb = JsonbBuilder.create(new YassonConfig()
                 .withForceMapArraySerializerForNullKeys(Boolean.TRUE)
-                .withNullValues(Boolean.TRUE));
-        assertEquals("[{\"key\":null,\"value\":null}]", jsonb.toJson(singletonMap(null, null)));
-        assertEquals("{\"key\":null}", jsonb.toJson(singletonMap("key", null)));
-        assertEquals("[{\"key\":null,\"value\":\"value\"}]", jsonb.toJson(singletonMap(null, "value")));
+                .withNullValues(Boolean.TRUE))) {
+            assertEquals("[{\"key\":null,\"value\":null}]", jsonb.toJson(singletonMap(null, null)));
+            assertEquals("{\"key\":null}", jsonb.toJson(singletonMap("key", null)));
+            assertEquals("[{\"key\":null,\"value\":\"value\"}]", jsonb.toJson(singletonMap(null, "value")));
+        }
     }
 
     /**
@@ -518,25 +541,27 @@ public class SerializersTest {
      * Map shall be stored as a single JsonObject with keys as object properties names.
      */
     @Test
-    public void testSerializeMapToJsonObject() {
+    public void testSerializeMapToJsonObject() throws Exception {
         Map<String, Object> map = new HashMap<>();
-        Jsonb jsonb = JsonbBuilder.create(new JsonbConfig());
-        map.put("name", "John SMith");
-        map.put("age", 35);
-        map.put("married", true);
-        String json = jsonb.toJson(map);
-        JsonObject jobj = Json.createReader(new StringReader(json)).read().asJsonObject();
-        assertEquals("John SMith", jobj.getString("name"));
-        assertEquals(35, jobj.getInt("age"));
-        assertEquals(true, jobj.getBoolean("married"));
+        try (Jsonb jsonb = JsonbBuilder.create(new JsonbConfig())) {
+            map.put("name", "John SMith");
+            map.put("age", 35);
+            map.put("married", true);
+            String json = jsonb.toJson(map);
+            JsonObject jobj = Json.createReader(new StringReader(json)).read().asJsonObject();
+            assertEquals("John SMith", jobj.getString("name"));
+            assertEquals(35, jobj.getInt("age"));
+            assertEquals(true, jobj.getBoolean("married"));
+        }
     }
 
     @Test
-    public void testDeserializeArrayWithAdvancingParserAfterObjectEnd() {
+    public void testDeserializeArrayWithAdvancingParserAfterObjectEnd() throws Exception {
         String json = "[{\"stringProperty\":\"Property 1 value\"},{\"stringProperty\":\"Property 2 value\"}]";
-        Jsonb jsonb = JsonbBuilder.create(new JsonbConfig().withDeserializers(new SimplePojoDeserializer()));
-        SimplePojo[] result = jsonb.fromJson(json, SimplePojo[].class);
-        assertEquals(2, result.length);
+        try (Jsonb jsonb = JsonbBuilder.create(new JsonbConfig().withDeserializers(new SimplePojoDeserializer()))) {
+            SimplePojo[] result = jsonb.fromJson(json, SimplePojo[].class);
+            assertEquals(2, result.length);
+        }
     }
 
     public class SimplePojoDeserializer implements JsonbDeserializer<SimplePojo> {
@@ -551,11 +576,12 @@ public class SerializersTest {
     }
 
     @Test
-    public void testDeserializeArrayWithAdvancingParserAfterObjectEndUsingValue() {
+    public void testDeserializeArrayWithAdvancingParserAfterObjectEndUsingValue() throws Exception {
         String json = "[{\"stringProperty\":\"Property 1 value\"},{\"stringProperty\":\"Property 2 value\"}]";
-        Jsonb jsonb = JsonbBuilder.create(new JsonbConfig().withDeserializers(new SimplePojoValueDeserializer()));
-        SimplePojo[] result = jsonb.fromJson(json, SimplePojo[].class);
-        assertEquals(2, result.length);
+        try (Jsonb jsonb = JsonbBuilder.create(new JsonbConfig().withDeserializers(new SimplePojoValueDeserializer()))) {
+            SimplePojo[] result = jsonb.fromJson(json, SimplePojo[].class);
+            assertEquals(2, result.length);
+        }
     }
 
     public class SimplePojoValueDeserializer implements JsonbDeserializer<SimplePojo> {
@@ -637,14 +663,15 @@ public class SerializersTest {
      * specific type in the class hierarchy.
      */
     @Test
-    public void testSerializerMatching() {
-      Jsonb jsonb = JsonbBuilder.create(new JsonbConfig()
-          .withSerializers(new FooSerializer(), new BazSerializer()));
-      assertEquals("\"foo\"", jsonb.toJson(new Foo()));
-      // Since 'Bar' does not have its own serializer, it should use 
-      // the next serializer in the tree (FooSerializer)
-      assertEquals("\"foo\"", jsonb.toJson(new Bar()));
-      assertEquals("\"baz\"", jsonb.toJson(new Baz()));
+    public void testSerializerMatching() throws Exception {
+      try (Jsonb jsonb = JsonbBuilder.create(new JsonbConfig()
+          .withSerializers(new FooSerializer(), new BazSerializer()))) {
+          assertEquals("\"foo\"", jsonb.toJson(new Foo()));
+          // Since 'Bar' does not have its own serializer, it should use
+          // the next serializer in the tree (FooSerializer)
+          assertEquals("\"foo\"", jsonb.toJson(new Bar()));
+          assertEquals("\"baz\"", jsonb.toJson(new Baz()));
+      }
     }
     
     public static interface One { }
@@ -674,19 +701,21 @@ public class SerializersTest {
     }
     
     @Test
-    public void testSerializerMatchingInterfaces01() {
-      Jsonb jsonb = JsonbBuilder.create(new JsonbConfig()
-          .withSerializers(new OneSerializer(), new TwoSerializer(), new ThreeSerializer()));
-      assertEquals("\"one\"", jsonb.toJson(new OneTwo()));
-      assertEquals("\"one\"", jsonb.toJson(new OneTwoThree()));
+    public void testSerializerMatchingInterfaces01() throws Exception {
+      try (Jsonb jsonb = JsonbBuilder.create(new JsonbConfig()
+          .withSerializers(new OneSerializer(), new TwoSerializer(), new ThreeSerializer()))) {
+          assertEquals("\"one\"", jsonb.toJson(new OneTwo()));
+          assertEquals("\"one\"", jsonb.toJson(new OneTwoThree()));
+      }
     }
     
     @Test
-    public void testSerializerMatchingInterfaces02() {
-      Jsonb jsonb = JsonbBuilder.create(new JsonbConfig()
-          .withSerializers(new ThreeSerializer(), new TwoSerializer()));
-      assertEquals("\"two\"", jsonb.toJson(new OneTwo()));
-      assertEquals("\"two\"", jsonb.toJson(new OneTwoThree()));
+    public void testSerializerMatchingInterfaces02() throws Exception {
+      try (Jsonb jsonb = JsonbBuilder.create(new JsonbConfig()
+          .withSerializers(new ThreeSerializer(), new TwoSerializer()))) {
+          assertEquals("\"two\"", jsonb.toJson(new OneTwo()));
+          assertEquals("\"two\"", jsonb.toJson(new OneTwoThree()));
+      }
     }
 
     public class GenericBean<T> {
@@ -731,156 +760,166 @@ public class SerializersTest {
     }
 
     @Test
-    public void testCustomDeserializerWithParameterizedType() {
+    public void testCustomDeserializerWithParameterizedType() throws Exception {
 
         GenericBeanSerializer genericBeanSerializer = new GenericBeanSerializer();
         GenericBeanDeserializer genericBeanDeserializer = new GenericBeanDeserializer();
 
-        Jsonb jsonb = JsonbBuilder.create(new JsonbConfig().withDeserializers(genericBeanDeserializer).withSerializers(genericBeanSerializer));
+        try (Jsonb jsonb = JsonbBuilder.create(new JsonbConfig().withDeserializers(genericBeanDeserializer).withSerializers(genericBeanSerializer))) {
 
-        GenericBean<String> bean1 = new GenericBean<>();
-        bean1.value = "test1";
-        GenericBean<String> bean2 = new GenericBean<>();
-        bean2.value = "test2";
-        GenericBean<String> bean3 = new GenericBean<>();
-        bean3.value = "test3";
+            GenericBean<String> bean1 = new GenericBean<>();
+            bean1.value = "test1";
+            GenericBean<String> bean2 = new GenericBean<>();
+            bean2.value = "test2";
+            GenericBean<String> bean3 = new GenericBean<>();
+            bean3.value = "test3";
 
-        Collection<GenericBean<String>> asList = Arrays.asList(bean1, bean2, bean3);
+            Collection<GenericBean<String>> asList = Arrays.asList(bean1, bean2, bean3);
 
-        String toJson = jsonb.toJson(asList);
+            String toJson = jsonb.toJson(asList);
 
-        assertEquals(toJson, "[{\"value\":\"test1\"},{\"value\":\"test2\"},{\"value\":\"test3\"}]");
-        assertTrue(genericBeanSerializer.called);
+            assertEquals(toJson, "[{\"value\":\"test1\"},{\"value\":\"test2\"},{\"value\":\"test3\"}]");
+            assertTrue(genericBeanSerializer.called);
 
-        List<GenericBean<String>> fromJson = jsonb.fromJson(
-                toJson,
-                new ParameterizedType() {
-            @Override
-            public Type[] getActualTypeArguments() {
-                return new Type[]{GenericBean.class};
-            }
+            List<GenericBean<String>> fromJson = jsonb.fromJson(
+                    toJson,
+                    new ParameterizedType() {
+                        @Override
+                        public Type[] getActualTypeArguments() {
+                            return new Type[] {GenericBean.class};
+                        }
 
-            @Override
-            public Type getRawType() {
-                return Collection.class;
-            }
+                        @Override
+                        public Type getRawType() {
+                            return Collection.class;
+                        }
 
-            @Override
-            public Type getOwnerType() {
-                return null;
-            }
+                        @Override
+                        public Type getOwnerType() {
+                            return null;
+                        }
+                    }
+            );
+
+            assertEquals(asList, fromJson);
+            assertTrue(genericBeanDeserializer.called);
         }
-        );
-
-        assertEquals(asList, fromJson);
-        assertTrue(genericBeanDeserializer.called);
-
     }
 
     @Test
-    public void testImplicitJsonbSerializers() {
-        Jsonb jsonb = JsonbBuilder.create(new JsonbConfig().withSerializers(new ExplicitJsonbSerializer()));
+    public void testImplicitJsonbSerializers() throws Exception {
         String expected = "{\"value\":\"123\"}";
         Box box = new Box();
         box.boxStr = "Box";
-        assertEquals(expected, jsonb.toJson(box));
 
-        jsonb = JsonbBuilder.create(new JsonbConfig().withSerializers(new ImplicitJsonbSerializer()));
-        assertEquals(expected, jsonb.toJson(box));
+        try (Jsonb jsonb = JsonbBuilder.create(new JsonbConfig().withSerializers(new ExplicitJsonbSerializer()))) {
+            assertEquals(expected, jsonb.toJson(box));
+        }
+
+        try (Jsonb jsonb = JsonbBuilder.create(new JsonbConfig().withSerializers(new ImplicitJsonbSerializer()))) {
+            assertEquals(expected, jsonb.toJson(box));
+        }
     }
 
     @Test
-    public void testBoxToArrayChained() {
+    public void testBoxToArrayChained() throws Exception {
         JsonbConfig cfg = new JsonbConfig().withSerializers(BOX_ARRAY_SERIALIZER_CHAINED);
-        Jsonb jsonb = JsonbBuilder.create(cfg);
-        Box box = new Box();
-        box.boxStr = "str1";
-        box.secondBoxStr = "str2";
-        String expected = "[\"str1\",\"str2\"]";
+        try (Jsonb jsonb = JsonbBuilder.create(cfg)) {
+            Box box = new Box();
+            box.boxStr = "str1";
+            box.secondBoxStr = "str2";
+            String expected = "[\"str1\",\"str2\"]";
 
-        assertThat(jsonb.toJson(box), is(expected));
+            assertThat(jsonb.toJson(box), is(expected));
+        }
     }
 
     @Test
-    public void testBoxToArray() {
+    public void testBoxToArray() throws Exception {
         JsonbConfig cfg = new JsonbConfig().withSerializers(BOX_ARRAY_SERIALIZER);
-        Jsonb jsonb = JsonbBuilder.create(cfg);
-        Box box = new Box();
-        box.boxStr = "str1";
-        box.secondBoxStr = "str2";
-        String expected = "[\"str1\",\"str2\"]";
+        try (Jsonb jsonb = JsonbBuilder.create(cfg)) {
+            Box box = new Box();
+            box.boxStr = "str1";
+            box.secondBoxStr = "str2";
+            String expected = "[\"str1\",\"str2\"]";
 
-        assertThat(jsonb.toJson(box), is(expected));
+            assertThat(jsonb.toJson(box), is(expected));
+        }
     }
 
     @Test
     public void testBoxToArrayChainedWithLambda() {
         JsonbConfig cfg = new JsonbConfig().withSerializers(BOX_ARRAY_SERIALIZER_CHAINED_AS_LAMBDA);
-        assertThrows(JsonbException.class, () -> JsonbBuilder.create(cfg));
-        /*Box box = new Box();
-        box.boxStr = "str1";
-        box.secondBoxStr = "str2";
-        String expected = "[\"str1\",\"str2\"]";
+        assertThrows(JsonbException.class, () -> {try (Jsonb jsonb = JsonbBuilder.create(cfg)){
+            Box box = new Box();
+            box.boxStr = "str1";
+            box.secondBoxStr = "str2";
+            String expected = "[\"str1\",\"str2\"]";
 
-        assertThat(jsonb.toJson(box), is(expected));*/
+            assertThat(jsonb.toJson(box), is(expected));
+        }});
     }
 
     @Test
     public void testBoxToArrayWithLambda() {
         JsonbConfig cfg = new JsonbConfig().withSerializers(BOX_ARRAY_SERIALIZER_AS_LAMBDA);
-        assertThrows(JsonbException.class, () -> JsonbBuilder.create(cfg));
-        /*Box box = new Box();
-        box.boxStr = "str1";
-        box.secondBoxStr = "str2";
-        String expected = "[\"str1\",\"str2\"]";
+        assertThrows(JsonbException.class, () -> {try (Jsonb jsonb = JsonbBuilder.create(cfg)){
+            Box box = new Box();
+            box.boxStr = "str1";
+            box.secondBoxStr = "str2";
+            String expected = "[\"str1\",\"str2\"]";
 
-        assertThat(jsonb.toJson(box), is(expected));*/
+            assertThat(jsonb.toJson(box), is(expected));
+        }});
     }
 
     @Test
-    public void testCustomSerializersInContainer(){
-        Jsonb jsonb = JsonbBuilder.create();
+    public void testCustomSerializersInContainer() throws Exception {
+        try (Jsonb jsonb = JsonbBuilder.create()) {
 
-        Container expected = new Container(List.of(new Containee("k", "v")));
+            Container expected = new Container(List.of(new Containee("k", "v")));
 
-        String expectedJson = jsonb.toJson(expected);
-        System.out.println(expectedJson);
+            String expectedJson = jsonb.toJson(expected);
+            System.out.println(expectedJson);
 
-        assertEquals(expected, jsonb.fromJson(expectedJson, Container.class));
-
+            assertEquals(expected, jsonb.fromJson(expectedJson, Container.class));
+        }
     }
 
     @Test
-    void testCustomSerializersAndDeserializersInEnum(){
-        Jsonb jsonb = JsonbBuilder.create();
+    void testCustomSerializersAndDeserializersInEnum() throws Exception {
+        try (Jsonb jsonb = JsonbBuilder.create()) {
 
-        Colors expected = Colors.GREEN;
+            Colors expected = Colors.GREEN;
 
-        String expectedJson = jsonb.toJson(expected);
+            String expectedJson = jsonb.toJson(expected);
 
-        assertEquals(expected, jsonb.fromJson(expectedJson, Colors.class));
+            assertEquals(expected, jsonb.fromJson(expectedJson, Colors.class));
+        }
     }
 
     @Test
-    void testJsonbPropertyInEnum(){
-        Jsonb jsonb = JsonbBuilder.create();
+    void testJsonbPropertyInEnum() throws Exception {
+        try (Jsonb jsonb = JsonbBuilder.create()) {
 
-        Cars expected = Cars.FORD;
+            Cars expected = Cars.FORD;
 
-        String expectedJson = jsonb.toJson(expected);
+            String expectedJson = jsonb.toJson(expected);
 
-        assertEquals(expected, jsonb.fromJson(expectedJson, Cars.class));
+            assertEquals(expected, jsonb.fromJson(expectedJson, Cars.class));
+        }
     }
 
     @Test
-    void testNoJsonbPropertyInEnum(){
-        Jsonb jsonb = JsonbBuilder.create();
+    void testNoJsonbPropertyInEnum() throws Exception {
+        try (Jsonb jsonb = JsonbBuilder.create()) {
 
-        Cars expected = Cars.FIAT;
+            Cars expected = Cars.FIAT;
 
-        String expectedJson = jsonb.toJson(expected);
+            String expectedJson = jsonb.toJson(expected);
 
-        assertEquals(expected, jsonb.fromJson(expectedJson, Cars.class));
+            assertEquals(expected, jsonb.fromJson(expectedJson, Cars.class));
+        }
     }
 
 }
