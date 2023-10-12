@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2015, 2022 Oracle and/or its affiliates. All rights reserved.
+ * Copyright (c) 2015, 2023 Oracle and/or its affiliates. All rights reserved.
  *
  * This program and the accompanying materials are made available under the
  * terms of the Eclipse Public License v. 2.0 which is available at
@@ -47,7 +47,6 @@ public class ReflectionUtils {
     /**
      * Get raw type by type.
      * Only for ParametrizedTypes, GenericArrayTypes and Classes.
-     *
      * Empty optional is returned if raw type cannot be resolved.
      *
      * @param type Type to get class information from, not null.

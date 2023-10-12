@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2015, 2022 Oracle and/or its affiliates. All rights reserved.
+ * Copyright (c) 2015, 2023 Oracle and/or its affiliates. All rights reserved.
  *
  * This program and the accompanying materials are made available under the
  * terms of the Eclipse Public License v. 2.0 which is available at
@@ -12,6 +12,12 @@
 
 package org.eclipse.yasson.defaultmapping.generics;
 
+import static org.eclipse.yasson.Jsonbs.defaultJsonb;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertThrows;
+import static org.junit.jupiter.api.Assertions.assertTrue;
+
+import java.lang.reflect.Field;
 import java.lang.reflect.Type;
 import java.math.BigDecimal;
 import java.text.ParseException;
@@ -26,11 +32,6 @@ import java.util.Map;
 import java.util.Optional;
 import java.util.TimeZone;
 
-import jakarta.json.bind.Jsonb;
-import jakarta.json.bind.JsonbBuilder;
-import jakarta.json.bind.JsonbConfig;
-import java.lang.reflect.Field;
-import java.util.Collection;
 import org.eclipse.yasson.TestTypeToken;
 import org.eclipse.yasson.adapters.model.GenericBox;
 import org.eclipse.yasson.defaultmapping.generics.model.AnotherGenericTestClass;
@@ -44,6 +45,7 @@ import org.eclipse.yasson.defaultmapping.generics.model.FinalMember;
 import org.eclipse.yasson.defaultmapping.generics.model.GenericArrayClass;
 import org.eclipse.yasson.defaultmapping.generics.model.GenericTestClass;
 import org.eclipse.yasson.defaultmapping.generics.model.GenericWithUnboundedWildcardClass;
+import org.eclipse.yasson.defaultmapping.generics.model.LowerBoundTypeVariableWithCollectionAttributeClass;
 import org.eclipse.yasson.defaultmapping.generics.model.MultiLevelExtendedGenericTestClass;
 import org.eclipse.yasson.defaultmapping.generics.model.MultipleBoundsContainer;
 import org.eclipse.yasson.defaultmapping.generics.model.MyCyclicGenericClass;
@@ -55,11 +57,9 @@ import org.eclipse.yasson.serializers.model.Box;
 import org.eclipse.yasson.serializers.model.Crate;
 import org.junit.jupiter.api.Test;
 
-import static org.eclipse.yasson.Jsonbs.defaultJsonb;
-import org.eclipse.yasson.defaultmapping.generics.model.LowerBoundTypeVariableWithCollectionAttributeClass;
-import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertThrows;
-import static org.junit.jupiter.api.Assertions.assertTrue;
+import jakarta.json.bind.Jsonb;
+import jakarta.json.bind.JsonbBuilder;
+import jakarta.json.bind.JsonbConfig;
 
 /**
  * This class contains JSONB default mapping generics tests.
