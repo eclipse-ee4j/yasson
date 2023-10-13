@@ -887,7 +887,7 @@ public class SerializersTest {
     }
 
     @Test
-    void testCustomSerializersAndDeserializersInEnum() throws Exception {
+    public void testCustomSerializersAndDeserializersInEnum() throws Exception {
         try (Jsonb jsonb = JsonbBuilder.create()) {
 
             Colors expected = Colors.GREEN;
@@ -899,7 +899,7 @@ public class SerializersTest {
     }
 
     @Test
-    void testJsonbPropertyInEnum() throws Exception {
+    public void testJsonbPropertyInEnum() throws Exception {
         try (Jsonb jsonb = JsonbBuilder.create()) {
 
             Cars expected = Cars.FORD;
@@ -911,7 +911,7 @@ public class SerializersTest {
     }
 
     @Test
-    void testNoJsonbPropertyInEnum() throws Exception {
+    public void testNoJsonbPropertyInEnum() throws Exception {
         try (Jsonb jsonb = JsonbBuilder.create()) {
 
             Cars expected = Cars.FIAT;

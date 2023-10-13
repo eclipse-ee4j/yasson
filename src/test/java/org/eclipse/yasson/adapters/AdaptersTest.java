@@ -632,7 +632,7 @@ public class AdaptersTest {
     }
 
     @Test
-    void testCustomAdapterInEnum() throws Exception {
+    public void testCustomAdapterInEnum() throws Exception {
         try (Jsonb jsonb = JsonbBuilder.create()) {
 
             Vegetables expected = Vegetables.TOMATO;
