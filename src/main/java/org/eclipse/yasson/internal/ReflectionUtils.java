@@ -327,7 +327,7 @@ public class ReflectionUtils {
      * @return type of JsonbAdapter
      */
     public static ParameterizedType findParameterizedType(Class<?> classToSearch, Class<?> parameterizedInterface) {
-        Class current = classToSearch;
+        Class<?> current = classToSearch;
         while (current != Object.class) {
             for (Type currentInterface : current.getGenericInterfaces()) {
                 if (currentInterface instanceof ParameterizedType
@@ -360,15 +360,15 @@ public class ReflectionUtils {
         return type instanceof Class<?>;
     }
 
-    private static ParameterizedType findParameterizedSuperclass(Type type) {
+    /*private static ParameterizedType findParameterizedSuperclass(Type type) {
         if (type == null || type instanceof ParameterizedType) {
             return (ParameterizedType) type;
         }
         if (!(type instanceof Class)) {
             throw new JsonbException("Can't resolve ParameterizedType superclass for: " + type);
         }
-        return findParameterizedSuperclass(((Class) type).getGenericSuperclass());
-    }
+        return findParameterizedSuperclass(((Class<?>) type).getGenericSuperclass());
+    }*/
 
     /**
      * Resolves a wildcard most specific upper or lower bound.

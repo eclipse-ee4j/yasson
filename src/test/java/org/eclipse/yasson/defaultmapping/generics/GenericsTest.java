@@ -172,8 +172,8 @@ public class GenericsTest {
 
         GenericWithUnboundedWildcardClass result = defaultJsonb.fromJson(expected, GenericWithUnboundedWildcardClass.class);
         assertTrue(result.wildcardList.get(0) instanceof Map);
-        assertEquals("v1", ((Map) result.wildcardList.get(0)).get("k1"));
-        assertEquals("v2", ((Map) result.wildcardList.get(0)).get("k2"));
+        assertEquals("v1", ((Map<?, ?>) result.wildcardList.get(0)).get("k1"));
+        assertEquals("v2", ((Map<?, ?>) result.wildcardList.get(0)).get("k2"));
     }
 
     @Test
@@ -270,7 +270,7 @@ public class GenericsTest {
 
     @Test
     public void testFunctional() {
-        FunctionalInterface myFunction = new FunctionalInterface<String>() {
+        FunctionalInterface<String> myFunction = new FunctionalInterface<String>() {
 
             private String value = "initValue";
 
@@ -384,9 +384,8 @@ public class GenericsTest {
     }
 
     @Test
-    @SuppressWarnings("unchecked")
     public void testMarshallRawList() throws ParseException {
-        List rawList = new ArrayList();
+        List<Object> rawList = new ArrayList<>();
         final SimpleDateFormat ddMMyyyy = new SimpleDateFormat("ddMMyyyy");
         ddMMyyyy.setTimeZone(TimeZone.getTimeZone("Z"));
         rawList.add(ddMMyyyy.parse("24031981"));
@@ -422,7 +421,7 @@ public class GenericsTest {
     @SuppressWarnings("unchecked")
     public void testDeserializeIntoRaw() {
 
-        GenericTestClass result = defaultJsonb.fromJson("{\"field1\":{\"val1\":\"abc\"},\"field2\":{\"val1\":\"def\"}}", GenericTestClass.class);
+        GenericTestClass<?,?> result = defaultJsonb.fromJson("{\"field1\":{\"val1\":\"abc\"},\"field2\":{\"val1\":\"def\"}}", GenericTestClass.class);
         assertEquals(((HashMap<String, ?>) result.getField1()).get("val1"), "abc");
         assertEquals(((HashMap<String, ?>) result.getField2()).get("val1"), "def");
     }
