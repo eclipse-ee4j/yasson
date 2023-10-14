@@ -564,7 +564,7 @@ public class SerializersTest {
         }
     }
 
-    public class SimplePojoDeserializer implements JsonbDeserializer<SimplePojo> {
+    public static class SimplePojoDeserializer implements JsonbDeserializer<SimplePojo> {
         @Override
         public SimplePojo deserialize(JsonParser parser, DeserializationContext ctx, Type rtType) {
             //parser.getObject advances the parser to END_OBJECT.
@@ -584,7 +584,7 @@ public class SerializersTest {
         }
     }
 
-    public class SimplePojoValueDeserializer implements JsonbDeserializer<SimplePojo> {
+    public static class SimplePojoValueDeserializer implements JsonbDeserializer<SimplePojo> {
         @Override
         public SimplePojo deserialize(JsonParser parser, DeserializationContext ctx, Type rtType) {
             //parser.getValue advances the parser to END_OBJECT in case of object.
@@ -595,7 +595,7 @@ public class SerializersTest {
         }
     }
 
-    public class SimplePojo {
+    public static class SimplePojo {
         private String stringProperty;
 
         public String getStringProperty() {
@@ -674,10 +674,10 @@ public class SerializersTest {
       }
     }
     
-    public static interface One { }
-    public static interface Two { }
+    public interface One { }
+    public interface Two { }
 
-    public static interface Three { }
+    public interface Three { }
     
     public static class OneTwo implements One, Two { }
     public static class OneTwoThree implements One, Two, Three { }
@@ -718,7 +718,7 @@ public class SerializersTest {
       }
     }
 
-    public class GenericBean<T> {
+    public static class GenericBean<T> {
 
         public T value;
 
@@ -732,7 +732,7 @@ public class SerializersTest {
 
     }
 
-    public class GenericBeanSerializer implements JsonbSerializer<GenericBean> {
+    public static class GenericBeanSerializer implements JsonbSerializer<GenericBean> {
 
         private Boolean called = Boolean.FALSE;
 
@@ -745,7 +745,7 @@ public class SerializersTest {
         }
     }
 
-    public class GenericBeanDeserializer implements JsonbDeserializer<GenericBean> {
+    public static class GenericBeanDeserializer implements JsonbDeserializer<GenericBean> {
 
         private Boolean called = Boolean.FALSE;
 
