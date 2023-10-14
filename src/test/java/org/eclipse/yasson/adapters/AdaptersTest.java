@@ -373,14 +373,14 @@ public class AdaptersTest {
 
         JsonbAdapter<?, ?>[] adapters = {new JsonbAdapter<Map<String, Integer>, String>() {
             @Override
-            public Map<String, Integer> adaptFromJson(String obj) throws Exception {
+            public Map<String, Integer> adaptFromJson(String obj) {
                 final HashMap<String, Integer> result = new HashMap<>();
                 result.put("fake", 101);
                 return result;
             }
 
             @Override
-            public String adaptToJson(Map<String, Integer> obj) throws Exception {
+            public String adaptToJson(Map<String, Integer> obj) {
                 StringBuilder sb = new StringBuilder();
                 for (Map.Entry<String, Integer> entry : obj.entrySet()) {
                     if (sb.length() > 0) {
@@ -414,14 +414,14 @@ public class AdaptersTest {
     public void testAdaptMapToObject() throws Exception {
         JsonbAdapter<?, ?>[] adapters = {new JsonbAdapter<Map<String, String>, Crate>() {
             @Override
-            public Map<String, String> adaptFromJson(Crate obj) throws Exception {
+            public Map<String, String> adaptFromJson(Crate obj) {
                 final HashMap<String, String> fake = new HashMap<>();
                 fake.put("fake", "11");
                 return fake;
             }
 
             @Override
-            public Crate adaptToJson(Map<String, String> obj) throws Exception {
+            public Crate adaptToJson(Map<String, String> obj) {
                 final Map.Entry<String, String> next = obj.entrySet().iterator().next();
                 return new Crate(next.getKey(), Integer.parseInt(next.getValue()));
             }
