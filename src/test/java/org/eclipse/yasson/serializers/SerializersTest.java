@@ -724,8 +724,8 @@ public class SerializersTest {
 
         @Override
         public boolean equals(Object obj) {
-            if (obj instanceof GenericBean<?> genericBean){
-                return Objects.equals(genericBean.value, this.value);
+            if (obj instanceof GenericBean){
+                return Objects.equals(GenericBean.class.cast(obj).value, this.value);
             }
             return Boolean.FALSE;
         }
