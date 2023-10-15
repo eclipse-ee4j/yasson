@@ -425,18 +425,16 @@ public class GenericsTest {
     }
 
     @Test
-    public void multipleGenericLevels() throws Exception {
+    public void multipleGenericLevels() {
         FinalMember member = new FinalMember();
         member.setName("Jason");
         FinalGenericWrapper concreteContainer = new FinalGenericWrapper();
         concreteContainer.setMember(member);
 
         String expected = "{\"member\":{\"name\":\"Jason\"}}";
-        try (Jsonb jsonb = JsonbBuilder.create()) {
-            assertEquals(expected, jsonb.toJson(concreteContainer));
-            FinalGenericWrapper finalGenericWrapper = jsonb.fromJson(expected, FinalGenericWrapper.class);
-            assertEquals(concreteContainer, finalGenericWrapper);
-        }
+        assertEquals(expected, defaultJsonb.toJson(concreteContainer));
+        FinalGenericWrapper finalGenericWrapper = defaultJsonb.fromJson(expected, FinalGenericWrapper.class);
+        assertEquals(concreteContainer, finalGenericWrapper);
     }
 
     @Test
@@ -451,18 +449,16 @@ public class GenericsTest {
         
         List<AnotherGenericTestClass<Integer, Shape>> asList = List.of(anotherGenericTestClass);
         
-        try (Jsonb jsonb = JsonbBuilder.create()) {
-            String toJson = jsonb.toJson(asList);
+        String toJson = defaultJsonb.toJson(asList);
 
-            Field field = LowerBoundTypeVariableWithCollectionAttributeClass.class.getDeclaredField("value");
+        Field field = LowerBoundTypeVariableWithCollectionAttributeClass.class.getDeclaredField("value");
 
-            Type genericType = field.getGenericType();
+        Type genericType = field.getGenericType();
 
-            List<AnotherGenericTestClass<Integer, Shape>> fromJson = jsonb.fromJson(toJson, genericType);
+        List<AnotherGenericTestClass<Integer, Shape>> fromJson = defaultJsonb.fromJson(toJson, genericType);
 
-            assertEquals(5, fromJson.get(0).field2.getArea());
-            assertEquals(6, fromJson.get(0).field1);
-        }
+        assertEquals(5, fromJson.get(0).field2.getArea());
+        assertEquals(6, fromJson.get(0).field1);
     }
     
     public interface FunctionalInterface<T> {

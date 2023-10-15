@@ -541,18 +541,16 @@ public class SerializersTest {
      * Map shall be stored as a single JsonObject with keys as object properties names.
      */
     @Test
-    public void testSerializeMapToJsonObject() throws Exception {
+    public void testSerializeMapToJsonObject() {
         Map<String, Object> map = new HashMap<>();
-        try (Jsonb jsonb = JsonbBuilder.create(new JsonbConfig())) {
-            map.put("name", "John SMith");
-            map.put("age", 35);
-            map.put("married", true);
-            String json = jsonb.toJson(map);
-            JsonObject jobj = Json.createReader(new StringReader(json)).read().asJsonObject();
-            assertEquals("John SMith", jobj.getString("name"));
-            assertEquals(35, jobj.getInt("age"));
-			assertTrue(jobj.getBoolean("married"));
-        }
+        map.put("name", "John SMith");
+        map.put("age", 35);
+        map.put("married", true);
+        String json = defaultJsonb.toJson(map);
+        JsonObject jobj = Json.createReader(new StringReader(json)).read().asJsonObject();
+        assertEquals("John SMith", jobj.getString("name"));
+        assertEquals(35, jobj.getInt("age"));
+        assertTrue(jobj.getBoolean("married"));
     }
 
     @Test
@@ -876,52 +874,40 @@ public class SerializersTest {
     }
 
     @Test
-    public void testCustomSerializersInContainer() throws Exception {
-        try (Jsonb jsonb = JsonbBuilder.create()) {
+    public void testCustomSerializersInContainer() {
+        Container expected = new Container(List.of(new Containee("k", "v")));
 
-            Container expected = new Container(List.of(new Containee("k", "v")));
+        String expectedJson = defaultJsonb.toJson(expected);
+        System.out.println(expectedJson);
 
-            String expectedJson = jsonb.toJson(expected);
-            System.out.println(expectedJson);
-
-            assertEquals(expected, jsonb.fromJson(expectedJson, Container.class));
-        }
+        assertEquals(expected, defaultJsonb.fromJson(expectedJson, Container.class));
     }
 
     @Test
-    public void testCustomSerializersAndDeserializersInEnum() throws Exception {
-        try (Jsonb jsonb = JsonbBuilder.create()) {
+    public void testCustomSerializersAndDeserializersInEnum() {
+        Colors expected = Colors.GREEN;
 
-            Colors expected = Colors.GREEN;
+        String expectedJson = defaultJsonb.toJson(expected);
 
-            String expectedJson = jsonb.toJson(expected);
-
-            assertEquals(expected, jsonb.fromJson(expectedJson, Colors.class));
-        }
+        assertEquals(expected, defaultJsonb.fromJson(expectedJson, Colors.class));
     }
 
     @Test
-    public void testJsonbPropertyInEnum() throws Exception {
-        try (Jsonb jsonb = JsonbBuilder.create()) {
+    public void testJsonbPropertyInEnum() {
+        Cars expected = Cars.FORD;
 
-            Cars expected = Cars.FORD;
+        String expectedJson = defaultJsonb.toJson(expected);
 
-            String expectedJson = jsonb.toJson(expected);
-
-            assertEquals(expected, jsonb.fromJson(expectedJson, Cars.class));
-        }
+        assertEquals(expected, defaultJsonb.fromJson(expectedJson, Cars.class));
     }
 
     @Test
-    public void testNoJsonbPropertyInEnum() throws Exception {
-        try (Jsonb jsonb = JsonbBuilder.create()) {
+    public void testNoJsonbPropertyInEnum() {
+        Cars expected = Cars.FIAT;
 
-            Cars expected = Cars.FIAT;
+        String expectedJson = defaultJsonb.toJson(expected);
 
-            String expectedJson = jsonb.toJson(expected);
-
-            assertEquals(expected, jsonb.fromJson(expectedJson, Cars.class));
-        }
+        assertEquals(expected, defaultJsonb.fromJson(expectedJson, Cars.class));
     }
 
 }

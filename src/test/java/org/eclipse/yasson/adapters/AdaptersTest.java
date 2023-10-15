@@ -632,14 +632,11 @@ public class AdaptersTest {
     }
 
     @Test
-    public void testCustomAdapterInEnum() throws Exception {
-        try (Jsonb jsonb = JsonbBuilder.create()) {
+    public void testCustomAdapterInEnum() {
+        Vegetables expected = Vegetables.TOMATO;
 
-            Vegetables expected = Vegetables.TOMATO;
+        String expectedJson = defaultJsonb.toJson(expected);
 
-            String expectedJson = jsonb.toJson(expected);
-
-            assertEquals(expected, jsonb.fromJson(expectedJson, Vegetables.class));
-        }
+        assertEquals(expected, defaultJsonb.fromJson(expectedJson, Vegetables.class));
     }
 }
