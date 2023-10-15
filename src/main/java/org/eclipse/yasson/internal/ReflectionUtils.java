@@ -26,7 +26,6 @@ import java.util.Arrays;
 import java.util.List;
 import java.util.Objects;
 import java.util.Optional;
-import java.util.logging.Logger;
 
 import jakarta.json.bind.JsonbException;
 
@@ -38,7 +37,7 @@ import org.eclipse.yasson.internal.properties.Messages;
  */
 public class ReflectionUtils {
 
-    private static final Logger LOGGER = Logger.getLogger(ReflectionUtils.class.getName());
+    /*private static final Logger LOGGER = Logger.getLogger(ReflectionUtils.class.getName());*/
 
     private ReflectionUtils() {
         throw new IllegalStateException("Utility classes should not be instantiated.");
@@ -66,8 +65,8 @@ public class ReflectionUtils {
                 for (Type bound : typeVariable.getBounds()) {
                     Optional<Class<?>> boundRawType = getOptionalRawType(bound);
                     if (boundRawType.isPresent() && !Object.class.equals(boundRawType.get())) {
-                        if (!specializedClass.isPresent() || specializedClass.get().isAssignableFrom(boundRawType.get())) {
-                            specializedClass = Optional.of(boundRawType.get());
+                        if (specializedClass.isEmpty() || specializedClass.get().isAssignableFrom(boundRawType.get())) {
+                            specializedClass = boundRawType;
                         }
                     }
                 }
@@ -80,7 +79,7 @@ public class ReflectionUtils {
     /**
      * Get raw type by type.
      * Resolves only ParametrizedTypes, GenericArrayTypes and Classes.
-     *
+     * <p>
      * Exception is thrown if raw type cannot be resolved.
      *
      * @param type Type to get class information from, not null.
@@ -168,20 +167,20 @@ public class ReflectionUtils {
      * @return Type of a generic "runtime" bound, not null.
      */
     public static Type resolveItemVariableType(List<Type> chain, TypeVariable<?> typeVariable, boolean warn) {
-//        if (chain == null) {
-//        Optional<Class<?>> optionalRawType = getOptionalRawType(typeVariable);
-//        if (optionalRawType.isPresent()) {
-//            return optionalRawType.get();
-//        }
+        /*if (chain == null) {
+        Optional<Class<?>> optionalRawType = getOptionalRawType(typeVariable);
+        if (optionalRawType.isPresent()) {
+            return optionalRawType.get();
+        }
 
-        //            //Bound not found, treat it as an Object.class
-//            if (warn) {
-//                LOGGER.warning(Messages.getMessage(MessageKeys.GENERIC_BOUND_NOT_FOUND,
-//                                                   typeVariable,
-//                                                   typeVariable.getGenericDeclaration()));
-//            }
-//            return Object.class;
-//        }
+            //Bound not found, treat it as an Object.class
+            if (warn) {
+                LOGGER.warning(Messages.getMessage(MessageKeys.GENERIC_BOUND_NOT_FOUND,
+                                                   typeVariable,
+                                                   typeVariable.getGenericDeclaration()));
+            }
+            return Object.class;
+        }*/
         Type returnType = typeVariable;
         for (int i = chain.size() - 1; i >= 0; i--) {
             Type type = chain.get(i);
@@ -428,9 +427,7 @@ public class ReflectionUtils {
 
         @Override
         public boolean equals(Object o) {
-            if (o instanceof GenericArrayType) {
-                GenericArrayType that = (GenericArrayType) o;
-
+            if (o instanceof GenericArrayType that) {
                 return Objects.equals(genericComponentType, that.getGenericComponentType());
             } else {
                 return false;

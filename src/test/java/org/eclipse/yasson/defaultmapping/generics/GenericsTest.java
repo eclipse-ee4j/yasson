@@ -270,19 +270,7 @@ public class GenericsTest {
 
     @Test
     public void testFunctional() {
-        FunctionalInterface<String> myFunction = new FunctionalInterface<String>() {
-
-            private String value = "initValue";
-
-            @Override
-            public String getValue() {
-                return value;
-            }
-
-            public void setValue(String value) {
-                this.value = value;
-            }
-        };
+		FunctionalInterface<String> myFunction = () -> "initValue";
 
         assertEquals("{\"value\":\"initValue\"}", defaultJsonb.toJson(myFunction));
     }
@@ -433,7 +421,7 @@ public class GenericsTest {
 
         collectionWrapper.setWrappedCollection(new ArrayList<>());
         collectionWrapper.setWrappedMap(new HashMap<>());
-        String s = defaultJsonb.toJson(collectionWrapper);
+        defaultJsonb.toJson(collectionWrapper);
     }
 
     @Test
@@ -461,7 +449,7 @@ public class GenericsTest {
         anotherGenericTestClass.field1 = 6;
         anotherGenericTestClass.field2 = shape;
         
-        List<AnotherGenericTestClass<Integer, Shape>> asList = Arrays.asList(anotherGenericTestClass);
+        List<AnotherGenericTestClass<Integer, Shape>> asList = List.of(anotherGenericTestClass);
         
         try (Jsonb jsonb = JsonbBuilder.create()) {
             String toJson = jsonb.toJson(asList);

@@ -399,13 +399,13 @@ public class SerializersTest {
             try {
                 jsonb.toJson(box);
                 fail();
-            } catch (JsonbException ex) {
+            } catch (JsonbException ignored) {
             }
 
             try {
                 jsonb.fromJson("{\"boxStr\":\"Box to deserialize\"}", Box.class);
                 fail();
-            } catch (StackOverflowError error) {
+            } catch (StackOverflowError ignored) {
             }
         }
     }
@@ -477,7 +477,7 @@ public class SerializersTest {
     }
 
     @Test
-    public void testSortedMapDerializer() throws Exception {
+    public void testSortedMapDeserializer() throws Exception {
         String json = "{\"first\":1,\"third\":3,\"second\":2}";
 
         try (Jsonb jsonb = JsonbBuilder.create(new JsonbConfig().withPropertyOrderStrategy(PropertyOrderStrategy.ANY))) {
@@ -551,7 +551,7 @@ public class SerializersTest {
             JsonObject jobj = Json.createReader(new StringReader(json)).read().asJsonObject();
             assertEquals("John SMith", jobj.getString("name"));
             assertEquals(35, jobj.getInt("age"));
-            assertEquals(true, jobj.getBoolean("married"));
+			assertTrue(jobj.getBoolean("married"));
         }
     }
 
@@ -561,6 +561,7 @@ public class SerializersTest {
         try (Jsonb jsonb = JsonbBuilder.create(new JsonbConfig().withDeserializers(new SimplePojoDeserializer()))) {
             SimplePojo[] result = jsonb.fromJson(json, SimplePojo[].class);
             assertEquals(2, result.length);
+            assertEquals("Property 1 value", result[0].getStringProperty());
         }
     }
 
@@ -581,6 +582,7 @@ public class SerializersTest {
         try (Jsonb jsonb = JsonbBuilder.create(new JsonbConfig().withDeserializers(new SimplePojoValueDeserializer()))) {
             SimplePojo[] result = jsonb.fromJson(json, SimplePojo[].class);
             assertEquals(2, result.length);
+            assertEquals("Property 1 value", result[0].getStringProperty());
         }
     }
 
@@ -657,7 +659,7 @@ public class SerializersTest {
     }
     
     /**
-     * Test for issue: https://github.com/quarkusio/quarkus/issues/8925
+     * Test for issue: <a href="https://github.com/quarkusio/quarkus/issues/8925">issue 8925</a>
      * Ensure that if multiple customizations (serializer, deserializer, or adapter) are applied 
      * for different types in the same class hierarchy, we use the customization for the most 
      * specific type in the class hierarchy.
@@ -724,8 +726,8 @@ public class SerializersTest {
 
         @Override
         public boolean equals(Object obj) {
-            if (obj instanceof GenericBean){
-                return Objects.equals(GenericBean.class.cast(obj).value, this.value);
+            if (obj instanceof GenericBean<?> genericBean){
+                return Objects.equals(genericBean.value, this.value);
             }
             return Boolean.FALSE;
         }

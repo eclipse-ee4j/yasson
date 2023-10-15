@@ -383,7 +383,7 @@ public class AdaptersTest {
             public String adaptToJson(Map<String, Integer> obj) {
                 StringBuilder sb = new StringBuilder();
                 for (Map.Entry<String, Integer> entry : obj.entrySet()) {
-                    if (sb.length() > 0) {
+                    if (!sb.isEmpty()) {
                         sb.append("#");
                     }
                     sb.append(entry.getKey()).append("-").append(entry.getValue());
@@ -594,7 +594,7 @@ public class AdaptersTest {
 
             String json = "{\"error\":\"CUSTOM_VALUE\"}";
             PropertyTypeMismatch obj = jsonb.fromJson(json, PropertyTypeMismatch.class);
-            assertEquals("Error at: +1000000000-12-31T23:59:59.999999999Z", obj.getError().get().getMessage());
+            assertEquals("Error at: +1000000000-12-31T23:59:59.999999999Z", obj.getError().orElseThrow().getMessage());
             assertEquals(1, instantAdapter.callCount);
 
             String afterJson = jsonb.toJson(obj);
@@ -617,7 +617,7 @@ public class AdaptersTest {
     }
     
     /**
-     * Test for: https://github.com/eclipse-ee4j/yasson/issues/346
+     * Test for: <a href="https://github.com/eclipse-ee4j/yasson/issues/346">issue 346</a>
      */
     @Test
     public void testAdaptedRootType() throws Exception {
