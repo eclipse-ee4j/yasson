@@ -427,7 +427,8 @@ public class ReflectionUtils {
 
         @Override
         public boolean equals(Object o) {
-            if (o instanceof GenericArrayType that) {
+            if (o instanceof GenericArrayType) {
+                GenericArrayType that = (GenericArrayType) o;
                 return Objects.equals(genericComponentType, that.getGenericComponentType());
             } else {
                 return false;
