@@ -34,11 +34,12 @@
 
     <properties>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
-        <jakarta.json.version>2.1.0</jakarta.json.version>
+        <jakarta.json.version>2.1.2</jakarta.json.version>
         <parson.version>2.1.0</parson.version>
         <jakarta.json.bind.version>3.0.0</jakarta.json.bind.version>
         <jakarta.enterprise.cdi-api.version>4.0.1</jakarta.enterprise.cdi-api.version>
         <netbeans.hint.jdkPlatform>JDK_9</netbeans.hint.jdkPlatform>
+        <junit.version>5.10.0</junit.version>
     </properties>
 
     <dependencyManagement>
@@ -51,7 +52,7 @@
             <dependency>
                 <groupId>jakarta.el</groupId>
                 <artifactId>jakarta.el-api</artifactId>
-                <version>5.0.0</version>
+                <version>5.0.1</version>
             </dependency>
             <dependency>
                 <groupId>jakarta.interceptor</groupId>
@@ -61,7 +62,7 @@
             <dependency>
                 <groupId>jakarta.annotation</groupId>
                 <artifactId>jakarta.annotation-api</artifactId>
-                <version>2.1.0</version>
+                <version>2.1.1</version>
             </dependency>
         </dependencies>
     </dependencyManagement>
@@ -81,7 +82,7 @@
         <dependency>
             <groupId>org.eclipse.parsson</groupId>
             <artifactId>parsson</artifactId>
-            <version>1.1.0</version>
+            <version>1.1.4</version>
         </dependency>
         <!-- Test/Provided dependencies -->
         <dependency>
@@ -93,19 +94,19 @@
         <dependency>
             <groupId>org.jboss.weld.se</groupId>
             <artifactId>weld-se-core</artifactId>
-            <version>5.0.0.Final</version>
+            <version>5.1.2.Final</version>
             <scope>test</scope>
         </dependency>
         <dependency>
             <groupId>org.junit.jupiter</groupId>
             <artifactId>junit-jupiter-api</artifactId>
-            <version>5.8.2</version>
+            <version>${junit.version}</version>
             <scope>test</scope>
         </dependency>
         <dependency>
             <groupId>org.junit.jupiter</groupId>
             <artifactId>junit-jupiter-engine</artifactId>
-            <version>5.8.2</version>
+            <version>${junit.version}</version>
             <scope>test</scope>
         </dependency>
         <dependency>
@@ -262,7 +263,7 @@
                     <plugin>
                         <groupId>org.apache.maven.plugins</groupId>
                         <artifactId>maven-compiler-plugin</artifactId>
-                        <version>3.8.1</version>
+                        <version>3.11.0</version>
                         <executions>
                             <execution>
                                 <id>default-testCompile</id>
@@ -345,7 +346,7 @@
                 <plugin>
                     <groupId>org.codehaus.mojo</groupId>
                     <artifactId>findbugs-maven-plugin</artifactId>
-                    <version>3.0.4</version>
+                    <version>3.0.5</version>
                     <configuration>
                         <effort>Max</effort>
                         <threshold>Low</threshold>
@@ -364,12 +365,12 @@
                 <plugin>
                     <groupId>org.apache.maven.plugins</groupId>
                     <artifactId>maven-failsafe-plugin</artifactId>
-                    <version>3.0.0-M3</version>
+                    <version>3.1.2</version>
                 </plugin>
                 <plugin>
                     <groupId>org.apache.maven.plugins</groupId>
                     <artifactId>maven-compiler-plugin</artifactId>
-                    <version>3.8.1</version>
+                    <version>3.11.0</version>
                     <executions>
                         <execution>
                             <id>default-compile</id>
@@ -413,7 +414,7 @@
                 <plugin>
                     <groupId>org.apache.maven.plugins</groupId>
                     <artifactId>maven-jar-plugin</artifactId>
-                    <version>3.0.2</version>
+                    <version>3.3.0</version>
                     <configuration>
                         <archive>
                             <manifestFile>${project.build.outputDirectory}/META-INF/MANIFEST.MF</manifestFile>
@@ -427,7 +428,7 @@
                     <!-- This plugin generates the buildNumber property used in maven-bundle-plugin -->
                     <groupId>org.codehaus.mojo</groupId>
                     <artifactId>buildnumber-maven-plugin</artifactId>
-                    <version>1.4</version>
+                    <version>3.2.0</version>
                     <configuration>
                         <format>{0,date,MM/dd/yyyy hh:mm aa}</format>
                         <items>
@@ -446,7 +447,7 @@
                 <plugin>
                     <groupId>org.apache.maven.plugins</groupId>
                     <artifactId>maven-javadoc-plugin</artifactId>
-                    <version>3.2.0</version>
+                    <version>3.6.0</version>
                     <configuration>
                         <doctitle>Yasson</doctitle>
                         <sourcepath>${basedir}/src/main/java/org/eclipse/yasson</sourcepath>
@@ -468,7 +469,7 @@
                 <plugin>
                     <groupId>org.apache.maven.plugins</groupId>
                     <artifactId>maven-source-plugin</artifactId>
-                    <version>3.0.1</version>
+                    <version>3.3.0</version>
                     <executions>
                         <execution>
                             <id>attach-sources</id>
@@ -481,7 +482,7 @@
                 <plugin>
                     <groupId>org.apache.felix</groupId>
                     <artifactId>maven-bundle-plugin</artifactId>
-                    <version>5.1.1</version>
+                    <version>5.1.9</version>
                     <executions>
                         <execution>
                             <id>osgi-bundle</id>
@@ -514,7 +515,7 @@
                 <plugin>
                     <groupId>org.apache.maven.plugins</groupId>
                     <artifactId>maven-surefire-plugin</artifactId>
-                    <version>3.0.0-M3</version>
+                    <version>3.1.2</version>
                     <executions>
                         <execution>
                             <id>default-test</id>
@@ -538,6 +539,9 @@
 
                                     --add-exports org.eclipse.yasson/org.eclipse.yasson.internal.cdi=java.naming
                                 </argLine>
+                                <!-- because of SUREFIRE-2097, jakarta.enterprise.cdi-api right now lands in module path, and is missing in class path
+                                     Could be removed as soo as this is solved and could be configured some other way. Or stay at  3.0.0-M7 -->
+                                <useModulePath>false</useModulePath>
                             </configuration>
                         </execution>
                         <execution>
@@ -562,7 +566,7 @@
                 <plugin>
                     <groupId>org.apache.maven.plugins</groupId>
                     <artifactId>maven-enforcer-plugin</artifactId>
-                    <version>3.0.0-M2</version>
+                    <version>3.4.1</version>
                     <executions>
                         <execution>
                             <id>enforce-versions</id>
@@ -577,7 +581,7 @@
                                 <version>[11,)</version>
                             </requireJavaVersion>
                             <requireMavenVersion>
-                                <version>[3.3.9,)</version>
+                                <version>[3.9.4,)</version>
                             </requireMavenVersion>
                             <DependencyConvergence/>
                         </rules>
@@ -586,7 +590,7 @@
                 <plugin>
                     <groupId>org.codehaus.mojo</groupId>
                     <artifactId>build-helper-maven-plugin</artifactId>
-                    <version>3.0.0</version>
+                    <version>3.4.0</version>
                     <executions>
                         <execution>
                             <id>add-resource</id>
@@ -612,11 +616,10 @@
                 <plugin>
                     <groupId>org.apache.maven.plugins</groupId>
                     <artifactId>maven-checkstyle-plugin</artifactId>
-                    <version>3.1.0</version>
+                    <version>3.3.0</version>
                     <configuration>
                         <configLocation>etc/checkstyle.xml</configLocation>
                         <suppressionsLocation>etc/checkstyle-suppressions.xml</suppressionsLocation>
-                        <encoding>UTF-8</encoding>
                         <consoleOutput>true</consoleOutput>
                         <failsOnError>true</failsOnError>
                         <linkXRef>false</linkXRef>
@@ -625,7 +628,7 @@
                         <dependency>
                             <groupId>com.puppycrawl.tools</groupId>
                             <artifactId>checkstyle</artifactId>
-                            <version>8.29</version>
+                            <version>10.12.4</version>
                             <exclusions>
                                 <exclusion>
                                     <groupId>com.sun</groupId>
@@ -638,7 +641,7 @@
                 <plugin>
                     <groupId>org.glassfish.copyright</groupId>
                     <artifactId>glassfish-copyright-maven-plugin</artifactId>
-                    <version>2.3</version>
+                    <version>2.4</version>
                     <configuration>
                         <templateFile>etc/copyright.txt</templateFile>
                         <excludeFile>etc/copyright-exclude.txt</excludeFile>
@@ -697,7 +700,7 @@
             <plugin>
                 <groupId>org.codehaus.mojo</groupId>
                 <artifactId>findbugs-maven-plugin</artifactId>
-                <version>3.0.4</version>
+                <version>3.0.5</version>
             </plugin>
         </plugins>
     </reporting>
