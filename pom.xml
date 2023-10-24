@@ -581,7 +581,7 @@
                                 <version>[11,)</version>
                             </requireJavaVersion>
                             <requireMavenVersion>
-                                <version>[3.9.4,)</version>
+                                <version>[3.9.5,)</version>
                             </requireMavenVersion>
                             <DependencyConvergence/>
                         </rules>

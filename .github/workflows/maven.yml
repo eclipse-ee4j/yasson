@@ -24,6 +24,10 @@ jobs:
         java_version: [ 11, 17 ]
 
     steps:
+      - name: Set up Maven
+        uses: stCarolas/setup-maven@v4.5
+        with:
+          maven-version: 3.9.5
       - name: Checkout for build
         uses: actions/checkout@v2.3.4
         with:
