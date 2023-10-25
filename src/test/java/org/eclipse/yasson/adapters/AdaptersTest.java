@@ -383,7 +383,7 @@ public class AdaptersTest {
             public String adaptToJson(Map<String, Integer> obj) {
                 StringBuilder sb = new StringBuilder();
                 for (Map.Entry<String, Integer> entry : obj.entrySet()) {
-                    if (!sb.isEmpty()) {
+                    if (!sb.toString().isEmpty()) {
                         sb.append("#");
                     }
                     sb.append(entry.getKey()).append("-").append(entry.getValue());
