@@ -451,10 +451,6 @@
                     <configuration>
                         <doctitle>Yasson</doctitle>
                         <sourcepath>${basedir}/src/main/java/org/eclipse/yasson</sourcepath>
-                        <additionalJOptions>
-                            <additionalJOption>--add-modules</additionalJOption>
-                            <additionalJOption>jakarta.json.bind,jakarta.json</additionalJOption>
-                        </additionalJOptions>
                         <source>11</source>
                     </configuration>
                     <executions>
