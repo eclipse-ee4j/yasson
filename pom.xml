@@ -34,7 +34,7 @@
 
     <properties>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
-        <jakarta.json.version>2.1.2</jakarta.json.version>
+        <jakarta.json.version>2.1.3</jakarta.json.version>
         <parson.version>2.1.0</parson.version>
         <jakarta.json.bind.version>3.0.0</jakarta.json.bind.version>
         <jakarta.enterprise.cdi-api.version>4.0.1</jakarta.enterprise.cdi-api.version>
@@ -82,7 +82,7 @@
         <dependency>
             <groupId>org.eclipse.parsson</groupId>
             <artifactId>parsson</artifactId>
-            <version>1.1.4</version>
+            <version>1.1.5</version>
         </dependency>
         <!-- Test/Provided dependencies -->
         <dependency>
@@ -365,7 +365,7 @@
                 <plugin>
                     <groupId>org.apache.maven.plugins</groupId>
                     <artifactId>maven-failsafe-plugin</artifactId>
-                    <version>3.1.2</version>
+                    <version>3.2.1</version>
                 </plugin>
                 <plugin>
                     <groupId>org.apache.maven.plugins</groupId>
@@ -511,7 +511,7 @@
                 <plugin>
                     <groupId>org.apache.maven.plugins</groupId>
                     <artifactId>maven-surefire-plugin</artifactId>
-                    <version>3.1.2</version>
+                    <version>3.2.1</version>
                     <executions>
                         <execution>
                             <id>default-test</id>
@@ -535,9 +535,6 @@
 
                                     --add-exports org.eclipse.yasson/org.eclipse.yasson.internal.cdi=java.naming
                                 </argLine>
-                                <!-- because of SUREFIRE-2097, jakarta.enterprise.cdi-api right now lands in module path, and is missing in class path
-                                     Could be removed as soo as this is solved and could be configured some other way. Or stay at  3.0.0-M7 -->
-                                <useModulePath>false</useModulePath>
                             </configuration>
                         </execution>
                         <execution>
@@ -549,7 +546,7 @@
                             <configuration>
                                 <argLine>
                                     <!--java.management is required by Maven's ForkedBooter-->
-                                    --limit-modules java.base,java.logging,java.sql,jakarta.json.bind,jakarta.json,java.management,jdk.localedata
+                                    --limit-modules java.base,java.logging,java.sql,jakarta.json.bind,jakarta.json,java.management,jdk.localedata,org.eclipse.yasson,org.eclipse.parsson
                                 </argLine>
                                 <includes>
                                     <include>**/JavaxNamingExcludedTest.class</include>
@@ -612,7 +609,7 @@
                 <plugin>
                     <groupId>org.apache.maven.plugins</groupId>
                     <artifactId>maven-checkstyle-plugin</artifactId>
-                    <version>3.3.0</version>
+                    <version>3.3.1</version>
                     <configuration>
                         <configLocation>etc/checkstyle.xml</configLocation>
                         <suppressionsLocation>etc/checkstyle-suppressions.xml</suppressionsLocation>
