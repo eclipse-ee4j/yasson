@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2015, 2022 Oracle and/or its affiliates. All rights reserved.
+ * Copyright (c) 2015, 2023 Oracle and/or its affiliates. All rights reserved.
  *
  * This program and the accompanying materials are made available under the
  * terms of the Eclipse Public License v. 2.0 which is available at
@@ -243,7 +243,7 @@ public final class PropertyModel implements Comparable<PropertyModel> {
             builder.deserializerBinding(introspector.getDeserializerBinding(property));
         }
 
-        final AdapterBinding adapterBinding = jsonbContext.getAnnotationIntrospector().getAdapterBinding(property);
+        final AdapterBinding<?, ?> adapterBinding = jsonbContext.getAnnotationIntrospector().getAdapterBinding(property);
         if (adapterBinding != null) {
             builder.serializeAdapter(adapterBinding);
             builder.deserializeAdapter(adapterBinding);

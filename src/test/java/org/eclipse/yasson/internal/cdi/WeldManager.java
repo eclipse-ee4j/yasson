@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2016, 2020 Oracle and/or its affiliates. All rights reserved.
+ * Copyright (c) 2016, 2023 Oracle and/or its affiliates. All rights reserved.
  *
  * This program and the accompanying materials are made available under the
  * terms of the Eclipse Public License v. 2.0 which is available at
@@ -31,7 +31,7 @@ public class WeldManager {
     private InitialContext initialContext;
 
 
-    public void startWeld(Class... scannedClasses) throws NamingException {
+    public void startWeld(Class<?>... scannedClasses) throws NamingException {
         weld = new Weld().beanClasses(scannedClasses).disableDiscovery();
         WeldContainer container = weld.initialize();
         initialContext = new InitialContext();

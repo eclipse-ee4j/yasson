@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2019, 2021 Oracle and/or its affiliates. All rights reserved.
+ * Copyright (c) 2019, 2023 Oracle and/or its affiliates. All rights reserved.
  *
  * This program and the accompanying materials are made available under the
  * terms of the Eclipse Public License v. 2.0 which is available at
@@ -194,7 +194,7 @@ public class MapToObjectSerializerTest {
         mapObject.put(256, "two hundred fifty-six");
 
         String json = jsonb.toJson(mapObject);
-        Map resObject = jsonb.fromJson(json, Map.class);
+        Map<?, ?> resObject = jsonb.fromJson(json, Map.class);
         assertEquals(3, resObject.size());
         assertTrue(resObject.keySet().iterator().next() instanceof String);
     }

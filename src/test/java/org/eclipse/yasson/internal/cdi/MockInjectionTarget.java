@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2018, 2020 Oracle and/or its affiliates. All rights reserved.
+ * Copyright (c) 2018, 2023 Oracle and/or its affiliates. All rights reserved.
  *
  * This program and the accompanying materials are made available under the
  * terms of the Eclipse Public License v. 2.0 which is available at
@@ -21,29 +21,30 @@ import java.util.Set;
 /**
  * For JNDI Bean Manager resolution testing purposes.
  */
-public class MockInjectionTarget implements InjectionTarget<JsonbAdapter> {
+public class MockInjectionTarget implements InjectionTarget<JsonbAdapter<String, Integer>> {
     @Override
-    public void inject(JsonbAdapter instance, CreationalContext<JsonbAdapter> ctx) {
+    public void inject(JsonbAdapter<String, Integer> instance, CreationalContext<JsonbAdapter<String, Integer>> ctx) {
 
     }
 
     @Override
-    public void postConstruct(JsonbAdapter instance) {
+    public void postConstruct(JsonbAdapter<String, Integer> instance) {
 
     }
 
     @Override
-    public void preDestroy(JsonbAdapter instance) {
+    public void preDestroy(JsonbAdapter<String, Integer> instance) {
 
     }
 
     @Override
-    public JsonbAdapter produce(CreationalContext<JsonbAdapter> ctx) {
+    public JsonbAdapter<String, Integer> produce(CreationalContext<JsonbAdapter<String, Integer>> ctx) {
+        // for the test we only need this adapter; so it's OK to always return just this one
         return new NonCdiAdapter();
     }
 
     @Override
-    public void dispose(JsonbAdapter instance) {
+    public void dispose(JsonbAdapter<String, Integer> instance) {
 
     }
 

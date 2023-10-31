@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2015, 2022 Oracle and/or its affiliates. All rights reserved.
+ * Copyright (c) 2015, 2023 Oracle and/or its affiliates. All rights reserved.
  * Copyright (c) 2019, 2020 Payara Foundation and/or its affiliates. All rights reserved.
  *
  * This program and the accompanying materials are made available under the
@@ -44,7 +44,7 @@ public class OptionalTest {
     public void testOptionalString() {
         assertEquals("{\"value\":\"abc\"}", bindingJsonb.toJson(new ScalarValueWrapper<>(Optional.of("abc"))));
 
-        ScalarValueWrapper<Optional> result = bindingJsonb.fromJson("{\"value\":\"abc\"}", new TestTypeToken<ScalarValueWrapper<Optional>>() {}.getType());
+        ScalarValueWrapper<Optional<String>> result = bindingJsonb.fromJson("{\"value\":\"abc\"}", new TestTypeToken<ScalarValueWrapper<Optional<String>>>() {}.getType());
         assertEquals(Optional.of("abc"), result.getValue());
     }
 
@@ -100,7 +100,7 @@ public class OptionalTest {
 
     @Test
     public void testMarshallOptionalArray() {
-        final Optional[] array = {Optional.of(new Customer(1, "Cust1")), Optional.of(new Customer(2, "Cust2")), Optional.empty()};
+        final Optional<?>[] array = {Optional.of(new Customer(1, "Cust1")), Optional.of(new Customer(2, "Cust2")), Optional.empty()};
         assertEquals("[{\"id\":1,\"name\":\"Cust1\"},{\"id\":2,\"name\":\"Cust2\"},null]", bindingJsonb.toJson(array));
     }
 

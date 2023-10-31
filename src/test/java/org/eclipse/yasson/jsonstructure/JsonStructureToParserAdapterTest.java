@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2019, 2020 Oracle and/or its affiliates. All rights reserved.
+ * Copyright (c) 2019, 2023 Oracle and/or its affiliates. All rights reserved.
  *
  * This program and the accompanying materials are made available under the
  * terms of the Eclipse Public License v. 2.0 which is available at
@@ -142,7 +142,7 @@ public class JsonStructureToParserAdapterTest {
         JsonArrayBuilder arrayBuilder = jsonProvider.createArrayBuilder();
         arrayBuilder.add(BigDecimal.TEN).add("String value").addNull();
         JsonArray jsonArray = arrayBuilder.build();
-        List result = yassonJsonb.fromJsonStructure(jsonArray, ArrayList.class);
+        List<?> result = yassonJsonb.fromJsonStructure(jsonArray, ArrayList.class);
         assertEquals(3, result.size());
         assertEquals(BigDecimal.TEN, result.get(0));
         assertEquals("String value", result.get(1));
@@ -182,11 +182,12 @@ public class JsonStructureToParserAdapterTest {
 
         JsonArray jsonArray = arrayBuilder.build();
 
-        ArrayList result = yassonJsonb.fromJsonStructure(jsonArray, ArrayList.class);
+        ArrayList<?> result = yassonJsonb.fromJsonStructure(jsonArray, ArrayList.class);
         assertEquals(2, result.size());
         assertEquals(BigDecimal.TEN, result.get(0));
         assertTrue(result.get(1) instanceof List);
-        List inner = (List) result.get(1);
+        @SuppressWarnings("unchecked")
+        List<String> inner = (List<String>) result.get(1);
         assertEquals(2, inner.size());
         assertEquals("first", inner.get(0));
         assertEquals("second", inner.get(1));
@@ -242,13 +243,15 @@ public class JsonStructureToParserAdapterTest {
         List<Object> result = yassonJsonb.fromJsonStructure(rootArray, new TestTypeToken<List<Object>>(){}.getType());
         assertEquals(new BigDecimal("10"), result.get(0));
         assertTrue(result.get(1) instanceof Map);
-        Map pojo = (Map) result.get(1);
+        @SuppressWarnings("unchecked")
+        Map<String, ?> pojo = (Map<String, ?>) result.get(1);
         assertNotNull(pojo);
         assertEquals("value 1", pojo.get("stringProperty"));
         assertEquals(new BigDecimal("1.1"), pojo.get("bigDecimalProperty"));
         assertEquals(new BigDecimal(10), pojo.get("longProperty"));
         assertTrue(pojo.get("strings") instanceof List);
-        List strings = (List) pojo.get("strings");
+        @SuppressWarnings("unchecked")
+        List<String> strings = (List<String>) pojo.get("strings");
         assertNotNull(strings);
         assertEquals(1, strings.size());
         assertEquals("String value 1", strings.get(0));

@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2016, 2020 Oracle and/or its affiliates. All rights reserved.
+ * Copyright (c) 2016, 2023 Oracle and/or its affiliates. All rights reserved.
  *
  * This program and the accompanying materials are made available under the
  * terms of the Eclipse Public License v. 2.0 which is available at
@@ -14,18 +14,26 @@ package org.eclipse.yasson.internal.components;
 
 import java.lang.reflect.Type;
 
+import jakarta.json.bind.adapter.JsonbAdapter;
+import jakarta.json.bind.serializer.JsonbDeserializer;
+import jakarta.json.bind.serializer.JsonbSerializer;
+
 /**
  * Wrapper holding singleton instances of user defined components - Adapters, (De)Serializers.
+ *
+ * @param <Original> The type for the @{@link JsonbAdapter} that JSONB doesn't know how to handle.
+ *                  Also type for the @{@link JsonbSerializer} to serialize and for the @{@link JsonbDeserializer} to deserialize.
+ * @param <Adapted> The type for @{@link JsonbAdapter} that JSONB knows how to handle out of the box.
  */
-public class ComponentBindings {
+public class ComponentBindings<Original, Adapted> {
 
     private final Type bindingType;
 
-    private final SerializerBinding serializer;
+    private final SerializerBinding<Original> serializer;
 
-    private final DeserializerBinding deserializer;
+    private final DeserializerBinding<Original> deserializer;
 
-    private final AdapterBinding adapterInfo;
+    private final AdapterBinding<Original, Adapted> adapterInfo;
 
     /**
      * Construct empty bindings for a given type.
@@ -45,9 +53,9 @@ public class ComponentBindings {
      * @param adapter      Adapter.
      */
     public ComponentBindings(Type bindingType,
-                             SerializerBinding serializer,
-                             DeserializerBinding deserializer,
-                             AdapterBinding adapter) {
+                             SerializerBinding<Original> serializer,
+                             DeserializerBinding<Original> deserializer,
+                             AdapterBinding<Original, Adapted> adapter) {
         this.bindingType = bindingType;
         this.serializer = serializer;
         this.deserializer = deserializer;
@@ -68,7 +76,7 @@ public class ComponentBindings {
      *
      * @return serializer
      */
-    public SerializerBinding getSerializer() {
+    public SerializerBinding<Original> getSerializer() {
         return serializer;
     }
 
@@ -77,7 +85,7 @@ public class ComponentBindings {
      *
      * @return deserializer
      */
-    public DeserializerBinding getDeserializer() {
+    public DeserializerBinding<Original> getDeserializer() {
         return deserializer;
     }
 
@@ -86,7 +94,7 @@ public class ComponentBindings {
      *
      * @return adapterInfo
      */
-    public AdapterBinding getAdapterInfo() {
+    public AdapterBinding<Original, Adapted> getAdapterInfo() {
         return adapterInfo;
     }
 

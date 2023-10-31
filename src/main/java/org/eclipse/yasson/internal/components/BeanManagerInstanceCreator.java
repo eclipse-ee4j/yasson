@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2016, 2022 Oracle and/or its affiliates. All rights reserved.
+ * Copyright (c) 2016, 2023 Oracle and/or its affiliates. All rights reserved.
  *
  * This program and the accompanying materials are made available under the
  * terms of the Eclipse Public License v. 2.0 which is available at
@@ -61,9 +61,9 @@ public class BeanManagerInstanceCreator implements JsonbComponentInstanceCreator
      * @return New instance of bean class with injected content.
      */
     @Override
-    @SuppressWarnings("unchecked")
     public <T> T getOrCreateComponent(Class<T> componentClass) {
-        return (T) injectionTargets.computeIfAbsent(componentClass, clazz -> {
+        @SuppressWarnings("unchecked")
+        T instance = (T) injectionTargets.computeIfAbsent(componentClass, clazz -> {
             final AnnotatedType<T> aType = beanManager.createAnnotatedType(componentClass);
             final InjectionTarget<T> injectionTarget = beanManager.getInjectionTargetFactory(aType)
                     .createInjectionTarget(null);
@@ -71,8 +71,9 @@ public class BeanManagerInstanceCreator implements JsonbComponentInstanceCreator
             final T beanInstance = injectionTarget.produce(creationalContext);
             injectionTarget.inject(beanInstance, creationalContext);
             injectionTarget.postConstruct(beanInstance);
-            return new CDIManagedBean(beanInstance, injectionTarget, creationalContext);
+            return new CDIManagedBean<T>(beanInstance, injectionTarget, creationalContext);
         }).getInstance();
+        return instance;
     }
 
     @Override

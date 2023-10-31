@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2021, 2022 Oracle and/or its affiliates. All rights reserved.
+ * Copyright (c) 2021, 2023 Oracle and/or its affiliates. All rights reserved.
  *
  * This program and the accompanying materials are made available under the
  * terms of the Eclipse Public License v. 2.0 which is available at
@@ -27,10 +27,10 @@ import org.eclipse.yasson.internal.properties.Messages;
 class AdapterSerializer extends AbstractSerializer {
 
     private final JsonbAdapter<Object, Object> adapter;
-    private final AdapterBinding adapterBinding;
+    private final AdapterBinding<?, ?> adapterBinding;
 
     @SuppressWarnings("unchecked")
-    AdapterSerializer(AdapterBinding adapterBinding,
+    AdapterSerializer(AdapterBinding<?, ?> adapterBinding,
                       ModelSerializer delegate) {
         super(delegate);
         this.adapter = (JsonbAdapter<Object, Object>) adapterBinding.getAdapter();

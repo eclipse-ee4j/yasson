@@ -222,7 +222,7 @@ public class AnnotationIntrospector {
      * @param property property not null
      * @return components info
      */
-    public AdapterBinding getAdapterBinding(Property property) {
+    public AdapterBinding<?, ?> getAdapterBinding(Property property) {
         Objects.requireNonNull(property);
         JsonbTypeAdapter adapterAnnotation = getAnnotationFromProperty(JsonbTypeAdapter.class, property)
                 .orElseGet(() -> getAnnotationFromPropertyType(property, JsonbTypeAdapter.class));
@@ -239,7 +239,7 @@ public class AnnotationIntrospector {
      * @param clsElement type not null
      * @return components info
      */
-    public AdapterBinding getAdapterBinding(JsonbAnnotatedElement<Class<?>> clsElement) {
+    public AdapterBinding<?, ?> getAdapterBinding(JsonbAnnotatedElement<Class<?>> clsElement) {
         Objects.requireNonNull(clsElement);
 
         JsonbTypeAdapter adapterAnnotation = clsElement.getElement().getAnnotation(JsonbTypeAdapter.class);
@@ -250,9 +250,11 @@ public class AnnotationIntrospector {
         return getAdapterBindingFromAnnotation(adapterAnnotation, Optional.ofNullable(clsElement.getElement()));
     }
 
-    private AdapterBinding getAdapterBindingFromAnnotation(JsonbTypeAdapter adapterAnnotation, Optional<Class<?>> expectedClass) {
+    private AdapterBinding<?, ?> getAdapterBindingFromAnnotation(JsonbTypeAdapter adapterAnnotation, Optional<Class<?>> expectedClass) {
+        @SuppressWarnings("rawtypes")
         final Class<? extends JsonbAdapter> adapterClass = adapterAnnotation.value();
-        final AdapterBinding adapterBinding = jsonbContext.getComponentMatcher().introspectAdapterBinding(adapterClass, null);
+        @SuppressWarnings("unchecked")
+        final AdapterBinding<?, ?> adapterBinding = jsonbContext.getComponentMatcher().introspectAdapterBinding(adapterClass, null);
 
         if (expectedClass.isPresent() && !(
                 ReflectionUtils.getRawType(adapterBinding.getBindingType()).isAssignableFrom(expectedClass.get()))) {
@@ -269,7 +271,7 @@ public class AnnotationIntrospector {
      * @param property property not null
      * @return components info
      */
-    public DeserializerBinding getDeserializerBinding(Property property) {
+    public DeserializerBinding<?> getDeserializerBinding(Property property) {
         Objects.requireNonNull(property);
         JsonbTypeDeserializer deserializerAnnotation = getAnnotationFromProperty(JsonbTypeDeserializer.class, property)
                 .orElseGet(() -> getAnnotationFromPropertyType(property, JsonbTypeDeserializer.class));
@@ -277,8 +279,11 @@ public class AnnotationIntrospector {
             return null;
         }
 
+        @SuppressWarnings("rawtypes")
         final Class<? extends JsonbDeserializer> deserializerClass = deserializerAnnotation.value();
-        return jsonbContext.getComponentMatcher().introspectDeserializerBinding(deserializerClass, null);
+        @SuppressWarnings("unchecked")
+        DeserializerBinding<?> deserializerBinding = jsonbContext.getComponentMatcher().introspectDeserializerBinding(deserializerClass, null);
+        return deserializerBinding;
     }
 
     /**
@@ -296,8 +301,11 @@ public class AnnotationIntrospector {
             return null;
         }
 
+        @SuppressWarnings("rawtypes")
         final Class<? extends JsonbDeserializer> deserializerClass = deserializerAnnotation.value();
-        return jsonbContext.getComponentMatcher().introspectDeserializerBinding(deserializerClass, null);
+        @SuppressWarnings("unchecked")
+        DeserializerBinding<?> deserializerBinding = jsonbContext.getComponentMatcher().introspectDeserializerBinding(deserializerClass, null);
+        return deserializerBinding;
     }
 
     /**
@@ -306,7 +314,7 @@ public class AnnotationIntrospector {
      * @param parameter parameter not null
      * @return components info
      */
-    public AdapterBinding getAdapterBinding(Parameter parameter) {
+    public AdapterBinding<?, ?> getAdapterBinding(Parameter parameter) {
         Objects.requireNonNull(parameter);
         JsonbTypeAdapter adapter =
                 Optional.ofNullable(parameter.getDeclaredAnnotation(JsonbTypeAdapter.class))
@@ -331,15 +339,18 @@ public class AnnotationIntrospector {
      * @param clsElement type not null
      * @return components info
      */
-    public DeserializerBinding getDeserializerBinding(JsonbAnnotatedElement<Class<?>> clsElement) {
+    public DeserializerBinding<?> getDeserializerBinding(JsonbAnnotatedElement<Class<?>> clsElement) {
         Objects.requireNonNull(clsElement);
         JsonbTypeDeserializer deserializerAnnotation = clsElement.getElement().getAnnotation(JsonbTypeDeserializer.class);
         if (deserializerAnnotation == null) {
             return null;
         }
 
+        @SuppressWarnings("rawtypes")
         final Class<? extends JsonbDeserializer> deserializerClass = deserializerAnnotation.value();
-        return jsonbContext.getComponentMatcher().introspectDeserializerBinding(deserializerClass, null);
+        @SuppressWarnings("unchecked")
+        DeserializerBinding<?> deserializerBinding = jsonbContext.getComponentMatcher().introspectDeserializerBinding(deserializerClass, null);
+        return deserializerBinding;
     }
 
     /**
@@ -348,7 +359,7 @@ public class AnnotationIntrospector {
      * @param property property not null
      * @return components info
      */
-    public SerializerBinding getSerializerBinding(Property property) {
+    public SerializerBinding<?> getSerializerBinding(Property property) {
         Objects.requireNonNull(property);
         JsonbTypeSerializer serializerAnnotation = getAnnotationFromProperty(JsonbTypeSerializer.class, property)
                 .orElseGet(() -> getAnnotationFromPropertyType(property, JsonbTypeSerializer.class));
@@ -356,9 +367,11 @@ public class AnnotationIntrospector {
             return null;
         }
 
+        @SuppressWarnings("rawtypes")
         final Class<? extends JsonbSerializer> serializerClass = serializerAnnotation.value();
-        return jsonbContext.getComponentMatcher().introspectSerializerBinding(serializerClass, null);
-
+        @SuppressWarnings("unchecked")
+        SerializerBinding<?> serializerBinding = jsonbContext.getComponentMatcher().introspectSerializerBinding(serializerClass, null);
+        return serializerBinding;
     }
 
     /**
@@ -367,15 +380,18 @@ public class AnnotationIntrospector {
      * @param clsElement type not null
      * @return components info
      */
-    public SerializerBinding getSerializerBinding(JsonbAnnotatedElement<Class<?>> clsElement) {
+    public SerializerBinding<?> getSerializerBinding(JsonbAnnotatedElement<Class<?>> clsElement) {
         Objects.requireNonNull(clsElement);
         JsonbTypeSerializer serializerAnnotation = clsElement.getElement().getAnnotation(JsonbTypeSerializer.class);
         if (serializerAnnotation == null) {
             return null;
         }
 
+        @SuppressWarnings("rawtypes")
         final Class<? extends JsonbSerializer> serializerClass = serializerAnnotation.value();
-        return jsonbContext.getComponentMatcher().introspectSerializerBinding(serializerClass, null);
+        @SuppressWarnings("unchecked")
+        SerializerBinding<?> serializerBinding = jsonbContext.getComponentMatcher().introspectSerializerBinding(serializerClass, null);
+        return serializerBinding;
     }
 
     private <T extends Annotation> T getAnnotationFromPropertyType(Property property, Class<T> annotationClass) {
@@ -476,7 +492,7 @@ public class AnnotationIntrospector {
         Map<AnnotationTarget, JsonbDateFormat> annotationFromPropertyCategorized = getAnnotationFromPropertyCategorized(
                 JsonbDateFormat.class,
                 property);
-        if (annotationFromPropertyCategorized.size() != 0) {
+        if (!annotationFromPropertyCategorized.isEmpty()) {
             annotationFromPropertyCategorized.forEach((key, annotation) -> result
                     .put(key, createJsonbDateFormatter(annotation.value(), annotation.locale(), property)));
         }

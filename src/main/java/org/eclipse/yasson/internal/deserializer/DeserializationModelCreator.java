@@ -163,9 +163,9 @@ public class DeserializationModelCreator {
             return user;
         }
 
-        Optional<AdapterBinding> adapterBinding = adapterBinding(type, (ComponentBoundCustomization) propertyCustomization);
+        Optional<AdapterBinding<?, ?>> adapterBinding = adapterBinding(type, (ComponentBoundCustomization) propertyCustomization);
         if (adapterBinding.isPresent()) {
-            AdapterBinding adapter = adapterBinding.get();
+            AdapterBinding<?, ?> adapter = adapterBinding.get();
             Class<?> toType = ReflectionUtils.getRawType(adapter.getToType());
             ClassModel targetModel = jsonbContext.getMappingContext().getOrCreateClassModel(toType);
             ModelDeserializer<JsonParser> typeDeserializer = typeDeserializer(toType,
@@ -399,7 +399,7 @@ public class DeserializationModelCreator {
                 : value -> value;
     }
 
-    private Optional<AdapterBinding> adapterBinding(Type type, ComponentBoundCustomization classCustomization) {
+    private Optional<AdapterBinding<?, ?>> adapterBinding(Type type, ComponentBoundCustomization classCustomization) {
         return jsonbContext.getComponentMatcher().getDeserializeAdapterBinding(type, classCustomization);
     }
 
@@ -453,9 +453,9 @@ public class DeserializationModelCreator {
                                                resolved,
                                                customization);
         }
-        Optional<AdapterBinding> adapterBinding = adapterBinding(resolved, (ComponentBoundCustomization) customization);
+        Optional<AdapterBinding<?, ?>> adapterBinding = adapterBinding(resolved, (ComponentBoundCustomization) customization);
         if (adapterBinding.isPresent()) {
-            AdapterBinding adapter = adapterBinding.get();
+            AdapterBinding<?, ?> adapter = adapterBinding.get();
             ModelDeserializer<JsonParser> typeDeserializer = typeDeserializer(ReflectionUtils.getRawType(adapter.getToType()),
                                                                               customization,
                                                                               JustReturn.instance(), events);

@@ -390,17 +390,17 @@ public class GenericsTest {
     @Test
     public void testMultipleBounds() {
         final LinkedList<String> list = new LinkedList<>(Arrays.asList("Test 1", "Test 2"));
-        MultipleBoundsContainer<LinkedList<String>> container = new MultipleBoundsContainer<>();
+        MultipleBoundsContainer<String, LinkedList<String>> container = new MultipleBoundsContainer<>();
         container.setInstance(new ArrayList<>());
         container.getInstance().add(list);
 
-        final Type type = new TestTypeToken<MultipleBoundsContainer<LinkedList<String>>>() {
+        final Type type = new TestTypeToken<MultipleBoundsContainer<String, LinkedList<String>>>() {
         }.getType();
 
         String jsonString = defaultJsonb.toJson(container, type);
         assertEquals("{\"instance\":[[\"Test 1\",\"Test 2\"]]}", jsonString);
 
-        MultipleBoundsContainer<LinkedList<String>> result = defaultJsonb.fromJson(jsonString, type);
+        MultipleBoundsContainer<String, LinkedList<String>> result = defaultJsonb.fromJson(jsonString, type);
 
         assertEquals(container.getInstance(), result.getInstance());
     }
@@ -473,4 +473,3 @@ public class GenericsTest {
     }
 
 }
-

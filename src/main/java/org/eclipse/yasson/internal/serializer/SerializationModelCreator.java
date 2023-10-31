@@ -152,9 +152,9 @@ public class SerializationModelCreator {
             return serializerBinding.get();
         }
         if (resolveRootAdapter) {
-            Optional<AdapterBinding> maybeAdapter = adapterBinding(type, (ComponentBoundCustomization) propertyCustomization);
+            Optional<AdapterBinding<?, ?>> maybeAdapter = adapterBinding(type, (ComponentBoundCustomization) propertyCustomization);
             if (maybeAdapter.isPresent()) {
-                AdapterBinding adapterBinding = maybeAdapter.get();
+                AdapterBinding<?, ?> adapterBinding = maybeAdapter.get();
                 Type toType = adapterBinding.getToType();
                 Class<?> rawToType = ReflectionUtils.getRawType(toType);
                 ModelSerializer typeSerializer = TypeSerializers
@@ -358,9 +358,9 @@ public class SerializationModelCreator {
         if (serializerBinding.isPresent()) {
             return serializerBinding.get();
         }
-        Optional<AdapterBinding> maybeAdapter = adapterBinding(resolved, (ComponentBoundCustomization) customization);
+        Optional<AdapterBinding<?, ?>> maybeAdapter = adapterBinding(resolved, (ComponentBoundCustomization) customization);
         if (maybeAdapter.isPresent()) {
-            AdapterBinding adapterBinding = maybeAdapter.get();
+            AdapterBinding<?, ?> adapterBinding = maybeAdapter.get();
             Type toType = adapterBinding.getToType();
             Class<?> rawToType = ReflectionUtils.getRawType(toType);
             ModelSerializer typeSerializer = TypeSerializers.getTypeSerializer(rawToType, customization, jsonbContext);
@@ -427,7 +427,7 @@ public class SerializationModelCreator {
                                                                              jsonbContext));
     }
 
-    private Optional<AdapterBinding> adapterBinding(Type type, ComponentBoundCustomization classCustomization) {
+    private Optional<AdapterBinding<?, ?>> adapterBinding(Type type, ComponentBoundCustomization classCustomization) {
         return jsonbContext.getComponentMatcher().getSerializeAdapterBinding(type, classCustomization);
     }
 

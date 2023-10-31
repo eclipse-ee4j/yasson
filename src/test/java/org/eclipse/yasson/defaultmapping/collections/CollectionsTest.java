@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2015, 2022 Oracle and/or its affiliates. All rights reserved.
+ * Copyright (c) 2015, 2023 Oracle and/or its affiliates. All rights reserved.
  *
  * This program and the accompanying materials are made available under the
  * terms of the Eclipse Public License v. 2.0 which is available at
@@ -32,6 +32,7 @@ import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 import java.util.NavigableMap;
+import java.util.Optional;
 import java.util.SortedMap;
 import java.util.TreeMap;
 import java.util.concurrent.ConcurrentHashMap;
@@ -199,6 +200,7 @@ public class CollectionsTest {
         final String[][] stringMultiArray = {{"first", "second"},{"third", "fourth"}};
         assertEquals("[[\"first\",\"second\"],[\"third\",\"fourth\"]]", nullableJsonb.toJson(stringMultiArray));
 
+        @SuppressWarnings("rawtypes")
         final Map<String, Object>[][] mapMultiArray = new LinkedHashMap[2][2];
         mapMultiArray[0][0] = new LinkedHashMap<>(1);
         mapMultiArray[0][0].put("0", 0);
@@ -233,9 +235,8 @@ public class CollectionsTest {
     }
 
     @Test
-    @SuppressWarnings("unchecked")
     public void testRawCollection() {
-        List rawList = new ArrayList();
+        List<Object> rawList = new ArrayList<>();
         rawList.add("first");
         Circle circle = new Circle();
         circle.setRadius(2.0);
@@ -244,10 +245,10 @@ public class CollectionsTest {
 
         String expected = "[\"first\",{\"area\":1.0,\"radius\":2.0}]";
         assertEquals(expected, nullableJsonb.toJson(rawList));
-        List result = nullableJsonb.fromJson(expected, List.class);
+        List<?> result = nullableJsonb.fromJson(expected, List.class);
         assertEquals("first", result.get(0));
-        assertEquals(new BigDecimal("2.0"), ((Map)result.get(1)).get("radius"));
-        assertEquals(new BigDecimal("1.0"), ((Map)result.get(1)).get("area"));
+        assertEquals(new BigDecimal("2.0"), ((Map<?, ?>)result.get(1)).get("radius"));
+        assertEquals(new BigDecimal("1.0"), ((Map<?, ?>)result.get(1)).get("area"));
     }
 
     @Test

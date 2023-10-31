@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2016, 2020 Oracle and/or its affiliates. All rights reserved.
+ * Copyright (c) 2016, 2023 Oracle and/or its affiliates. All rights reserved.
  *
  * This program and the accompanying materials are made available under the
  * terms of the Eclipse Public License v. 2.0 which is available at
@@ -19,12 +19,15 @@ import jakarta.json.bind.adapter.JsonbAdapter;
 
 /**
  * Wrapper for JsonbAdapter generic information and an components itself.
+ *
+ * @param <Original> The type for the @{@link JsonbAdapter} that JSONB doesn't know how to handle.
+ * @param <Adapted> The type for the @{@link JsonbAdapter} that JSONB knows how to handle out of the box.
  */
-public class AdapterBinding extends AbstractComponentBinding {
+public class AdapterBinding<Original, Adapted> extends AbstractComponentBinding {
 
     private final Type toType;
 
-    private final JsonbAdapter<?, ?> adapter;
+    private final JsonbAdapter<Original, Adapted> adapter;
 
     /**
      * Adapter info with type to "adapt from", type to "adapt to" and an components itself.
@@ -33,7 +36,7 @@ public class AdapterBinding extends AbstractComponentBinding {
      * @param toType   to not null
      * @param adapter  components not null
      */
-    public AdapterBinding(Type fromType, Type toType, JsonbAdapter<?, ?> adapter) {
+    public AdapterBinding(Type fromType, Type toType, JsonbAdapter<Original, Adapted> adapter) {
         super(fromType);
         Objects.requireNonNull(toType);
         Objects.requireNonNull(adapter);
@@ -58,7 +61,7 @@ public class AdapterBinding extends AbstractComponentBinding {
      *
      * @return components
      */
-    public JsonbAdapter<?, ?> getAdapter() {
+    public JsonbAdapter<Original, Adapted> getAdapter() {
         return adapter;
     }
 

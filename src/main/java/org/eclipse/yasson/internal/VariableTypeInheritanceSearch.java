@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2015, 2022 Oracle and/or its affiliates. All rights reserved.
+ * Copyright (c) 2015, 2023 Oracle and/or its affiliates. All rights reserved.
  *
  * This program and the accompanying materials are made available under the
  * terms of the Eclipse Public License v. 2.0 which is available at
@@ -86,7 +86,7 @@ class VariableTypeInheritanceSearch {
         return searchParametrizedType(((Class) parameterizedType.getRawType()).getGenericSuperclass(), typeVar);
     }
 
-    private Type checkSubclassRuntimeInfo(TypeVariable typeVar) {
+    private Type checkSubclassRuntimeInfo(TypeVariable<?> typeVar) {
         if (parameterizedSubclasses.size() == 0) {
             return typeVar;
         }
@@ -94,17 +94,17 @@ class VariableTypeInheritanceSearch {
         return searchRuntimeTypeArgument(parametrizedSubclass, typeVar);
     }
 
-    private Type searchRuntimeTypeArgument(ParameterizedType runtimeType, TypeVariable<?> typeVar) {
+        private Type searchRuntimeTypeArgument(ParameterizedType runtimeType, TypeVariable<?> typeVar) {
         if (ReflectionUtils.getRawType(runtimeType) != typeVar.getGenericDeclaration()) {
             return null;
         }
-        TypeVariable[] bounds = typeVar.getGenericDeclaration().getTypeParameters();
+        TypeVariable<?>[] bounds = typeVar.getGenericDeclaration().getTypeParameters();
         for (int i = 0; i < bounds.length; i++) {
             if (bounds[i].equals(typeVar)) {
                 Type matchedGenericType = runtimeType.getActualTypeArguments()[i];
                 //Propagated generic types to another generic classes
                 if (matchedGenericType instanceof TypeVariable<?>) {
-                    return checkSubclassRuntimeInfo((TypeVariable) matchedGenericType);
+                    return checkSubclassRuntimeInfo((TypeVariable<?>) matchedGenericType);
                 }
                 //found runtime matchedGenericType
                 return matchedGenericType;
