@@ -24,6 +24,7 @@ import java.util.Collection;
 import java.util.Deque;
 import java.util.EnumMap;
 import java.util.EnumSet;
+import java.util.HashMap;
 import java.util.Iterator;
 import java.util.LinkedHashMap;
 import java.util.LinkedHashSet;
@@ -37,7 +38,6 @@ import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ConcurrentMap;
 import java.util.concurrent.ConcurrentNavigableMap;
 import java.util.concurrent.ConcurrentSkipListMap;
-import java.util.function.Function;
 import java.util.stream.Collectors;
 import java.util.stream.IntStream;
 
@@ -110,15 +110,10 @@ public class CollectionsTest {
 
     @Test
     public void listOfMapsOfListsOfMaps() {
-        List<Map<String, List<Map<String, Integer>>>> listOfMapsOfListsOfMaps = IntStream.range(0, 3).mapToObj(i ->
+        List<Map<String, List<HashMap<String, Integer>>>> listOfMapsOfListsOfMaps = IntStream.range(0, 3).mapToObj(i ->
             IntStream.range(0, 3).boxed().collect(Collectors.toMap(String::valueOf, j ->
                 IntStream.range(0, 3).mapToObj(k ->
-                    IntStream.range(1, 4).boxed().collect(Collectors.toMap(l -> switch (l) {
-                        case 1 -> "first";
-                        case 2 -> "second";
-                        case 3 -> "third";
-                        default -> throw new IllegalStateException("Unexpected value: " + l);
-                    }, Function.identity()))
+                    new HashMap<>(Map.of("first", 1, "second", 2, "third", 3))
                 ).toList()
             ))
         ).toList();
