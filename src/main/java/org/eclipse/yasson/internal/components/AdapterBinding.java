@@ -46,7 +46,7 @@ public class AdapterBinding<Original, Adapted> extends AbstractComponentBinding 
 
     /**
      * Represents a type to which to adapt into.
-     *
+     * <p>
      * During marshalling object property is adapted to this type and result is marshalled.
      * During unmarshalling object is unmarshalled into this type first, than converted to field type and set.
      *

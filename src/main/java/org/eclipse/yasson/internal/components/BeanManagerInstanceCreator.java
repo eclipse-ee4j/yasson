@@ -31,7 +31,7 @@ import org.eclipse.yasson.spi.JsonbComponentInstanceCreator;
  * CDI instance manager.
  * Instances are created and stored per instance of {@link JsonBinding}.
  * Calling close on JsonBinding, cleans up Jsonb CDI instances and in case of "dependant" scope its dependencies.
- *
+ * <p>
  * CDI API dependency is optional, this class is never referenced / loaded if CDI API is not resolvable.
  */
 public class BeanManagerInstanceCreator implements JsonbComponentInstanceCreator {
@@ -71,7 +71,7 @@ public class BeanManagerInstanceCreator implements JsonbComponentInstanceCreator
             final T beanInstance = injectionTarget.produce(creationalContext);
             injectionTarget.inject(beanInstance, creationalContext);
             injectionTarget.postConstruct(beanInstance);
-            return new CDIManagedBean<T>(beanInstance, injectionTarget, creationalContext);
+            return new CDIManagedBean<>(beanInstance, injectionTarget, creationalContext);
         }).getInstance();
         return instance;
     }

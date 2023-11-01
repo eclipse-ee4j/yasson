@@ -24,7 +24,6 @@ import java.util.Collection;
 import java.util.Deque;
 import java.util.EnumMap;
 import java.util.EnumSet;
-import java.util.HashMap;
 import java.util.Iterator;
 import java.util.LinkedHashMap;
 import java.util.LinkedHashSet;
@@ -32,13 +31,15 @@ import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 import java.util.NavigableMap;
-import java.util.Optional;
 import java.util.SortedMap;
 import java.util.TreeMap;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ConcurrentMap;
 import java.util.concurrent.ConcurrentNavigableMap;
 import java.util.concurrent.ConcurrentSkipListMap;
+import java.util.function.Function;
+import java.util.stream.Collectors;
+import java.util.stream.IntStream;
 
 import org.eclipse.yasson.TestTypeToken;
 import org.eclipse.yasson.defaultmapping.generics.model.Circle;
@@ -87,6 +88,7 @@ public class CollectionsTest {
         numberList.add(10);
 
         String result = nullableJsonb.toJson(numberList, new TestTypeToken<List<Number>>(){}.getType());
+        assertEquals("[1,2.0,10]", result);
     }
 
     @Test
@@ -108,26 +110,19 @@ public class CollectionsTest {
 
     @Test
     public void listOfMapsOfListsOfMaps() {
-        List<Map<String, List<Map<String, Integer>>>> listOfMapsOfListsOfMaps = new ArrayList<>();
-        
-        for(int i = 0; i < 3; i++) {
-            Map<String, List<Map<String, Integer>>> mapOfListsOfMap = new HashMap<>();
-            
-            for(int j = 0; j < 3; j++) {
-                List<Map<String, Integer>> listOfMaps = new ArrayList<>();
-                
-                for(int k = 0; k < 3; k++) {
-                    Map<String, Integer> stringIntegerMap = new HashMap<>();
-                    stringIntegerMap.put("first", 1);
-                    stringIntegerMap.put("second", 2);
-                    stringIntegerMap.put("third", 3);
-                    listOfMaps.add(stringIntegerMap);
-                }
-                mapOfListsOfMap.put(String.valueOf(j), listOfMaps);
-            }
-            listOfMapsOfListsOfMaps.add(mapOfListsOfMap);
-        }
-        
+        List<Map<String, List<Map<String, Integer>>>> listOfMapsOfListsOfMaps = IntStream.range(0, 3).mapToObj(i ->
+            IntStream.range(0, 3).boxed().collect(Collectors.toMap(String::valueOf, j ->
+                IntStream.range(0, 3).mapToObj(k ->
+                    IntStream.range(1, 4).boxed().collect(Collectors.toMap(l -> switch (l) {
+                        case 1 -> "first";
+                        case 2 -> "second";
+                        case 3 -> "third";
+                        default -> throw new IllegalStateException("Unexpected value: " + l);
+                    }, Function.identity()))
+                ).toList()
+            ))
+        ).toList();
+
         String expected = "[{\"0\":[{\"third\":3,\"first\":1,\"second\":2},{\"third\":3,\"first\":1,\"second\":2},{\"third\":3,\"first\":1,\"second\":2}],\"1\":[{\"third\":3,\"first\":1,\"second\":2},{\"third\":3,\"first\":1,\"second\":2},{\"third\":3,\"first\":1,\"second\":2}],\"2\":[{\"third\":3,\"first\":1,\"second\":2},{\"third\":3,\"first\":1,\"second\":2},{\"third\":3,\"first\":1,\"second\":2}]},{\"0\":[{\"third\":3,\"first\":1,\"second\":2},{\"third\":3,\"first\":1,\"second\":2},{\"third\":3,\"first\":1,\"second\":2}],\"1\":[{\"third\":3,\"first\":1,\"second\":2},{\"third\":3,\"first\":1,\"second\":2},{\"third\":3,\"first\":1,\"second\":2}],\"2\":[{\"third\":3,\"first\":1,\"second\":2},{\"third\":3,\"first\":1,\"second\":2},{\"third\":3,\"first\":1,\"second\":2}]},{\"0\":[{\"third\":3,\"first\":1,\"second\":2},{\"third\":3,\"first\":1,\"second\":2},{\"third\":3,\"first\":1,\"second\":2}],\"1\":[{\"third\":3,\"first\":1,\"second\":2},{\"third\":3,\"first\":1,\"second\":2},{\"third\":3,\"first\":1,\"second\":2}],\"2\":[{\"third\":3,\"first\":1,\"second\":2},{\"third\":3,\"first\":1,\"second\":2},{\"third\":3,\"first\":1,\"second\":2}]}]";
         assertEquals(expected, nullableJsonb.toJson(listOfMapsOfListsOfMaps));
         ArrayList<Map<String, List<Map<String, Integer>>>> result = nullableJsonb.fromJson(expected, new TestTypeToken<ArrayList<Map<String, List<Map<String, Integer>>>>>(){}.getType());
@@ -290,7 +285,7 @@ public class CollectionsTest {
     public void testConcurrentMaps() {
     	// ConcurrentMap
     	ConcurrentMapContainer c = new ConcurrentMapContainer();
-    	c.concurrentMap = new ConcurrentHashMap<String, String>();
+    	c.concurrentMap = new ConcurrentHashMap<>();
     	c.concurrentMap.put("foo", "fooVal");
     	c.concurrentMap.put("bar", "barVal");
     	String expectedJson = "{\"concurrentMap\":{\"bar\":\"barVal\",\"foo\":\"fooVal\"}}";
@@ -299,7 +294,7 @@ public class CollectionsTest {
     	
     	// ConcurrentHashMap
     	c = new ConcurrentMapContainer();
-    	c.concurrentHashMap = new ConcurrentHashMap<String, String>();
+    	c.concurrentHashMap = new ConcurrentHashMap<>();
     	c.concurrentHashMap.put("foo", "fooVal2");
     	c.concurrentHashMap.put("bar", "barVal2");
     	expectedJson = "{\"concurrentHashMap\":{\"bar\":\"barVal2\",\"foo\":\"fooVal2\"}}";
@@ -308,7 +303,7 @@ public class CollectionsTest {
     	
     	// ConcurrentNavigableMap
     	c = new ConcurrentMapContainer();
-    	c.concurrentNavigableMap = new ConcurrentSkipListMap<String, String>();
+    	c.concurrentNavigableMap = new ConcurrentSkipListMap<>();
     	c.concurrentNavigableMap.put("foo", "fooVal3");
     	c.concurrentNavigableMap.put("bar", "barVal3");
     	expectedJson = "{\"concurrentNavigableMap\":{\"bar\":\"barVal3\",\"foo\":\"fooVal3\"}}";
@@ -317,7 +312,7 @@ public class CollectionsTest {
     	
     	// ConcurrentSkipListMap
     	c = new ConcurrentMapContainer();
-    	c.concurrentSkipListMap = new ConcurrentSkipListMap<String, String>();
+    	c.concurrentSkipListMap = new ConcurrentSkipListMap<>();
     	c.concurrentSkipListMap.put("foo", "fooVal4");
     	c.concurrentSkipListMap.put("bar", "barVal4");
     	expectedJson = "{\"concurrentSkipListMap\":{\"bar\":\"barVal4\",\"foo\":\"fooVal4\"}}";

@@ -40,10 +40,10 @@ public class MapToObjectSerializerTest {
     enum TestEnum {
         ONE, TWO;
 
-        @Override
         /**
          * Force to lower case to check toString is not used during serialization of maps
          */
+        @Override
         public String toString() {
             return this.name().toLowerCase();
         }
@@ -90,17 +90,17 @@ public class MapToObjectSerializerTest {
         }
     }
 
-    public static class MapObjectIntegerString extends MapObject<Integer, String> {};
+    public static class MapObjectIntegerString extends MapObject<Integer, String> {}
 
-    public static class MapObjectBigIntegerString extends MapObject<BigInteger, String> {};
+	public static class MapObjectBigIntegerString extends MapObject<BigInteger, String> {}
 
-    public static class MapObjectEnumString extends MapObject<TestEnum, String> {};
+	public static class MapObjectEnumString extends MapObject<TestEnum, String> {}
 
-    public static class MapObjectStringString extends MapObject<String, String> {};
+	public static class MapObjectStringString extends MapObject<String, String> {}
 
-    public static class MapObjectBooleanString extends MapObject<Boolean, String> {};
+	public static class MapObjectBooleanString extends MapObject<Boolean, String> {}
 
-    /**
+	/**
      * Test serialization of Map with Number keys and String values.
      */
     @Test

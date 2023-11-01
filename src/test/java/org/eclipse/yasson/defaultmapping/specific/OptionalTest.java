@@ -26,10 +26,7 @@ import org.eclipse.yasson.defaultmapping.generics.model.ScalarValueWrapper;
 import org.eclipse.yasson.defaultmapping.specific.model.OptionalWrapper;
 import org.eclipse.yasson.defaultmapping.specific.model.NotMatchingGettersAndSetters;
 import org.eclipse.yasson.defaultmapping.specific.model.Street;
-import org.eclipse.yasson.internal.JsonBindingBuilder;
 
-import jakarta.json.bind.Jsonb;
-import jakarta.json.bind.JsonbBuilder;
 import java.util.*;
 
 /**

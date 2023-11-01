@@ -356,7 +356,7 @@ public final class PropertyModel implements Comparable<PropertyModel> {
 
     /**
      * Sets a property.
-     *
+     * <p>
      * If not writable (final, transient, static), ignores property.
      *
      * @param object Object to set value in.

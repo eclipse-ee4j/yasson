@@ -83,7 +83,7 @@ class VariableTypeInheritanceSearch {
             return matchedGenericType;
         }
         parameterizedSubclasses.push(parameterizedType);
-        return searchParametrizedType(((Class) parameterizedType.getRawType()).getGenericSuperclass(), typeVar);
+        return searchParametrizedType(((Class<?>) parameterizedType.getRawType()).getGenericSuperclass(), typeVar);
     }
 
     private Type checkSubclassRuntimeInfo(TypeVariable<?> typeVar) {
@@ -120,6 +120,6 @@ class VariableTypeInheritanceSearch {
         if (!(type instanceof Class)) {
             throw new JsonbException(Messages.getMessage(MessageKeys.RESOLVE_PARAMETRIZED_TYPE, type));
         }
-        return findParameterizedSuperclass(((Class) type).getGenericSuperclass());
+        return findParameterizedSuperclass(((Class<?>) type).getGenericSuperclass());
     }
 }

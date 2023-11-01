@@ -60,7 +60,7 @@ public class JsonbTypeAdapterTest {
     }
 
     @Test
-    public void testIncompatibleAdapter() throws Exception {
+    public void testIncompatibleAdapter() {
         IncompatibleAdapterPojo<?, ?> incompatibleAdapterFieldPojo = new IncompatibleAdapterPojo<>();
         incompatibleAdapterFieldPojo.str = "STR";
         try {
@@ -85,7 +85,7 @@ public class JsonbTypeAdapterTest {
     }
 
     @Test
-    public void testAnnotatedTbox() throws Exception {
+    public void testAnnotatedTbox() {
         AnnotatedPojo<?, ?> pojo = new AnnotatedPojo<>();
         pojo.box = new Box("STR", 101);
         String marshalledJson = defaultJsonb.toJson(pojo);
