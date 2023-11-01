@@ -259,7 +259,7 @@ public class JsonStructureToParserAdapterTest {
 
 
     @Test
-    public void testCustomJsonbDeserializer() {
+    public void testCustomJsonbDeserializer() throws Exception {
         JsonObjectBuilder outerBuilder = jsonProvider.createObjectBuilder();
         JsonObjectBuilder innerBuilder = jsonProvider.createObjectBuilder();
         innerBuilder.add("first", "String value 1");
@@ -267,10 +267,11 @@ public class JsonStructureToParserAdapterTest {
         outerBuilder.add("inner", innerBuilder.build());
         JsonObject object = outerBuilder.build();
 
-        YassonJsonb jsonb = (YassonJsonb) JsonbBuilder.create(new JsonbConfig().withDeserializers(new InnerPojoDeserializer()));
-        Pojo result = jsonb.fromJsonStructure(object, Pojo.class);
-        assertNotNull(result.getInner());
-        assertEquals("String value 1", result.getInner().getInnerFirst());
-        assertEquals("String value 2", result.getInner().getInnerSecond());
+        try (YassonJsonb jsonb = (YassonJsonb) JsonbBuilder.create(new JsonbConfig().withDeserializers(new InnerPojoDeserializer()))) {
+            Pojo result = jsonb.fromJsonStructure(object, Pojo.class);
+            assertNotNull(result.getInner());
+            assertEquals("String value 1", result.getInner().getInnerFirst());
+            assertEquals("String value 2", result.getInner().getInnerSecond());
+        }
     }
 }

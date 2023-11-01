@@ -44,17 +44,18 @@ public class ImplementationClassTest {
     }
 
     @Test
-    public void testJsonbConfigUserImplementation() {
+    public void testJsonbConfigUserImplementation() throws Exception {
         HashMap<Class<?>, Class<?>> userMapping = new HashMap<>();
         userMapping.put(Animal.class, Dog.class);
-        Jsonb jsonb = JsonbBuilder.create(new JsonbConfig().setProperty(USER_TYPE_MAPPING, userMapping));
-        Animal animal = new Dog("Bulldog");
-        String expected = "{\"dogProperty\":\"Bulldog\"}";
-        String json = jsonb.toJson(animal);
+        try (Jsonb jsonb = JsonbBuilder.create(new JsonbConfig().setProperty(USER_TYPE_MAPPING, userMapping))) {
+            Animal animal = new Dog("Bulldog");
+            String expected = "{\"dogProperty\":\"Bulldog\"}";
+            String json = jsonb.toJson(animal);
 
-        assertEquals(expected, json);
+            assertEquals(expected, json);
 
-        Dog result = (Dog) jsonb.fromJson("{\"dogProperty\":\"Bulldog\"}", Animal.class);
-        assertEquals("Bulldog", result.getDogProperty());
+            Dog result = (Dog) jsonb.fromJson("{\"dogProperty\":\"Bulldog\"}", Animal.class);
+            assertEquals("Bulldog", result.getDogProperty());
+        }
     }
 }
