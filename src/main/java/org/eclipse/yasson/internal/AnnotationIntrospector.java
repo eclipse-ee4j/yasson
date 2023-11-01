@@ -396,9 +396,9 @@ public class AnnotationIntrospector {
 
     private <T extends Annotation> T getAnnotationFromPropertyType(Property property, Class<T> annotationClass) {
         final Optional<Class<?>> optionalRawType = ReflectionUtils.getOptionalRawType(property.getPropertyType());
-		//will not work for type variable properties, which are bound to class that is annotated.
-		return optionalRawType.map(aClass -> findAnnotation(collectAnnotations(aClass).getAnnotations(), annotationClass)).orElse(null);
-	}
+        //will not work for type variable properties, which are bound to class that is annotated.
+        return optionalRawType.map(aClass -> findAnnotation(collectAnnotations(aClass).getAnnotations(), annotationClass)).orElse(null);
+    }
 
     /**
      * Checks if property is nillable.
