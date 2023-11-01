@@ -87,7 +87,7 @@ class VariableTypeInheritanceSearch {
     }
 
     private Type checkSubclassRuntimeInfo(TypeVariable<?> typeVar) {
-        if (parameterizedSubclasses.size() == 0) {
+        if (parameterizedSubclasses.isEmpty()) {
             return typeVar;
         }
         ParameterizedType parametrizedSubclass = parameterizedSubclasses.pop();

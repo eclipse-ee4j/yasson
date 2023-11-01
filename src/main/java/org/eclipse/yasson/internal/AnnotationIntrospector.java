@@ -396,12 +396,9 @@ public class AnnotationIntrospector {
 
     private <T extends Annotation> T getAnnotationFromPropertyType(Property property, Class<T> annotationClass) {
         final Optional<Class<?>> optionalRawType = ReflectionUtils.getOptionalRawType(property.getPropertyType());
-        if (!optionalRawType.isPresent()) {
-            //will not work for type variable properties, which are bound to class that is annotated.
-            return null;
-        }
-        return findAnnotation(collectAnnotations(optionalRawType.get()).getAnnotations(), annotationClass);
-    }
+		//will not work for type variable properties, which are bound to class that is annotated.
+		return optionalRawType.map(aClass -> findAnnotation(collectAnnotations(aClass).getAnnotations(), annotationClass)).orElse(null);
+	}
 
     /**
      * Checks if property is nillable.
@@ -469,7 +466,7 @@ public class AnnotationIntrospector {
         Map<AnnotationTarget, JsonbTransient> annotationFromPropertyCategorized = getAnnotationFromPropertyCategorized(
                 JsonbTransient.class,
                 property);
-        if (annotationFromPropertyCategorized.size() > 0) {
+        if (!annotationFromPropertyCategorized.isEmpty()) {
             transientTarget.addAll(annotationFromPropertyCategorized.keySet());
             return transientTarget;
         }

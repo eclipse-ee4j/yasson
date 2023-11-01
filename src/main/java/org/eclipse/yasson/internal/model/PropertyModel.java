@@ -209,7 +209,7 @@ public final class PropertyModel implements Comparable<PropertyModel> {
                 }
             }
         }
-        if (transientInfo.size() != 0) {
+        if (!transientInfo.isEmpty()) {
             builder.readTransient(transientInfo.contains(AnnotationTarget.GETTER));
             builder.writeTransient(transientInfo.contains(AnnotationTarget.SETTER));
 
