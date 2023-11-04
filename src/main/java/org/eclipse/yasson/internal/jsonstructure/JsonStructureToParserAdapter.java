@@ -211,20 +211,20 @@ public class JsonStructureToParserAdapter implements JsonParser {
         JsonStructureIterator current = iterators.peek();
         if (current instanceof JsonArrayIterator) {
             return StreamSupport.stream(new Spliterators.AbstractSpliterator<>(Long.MAX_VALUE, ORDERED) {
-				public Spliterator<JsonValue> trySplit() {
-					return null;
-				}
+                public Spliterator<JsonValue> trySplit() {
+                    return null;
+                }
 
-				public boolean tryAdvance(Consumer<? super JsonValue> action) {
-					Objects.requireNonNull(action);
-					if (!JsonStructureToParserAdapter.this.hasNext() || JsonStructureToParserAdapter.this.next() == Event.END_ARRAY) {
-						return false;
-					} else {
-						action.accept(JsonStructureToParserAdapter.this.getValue());
-						return true;
-					}
-				}
-			}, false);
+                public boolean tryAdvance(Consumer<? super JsonValue> action) {
+                    Objects.requireNonNull(action);
+                    if (!JsonStructureToParserAdapter.this.hasNext() || JsonStructureToParserAdapter.this.next() == Event.END_ARRAY) {
+                        return false;
+                    } else {
+                        action.accept(JsonStructureToParserAdapter.this.getValue());
+                        return true;
+                    }
+                }
+            }, false);
         } else {
             throw new IllegalStateException(Messages.getMessage(MessageKeys.INTERNAL_ERROR, "Outside of array context"));
         }
@@ -235,34 +235,34 @@ public class JsonStructureToParserAdapter implements JsonParser {
         JsonStructureIterator current = iterators.peek();
         if (current instanceof JsonObjectIterator) {
             return StreamSupport.stream(new Spliterators.AbstractSpliterator<>(Long.MAX_VALUE, ORDERED) {
-				public Spliterator<Map.Entry<String, JsonValue>> trySplit() {
-					return null;
-				}
+                public Spliterator<Map.Entry<String, JsonValue>> trySplit() {
+                    return null;
+                }
 
-				public boolean tryAdvance(Consumer<? super Map.Entry<String, JsonValue>> action) {
-					Objects.requireNonNull(action);
-					if (!JsonStructureToParserAdapter.this.hasNext()) {
-						return false;
-					} else {
-						Event e = JsonStructureToParserAdapter.this.next();
-						if (e == Event.END_OBJECT) {
-							return false;
-						} else if (e != Event.KEY_NAME) {
-							throw new JsonException(Messages.getMessage(MessageKeys.INTERNAL_ERROR, "Cannot read object key"));
-						} else {
-							String key = JsonStructureToParserAdapter.this.getString();
-							if (!JsonStructureToParserAdapter.this.hasNext()) {
-								throw new JsonException(Messages.getMessage(MessageKeys.INTERNAL_ERROR, "Cannot read object value"));
-							} else {
-								JsonStructureToParserAdapter.this.next();
-								JsonValue value = JsonStructureToParserAdapter.this.getValue();
-								action.accept(new AbstractMap.SimpleImmutableEntry<>(key, value));
-								return true;
-							}
-						}
-					}
-				}
-			}, false);
+                public boolean tryAdvance(Consumer<? super Map.Entry<String, JsonValue>> action) {
+                    Objects.requireNonNull(action);
+                    if (!JsonStructureToParserAdapter.this.hasNext()) {
+                        return false;
+                    } else {
+                        Event e = JsonStructureToParserAdapter.this.next();
+                        if (e == Event.END_OBJECT) {
+                            return false;
+                        } else if (e != Event.KEY_NAME) {
+                            throw new JsonException(Messages.getMessage(MessageKeys.INTERNAL_ERROR, "Cannot read object key"));
+                        } else {
+                            String key = JsonStructureToParserAdapter.this.getString();
+                            if (!JsonStructureToParserAdapter.this.hasNext()) {
+                                throw new JsonException(Messages.getMessage(MessageKeys.INTERNAL_ERROR, "Cannot read object value"));
+                            } else {
+                                JsonStructureToParserAdapter.this.next();
+                                JsonValue value = JsonStructureToParserAdapter.this.getValue();
+                                action.accept(new AbstractMap.SimpleImmutableEntry<>(key, value));
+                                return true;
+                            }
+                        }
+                    }
+                }
+            }, false);
         } else {
             throw new IllegalStateException(Messages.getMessage(MessageKeys.INTERNAL_ERROR, "Outside of object context"));
         }
