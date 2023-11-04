@@ -20,12 +20,9 @@ import java.util.EnumSet;
 import java.util.Map;
 import java.util.NoSuchElementException;
 import java.util.Objects;
-import java.util.Spliterator;
-import java.util.Spliterators;
-import java.util.function.Consumer;
 import java.util.function.Predicate;
+import java.util.function.Supplier;
 import java.util.stream.Stream;
-import java.util.stream.StreamSupport;
 
 import jakarta.json.JsonArray;
 import jakarta.json.JsonException;
@@ -39,8 +36,6 @@ import jakarta.json.stream.JsonParser;
 
 import org.eclipse.yasson.internal.properties.MessageKeys;
 import org.eclipse.yasson.internal.properties.Messages;
-
-import static java.util.Spliterator.ORDERED;
 
 /**
  * Adapter for {@link JsonParser}, that reads a {@link JsonStructure} content tree instead of JSON text.
@@ -68,6 +63,17 @@ public class JsonStructureToParserAdapter implements JsonParser {
      */
     public JsonStructureToParserAdapter(JsonStructure structure) {
         this.rootStructure = structure;
+    }
+
+    /**
+     * Creates new {@link Stream} from values from {@link Supplier}. The stream delivers the values as long as supplier delivers non-null values
+     * @param supplier supplier of the values
+     * @return stream of values from given supplier
+     * @param <T> type of the values which are delivered by the supplier and the stream
+     */
+    private static <T> Stream<T> streamFromSupplier(Supplier<T> supplier){
+        Objects.requireNonNull(supplier);
+        return Stream.iterate(supplier.get(), Objects::nonNull, value -> supplier.get());
     }
 
     @Override
@@ -210,21 +216,7 @@ public class JsonStructureToParserAdapter implements JsonParser {
     public Stream<JsonValue> getArrayStream() {
         JsonStructureIterator current = iterators.peek();
         if (current instanceof JsonArrayIterator) {
-            return StreamSupport.stream(new Spliterators.AbstractSpliterator<>(Long.MAX_VALUE, ORDERED) {
-                public Spliterator<JsonValue> trySplit() {
-                    return null;
-                }
-
-                public boolean tryAdvance(Consumer<? super JsonValue> action) {
-                    Objects.requireNonNull(action);
-                    if (!JsonStructureToParserAdapter.this.hasNext() || JsonStructureToParserAdapter.this.next() == Event.END_ARRAY) {
-                        return false;
-                    } else {
-                        action.accept(JsonStructureToParserAdapter.this.getValue());
-                        return true;
-                    }
-                }
-            }, false);
+            return streamFromSupplier(() -> (hasNext() && next() != Event.END_ARRAY) ? getValue() : null);
         } else {
             throw new IllegalStateException(Messages.getMessage(MessageKeys.INTERNAL_ERROR, "Outside of array context"));
         }
@@ -234,35 +226,22 @@ public class JsonStructureToParserAdapter implements JsonParser {
     public Stream<Map.Entry<String, JsonValue>> getObjectStream() {
         JsonStructureIterator current = iterators.peek();
         if (current instanceof JsonObjectIterator) {
-            return StreamSupport.stream(new Spliterators.AbstractSpliterator<>(Long.MAX_VALUE, ORDERED) {
-                public Spliterator<Map.Entry<String, JsonValue>> trySplit() {
+            return streamFromSupplier(() -> {
+                Event e = next();
+                if (e == Event.END_OBJECT) {
                     return null;
-                }
-
-                public boolean tryAdvance(Consumer<? super Map.Entry<String, JsonValue>> action) {
-                    Objects.requireNonNull(action);
-                    if (!JsonStructureToParserAdapter.this.hasNext()) {
-                        return false;
+                } else if (e != Event.KEY_NAME) {
+                    throw new JsonException(Messages.getMessage(MessageKeys.INTERNAL_ERROR, "Cannot read object key"));
+                } else {
+                    String key = getString();
+                    if (!hasNext()) {
+                        throw new JsonException(Messages.getMessage(MessageKeys.INTERNAL_ERROR, "Cannot read object value"));
                     } else {
-                        Event e = JsonStructureToParserAdapter.this.next();
-                        if (e == Event.END_OBJECT) {
-                            return false;
-                        } else if (e != Event.KEY_NAME) {
-                            throw new JsonException(Messages.getMessage(MessageKeys.INTERNAL_ERROR, "Cannot read object key"));
-                        } else {
-                            String key = JsonStructureToParserAdapter.this.getString();
-                            if (!JsonStructureToParserAdapter.this.hasNext()) {
-                                throw new JsonException(Messages.getMessage(MessageKeys.INTERNAL_ERROR, "Cannot read object value"));
-                            } else {
-                                JsonStructureToParserAdapter.this.next();
-                                JsonValue value = JsonStructureToParserAdapter.this.getValue();
-                                action.accept(new AbstractMap.SimpleImmutableEntry<>(key, value));
-                                return true;
-                            }
-                        }
+                        next();
+                        return new AbstractMap.SimpleImmutableEntry<>(key, getValue());
                     }
                 }
-            }, false);
+            });
         } else {
             throw new IllegalStateException(Messages.getMessage(MessageKeys.INTERNAL_ERROR, "Outside of object context"));
         }
@@ -273,24 +252,13 @@ public class JsonStructureToParserAdapter implements JsonParser {
         if (iterators.isEmpty()) {
             //JsonParserImpl delivers the whole object - so we have to do this the same way
             JsonStructureToParserAdapter.this.next();
-            return StreamSupport.stream(new Spliterators.AbstractSpliterator<>(Long.MAX_VALUE, ORDERED) {
-                public Spliterator<JsonValue> trySplit() {
+            return streamFromSupplier(() -> {
+                if (hasNext()) {
+                    return getValue();
+                } else {
                     return null;
                 }
-
-                public boolean tryAdvance(Consumer<? super JsonValue> action) {
-                    Objects.requireNonNull(action);
-                    if (!JsonStructureToParserAdapter.this.hasNext()) {
-                        return false;
-                    } else {
-                        //JsonParserImpl delivers the whole object - so we have to do this the same way
-                        /*JsonStructureToParserAdapter.this.next();*/
-                        JsonValue value = JsonStructureToParserAdapter.this.getValue();
-                        action.accept(value);
-                        return true;
-                    }
-                }
-            }, false);
+            });
         } else {
             throw new IllegalStateException(Messages.getMessage(MessageKeys.INTERNAL_ERROR, "getValueStream can be only called at the root level of JSON structure"));
         }
