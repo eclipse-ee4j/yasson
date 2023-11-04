@@ -13,10 +13,22 @@
 package org.eclipse.yasson.internal.jsonstructure;
 
 import java.math.BigDecimal;
+import java.util.AbstractMap;
 import java.util.ArrayDeque;
 import java.util.Deque;
+import java.util.EnumSet;
+import java.util.Map;
+import java.util.NoSuchElementException;
+import java.util.Objects;
+import java.util.Spliterator;
+import java.util.Spliterators;
+import java.util.function.Consumer;
+import java.util.function.Predicate;
+import java.util.stream.Stream;
+import java.util.stream.StreamSupport;
 
 import jakarta.json.JsonArray;
+import jakarta.json.JsonException;
 import jakarta.json.JsonNumber;
 import jakarta.json.JsonObject;
 import jakarta.json.JsonStructure;
@@ -28,18 +40,26 @@ import jakarta.json.stream.JsonParser;
 import org.eclipse.yasson.internal.properties.MessageKeys;
 import org.eclipse.yasson.internal.properties.Messages;
 
+import static java.util.Spliterator.ORDERED;
+
 /**
  * Adapter for {@link JsonParser}, that reads a {@link JsonStructure} content tree instead of JSON text.
- *
+ * <p>
  * Yasson and jsonb API components are using {@link JsonParser} as its input API.
  * This adapter allows deserialization of {@link JsonStructure} into java content tree using same components
  * as when parsing JSON text.
  */
 public class JsonStructureToParserAdapter implements JsonParser {
 
-    private Deque<JsonStructureIterator> iterators = new ArrayDeque<>();
+    private static final EnumSet<Event> GET_STRING_EVENTS = EnumSet.of(Event.KEY_NAME, Event.VALUE_STRING, Event.VALUE_NUMBER);
+
+    private static final EnumSet<JsonParser.Event> NOT_GET_VALUE_EVENT_ENUM_SET = EnumSet.of(JsonParser.Event.END_OBJECT, JsonParser.Event.END_ARRAY);
+
+    private final Deque<JsonStructureIterator> iterators = new ArrayDeque<>();
 
     private final JsonStructure rootStructure;
+
+    private Event currentEvent;
 
     /**
      * Creates new {@link JsonStructure} parser.
@@ -52,35 +72,51 @@ public class JsonStructureToParserAdapter implements JsonParser {
 
     @Override
     public boolean hasNext() {
-        return iterators.peek().hasNext();
+        JsonStructureIterator iterator = iterators.peek();
+        return (iterator != null) && iterator.hasNext();
     }
 
     @Override
     public Event next() {
         if (iterators.isEmpty()) {
-            if (rootStructure instanceof JsonObject) {
-                iterators.push(new JsonObjectIterator((JsonObject) rootStructure));
-                return Event.START_OBJECT;
-            } else if (rootStructure instanceof JsonArray) {
-                iterators.push(new JsonArrayIterator((JsonArray) rootStructure));
-                return Event.START_ARRAY;
-            }
+            currentEvent = pushIntoIterators(rootStructure, rootStructure instanceof JsonObject, Event.START_OBJECT,
+                    rootStructure instanceof JsonArray, Event.START_ARRAY);
+            return currentEvent;
         }
         JsonStructureIterator current = iterators.peek();
-        Event next = current.next();
-        if (next == Event.START_OBJECT) {
-            iterators.push(new JsonObjectIterator((JsonObject) current.getValue()));
-        } else if (next == Event.START_ARRAY) {
-            iterators.push(new JsonArrayIterator((JsonArray) current.getValue()));
-        } else if (next == Event.END_OBJECT || next == Event.END_ARRAY) {
+        currentEvent = current.next();
+        pushIntoIterators(current.getValue(), currentEvent == Event.START_OBJECT, null, currentEvent == Event.START_ARRAY, null);
+        if (currentEvent == Event.END_OBJECT || currentEvent == Event.END_ARRAY) {
             iterators.pop();
         }
-        return next;
+        return currentEvent;
+    }
+
+    private Event pushIntoIterators(JsonValue value, boolean isObject, Event objectEvent, boolean isArray, Event arrayEvent) {
+        if (isObject) {
+            iterators.push(new JsonObjectIterator((JsonObject) value));
+            return objectEvent;
+        } else if (isArray) {
+            iterators.push(new JsonArrayIterator((JsonArray) value));
+            return arrayEvent;
+        }
+        return null;
+    }
+
+    @Override
+    public Event currentEvent() {
+        return currentEvent;
     }
 
     @Override
     public String getString() {
-        return iterators.peek().getString();
+        JsonStructureIterator iterator = iterators.peek();
+        if (iterator == null || !GET_STRING_EVENTS.contains(currentEvent)) {
+            throw new IllegalStateException(Messages.getMessage(MessageKeys.INTERNAL_ERROR, "getString() call with current event: "
+                    + (iterator == null ? "null" : currentEvent) + "; should be in " + GET_STRING_EVENTS));
+        } else {
+            return iterator.getString();
+        }
     }
 
     @Override
@@ -111,12 +147,15 @@ public class JsonStructureToParserAdapter implements JsonParser {
             iterators.pop();
             return current.getValue().asJsonObject();
         } else {
-            throw new JsonbException(Messages.getMessage(MessageKeys.INTERNAL_ERROR, "Outside of object context"));
+            throw new IllegalStateException(Messages.getMessage(MessageKeys.INTERNAL_ERROR, "Outside of object context"));
         }
     }
 
     private JsonNumber getJsonNumberValue() {
         JsonStructureIterator iterator = iterators.peek();
+        if (iterator == null) {
+            throw new IllegalStateException(Messages.getMessage(MessageKeys.INTERNAL_ERROR, "Call of the number method on empty context"));
+        }
         JsonValue value = iterator.getValue();
         if (value.getValueType() != JsonValue.ValueType.NUMBER) {
             throw iterator.createIncompatibleValueError();
@@ -130,20 +169,148 @@ public class JsonStructureToParserAdapter implements JsonParser {
     }
 
     @Override
-    public void skipArray() {
-        if (!iterators.isEmpty()) {
-            JsonStructureIterator current = iterators.peek();
-            if (current instanceof JsonArrayIterator) {
-                iterators.pop();
+    public JsonValue getValue() {
+        if (currentEvent == null || NOT_GET_VALUE_EVENT_ENUM_SET.contains(currentEvent)) {
+            throw new IllegalStateException(Messages.getMessage(MessageKeys.INTERNAL_ERROR, "getValue() call with current event: "
+                    + currentEvent + "; should not be in " + NOT_GET_VALUE_EVENT_ENUM_SET));
+        } else {
+            JsonStructureIterator iterator = iterators.peek();
+            if (iterator == null) {
+                throw new IllegalStateException(Messages.getMessage(MessageKeys.INTERNAL_ERROR, "getValue() call on empty context"));
+            } else {
+                switch (currentEvent) {
+                    case START_OBJECT:
+                        return getObject();
+                    case START_ARRAY:
+                        return getArray();
+                    default:
+                        return iterator.getValue();
+                }
             }
         }
     }
 
     @Override
+    public JsonArray getArray() {
+        JsonStructureIterator current = iterators.peek();
+        if (current instanceof JsonArrayIterator) {
+            //Remove child iterator as getArray() method contract says
+            iterators.pop();
+            current = iterators.peek();
+            if (current == null) {
+                throw new NoSuchElementException(Messages.getMessage(MessageKeys.INTERNAL_ERROR, "No more elements in JSON structure"));
+            }
+            return current.getValue().asJsonArray();
+        } else {
+            throw new IllegalStateException(Messages.getMessage(MessageKeys.INTERNAL_ERROR, "Outside of array context"));
+        }
+    }
+
+    @Override
+    public Stream<JsonValue> getArrayStream() {
+        JsonStructureIterator current = iterators.peek();
+        if (current instanceof JsonArrayIterator) {
+            return StreamSupport.stream(new Spliterators.AbstractSpliterator<>(Long.MAX_VALUE, ORDERED) {
+				public Spliterator<JsonValue> trySplit() {
+					return null;
+				}
+
+				public boolean tryAdvance(Consumer<? super JsonValue> action) {
+					Objects.requireNonNull(action);
+					if (!JsonStructureToParserAdapter.this.hasNext() || JsonStructureToParserAdapter.this.next() == Event.END_ARRAY) {
+						return false;
+					} else {
+						action.accept(JsonStructureToParserAdapter.this.getValue());
+						return true;
+					}
+				}
+			}, false);
+        } else {
+            throw new IllegalStateException(Messages.getMessage(MessageKeys.INTERNAL_ERROR, "Outside of array context"));
+        }
+    }
+
+    @Override
+    public Stream<Map.Entry<String, JsonValue>> getObjectStream() {
+        JsonStructureIterator current = iterators.peek();
+        if (current instanceof JsonObjectIterator) {
+            return StreamSupport.stream(new Spliterators.AbstractSpliterator<>(Long.MAX_VALUE, ORDERED) {
+				public Spliterator<Map.Entry<String, JsonValue>> trySplit() {
+					return null;
+				}
+
+				public boolean tryAdvance(Consumer<? super Map.Entry<String, JsonValue>> action) {
+					Objects.requireNonNull(action);
+					if (!JsonStructureToParserAdapter.this.hasNext()) {
+						return false;
+					} else {
+						Event e = JsonStructureToParserAdapter.this.next();
+						if (e == Event.END_OBJECT) {
+							return false;
+						} else if (e != Event.KEY_NAME) {
+							throw new JsonException(Messages.getMessage(MessageKeys.INTERNAL_ERROR, "Cannot read object key"));
+						} else {
+							String key = JsonStructureToParserAdapter.this.getString();
+							if (!JsonStructureToParserAdapter.this.hasNext()) {
+								throw new JsonException(Messages.getMessage(MessageKeys.INTERNAL_ERROR, "Cannot read object value"));
+							} else {
+								JsonStructureToParserAdapter.this.next();
+								JsonValue value = JsonStructureToParserAdapter.this.getValue();
+								action.accept(new AbstractMap.SimpleImmutableEntry<>(key, value));
+								return true;
+							}
+						}
+					}
+				}
+			}, false);
+        } else {
+            throw new IllegalStateException(Messages.getMessage(MessageKeys.INTERNAL_ERROR, "Outside of object context"));
+        }
+    }
+
+    @Override
+    public Stream<JsonValue> getValueStream() {
+        if (iterators.isEmpty()) {
+            //JsonParserImpl delivers the whole object - so we have to do this the same way
+            JsonStructureToParserAdapter.this.next();
+            return StreamSupport.stream(new Spliterators.AbstractSpliterator<>(Long.MAX_VALUE, ORDERED) {
+                public Spliterator<JsonValue> trySplit() {
+                    return null;
+                }
+
+                public boolean tryAdvance(Consumer<? super JsonValue> action) {
+                    Objects.requireNonNull(action);
+                    if (!JsonStructureToParserAdapter.this.hasNext()) {
+                        return false;
+                    } else {
+                        //JsonParserImpl delivers the whole object - so we have to do this the same way
+                        /*JsonStructureToParserAdapter.this.next();*/
+                        JsonValue value = JsonStructureToParserAdapter.this.getValue();
+                        action.accept(value);
+                        return true;
+                    }
+                }
+            }, false);
+        } else {
+            throw new IllegalStateException(Messages.getMessage(MessageKeys.INTERNAL_ERROR, "getValueStream can be only called at the root level of JSON structure"));
+        }
+    }
+
+    @Override
+    public void skipArray() {
+        skipJsonPart(iterator -> iterator instanceof JsonArrayIterator);
+    }
+
+    @Override
     public void skipObject() {
+        skipJsonPart(iterator -> iterator instanceof JsonObjectIterator);
+    }
+
+    private void skipJsonPart(Predicate<JsonStructureIterator> predicate) {
+        Objects.requireNonNull(predicate);
         if (!iterators.isEmpty()) {
             JsonStructureIterator current = iterators.peek();
-            if (current instanceof JsonObjectIterator) {
+            if (predicate.test(current)) {
                 iterators.pop();
             }
         }

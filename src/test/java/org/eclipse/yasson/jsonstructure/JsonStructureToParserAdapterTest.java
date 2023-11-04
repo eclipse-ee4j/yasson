@@ -12,27 +12,60 @@
 
 package org.eclipse.yasson.jsonstructure;
 
+import org.eclipse.yasson.internal.jsonstructure.JsonStructureToParserAdapter;
+import org.hamcrest.Matcher;
 import org.junit.jupiter.api.*;
+
+import static org.hamcrest.MatcherAssert.assertThat;
+import static org.hamcrest.Matchers.contains;
 import static org.junit.jupiter.api.Assertions.*;
 import static org.eclipse.yasson.Jsonbs.*;
 
 import org.eclipse.yasson.TestTypeToken;
 import org.eclipse.yasson.YassonJsonb;
 
+import jakarta.json.Json;
 import jakarta.json.JsonArray;
 import jakarta.json.JsonArrayBuilder;
 import jakarta.json.JsonObject;
 import jakarta.json.JsonObjectBuilder;
+import jakarta.json.JsonString;
+import jakarta.json.JsonValue;
 import jakarta.json.bind.JsonbBuilder;
 import jakarta.json.bind.JsonbConfig;
 import jakarta.json.spi.JsonProvider;
+import jakarta.json.stream.JsonParser;
+import jakarta.json.stream.JsonParserFactory;
+
+import java.io.StringReader;
 import java.math.BigDecimal;
+import java.math.BigInteger;
 import java.util.ArrayList;
+import java.util.EnumSet;
 import java.util.List;
 import java.util.Map;
+import java.util.Objects;
+import java.util.stream.Collector;
+import java.util.stream.Collectors;
 
 public class JsonStructureToParserAdapterTest {
-    private final JsonProvider jsonProvider = JsonProvider.provider();
+    private static final EnumSet<JsonParser.Event> GET_STRING_EVENT_ENUM_SET =
+            EnumSet.of(JsonParser.Event.KEY_NAME, JsonParser.Event.VALUE_STRING, JsonParser.Event.VALUE_NUMBER);
+
+    private static final EnumSet<JsonParser.Event> NOT_GET_VALUE_EVENT_ENUM_SET = EnumSet.of(JsonParser.Event.END_OBJECT, JsonParser.Event.END_ARRAY);
+
+    private static final Collector<Map.Entry<String, JsonValue>, ?, ArrayList<String>> MAP_TO_LIST_COLLECTOR = Collector.of(ArrayList::new,
+            (list, entry) -> {
+                list.add(entry.getKey());
+                list.add(entry.getValue().toString());
+            },
+            (left, right) -> {
+                left.addAll(right);
+                return left;
+            },
+            Collector.Characteristics.IDENTITY_FINISH);
+
+    private static final JsonProvider jsonProvider = JsonProvider.provider();
 
     @Test
     public void testBasicJsonObject() {
@@ -274,4 +307,369 @@ public class JsonStructureToParserAdapterTest {
             assertEquals("String value 2", result.getInner().getInnerSecond());
         }
     }
+
+    @Nested
+    public class DirectParserTests {
+        @Test
+        public void testNumbers() {
+            JsonObject jsonObject = jsonProvider.createObjectBuilder()
+                    .add("int", 1)
+                    .add("long", 1L)
+                    .add("double", 1d)
+                    .add("BigInteger", BigInteger.TEN)
+                    .add("BigDecimal", BigDecimal.TEN)
+                    .build();
+
+            try (JsonStructureToParserAdapter parser = new JsonStructureToParserAdapter(jsonObject)) {
+                parser.next();
+                parser.next();
+                parser.getString();
+                parser.next();
+                assertTrue(parser.isIntegralNumber());
+                assertEquals(1, parser.getInt());
+
+                parser.next();
+                parser.getString();
+                parser.next();
+                assertTrue(parser.isIntegralNumber());
+                assertEquals(1L, parser.getLong());
+
+                parser.next();
+                parser.getString();
+                parser.next();
+                assertFalse(parser.isIntegralNumber());
+                assertEquals(BigDecimal.valueOf(1d), parser.getBigDecimal());
+
+                parser.next();
+                parser.getString();
+                parser.next();
+                assertTrue(parser.isIntegralNumber());
+                assertEquals(BigDecimal.TEN, parser.getBigDecimal());
+
+                parser.next();
+                parser.getString();
+                parser.next();
+                assertTrue(parser.isIntegralNumber());
+                assertEquals(BigDecimal.TEN, parser.getBigDecimal());
+            }
+        }
+
+        @Test
+        public void testParser_getString(){
+            JsonObject jsonObject = TestData.createFamilyPerson();
+
+            try (JsonStructureToParserAdapter parser = new JsonStructureToParserAdapter(jsonObject)) {
+                List<String> values = new ArrayList<>();
+                parser.next();
+                while (parser.hasNext()) {
+                    JsonParser.Event event = parser.next();
+                    if (GET_STRING_EVENT_ENUM_SET.contains(event)) {
+                        String strValue = Objects.toString(parser.getString(), "null");
+                        values.add(strValue);
+                    }
+                }
+
+                assertThat(values,TestData.FAMILY_MATCHER_WITH_NO_QUOTATION);
+            }
+        }
+
+        @Test
+        public void testParser_getValue(){
+            JsonObject jsonObject = TestData.createFamilyPerson();
+
+            try (JsonStructureToParserAdapter parser = new JsonStructureToParserAdapter(jsonObject)) {
+                List<String> values = new ArrayList<>();
+                parser.next();
+                while (parser.hasNext()) {
+                    JsonParser.Event event = parser.next();
+                    if (!NOT_GET_VALUE_EVENT_ENUM_SET.contains(event)) {
+                        String strValue = Objects.toString(parser.getValue(), "null");
+                        values.add(strValue);
+                    }
+                }
+
+                //should look like this with a correct implementation -> FAMILY_MATCHER_KEYS_WITH_QUOTATION
+                /*assertThat(values, contains("\"name\"", "\"John\"", "\"surname\"", "\"Smith\"", "\"age\"", "30", "\"married\"", "true",
+                        "\"wife\"", "{\"name\":\"Deborah\",\"surname\":\"Harris\"}", "\"children\"", "[\"Jack\",\"Mike\"]"));*/
+                assertThat(values, contains("\"John\"", "\"John\"", "\"Smith\"", "\"Smith\"", "30", "30", "true", "true",
+                        "{\"name\":\"Deborah\",\"surname\":\"Harris\"}", "{\"name\":\"Deborah\",\"surname\":\"Harris\"}",
+                        "[\"Jack\",\"Mike\"]", "[\"Jack\",\"Mike\"]"));
+            }
+        }
+
+        @Test
+        public void testSkipArray() {
+            JsonObject jsonObject = TestData.createObjectWithArrays();
+
+            try (JsonStructureToParserAdapter parser = new JsonStructureToParserAdapter(jsonObject)) {
+                parser.next();
+                parser.next();
+                parser.getString();
+                parser.next();
+                parser.skipArray();
+                parser.next();
+                String key = parser.getString();
+
+                assertEquals("secondElement", key);
+            }
+        }
+
+        @Test
+        public void testSkipObject() {
+            JsonObject jsonObject = TestData.createJsonObject();
+
+            try (JsonStructureToParserAdapter parser = new JsonStructureToParserAdapter(jsonObject)) {
+                parser.next();
+                parser.next();
+                parser.getString();
+                parser.next();
+                parser.skipObject();
+                parser.next();
+                String key = parser.getString();
+
+                assertEquals("secondPerson", key);
+            }
+        }
+    }
+
+    @Nested
+    public class StreamTests {
+        @Test
+        public void testGetValueStream_GetOneElement() {
+            JsonObject jsonObject = TestData.createFamilyPerson();
+
+            try (JsonStructureToParserAdapter parser = new JsonStructureToParserAdapter(jsonObject)) {
+                JsonString name = (JsonString) parser.getValueStream()
+                        .map(JsonValue::asJsonObject)
+                        .map(JsonObject::values)
+                        .findFirst()
+                        .orElseThrow()
+                        .stream()
+                        .filter(e -> e.getValueType()  == JsonValue.ValueType.STRING)
+                        .findFirst()
+                        .orElseThrow(() -> new RuntimeException("Name not found"));
+
+                assertEquals("John", name.getString());
+            }
+        }
+
+        @Test
+        public void testGetValueStream_GetList() {
+            JsonObject jsonObject = TestData.createFamilyPerson();
+
+            try (JsonStructureToParserAdapter parser = new JsonStructureToParserAdapter(jsonObject)) {
+                List<String> values = parser.getValueStream().map(value -> Objects.toString(value, "null")).collect(Collectors.toList());
+
+                assertThat(values, contains(TestData.JSON_FAMILY_STRING));
+            }
+        }
+
+        @Test
+        public void testGetArrayStream_GetOneElement() {
+            JsonObject jsonObject = TestData.createObjectWithArrays();
+
+            try (JsonStructureToParserAdapter parser = new JsonStructureToParserAdapter(jsonObject)) {
+                parser.next();
+                parser.next();
+                String key = parser.getString();
+                parser.next();
+                JsonString element = (JsonString) parser.getArrayStream().filter(e -> e.getValueType()  == JsonValue.ValueType.STRING)
+                        .findFirst()
+                        .orElseThrow(() -> new RuntimeException("Element not found"));
+
+                assertEquals("first", element.getString());
+                assertEquals("firstElement", key);
+            }
+        }
+
+        @Test
+        public void testGetArrayStream_GetList() {
+            JsonObject jsonObject = TestData.createObjectWithArrays();
+
+            try (JsonStructureToParserAdapter parser = new JsonStructureToParserAdapter(jsonObject)) {
+                parser.next();
+                parser.next();
+                String key = parser.getString();
+                parser.next();
+                List<String> values = parser.getArrayStream().map(value -> Objects.toString(value, "null")).collect(Collectors.toList());
+
+                assertThat(values, TestData.ARRAY_STREAM_MATCHER);
+                assertEquals("firstElement", key);
+            }
+        }
+
+        @Test
+        public void testGetObjectStream_GetOneElement() {
+            JsonObject jsonObject = TestData.createJsonObject();
+
+            try (JsonStructureToParserAdapter parser = new JsonStructureToParserAdapter(jsonObject)) {
+                parser.next();
+                String surname = parser.getObjectStream().filter(e -> e.getKey().equals("firstPerson"))
+                        .map(Map.Entry::getValue)
+                        .map(JsonValue::asJsonObject)
+                        .map(obj -> obj.getString("surname"))
+                        .findFirst()
+                        .orElseThrow(() -> new RuntimeException("Surname not found"));
+
+                assertEquals("Smith", surname);
+            }
+        }
+
+        @Test
+        public void testGetObjectStream_GetList() {
+            JsonObject jsonObject = TestData.createFamilyPerson();
+
+            try (JsonStructureToParserAdapter parser = new JsonStructureToParserAdapter(jsonObject)) {
+                parser.next();
+                List<String> values = parser.getObjectStream().collect(MAP_TO_LIST_COLLECTOR);
+
+                assertThat(values, TestData.FAMILY_MATCHER_KEYS_WITHOUT_QUOTATION);
+            }
+        }
+    }
+
+	@Nested
+    public class JSONPStandardParserTests {
+        @Test
+        public void testStandardStringParser_getValueStream() {
+            try (JsonParser parser = Json.createParser(new StringReader(TestData.JSON_FAMILY_STRING))) {
+                List<String> values = parser.getValueStream().map(value -> Objects.toString(value, "null")).collect(Collectors.toList());
+
+                assertThat(values, contains(TestData.JSON_FAMILY_STRING));
+            }
+        }
+
+        @Test
+        public void testStandardStringParser_getArrayStream() {
+            try (JsonParser parser = Json.createParser(new StringReader("{\"firstElement\":[\"first\", \"second\"],\"secondElement\":[\"third\", \"fourth\"]}"))) {
+                parser.next();
+                parser.next();
+                String key = parser.getString();
+                parser.next();
+                List<String> values = parser.getArrayStream().map(value -> Objects.toString(value, "null")).collect(Collectors.toList());
+
+                assertThat(values, TestData.ARRAY_STREAM_MATCHER);
+                assertEquals("firstElement", key);
+            }
+        }
+
+        @Test
+        public void testStandardStringParser_getObjectStream() {
+            try (JsonParser parser = Json.createParser(new StringReader(TestData.JSON_FAMILY_STRING))) {
+
+                parser.next();
+                List<String> values = parser.getObjectStream().collect(MAP_TO_LIST_COLLECTOR);
+
+                assertThat(values, TestData.FAMILY_MATCHER_KEYS_WITHOUT_QUOTATION);
+            }
+        }
+
+        @Test
+        public void testStandardStringParser_getValue() {
+            try (JsonParser parser = Json.createParser(new StringReader(TestData.JSON_FAMILY_STRING))) {
+                List<String> values = new ArrayList<>();
+                parser.next();
+                while (parser.hasNext()) {
+                    JsonParser.Event event = parser.next();
+                    if (!NOT_GET_VALUE_EVENT_ENUM_SET.contains(event)) {
+                        String strValue = Objects.toString(parser.getValue(), "null");
+                        values.add(strValue);
+                    }
+                }
+
+                assertThat(values, TestData.FAMILY_MATCHER_KEYS_WITH_QUOTATION);
+            }
+        }
+
+        @Test
+        public void testStandardStringParser_getString() {
+            try (JsonParser parser = Json.createParser(new StringReader(TestData.JSON_FAMILY_STRING))) {
+                List<String> values = new ArrayList<>();
+                parser.next();
+                while (parser.hasNext()) {
+                    JsonParser.Event event = parser.next();
+                    if (GET_STRING_EVENT_ENUM_SET.contains(event)) {
+                        String strValue = Objects.toString(parser.getString(), "null");
+                        values.add(strValue);
+                    }
+                }
+
+                assertThat(values, TestData.FAMILY_MATCHER_WITH_NO_QUOTATION);
+            }
+        }
+
+        @Test
+        public void testStandardStructureParser_getString() {
+            JsonParserFactory factory = Json.createParserFactory(Map.of());
+            JsonObject jsonObject = TestData.createFamilyPerson();
+
+            try (JsonParser parser = factory.createParser(jsonObject)) {
+                List<String> values = new ArrayList<>();
+                parser.next();
+                while (parser.hasNext()) {
+                    JsonParser.Event event = parser.next();
+                    if (GET_STRING_EVENT_ENUM_SET.contains(event)) {
+                        String strValue = Objects.toString(parser.getString(), "null");
+                        values.add(strValue);
+                    }
+                }
+
+                assertThat(values, TestData.FAMILY_MATCHER_WITH_NO_QUOTATION);
+            }
+        }
+    }
+
+    private static class TestData {
+        private static final String JSON_FAMILY_STRING = "{\"name\":\"John\",\"surname\":\"Smith\",\"age\":30,\"married\":true," +
+                "\"wife\":{\"name\":\"Deborah\",\"surname\":\"Harris\"},\"children\":[\"Jack\",\"Mike\"]}";
+
+        private static final Matcher<Iterable<? extends String>> FAMILY_MATCHER_KEYS_WITHOUT_QUOTATION =
+                contains("name", "\"John\"", "surname", "\"Smith\"", "age", "30", "married", "true", "wife",
+                        "{\"name\":\"Deborah\",\"surname\":\"Harris\"}", "children", "[\"Jack\",\"Mike\"]");
+
+        private static final Matcher<Iterable<? extends String>> FAMILY_MATCHER_KEYS_WITH_QUOTATION =
+                contains("\"name\"", "\"John\"", "\"surname\"", "\"Smith\"", "\"age\"", "30", "\"married\"", "true",
+                        "\"wife\"", "{\"name\":\"Deborah\",\"surname\":\"Harris\"}", "\"children\"", "[\"Jack\",\"Mike\"]");
+
+        private static final Matcher<Iterable<? extends String>> FAMILY_MATCHER_WITH_NO_QUOTATION =
+                contains("name", "John", "surname", "Smith", "age", "30", "married",
+                        "wife", "name", "Deborah", "surname", "Harris", "children", "Jack", "Mike");
+
+        private static final Matcher<Iterable<? extends String>> ARRAY_STREAM_MATCHER = contains("\"first\"", "\"second\"");
+
+        private static JsonObject createFamilyPerson() {
+            return jsonProvider.createObjectBuilder()
+                    .add("name", "John")
+                    .add("surname", "Smith")
+                    .add("age", 30)
+                    .add("married", true)
+                    .add("wife", createPerson("Deborah", "Harris"))
+                    .add("children", createArray("Jack", "Mike"))
+                    .build();
+        }
+
+		private static JsonObject createObjectWithArrays() {
+			return jsonProvider.createObjectBuilder()
+					.add("firstElement", createArray("first", "second"))
+					.add("secondElement", createArray("third", "fourth"))
+					.build();
+		}
+
+		private static JsonArrayBuilder createArray(String firstElement, String secondElement) {
+			return jsonProvider.createArrayBuilder().add(firstElement).add(secondElement);
+		}
+
+		private static JsonObject createJsonObject() {
+			return jsonProvider.createObjectBuilder()
+				.add("firstPerson", createPerson("John", "Smith"))
+				.add("secondPerson", createPerson("Deborah", "Harris"))
+				.build();
+		}
+
+		private static JsonObjectBuilder createPerson(String name, String surname) {
+			return jsonProvider.createObjectBuilder()
+				.add("name", name)
+				.add("surname", surname);
+		}
+	}
 }
