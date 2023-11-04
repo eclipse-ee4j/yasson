@@ -31,6 +31,7 @@ import jakarta.json.JsonObject;
 import jakarta.json.JsonStructure;
 import jakarta.json.JsonValue;
 import jakarta.json.bind.JsonbException;
+import jakarta.json.spi.JsonProvider;
 import jakarta.json.stream.JsonLocation;
 import jakarta.json.stream.JsonParser;
 
@@ -53,16 +54,19 @@ public class JsonStructureToParserAdapter implements JsonParser {
     private final Deque<JsonStructureIterator> iterators = new ArrayDeque<>();
 
     private final JsonStructure rootStructure;
+    private final JsonProvider jsonProvider;
 
     private Event currentEvent;
 
     /**
      * Creates new {@link JsonStructure} parser.
      *
-     * @param structure json structure
+     * @param structure    json structure
+     * @param jsonProvider json provider for creation of {@link JsonValue} for keys
      */
-    public JsonStructureToParserAdapter(JsonStructure structure) {
+    public JsonStructureToParserAdapter(JsonStructure structure, JsonProvider jsonProvider) {
         this.rootStructure = structure;
+        this.jsonProvider = jsonProvider;
     }
 
     /**
@@ -189,6 +193,8 @@ public class JsonStructureToParserAdapter implements JsonParser {
                         return getObject();
                     case START_ARRAY:
                         return getArray();
+                    case KEY_NAME:
+                        return jsonProvider.createValue(iterator.getString());
                     default:
                         return iterator.getValue();
                 }

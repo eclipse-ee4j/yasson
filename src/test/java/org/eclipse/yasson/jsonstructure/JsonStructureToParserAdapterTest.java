@@ -320,7 +320,7 @@ public class JsonStructureToParserAdapterTest {
                     .add("BigDecimal", BigDecimal.TEN)
                     .build();
 
-            try (JsonStructureToParserAdapter parser = new JsonStructureToParserAdapter(jsonObject)) {
+            try (JsonStructureToParserAdapter parser = new JsonStructureToParserAdapter(jsonObject, jsonProvider)) {
                 parser.next();
                 parser.next();
                 parser.getString();
@@ -358,7 +358,7 @@ public class JsonStructureToParserAdapterTest {
         public void testParser_getString(){
             JsonObject jsonObject = TestData.createFamilyPerson();
 
-            try (JsonStructureToParserAdapter parser = new JsonStructureToParserAdapter(jsonObject)) {
+            try (JsonStructureToParserAdapter parser = new JsonStructureToParserAdapter(jsonObject, jsonProvider)) {
                 List<String> values = new ArrayList<>();
                 parser.next();
                 while (parser.hasNext()) {
@@ -377,7 +377,7 @@ public class JsonStructureToParserAdapterTest {
         public void testParser_getValue(){
             JsonObject jsonObject = TestData.createFamilyPerson();
 
-            try (JsonStructureToParserAdapter parser = new JsonStructureToParserAdapter(jsonObject)) {
+            try (JsonStructureToParserAdapter parser = new JsonStructureToParserAdapter(jsonObject, jsonProvider)) {
                 List<String> values = new ArrayList<>();
                 parser.next();
                 while (parser.hasNext()) {
@@ -388,12 +388,7 @@ public class JsonStructureToParserAdapterTest {
                     }
                 }
 
-                //should look like this with a correct implementation -> FAMILY_MATCHER_KEYS_WITH_QUOTATION
-                /*assertThat(values, contains("\"name\"", "\"John\"", "\"surname\"", "\"Smith\"", "\"age\"", "30", "\"married\"", "true",
-                        "\"wife\"", "{\"name\":\"Deborah\",\"surname\":\"Harris\"}", "\"children\"", "[\"Jack\",\"Mike\"]"));*/
-                assertThat(values, contains("\"John\"", "\"John\"", "\"Smith\"", "\"Smith\"", "30", "30", "true", "true",
-                        "{\"name\":\"Deborah\",\"surname\":\"Harris\"}", "{\"name\":\"Deborah\",\"surname\":\"Harris\"}",
-                        "[\"Jack\",\"Mike\"]", "[\"Jack\",\"Mike\"]"));
+                assertThat(values, TestData.FAMILY_MATCHER_KEYS_WITH_QUOTATION);
             }
         }
 
@@ -401,7 +396,7 @@ public class JsonStructureToParserAdapterTest {
         public void testSkipArray() {
             JsonObject jsonObject = TestData.createObjectWithArrays();
 
-            try (JsonStructureToParserAdapter parser = new JsonStructureToParserAdapter(jsonObject)) {
+            try (JsonStructureToParserAdapter parser = new JsonStructureToParserAdapter(jsonObject, jsonProvider)) {
                 parser.next();
                 parser.next();
                 parser.getString();
@@ -418,7 +413,7 @@ public class JsonStructureToParserAdapterTest {
         public void testSkipObject() {
             JsonObject jsonObject = TestData.createJsonObject();
 
-            try (JsonStructureToParserAdapter parser = new JsonStructureToParserAdapter(jsonObject)) {
+            try (JsonStructureToParserAdapter parser = new JsonStructureToParserAdapter(jsonObject, jsonProvider)) {
                 parser.next();
                 parser.next();
                 parser.getString();
@@ -438,7 +433,7 @@ public class JsonStructureToParserAdapterTest {
         public void testGetValueStream_GetOneElement() {
             JsonObject jsonObject = TestData.createFamilyPerson();
 
-            try (JsonStructureToParserAdapter parser = new JsonStructureToParserAdapter(jsonObject)) {
+            try (JsonStructureToParserAdapter parser = new JsonStructureToParserAdapter(jsonObject, jsonProvider)) {
                 JsonString name = (JsonString) parser.getValueStream()
                         .map(JsonValue::asJsonObject)
                         .map(JsonObject::values)
@@ -457,7 +452,7 @@ public class JsonStructureToParserAdapterTest {
         public void testGetValueStream_GetList() {
             JsonObject jsonObject = TestData.createFamilyPerson();
 
-            try (JsonStructureToParserAdapter parser = new JsonStructureToParserAdapter(jsonObject)) {
+            try (JsonStructureToParserAdapter parser = new JsonStructureToParserAdapter(jsonObject, jsonProvider)) {
                 List<String> values = parser.getValueStream().map(value -> Objects.toString(value, "null")).collect(Collectors.toList());
 
                 assertThat(values, contains(TestData.JSON_FAMILY_STRING));
@@ -468,7 +463,7 @@ public class JsonStructureToParserAdapterTest {
         public void testGetArrayStream_GetOneElement() {
             JsonObject jsonObject = TestData.createObjectWithArrays();
 
-            try (JsonStructureToParserAdapter parser = new JsonStructureToParserAdapter(jsonObject)) {
+            try (JsonStructureToParserAdapter parser = new JsonStructureToParserAdapter(jsonObject, jsonProvider)) {
                 parser.next();
                 parser.next();
                 String key = parser.getString();
@@ -486,7 +481,7 @@ public class JsonStructureToParserAdapterTest {
         public void testGetArrayStream_GetList() {
             JsonObject jsonObject = TestData.createObjectWithArrays();
 
-            try (JsonStructureToParserAdapter parser = new JsonStructureToParserAdapter(jsonObject)) {
+            try (JsonStructureToParserAdapter parser = new JsonStructureToParserAdapter(jsonObject, jsonProvider)) {
                 parser.next();
                 parser.next();
                 String key = parser.getString();
@@ -502,7 +497,7 @@ public class JsonStructureToParserAdapterTest {
         public void testGetObjectStream_GetOneElement() {
             JsonObject jsonObject = TestData.createJsonObject();
 
-            try (JsonStructureToParserAdapter parser = new JsonStructureToParserAdapter(jsonObject)) {
+            try (JsonStructureToParserAdapter parser = new JsonStructureToParserAdapter(jsonObject, jsonProvider)) {
                 parser.next();
                 String surname = parser.getObjectStream().filter(e -> e.getKey().equals("firstPerson"))
                         .map(Map.Entry::getValue)
@@ -519,7 +514,7 @@ public class JsonStructureToParserAdapterTest {
         public void testGetObjectStream_GetList() {
             JsonObject jsonObject = TestData.createFamilyPerson();
 
-            try (JsonStructureToParserAdapter parser = new JsonStructureToParserAdapter(jsonObject)) {
+            try (JsonStructureToParserAdapter parser = new JsonStructureToParserAdapter(jsonObject, jsonProvider)) {
                 parser.next();
                 List<String> values = parser.getObjectStream().collect(MAP_TO_LIST_COLLECTOR);
 

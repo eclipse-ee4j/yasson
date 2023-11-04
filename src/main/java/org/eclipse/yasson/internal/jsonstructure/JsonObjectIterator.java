@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2019, 2022 Oracle and/or its affiliates. All rights reserved.
+ * Copyright (c) 2019, 2023 Oracle and/or its affiliates. All rights reserved.
  *
  * This program and the accompanying materials are made available under the
  * terms of the Eclipse Public License v. 2.0 which is available at
@@ -75,20 +75,20 @@ public class JsonObjectIterator extends JsonStructureIterator {
         case START:
             if (keyIterator.hasNext()) {
                 nextKey();
-                setState(JsonObjectIterator.State.KEY);
+                setState(State.KEY);
                 return JsonParser.Event.KEY_NAME;
             } else {
                 setState(State.END);
                 return JsonParser.Event.END_OBJECT;
             }
         case KEY:
-            setState(JsonObjectIterator.State.VALUE);
+            setState(State.VALUE);
             JsonValue value = getValue();
             return getValueEvent(value);
         case VALUE:
             if (keyIterator.hasNext()) {
                 nextKey();
-                setState(JsonObjectIterator.State.KEY);
+                setState(State.KEY);
                 return JsonParser.Event.KEY_NAME;
             }
             setState(State.END);
@@ -119,7 +119,7 @@ public class JsonObjectIterator extends JsonStructureIterator {
 
     @Override
     String getString() {
-        if (state == JsonObjectIterator.State.KEY) {
+        if (state == State.KEY) {
             return currentKey;
         }
         return super.getString();
