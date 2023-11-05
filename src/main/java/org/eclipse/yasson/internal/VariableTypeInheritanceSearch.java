@@ -94,14 +94,17 @@ class VariableTypeInheritanceSearch {
         return searchRuntimeTypeArgument(parametrizedSubclass, typeVar);
     }
 
-        private Type searchRuntimeTypeArgument(ParameterizedType runtimeType, TypeVariable<?> typeVar) {
+    private Type searchRuntimeTypeArgument(ParameterizedType runtimeType, TypeVariable<?> typeVar) {
         if (ReflectionUtils.getRawType(runtimeType) != typeVar.getGenericDeclaration()) {
             return null;
         }
         TypeVariable<?>[] bounds = typeVar.getGenericDeclaration().getTypeParameters();
-        for (int i = 0; i < bounds.length; i++) {
-            if (bounds[i].equals(typeVar)) {
-                Type matchedGenericType = runtimeType.getActualTypeArguments()[i];
+        Type[] actualTypeArguments = runtimeType.getActualTypeArguments();
+        int i = 0;
+
+        for (TypeVariable<?> bound : bounds) {
+            if (bound.equals(typeVar)) {
+                Type matchedGenericType = actualTypeArguments[i];
                 //Propagated generic types to another generic classes
                 if (matchedGenericType instanceof TypeVariable<?>) {
                     return checkSubclassRuntimeInfo((TypeVariable<?>) matchedGenericType);
@@ -109,6 +112,7 @@ class VariableTypeInheritanceSearch {
                 //found runtime matchedGenericType
                 return matchedGenericType;
             }
+            i++;
         }
         return null;
     }
