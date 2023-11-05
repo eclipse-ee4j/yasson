@@ -157,7 +157,7 @@ public class DeserializationModelCreator {
         Optional<DeserializerBinding<?>> deserializerBinding = userDeserializer(type,
                 (ComponentBoundCustomization) propertyCustomization);
         if (deserializerBinding.isPresent()) {
-            UserDefinedDeserializer user = new UserDefinedDeserializer(deserializerBinding.get().getJsonbDeserializer(),
+            UserDefinedDeserializer user = new UserDefinedDeserializer(deserializerBinding.get().getComponent(),
                     JustReturn.instance(), type, classCustomization);
             models.put(cachedItem, user);
             return user;
@@ -448,7 +448,7 @@ public class DeserializationModelCreator {
             //                                               memberDeserializer,
             //                                               resolved,
             //                                               customization);
-            return new UserDefinedDeserializer(deserializerBinding.get().getJsonbDeserializer(),
+            return new UserDefinedDeserializer(deserializerBinding.get().getComponent(),
                                                memberDeserializer,
                                                resolved,
                                                customization);

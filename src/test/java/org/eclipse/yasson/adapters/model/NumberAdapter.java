@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2018, 2020 Oracle and/or its affiliates. All rights reserved.
+ * Copyright (c) 2018, 2023 Oracle and/or its affiliates. All rights reserved.
  *
  * This program and the accompanying materials are made available under the
  * terms of the Eclipse Public License v. 2.0 which is available at
@@ -12,9 +12,22 @@
 
 package org.eclipse.yasson.adapters.model;
 
+import org.eclipse.yasson.serializers.model.Counter;
+
 import jakarta.json.bind.adapter.JsonbAdapter;
 
 public class NumberAdapter implements JsonbAdapter<Number, String> {
+
+    private final static Counter counter = new Counter();
+
+    public static Counter getCounter() {
+        return counter;
+    }
+
+    {
+        counter.add();
+    }
+
     @Override
     public String adaptToJson(Number obj) throws Exception {
         return Integer.valueOf(((Integer)obj) + 1).toString();

@@ -424,10 +424,12 @@ public class SerializersTest {
     }
 
     @Test
-    public void testSupertypeSerializer() throws Exception {
-        try (Jsonb jsonb = JsonbBuilder.create(
-                new JsonbConfig().withSerializers(new NumberSerializer())
-                        .withDeserializers(new NumberDeserializer()))) {
+    public void testSupertypeSerializer_withConfiguration() throws Exception {
+        NumberSerializer.getCounter().resetCount();
+        NumberDeserializer.getCounter().resetCount();
+        try (Jsonb jsonb = JsonbBuilder.create(new JsonbConfig()
+                .withSerializers(new NumberSerializer())
+                .withDeserializers(new NumberDeserializer()))) {
             SupertypeSerializerPojo pojo = new SupertypeSerializerPojo();
             pojo.setNumberInteger(10);
             pojo.setAnotherNumberInteger(11);
@@ -436,9 +438,29 @@ public class SerializersTest {
             pojo = jsonb.fromJson("{\"anotherNumberInteger\":\"12\",\"numberInteger\":\"11\"}", SupertypeSerializerPojo.class);
             assertEquals(Integer.valueOf(10), pojo.getNumberInteger());
             assertEquals(Integer.valueOf(11), pojo.getAnotherNumberInteger());
+            //assert that deserializer and serializer were reused
+            assertEquals(1, NumberSerializer.getCounter().getCount());
+            assertEquals(1, NumberDeserializer.getCounter().getCount());
         }
     }
-    
+
+    @Test
+    public void testSupertypeSerializer() {
+        NumberSerializer.getCounter().resetCount();
+        NumberDeserializer.getCounter().resetCount();
+        SupertypeSerializerPojo pojo = new SupertypeSerializerPojo();
+        pojo.setNumberInteger(9);
+        pojo.setAnotherNumberInteger(11);
+        assertEquals("{\"anotherNumberInteger\":11,\"numberInteger\":\"10\"}", defaultJsonb.toJson(pojo));
+
+        pojo = defaultJsonb.fromJson("{\"anotherNumberInteger\":11,\"numberInteger\":\"10\"}", SupertypeSerializerPojo.class);
+        assertEquals(Integer.valueOf(9), pojo.getNumberInteger());
+        assertEquals(Integer.valueOf(11), pojo.getAnotherNumberInteger());
+        //assert that deserializer and serializer were used just once
+        assertEquals(1, NumberSerializer.getCounter().getCount());
+        assertEquals(1, NumberDeserializer.getCounter().getCount());
+    }
+
     @Test
     public void testObjectDeserializerWithLexOrderStrategy() throws Exception {
         try (Jsonb jsonb = JsonbBuilder.create(new JsonbConfig().withPropertyOrderStrategy(PropertyOrderStrategy.LEXICOGRAPHICAL))) {

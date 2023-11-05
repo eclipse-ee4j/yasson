@@ -33,7 +33,7 @@ class AdapterDeserializer implements ModelDeserializer<Object> {
     AdapterDeserializer(AdapterBinding<?, ?> adapterBinding,
                         ModelDeserializer<Object> delegate) {
         this.adapterBinding = adapterBinding;
-        this.adapter = (JsonbAdapter<Object, Object>) adapterBinding.getAdapter();
+        this.adapter = (JsonbAdapter<Object, Object>) adapterBinding.getComponent();
         this.delegate = delegate;
     }
 
@@ -45,7 +45,7 @@ class AdapterDeserializer implements ModelDeserializer<Object> {
             throw new JsonbException(Messages.getMessage(MessageKeys.ADAPTER_EXCEPTION,
                                                          adapterBinding.getBindingType(),
                                                          adapterBinding.getToType(),
-                                                         adapterBinding.getAdapter().getClass()), e);
+                                                         adapterBinding.getComponentClass()), e);
         }
     }
 

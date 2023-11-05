@@ -419,7 +419,7 @@ public class SerializationModelCreator {
     private Optional<ModelSerializer> userSerializer(Type type, ComponentBoundCustomization classCustomization) {
         final ComponentMatcher componentMatcher = jsonbContext.getComponentMatcher();
         return componentMatcher.getSerializerBinding(type, classCustomization)
-                .map(SerializerBinding::getJsonbSerializer)
+                .map(SerializerBinding::getComponent)
                 .map(UserDefinedSerializer::new)
                 .map(RecursionChecker::new)
                 .map(serializer -> SerializationModelCreator.wrapInCommonSet(serializer,

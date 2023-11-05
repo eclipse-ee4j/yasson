@@ -39,6 +39,7 @@ import org.eclipse.yasson.adapters.model.Crate;
 import org.eclipse.yasson.adapters.model.GenericBox;
 import org.eclipse.yasson.adapters.model.IntegerListToStringAdapter;
 import org.eclipse.yasson.adapters.model.JsonObjectPojo;
+import org.eclipse.yasson.adapters.model.NumberAdapter;
 import org.eclipse.yasson.adapters.model.ReturnNullAdapter;
 import org.eclipse.yasson.adapters.model.SupertypeAdapterPojo;
 import org.eclipse.yasson.adapters.model.UUIDContainer;
@@ -504,6 +505,7 @@ public class AdaptersTest {
 
     @Test
     public void testSupertypeAdapter() {
+        NumberAdapter.getCounter().resetCount();
         SupertypeAdapterPojo pojo = new SupertypeAdapterPojo();
         pojo.setNumberInteger(10);
         pojo.setSerializableInteger(11);
@@ -511,8 +513,26 @@ public class AdaptersTest {
         pojo = defaultJsonb.fromJson("{\"numberInteger\":\"11\",\"serializableInteger\":12}", SupertypeAdapterPojo.class);
         assertEquals(Integer.valueOf(10), pojo.getNumberInteger());
         assertEquals(Integer.valueOf(11), pojo.getSerializableInteger());
+        //assert that the adapter was used just once
+        assertEquals(1, NumberAdapter.getCounter().getCount());
     }
     
+    @Test
+    public void testSupertypeAdapter_withConfiguration() throws Exception {
+        NumberAdapter.getCounter().resetCount();
+        SupertypeAdapterPojo pojo = new SupertypeAdapterPojo();
+        pojo.setNumberInteger(10);
+        pojo.setSerializableInteger(11);
+        try (Jsonb jsonb = JsonbBuilder.create(new JsonbConfig().withAdapters(new NumberAdapter()))) {
+            assertEquals("{\"numberInteger\":\"11\",\"serializableInteger\":12}", jsonb.toJson(pojo));
+            pojo = jsonb.fromJson("{\"numberInteger\":\"11\",\"serializableInteger\":12}", SupertypeAdapterPojo.class);
+            assertEquals(Integer.valueOf(10), pojo.getNumberInteger());
+            assertEquals(Integer.valueOf(11), pojo.getSerializableInteger());
+            //assert that the adapter was reused
+            assertEquals(1, NumberAdapter.getCounter().getCount());
+        }
+    }
+
     public static class PropertyTypeMismatch {
         private Throwable error = new RuntimeException("foo");
         

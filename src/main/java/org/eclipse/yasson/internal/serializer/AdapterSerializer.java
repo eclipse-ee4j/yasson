@@ -33,7 +33,7 @@ class AdapterSerializer extends AbstractSerializer {
     AdapterSerializer(AdapterBinding<?, ?> adapterBinding,
                       ModelSerializer delegate) {
         super(delegate);
-        this.adapter = (JsonbAdapter<Object, Object>) adapterBinding.getAdapter();
+        this.adapter = (JsonbAdapter<Object, Object>) adapterBinding.getComponent();
         this.adapterBinding = adapterBinding;
     }
 
@@ -45,7 +45,7 @@ class AdapterSerializer extends AbstractSerializer {
             throw new JsonbException(Messages.getMessage(MessageKeys.ADAPTER_EXCEPTION,
                                                          adapterBinding.getBindingType(),
                                                          adapterBinding.getToType(),
-                                                         adapter.getClass()), e);
+                                                         adapterBinding.getComponentClass()), e);
         }
     }
 

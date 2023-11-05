@@ -13,6 +13,7 @@
 package org.eclipse.yasson.internal.components;
 
 import java.lang.reflect.Type;
+import java.util.Objects;
 
 import jakarta.json.bind.adapter.JsonbAdapter;
 import jakarta.json.bind.serializer.JsonbDeserializer;
@@ -29,11 +30,11 @@ public class ComponentBindings<Original, Adapted> {
 
     private final Type bindingType;
 
-    private final SerializerBinding<Original> serializer;
+    private final SerializerBinding<Original> serializerBinding;
 
-    private final DeserializerBinding<Original> deserializer;
+    private final DeserializerBinding<Original> deserializerBinding;
 
-    private final AdapterBinding<Original, Adapted> adapterInfo;
+    private final AdapterBinding<Original, Adapted> adapterBinding;
 
     /**
      * Construct empty bindings for a given type.
@@ -47,19 +48,53 @@ public class ComponentBindings<Original, Adapted> {
     /**
      * Creates an instance and populates it with bindings for a given type.
      *
-     * @param bindingType  Type components are bound to.
-     * @param serializer   Serializer.
-     * @param deserializer Deserializer.
-     * @param adapter      Adapter.
+     * @param bindingType         Type components are bound to.
+     * @param serializerBinding   Serializer.
+     * @param deserializerBinding Deserializer.
+     * @param adapterBinding      Adapter.
      */
-    public ComponentBindings(Type bindingType,
-                             SerializerBinding<Original> serializer,
-                             DeserializerBinding<Original> deserializer,
-                             AdapterBinding<Original, Adapted> adapter) {
+    private ComponentBindings(Type bindingType,
+                             SerializerBinding<Original> serializerBinding,
+                             DeserializerBinding<Original> deserializerBinding,
+                             AdapterBinding<Original, Adapted> adapterBinding) {
+        Objects.requireNonNull(bindingType);
         this.bindingType = bindingType;
-        this.serializer = serializer;
-        this.deserializer = deserializer;
-        this.adapterInfo = adapter;
+        this.serializerBinding = serializerBinding;
+        this.deserializerBinding = deserializerBinding;
+        this.adapterBinding = adapterBinding;
+    }
+
+    /**
+     * Creates a copy of the given bindings and new serializer.
+     *
+     * @param bindings           Deserializer and adapter will be copied from this instance.
+     * @param serializerBinding  New serializer. The bound type for the copy will be also taken from this serializer.
+     */
+    public ComponentBindings(ComponentBindings<Original, Adapted> bindings,
+                             SerializerBinding<Original> serializerBinding) {
+        this(Objects.requireNonNull(serializerBinding).getBindingType(), serializerBinding, bindings.deserializerBinding, bindings.adapterBinding);
+    }
+
+    /**
+     * Creates a copy of the given bindings and new deserializer.
+     *
+     * @param bindings             Serializer and adapter will be copied from this instance.
+     * @param deserializerBinding  New deserializer. The bound type for the copy will be also taken from this deserializer.
+     */
+    public ComponentBindings(ComponentBindings<Original, Adapted> bindings,
+                             DeserializerBinding<Original> deserializerBinding) {
+        this(Objects.requireNonNull(deserializerBinding).getBindingType(), bindings.serializerBinding, deserializerBinding, bindings.adapterBinding);
+    }
+
+    /**
+     * Creates a copy of the given bindings and new adapter.
+     *
+     * @param bindings        Serializer and serializer will be copied from this instance.
+     * @param adapterBinding  New adapter. The bound type for the copy will be also taken from this adapter.
+     */
+    public ComponentBindings(ComponentBindings<Original, Adapted> bindings,
+                             AdapterBinding<Original, Adapted> adapterBinding) {
+        this(Objects.requireNonNull(adapterBinding).getBindingType(), bindings.serializerBinding, bindings.deserializerBinding, adapterBinding);
     }
 
     /**
@@ -76,8 +111,8 @@ public class ComponentBindings<Original, Adapted> {
      *
      * @return serializer
      */
-    public SerializerBinding<Original> getSerializer() {
-        return serializer;
+    public SerializerBinding<Original> getSerializerBinding() {
+        return serializerBinding;
     }
 
     /**
@@ -85,8 +120,8 @@ public class ComponentBindings<Original, Adapted> {
      *
      * @return deserializer
      */
-    public DeserializerBinding<Original> getDeserializer() {
-        return deserializer;
+    public DeserializerBinding<Original> getDeserializerBinding() {
+        return deserializerBinding;
     }
 
     /**
@@ -94,8 +129,8 @@ public class ComponentBindings<Original, Adapted> {
      *
      * @return adapterInfo
      */
-    public AdapterBinding<Original, Adapted> getAdapterInfo() {
-        return adapterInfo;
+    public AdapterBinding<Original, Adapted> getAdapterBinding() {
+        return adapterBinding;
     }
 
 }

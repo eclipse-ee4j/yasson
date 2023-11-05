@@ -23,11 +23,9 @@ import jakarta.json.bind.adapter.JsonbAdapter;
  * @param <Original> The type for the @{@link JsonbAdapter} that JSONB doesn't know how to handle.
  * @param <Adapted> The type for the @{@link JsonbAdapter} that JSONB knows how to handle out of the box.
  */
-public class AdapterBinding<Original, Adapted> extends AbstractComponentBinding {
+public class AdapterBinding<Original, Adapted> extends AbstractComponentBinding<JsonbAdapter<Original, Adapted>> {
 
     private final Type toType;
-
-    private final JsonbAdapter<Original, Adapted> adapter;
 
     /**
      * Adapter info with type to "adapt from", type to "adapt to" and an components itself.
@@ -37,11 +35,9 @@ public class AdapterBinding<Original, Adapted> extends AbstractComponentBinding 
      * @param adapter  components not null
      */
     public AdapterBinding(Type fromType, Type toType, JsonbAdapter<Original, Adapted> adapter) {
-        super(fromType);
+        super(fromType, adapter);
         Objects.requireNonNull(toType);
-        Objects.requireNonNull(adapter);
         this.toType = toType;
-        this.adapter = adapter;
     }
 
     /**
@@ -54,19 +50,5 @@ public class AdapterBinding<Original, Adapted> extends AbstractComponentBinding 
      */
     public Type getToType() {
         return toType;
-    }
-
-    /**
-     * Get actual components to adapt object value.
-     *
-     * @return components
-     */
-    public JsonbAdapter<Original, Adapted> getAdapter() {
-        return adapter;
-    }
-
-    @Override
-    public Class<?> getComponentClass() {
-        return adapter.getClass();
     }
 }

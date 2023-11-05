@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2016, 2020 Oracle and/or its affiliates. All rights reserved.
+ * Copyright (c) 2016, 2023 Oracle and/or its affiliates. All rights reserved.
  *
  * This program and the accompanying materials are made available under the
  * terms of the Eclipse Public License v. 2.0 which is available at
@@ -21,9 +21,7 @@ import jakarta.json.bind.serializer.JsonbSerializer;
  *
  * @param <T> type of jsonb serializer
  */
-public class SerializerBinding<T> extends AbstractComponentBinding {
-
-    private final JsonbSerializer<T> jsonbSerializer;
+public class SerializerBinding<T> extends AbstractComponentBinding<JsonbSerializer<T>> {
 
     /**
      * Creates a new instance.
@@ -32,26 +30,6 @@ public class SerializerBinding<T> extends AbstractComponentBinding {
      * @param jsonbSerializer Serializer. Can be null.
      */
     public SerializerBinding(Type bindingType, JsonbSerializer<T> jsonbSerializer) {
-        super(bindingType);
-        this.jsonbSerializer = jsonbSerializer;
-    }
-
-    /**
-     * Returns a serializer if any.
-     *
-     * @return Serializer.
-     */
-    public JsonbSerializer<T> getJsonbSerializer() {
-        return jsonbSerializer;
-    }
-
-    /**
-     * Class of user component.
-     *
-     * @return Component class.
-     */
-    @Override
-    public Class<?> getComponentClass() {
-        return jsonbSerializer.getClass();
+        super(bindingType, jsonbSerializer);
     }
 }
