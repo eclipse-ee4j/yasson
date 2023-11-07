@@ -20,8 +20,6 @@ import org.eclipse.yasson.customization.model.Animal;
 import org.eclipse.yasson.customization.model.Dog;
 import org.eclipse.yasson.customization.model.ImplementationClassPojo;
 
-import jakarta.json.bind.Jsonb;
-import jakarta.json.bind.JsonbBuilder;
 import jakarta.json.bind.JsonbConfig;
 import java.util.HashMap;
 
@@ -44,10 +42,10 @@ public class ImplementationClassTest {
     }
 
     @Test
-    public void testJsonbConfigUserImplementation() throws Exception {
+    public void testJsonbConfigUserImplementation() {
         HashMap<Class<?>, Class<?>> userMapping = new HashMap<>();
         userMapping.put(Animal.class, Dog.class);
-        try (Jsonb jsonb = JsonbBuilder.create(new JsonbConfig().setProperty(USER_TYPE_MAPPING, userMapping))) {
+        testWithJsonbBuilderCreate(new JsonbConfig().setProperty(USER_TYPE_MAPPING, userMapping), jsonb -> {
             Animal animal = new Dog("Bulldog");
             String expected = "{\"dogProperty\":\"Bulldog\"}";
             String json = jsonb.toJson(animal);
@@ -56,6 +54,6 @@ public class ImplementationClassTest {
 
             Dog result = (Dog) jsonb.fromJson("{\"dogProperty\":\"Bulldog\"}", Animal.class);
             assertEquals("Bulldog", result.getDogProperty());
-        }
+        });
     }
 }

@@ -13,10 +13,12 @@
 package org.eclipse.yasson.defaultmapping.generics;
 
 import static org.eclipse.yasson.Jsonbs.defaultJsonb;
+import static org.eclipse.yasson.Jsonbs.testWithJsonbBuilderCreate;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
+import java.io.Serial;
 import java.lang.reflect.Field;
 import java.lang.reflect.Type;
 import java.math.BigDecimal;
@@ -57,8 +59,6 @@ import org.eclipse.yasson.serializers.model.Box;
 import org.eclipse.yasson.serializers.model.Crate;
 import org.junit.jupiter.api.Test;
 
-import jakarta.json.bind.Jsonb;
-import jakarta.json.bind.JsonbBuilder;
 import jakarta.json.bind.JsonbConfig;
 
 /**
@@ -276,7 +276,7 @@ public class GenericsTest {
     }
 
     @Test
-    public void testBoundedGenerics() throws Exception {
+    public void testBoundedGenerics() {
         //bounded generics
         BoundedGenericClass<HashSet<Integer>, Circle> boundedGenericClass = new BoundedGenericClass<>();
         List<Shape> shapeList = new ArrayList<>();
@@ -299,7 +299,7 @@ public class GenericsTest {
         String expected = "{\"boundedSet\":[3],\"lowerBoundedList\":[{\"radius\":2.5}],\"upperBoundedList\":[{\"radius\":3.5,\"color\":\"0,0,255\"}]}";
         assertEquals(expected, defaultJsonb.toJson(boundedGenericClass));
 
-        try (Jsonb localJsonb = JsonbBuilder.create(new JsonbConfig())) {
+        testWithJsonbBuilderCreate(new JsonbConfig(), localJsonb -> {
             BoundedGenericClass<HashSet<Integer>, Circle> result = localJsonb.fromJson(expected,
                     new TestTypeToken<BoundedGenericClass<HashSet<Integer>, Circle>>() {
                     }.getType());
@@ -312,7 +312,7 @@ public class GenericsTest {
             assertEquals(Double.valueOf(3.5), result.upperBoundedList.get(0).getRadius());
             //If it was possible we could assert following, but it is not.
             //assertEquals("0,0,255", ((ColoredCircle) result.upperBoundedList.get(0)).color);
-        }
+        });
     }
 
     @Test
@@ -466,6 +466,8 @@ public class GenericsTest {
     }
 
     public static class ExtendsBigDecimal extends BigDecimal {
+        @Serial
+        private static final long serialVersionUID = 1L;
 
         public ExtendsBigDecimal(String val) {
             super(val);
