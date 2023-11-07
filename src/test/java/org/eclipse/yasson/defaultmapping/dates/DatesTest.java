@@ -12,7 +12,6 @@
 
 package org.eclipse.yasson.defaultmapping.dates;
 
-import java.io.Serial;
 import java.io.Serializable;
 import java.lang.reflect.Field;
 import java.lang.reflect.Method;
@@ -86,14 +85,12 @@ public class DatesTest {
     private static LocalDate localDate = LocalDate.of(2018, 1, 31);
 
 	public static class LocalDateObj implements Serializable {
-        @Serial
         private static final long serialVersionUID = 1L;
 
         public LocalDate date = localDate;
     }
 
 	public static class SqlDateObj implements Serializable {
-        @Serial
         private static final long serialVersionUID = 1L;
         
         public java.sql.Date sqlDate = java.sql.Date.valueOf("2018-01-31");

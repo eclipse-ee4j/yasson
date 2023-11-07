@@ -18,7 +18,6 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
-import java.io.Serial;
 import java.lang.reflect.Field;
 import java.lang.reflect.Type;
 import java.math.BigDecimal;
@@ -466,7 +465,6 @@ public class GenericsTest {
     }
 
     public static class ExtendsBigDecimal extends BigDecimal {
-        @Serial
         private static final long serialVersionUID = 1L;
 
         public ExtendsBigDecimal(String val) {
