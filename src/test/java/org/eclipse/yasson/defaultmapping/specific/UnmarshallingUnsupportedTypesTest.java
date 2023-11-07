@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2015, 2022 Oracle and/or its affiliates. All rights reserved.
+ * Copyright (c) 2015, 2023 Oracle and/or its affiliates. All rights reserved.
  *
  * This program and the accompanying materials are made available under the
  * terms of the Eclipse Public License v. 2.0 which is available at
@@ -23,8 +23,6 @@ import java.util.OptionalDouble;
 import java.util.OptionalInt;
 import java.util.OptionalLong;
 
-import jakarta.json.bind.Jsonb;
-import jakarta.json.bind.JsonbBuilder;
 import jakarta.json.bind.JsonbConfig;
 import jakarta.json.bind.JsonbException;
 
@@ -37,10 +35,12 @@ import org.eclipse.yasson.defaultmapping.specific.model.SupportedTypes.NestedPoj
 import org.junit.jupiter.api.Test;
 
 import static org.eclipse.yasson.Jsonbs.defaultJsonb;
+import static org.eclipse.yasson.Jsonbs.testWithJsonbBuilderCreate;
 import static org.eclipse.yasson.YassonConfig.FAIL_ON_UNKNOWN_PROPERTIES;
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.is;
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertInstanceOf;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.junit.jupiter.api.Assertions.fail;
@@ -120,7 +120,7 @@ public class UnmarshallingUnsupportedTypesTest {
         String json  = "{\"nestedPojo\":{\"integerValue\":10,\"missingField\":5},\"optionalLong\":11}";
         SupportedTypes result = defaultJsonb.fromJson(json, SupportedTypes.class);
         assertEquals(Integer.valueOf(10), result.getNestedPojo().getIntegerValue());
-        assertEquals(11, result.getOptionalLong().getAsLong());
+        assertEquals(11, result.getOptionalLong().orElseThrow(RuntimeException::new));
     }
 
     @Test()
@@ -128,16 +128,18 @@ public class UnmarshallingUnsupportedTypesTest {
         String json  = "{\"nestedPojo\":{\"integerValue\":10,\"missingField\":null},\"optionalLong\":11}";
         SupportedTypes result = defaultJsonb.fromJson(json, SupportedTypes.class);
         assertEquals(Integer.valueOf(10), result.getNestedPojo().getIntegerValue());
-        assertEquals(11, result.getOptionalLong().getAsLong());
+        assertEquals(11, result.getOptionalLong().orElseThrow(RuntimeException::new));
     }
 
     @Test
     public void testMissingFieldIgnored() {
-    	assertThrows(JsonbException.class, () -> {
-	        Jsonb defaultConfig = JsonbBuilder.create(new JsonbConfig().setProperty(FAIL_ON_UNKNOWN_PROPERTIES, true));
-	        String json  = "{\"nestedPojo\":{\"integerValue\":10,\"missingField\":5},\"optionalLong\":11}";
-	        SupportedTypes result = defaultConfig.fromJson(json, SupportedTypes.class);
-    	});
+    	RuntimeException runtimeException
+                = assertThrows(RuntimeException.class, () -> testWithJsonbBuilderCreate(new JsonbConfig().setProperty(FAIL_ON_UNKNOWN_PROPERTIES, true), jsonb -> {
+            String json = "{\"nestedPojo\":{\"integerValue\":10,\"missingField\":5},\"optionalLong\":11}";
+            SupportedTypes result = jsonb.fromJson(json, SupportedTypes.class);
+        }));
+
+        assertInstanceOf(JsonbException.class, runtimeException.getCause());
     }
 
     @Test

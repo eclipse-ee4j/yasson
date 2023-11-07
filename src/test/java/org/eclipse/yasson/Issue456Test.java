@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2022 Oracle and/or its affiliates. All rights reserved.
+ * Copyright (c) 2022, 2023 Oracle and/or its affiliates. All rights reserved.
  *
  * This program and the accompanying materials are made available under the
  * terms of the Eclipse Public License v. 2.0 which is available at
@@ -12,11 +12,11 @@
 
 package org.eclipse.yasson;
 
+import static org.eclipse.yasson.Jsonbs.defaultJsonb;
 import static org.junit.jupiter.api.Assertions.fail;
 
 import org.junit.jupiter.api.Test;
 
-import jakarta.json.bind.JsonbBuilder;
 import jakarta.json.bind.JsonbException;
 
 public class Issue456Test {
@@ -24,7 +24,7 @@ public class Issue456Test {
     @Test
     public void dontInvokeToString() {
         try {
-            JsonbBuilder.create().toJson(new Example());
+            defaultJsonb.toJson(new Example());
             fail("JsonbException is expected");
         } catch (JsonbException e) {
             // Expected
@@ -39,7 +39,7 @@ public class Issue456Test {
 
         @Override
         public String toString() {
-            return JsonbBuilder.create().toJson(this);
+            return defaultJsonb.toJson(this);
         }
     }
 }

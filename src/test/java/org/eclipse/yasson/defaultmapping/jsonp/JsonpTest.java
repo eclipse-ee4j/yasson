@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2015, 2022 Oracle and/or its affiliates. All rights reserved.
+ * Copyright (c) 2015, 2023 Oracle and/or its affiliates. All rights reserved.
  *
  * This program and the accompanying materials are made available under the
  * terms of the Eclipse Public License v. 2.0 which is available at
@@ -22,14 +22,13 @@ import jakarta.json.JsonObject;
 import jakarta.json.JsonObjectBuilder;
 import jakarta.json.JsonString;
 import jakarta.json.JsonValue;
-import jakarta.json.bind.Jsonb;
-import jakarta.json.bind.JsonbBuilder;
 import jakarta.json.bind.JsonbConfig;
 import jakarta.json.spi.JsonProvider;
 import org.eclipse.yasson.defaultmapping.jsonp.model.JsonpPojo;
 import org.junit.jupiter.api.Test;
 
 import static org.eclipse.yasson.Jsonbs.defaultJsonb;
+import static org.eclipse.yasson.Jsonbs.testWithJsonbBuilderCreate;
 import static org.hamcrest.CoreMatchers.is;
 import static org.hamcrest.CoreMatchers.nullValue;
 import static org.hamcrest.MatcherAssert.assertThat;
@@ -114,45 +113,45 @@ public class JsonpTest {
 
     @Test
     public void testJsonPojo() {
-        JsonbConfig config = new JsonbConfig();
-//        config.withFormatting(true);
-        Jsonb jsonb = JsonbBuilder.create(config);
+        //        config.withFormatting(true);
+        testWithJsonbBuilderCreate(new JsonbConfig(), jsonb -> {
+
+            JsonpPojo pojo = new JsonpPojo();
+            final JsonObjectBuilder obj1builder = JsonProvider.provider().createObjectBuilder();
+            obj1builder.add("strVal", "string value");
+            obj1builder.add("numVal", 2.0d);
+            obj1builder.addNull("nullVal");
+            obj1builder.add("boolVal", Boolean.TRUE);
+
+            final JsonObjectBuilder obj2Builder = JsonProvider.provider().createObjectBuilder();
+            obj2Builder.add("innerStr", "string val");
+            obj2Builder.add("innerNum", 11.1d);
+            final JsonObject obj2 = obj2Builder.build();
+
+            JsonArrayBuilder array1Builder = JsonProvider.provider().createArrayBuilder();
+            array1Builder.addNull().add(false).add(11L).add(BigDecimal.TEN).add("array STR value").add(obj2);
+            JsonArray jsonArray1 = array1Builder.build();
+
+            obj1builder.add("innerJsonObject", obj2);
+            obj1builder.add("innerArrayObject", jsonArray1);
+
+            final JsonObject obj1 = obj1builder.build();
+            pojo.jsonObject = obj1;
+
+            JsonArrayBuilder arrayBuilder = JsonProvider.provider().createArrayBuilder();
+            arrayBuilder.add(obj1).add(true).add(obj2).add(101.0d).add(BigDecimal.TEN);
+            pojo.jsonArray = arrayBuilder.build();
 
 
-        JsonpPojo pojo = new JsonpPojo();
-        final JsonObjectBuilder obj1builder = JsonProvider.provider().createObjectBuilder();
-        obj1builder.add("strVal", "string value");
-        obj1builder.add("numVal", 2.0d);
-        obj1builder.addNull("nullVal");
-        obj1builder.add("boolVal", Boolean.TRUE);
+            String expected =
+                    "{\"jsonArray\":[{\"strVal\":\"string value\",\"numVal\":2.0,\"nullVal\":null,\"boolVal\":true,\"innerJsonObject\":{\"innerStr\":\"string val\",\"innerNum\":11.1},\"innerArrayObject\":[null,false,11,10,\"array STR value\",{\"innerStr\":\"string val\",\"innerNum\":11.1}]},true,{\"innerStr\":\"string val\",\"innerNum\":11.1},101.0,10],\"jsonObject\":{\"strVal\":\"string value\",\"numVal\":2.0,\"nullVal\":null,\"boolVal\":true,\"innerJsonObject\":{\"innerStr\":\"string val\",\"innerNum\":11.1},\"innerArrayObject\":[null,false,11,10,\"array STR value\",{\"innerStr\":\"string val\",\"innerNum\":11.1}]}}";
+            final String actual = jsonb.toJson(pojo);
+            assertEquals(expected, actual);
 
-        final JsonObjectBuilder obj2Builder = JsonProvider.provider().createObjectBuilder();
-        obj2Builder.add("innerStr", "string val");
-        obj2Builder.add("innerNum", 11.1d);
-        final JsonObject obj2 = obj2Builder.build();
-
-        JsonArrayBuilder array1Builder = JsonProvider.provider().createArrayBuilder();
-        array1Builder.addNull().add(false).add(11L).add(BigDecimal.TEN).add("array STR value").add(obj2);
-        JsonArray jsonArray1 = array1Builder.build();
-
-        obj1builder.add("innerJsonObject", obj2);
-        obj1builder.add("innerArrayObject", jsonArray1);
-
-        final JsonObject obj1 = obj1builder.build();
-        pojo.jsonObject = obj1;
-
-        JsonArrayBuilder arrayBuilder = JsonProvider.provider().createArrayBuilder();
-        arrayBuilder.add(obj1).add(true).add(obj2).add(101.0d).add(BigDecimal.TEN);
-        pojo.jsonArray = arrayBuilder.build();
-
-
-        String expected = "{\"jsonArray\":[{\"strVal\":\"string value\",\"numVal\":2.0,\"nullVal\":null,\"boolVal\":true,\"innerJsonObject\":{\"innerStr\":\"string val\",\"innerNum\":11.1},\"innerArrayObject\":[null,false,11,10,\"array STR value\",{\"innerStr\":\"string val\",\"innerNum\":11.1}]},true,{\"innerStr\":\"string val\",\"innerNum\":11.1},101.0,10],\"jsonObject\":{\"strVal\":\"string value\",\"numVal\":2.0,\"nullVal\":null,\"boolVal\":true,\"innerJsonObject\":{\"innerStr\":\"string val\",\"innerNum\":11.1},\"innerArrayObject\":[null,false,11,10,\"array STR value\",{\"innerStr\":\"string val\",\"innerNum\":11.1}]}}";
-        final String actual = jsonb.toJson(pojo);
-        assertEquals(expected, actual);
-
-        JsonpPojo result = jsonb.fromJson(expected, JsonpPojo.class);
-        assertEquals(pojo.jsonObject, result.jsonObject);
-        assertEquals(pojo.jsonArray, result.jsonArray);
+            JsonpPojo result = jsonb.fromJson(expected, JsonpPojo.class);
+            assertEquals(pojo.jsonObject, result.jsonObject);
+            assertEquals(pojo.jsonArray, result.jsonArray);
+        });
     }
 
     @Test

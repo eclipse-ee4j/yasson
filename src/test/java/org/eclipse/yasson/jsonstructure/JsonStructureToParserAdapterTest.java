@@ -31,7 +31,6 @@ import jakarta.json.JsonObject;
 import jakarta.json.JsonObjectBuilder;
 import jakarta.json.JsonString;
 import jakarta.json.JsonValue;
-import jakarta.json.bind.JsonbBuilder;
 import jakarta.json.bind.JsonbConfig;
 import jakarta.json.spi.JsonProvider;
 import jakarta.json.stream.JsonParser;
@@ -292,7 +291,7 @@ public class JsonStructureToParserAdapterTest {
 
 
     @Test
-    public void testCustomJsonbDeserializer() throws Exception {
+    public void testCustomJsonbDeserializer() {
         JsonObjectBuilder outerBuilder = jsonProvider.createObjectBuilder();
         JsonObjectBuilder innerBuilder = jsonProvider.createObjectBuilder();
         innerBuilder.add("first", "String value 1");
@@ -300,12 +299,12 @@ public class JsonStructureToParserAdapterTest {
         outerBuilder.add("inner", innerBuilder.build());
         JsonObject object = outerBuilder.build();
 
-        try (YassonJsonb jsonb = (YassonJsonb) JsonbBuilder.create(new JsonbConfig().withDeserializers(new InnerPojoDeserializer()))) {
-            Pojo result = jsonb.fromJsonStructure(object, Pojo.class);
+        testWithJsonbBuilderCreate(new JsonbConfig().withDeserializers(new InnerPojoDeserializer()), jsonb -> {
+            Pojo result = ((YassonJsonb)jsonb).fromJsonStructure(object, Pojo.class);
             assertNotNull(result.getInner());
             assertEquals("String value 1", result.getInner().getInnerFirst());
             assertEquals("String value 2", result.getInner().getInnerSecond());
-        }
+        });
     }
 
     @Nested

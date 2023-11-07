@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2016, 2020 Oracle and/or its affiliates. All rights reserved.
+ * Copyright (c) 2016, 2023 Oracle and/or its affiliates. All rights reserved.
  *
  * This program and the accompanying materials are made available under the
  * terms of the Eclipse Public License v. 2.0 which is available at
@@ -20,8 +20,6 @@ import org.eclipse.yasson.customization.model.JsonbPropertyName;
 import org.eclipse.yasson.customization.model.JsonbPropertyNameCollision;
 import org.eclipse.yasson.customization.model.JsonbPropertyNillable;
 
-import jakarta.json.bind.Jsonb;
-import jakarta.json.bind.JsonbBuilder;
 import jakarta.json.bind.JsonbConfig;
 import jakarta.json.bind.JsonbException;
 import jakarta.json.bind.annotation.JsonbProperty;
@@ -34,7 +32,7 @@ import jakarta.json.bind.config.PropertyNamingStrategy;
 public class JsonbPropertyTest {
 
     @Test
-    public void testPropertyName() throws Exception {
+    public void testPropertyName() {
 
         JsonbPropertyName pojo = new JsonbPropertyName();
         pojo.setFieldAnnotatedName("FIELD_ANNOTATED");
@@ -92,28 +90,29 @@ public class JsonbPropertyTest {
     @Test
     public void testRenamedGetterAndSetter2() {
         // Reported in issue: https://github.com/eclipse-ee4j/yasson/issues/81
-        final Jsonb jsonb = JsonbBuilder.create(
-                new JsonbConfig().withPropertyNamingStrategy(PropertyNamingStrategy.UPPER_CAMEL_CASE));
+        testWithJsonbBuilderCreate(new JsonbConfig().withPropertyNamingStrategy(PropertyNamingStrategy.UPPER_CAMEL_CASE), jsonb -> {
 
-        final RenamedGetterAndSetter2 bean1 = new RenamedGetterAndSetter2();
-        bean1.setAPIDocumentation("REST");
+            final RenamedGetterAndSetter2 bean1 = new RenamedGetterAndSetter2();
+            bean1.setAPIDocumentation("REST");
 
-        final String json = jsonb.toJson(bean1);
-        final RenamedGetterAndSetter2 bean2 = jsonb.fromJson(json, RenamedGetterAndSetter2.class);
-        assertEquals(bean1.getAPIDocumentation(), bean2.getAPIDocumentation());
+            final String json = jsonb.toJson(bean1);
+            final RenamedGetterAndSetter2 bean2 = jsonb.fromJson(json, RenamedGetterAndSetter2.class);
+            assertEquals(bean1.getAPIDocumentation(), bean2.getAPIDocumentation());
+        });
     }
     
     @Test
     public void testRenamedGetterAndSetter3() {
         // Reported in issue: https://github.com/eclipse-ee4j/yasson/issues/81
-        final Jsonb jsonb = JsonbBuilder.create();
-        
-        final RenamedGetterAndSetter2 bean1 = new RenamedGetterAndSetter2();
-        bean1.setAPIDocumentation("REST");
+        testWithJsonbBuilderCreate(jsonb -> {
 
-        final String json = jsonb.toJson(bean1);
-        final RenamedGetterAndSetter2 bean2 = jsonb.fromJson(json, RenamedGetterAndSetter2.class);
-        assertEquals(bean1.getAPIDocumentation(), bean2.getAPIDocumentation());
+            final RenamedGetterAndSetter2 bean1 = new RenamedGetterAndSetter2();
+            bean1.setAPIDocumentation("REST");
+
+            final String json = jsonb.toJson(bean1);
+            final RenamedGetterAndSetter2 bean2 = jsonb.fromJson(json, RenamedGetterAndSetter2.class);
+            assertEquals(bean1.getAPIDocumentation(), bean2.getAPIDocumentation());
+        });
     }
     
     public static class RenamedGetterAndSetter {
@@ -152,7 +151,7 @@ public class JsonbPropertyTest {
      * is private without getter / setter.
      * And property "DOI" - getter / setter without a field with customization on getter renaming it to doi
      * in serialized document.
-     *
+     * <p>
      * Because first of those properties is not readable this should not raise naming clash error.
      */
     @Test
@@ -174,16 +173,18 @@ public class JsonbPropertyTest {
     public void testConflictingProperties() {
         ConflictingProperties conflictingProperties = new ConflictingProperties();
         conflictingProperties.setDOI("DOI value");
-        Jsonb jsonb = JsonbBuilder.create(new JsonbConfig());
+        testWithJsonbBuilderCreate(new JsonbConfig(), jsonb -> {
 
-        try {
-            jsonb.toJson(conflictingProperties);
-            fail();
-        } catch (JsonbException e) {
-            if (!e.getMessage().equals("Property DOI clashes with property doi by read or write name in class org.eclipse.yasson.customization.JsonbPropertyTest$ConflictingProperties.")) {
-                throw e;
+            try {
+                jsonb.toJson(conflictingProperties);
+                fail();
+            } catch (JsonbException e) {
+                if (!e.getMessage()
+                        .equals("Property DOI clashes with property doi by read or write name in class org.eclipse.yasson.customization.JsonbPropertyTest$ConflictingProperties.")) {
+                    throw e;
+                }
             }
-        }
+        });
     }
 
     /**
@@ -197,26 +198,26 @@ public class JsonbPropertyTest {
         String json = defaultJsonb.toJson(pojo);
         assertEquals("{\"Doi\":\"DOI value\",\"doi\":\"DOI value\"}", json);
 
-        Jsonb jsonb = JsonbBuilder.create(new JsonbConfig()
-                .withPropertyNamingStrategy(PropertyNamingStrategy.UPPER_CAMEL_CASE));
+        testWithJsonbBuilderCreate(new JsonbConfig().withPropertyNamingStrategy(PropertyNamingStrategy.UPPER_CAMEL_CASE), jsonb -> {
 
-        try {
-            jsonb.toJson(pojo);
-            fail();
-        } catch (JsonbException e) {
-            if (!e.getMessage().equals("Property DOI clashes with property doi by read or write name in class org.eclipse.yasson.customization.JsonbPropertyTest$ConflictingWithUpperCamelStrategy.")) {
-                throw e;
+            try {
+                jsonb.toJson(pojo);
+                fail();
+            } catch (JsonbException e) {
+                if (!e.getMessage()
+                        .equals("Property DOI clashes with property doi by read or write name in class org.eclipse.yasson.customization.JsonbPropertyTest$ConflictingWithUpperCamelStrategy.")) {
+                    throw e;
+                }
             }
-        }
-
+        });
     }
     
     @Test
     public void testConflictingWithLowercaseStrategy() {
     	// scenario raised by user here: https://github.com/eclipse-ee4j/yasson/issues/296
-    	Jsonb jsonb = JsonbBuilder.create(new JsonbConfig().withPropertyNamingStrategy(PropertyNamingStrategy.LOWER_CASE_WITH_UNDERSCORES));
-    	assertEquals("{\"url\":\"http://foo.com\"}", 
-    			jsonb.toJson(new ConflictingIfLowercase()));
+        testWithJsonbBuilderCreate(new JsonbConfig().withPropertyNamingStrategy(PropertyNamingStrategy.LOWER_CASE_WITH_UNDERSCORES), jsonb ->
+            assertEquals("{\"url\":\"http://foo.com\"}", jsonb.toJson(new ConflictingIfLowercase()))
+        );
     }
     
     public static class ConflictingIfLowercase {

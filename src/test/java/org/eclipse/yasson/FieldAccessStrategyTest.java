@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2016, 2020 Oracle and/or its affiliates. All rights reserved.
+ * Copyright (c) 2016, 2023 Oracle and/or its affiliates. All rights reserved.
  *
  * This program and the accompanying materials are made available under the
  * terms of the Eclipse Public License v. 2.0 which is available at
@@ -11,10 +11,10 @@
  */package org.eclipse.yasson;
 
  import org.junit.jupiter.api.*;
+
+ import static org.eclipse.yasson.Jsonbs.testWithJsonbBuilderCreate;
  import static org.junit.jupiter.api.Assertions.*;
 
-import jakarta.json.bind.Jsonb;
-import jakarta.json.bind.JsonbBuilder;
 import jakarta.json.bind.JsonbConfig;
 import jakarta.json.bind.annotation.JsonbTransient;
 import jakarta.json.bind.config.PropertyVisibilityStrategy;
@@ -55,32 +55,34 @@ public class FieldAccessStrategyTest {
 
     @Test
     public void testPrivateFields() {
-        Jsonb jsonb = JsonbBuilder.create(new JsonbConfig().withPropertyVisibilityStrategy(new FieldAccessStrategy()));
+        testWithJsonbBuilderCreate(new JsonbConfig().withPropertyVisibilityStrategy(new FieldAccessStrategy()), jsonb -> {
 
-        PrivateFields pojo = new PrivateFields("pojo string");
+            PrivateFields pojo = new PrivateFields("pojo string");
 
-        String expected = "{\"strField\":\"pojo string\"}";
+            String expected = "{\"strField\":\"pojo string\"}";
 
-        assertEquals(expected, jsonb.toJson(pojo));
-        PrivateFields result = jsonb.fromJson(expected, PrivateFields.class);
-        assertEquals(false, result.getterCalled);
-        assertEquals(false, result.setterCalled);
-        assertEquals("pojo string", result.strField);
+            assertEquals(expected, jsonb.toJson(pojo));
+            PrivateFields result = jsonb.fromJson(expected, PrivateFields.class);
+            assertFalse(result.getterCalled);
+            assertFalse(result.setterCalled);
+            assertEquals("pojo string", result.strField);
+        });
     }
 
 
     @Test
     public void testHidePublicFields() {
-        Jsonb jsonb = JsonbBuilder.create(new JsonbConfig().withPropertyVisibilityStrategy(new NoAccessStrategy()));
+        testWithJsonbBuilderCreate(new JsonbConfig().withPropertyVisibilityStrategy(new NoAccessStrategy()), jsonb -> {
 
-        PublicFields pojo = new PublicFields();
-        pojo.strField = "string field";
+            PublicFields pojo = new PublicFields();
+            pojo.strField = "string field";
 
-        String expected = "{}";
+            String expected = "{}";
 
-        assertEquals(expected, jsonb.toJson(pojo));
-        PublicFields result = jsonb.fromJson("{\"strField\":\"pojo string\"}", PublicFields.class);
-        assertEquals(null, result.strField);
+            assertEquals(expected, jsonb.toJson(pojo));
+            PublicFields result = jsonb.fromJson("{\"strField\":\"pojo string\"}", PublicFields.class);
+            assertNull(result.strField);
+        });
     }
 
     /**
@@ -88,23 +90,25 @@ public class FieldAccessStrategyTest {
      */
     @Test
     public void testCustomVisibityStrategy() {
-        Jsonb jsonb = JsonbBuilder.create(new JsonbConfig().withPropertyVisibilityStrategy(new CustomVisibilityStrategy()));
+        testWithJsonbBuilderCreate(new JsonbConfig().withPropertyVisibilityStrategy(new CustomVisibilityStrategy()), jsonb -> {
 
-        String json = "{\"floatInstance\":10.0,\"stringInstance\":\"Test String\"}";
-        SimpleContainer simpleContainer = new SimpleContainer();
-        simpleContainer.setStringInstance("Test String");
-        simpleContainer.setIntegerInstance(10);
-        simpleContainer.setFloatInstance(10.0f);
-        assertEquals(json, jsonb.toJson(simpleContainer));
+            String json = "{\"floatInstance\":10.0,\"stringInstance\":\"Test String\"}";
+            SimpleContainer simpleContainer = new SimpleContainer();
+            simpleContainer.setStringInstance("Test String");
+            simpleContainer.setIntegerInstance(10);
+            simpleContainer.setFloatInstance(10.0f);
+            assertEquals(json, jsonb.toJson(simpleContainer));
 
 
-        SimpleContainer result = jsonb.fromJson("{ \"stringInstance\" : \"Test String\", \"floatInstance\" : 1.0, \"integerInstance\" : 1 }", SimpleContainer.class);
-        assertEquals("Test String", result.stringInstance);
-        assertNull(result.integerInstance);
-        assertNull(result.floatInstance);
+            SimpleContainer result = jsonb.fromJson("{ \"stringInstance\" : \"Test String\", \"floatInstance\" : 1.0, \"integerInstance\" : 1 }",
+                    SimpleContainer.class);
+            assertEquals("Test String", result.stringInstance);
+            assertNull(result.integerInstance);
+            assertNull(result.floatInstance);
+        });
     }
 
-    public class CustomVisibilityStrategy implements PropertyVisibilityStrategy {
+    public static class CustomVisibilityStrategy implements PropertyVisibilityStrategy {
         @Override
         public boolean isVisible(Field field) {
             return field.getName().equals("stringInstance");
@@ -115,6 +119,7 @@ public class FieldAccessStrategyTest {
             return method.getName().equals("getFloatInstance");
         }
     }
+
     public static class SimpleContainer {
         private String stringInstance;
         private Integer integerInstance;

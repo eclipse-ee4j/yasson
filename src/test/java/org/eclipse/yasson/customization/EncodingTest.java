@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2016, 2020 Oracle and/or its affiliates. All rights reserved.
+ * Copyright (c) 2016, 2023 Oracle and/or its affiliates. All rights reserved.
  *
  * This program and the accompanying materials are made available under the
  * terms of the Eclipse Public License v. 2.0 which is available at
@@ -13,12 +13,13 @@
 package org.eclipse.yasson.customization;
 
 import org.junit.jupiter.api.*;
+
+import static org.eclipse.yasson.Jsonbs.testWithJsonbBuilderCreate;
 import static org.junit.jupiter.api.Assertions.*;
 
 import org.eclipse.yasson.TestTypeToken;
 
 import jakarta.json.bind.Jsonb;
-import jakarta.json.bind.JsonbBuilder;
 import jakarta.json.bind.JsonbConfig;
 import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
@@ -50,32 +51,47 @@ public class EncodingTest {
     }
 
     @Test
-    public void testCP1250Encoding() throws UnsupportedEncodingException {
+    public void testCP1250Encoding() {
     	String encoding = "cp1250";
-    	Jsonb jsonb = JsonbBuilder.create(new JsonbConfig().withEncoding(encoding));
-    	
-        testMarshaller(CZECH, jsonb, encoding);
-        testUnmarshaller(CZECH, jsonb, encoding);
+    	testWithJsonbBuilderCreate(new JsonbConfig().withEncoding(encoding), jsonb -> {
+
+            try {
+                testMarshaller(CZECH, jsonb, encoding);
+                testUnmarshaller(CZECH, jsonb, encoding);
+            } catch (UnsupportedEncodingException e) {
+                throw new RuntimeException(e);
+            }
+        });
     }
 
     @Test
-    public void testUTF8Encoding() throws UnsupportedEncodingException {
+    public void testUTF8Encoding() {
     	String encoding = "UTF-8";
-    	Jsonb jsonb = JsonbBuilder.create(new JsonbConfig().withEncoding(encoding));
-    	
-        testMarshaller(CZECH, jsonb, encoding);
-        testUnmarshaller(CZECH, jsonb, encoding);
-        testMarshaller(RUSSIAN, jsonb, encoding);
-        testUnmarshaller(RUSSIAN, jsonb, encoding);
+    	testWithJsonbBuilderCreate(new JsonbConfig().withEncoding(encoding), jsonb -> {
+
+            try {
+                testMarshaller(CZECH, jsonb, encoding);
+                testUnmarshaller(CZECH, jsonb, encoding);
+                testMarshaller(RUSSIAN, jsonb, encoding);
+                testUnmarshaller(RUSSIAN, jsonb, encoding);
+            } catch (UnsupportedEncodingException e) {
+                throw new RuntimeException(e);
+            }
+        });
     }
 
     @Test
-    public void testcp1251Encoding() throws UnsupportedEncodingException {
+    public void testcp1251Encoding() {
     	String encoding = "cp1251";
-    	Jsonb jsonb = JsonbBuilder.create(new JsonbConfig().withEncoding(encoding));
-    	
-        testMarshaller(RUSSIAN, jsonb, encoding);
-        testUnmarshaller(RUSSIAN, jsonb, encoding);
+    	testWithJsonbBuilderCreate(new JsonbConfig().withEncoding(encoding), jsonb -> {
+
+            try {
+                testMarshaller(RUSSIAN, jsonb, encoding);
+                testUnmarshaller(RUSSIAN, jsonb, encoding);
+            } catch (UnsupportedEncodingException e) {
+                throw new RuntimeException(e);
+            }
+        });
     }
 
     private static void testMarshaller(String[] input, Jsonb jsonb, String encoding) throws UnsupportedEncodingException {
@@ -92,7 +108,7 @@ public class EncodingTest {
         logger.finest("JSON for unmarshaller: "+json);
         InputStream bis = new ByteArrayInputStream(json.getBytes(encoding));
         ArrayList<String> result = jsonb.fromJson(bis, new TestTypeToken<ArrayList<String>>(){}.getType());
-        assertArrayEquals(input, result.toArray(new String[result.size()]));
+        assertArrayEquals(input, result.toArray(new String[0]));
     }
 
     private static String diacriticsToJsonArray(String[] diacritics) {

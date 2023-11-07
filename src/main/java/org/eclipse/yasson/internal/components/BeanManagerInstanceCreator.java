@@ -83,9 +83,16 @@ public class BeanManagerInstanceCreator implements JsonbComponentInstanceCreator
     }
 
     private <T> void cleanupBean(CDIManagedBean<T> bean) {
-        bean.getInjectionTarget().preDestroy(bean.getInstance());
-        bean.getInjectionTarget().dispose(bean.getInstance());
-        bean.getCreationalContext().release();
+        InjectionTarget<T> injectionTarget = bean.getInjectionTarget();
+        if (injectionTarget != null) {
+            injectionTarget.preDestroy(bean.getInstance());
+            injectionTarget.dispose(bean.getInstance());
+        }
+
+        CreationalContext<T> creationalContext = bean.getCreationalContext();
+        if (creationalContext != null) {
+            creationalContext.release();
+        }
     }
 
     /**

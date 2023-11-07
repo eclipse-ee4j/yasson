@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2016, 2020 Oracle and/or its affiliates. All rights reserved.
+ * Copyright (c) 2016, 2023 Oracle and/or its affiliates. All rights reserved.
  *
  * This program and the accompanying materials are made available under the
  * terms of the Eclipse Public License v. 2.0 which is available at
@@ -16,8 +16,6 @@ import org.junit.jupiter.api.*;
 import static org.junit.jupiter.api.Assertions.*;
 import static org.eclipse.yasson.Jsonbs.*;
 
-import jakarta.json.bind.Jsonb;
-import jakarta.json.bind.JsonbBuilder;
 import jakarta.json.bind.JsonbConfig;
 import jakarta.json.bind.annotation.JsonbVisibility;
 import jakarta.json.bind.config.PropertyVisibilityStrategy;
@@ -110,24 +108,24 @@ public class JsonbPropertyVisibilityStrategyTest {
      */
     @Test
     public void testFieldVisibilityStrategy() {
-        JsonbConfig customizedConfig = new JsonbConfig();
-        customizedConfig.setProperty(JsonbConfig.PROPERTY_VISIBILITY_STRATEGY, new PropertyVisibilityStrategy() {
-            @Override
-            public boolean isVisible(Field field) {
-                final String fieldName = field.getName();
-                return fieldName.equals("afield") || fieldName.equals("dfield");
-            }
+        JsonbConfig customizedConfig = new JsonbConfig()
+            .setProperty(JsonbConfig.PROPERTY_VISIBILITY_STRATEGY, new PropertyVisibilityStrategy() {
+                @Override
+                public boolean isVisible(Field field) {
+                    final String fieldName = field.getName();
+                    return fieldName.equals("afield") || fieldName.equals("dfield");
+                }
 
-            @Override
-            public boolean isVisible(Method method) {
-                throw new IllegalStateException("Not supported");
-            }
-        });
+                @Override
+                public boolean isVisible(Method method) {
+                    throw new IllegalStateException("Not supported");
+                }
+            });
 
         FieldPojo fieldPojo = new FieldPojo("avalue", "bvalue", "cvalue", "dvalue");
 
-        Jsonb jsonb = JsonbBuilder.create(customizedConfig);
-        assertEquals("{\"afield\":\"avalue\",\"dfield\":\"dvalue\"}", jsonb.toJson(fieldPojo));
+        testWithJsonbBuilderCreate(customizedConfig, jsonb ->
+            assertEquals("{\"afield\":\"avalue\",\"dfield\":\"dvalue\"}", jsonb.toJson(fieldPojo)));
     }
 
     /**
@@ -135,24 +133,24 @@ public class JsonbPropertyVisibilityStrategyTest {
      */
     @Test
     public void testMethodVisibilityStrategy() {
-        JsonbConfig customizedConfig = new JsonbConfig();
-        customizedConfig.setProperty(JsonbConfig.PROPERTY_VISIBILITY_STRATEGY, new PropertyVisibilityStrategy() {
-            @Override
-            public boolean isVisible(Field field) {
-                throw new IllegalStateException("Not supported");
-            }
+        JsonbConfig customizedConfig = new JsonbConfig()
+            .setProperty(JsonbConfig.PROPERTY_VISIBILITY_STRATEGY, new PropertyVisibilityStrategy() {
+                @Override
+                public boolean isVisible(Field field) {
+                    throw new IllegalStateException("Not supported");
+                }
 
-            @Override
-            public boolean isVisible(Method method) {
-                final String methodName = method.getName();
-                return methodName.equals("getAgetter") || methodName.equals("getDgetter");
-            }
-        });
+                @Override
+                public boolean isVisible(Method method) {
+                    final String methodName = method.getName();
+                    return methodName.equals("getAgetter") || methodName.equals("getDgetter");
+                }
+            });
 
         GetterPojo getterPojo = new GetterPojo();
 
-        Jsonb jsonb = JsonbBuilder.create(customizedConfig);
-        assertEquals("{\"agetter\":\"avalue\",\"dgetter\":\"dvalue\"}", jsonb.toJson(getterPojo));
+        testWithJsonbBuilderCreate(customizedConfig, jsonb ->
+                assertEquals("{\"agetter\":\"avalue\",\"dgetter\":\"dvalue\"}", jsonb.toJson(getterPojo)));
     }
 
     @Test

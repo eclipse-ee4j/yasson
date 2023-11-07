@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2019, 2020 Oracle and/or its affiliates. All rights reserved.
+ * Copyright (c) 2019, 2023 Oracle and/or its affiliates. All rights reserved.
  *
  * This program and the accompanying materials are made available under the
  * terms of the Eclipse Public License v. 2.0 which is available at
@@ -31,13 +31,13 @@ import java.util.TimeZone;
  */
 public class IJsonTest {
 
-    private Jsonb jsonb = JsonbBuilder.create(new JsonbConfig().withStrictIJSON(true));
+    private final static Jsonb jsonb = JsonbBuilder.create(new JsonbConfig().withStrictIJSON(true));
 
     @Test
     public void testStrictCalendar() {
         Calendar calendar = Calendar.getInstance();
         calendar.clear();
-        calendar.set(1970, 0, 1, 0, 0, 0);
+        calendar.set(1970, Calendar.JANUARY, 1, 0, 0, 0);
         calendar.setTimeZone(TimeZone.getTimeZone("Europe/Paris"));
 
         String jsonString = jsonb.toJson(new ScalarValueWrapper<>(calendar));
@@ -51,7 +51,7 @@ public class IJsonTest {
     @Test
     public void testStrictDate() {
         Calendar calendar = Calendar.getInstance();
-        calendar.set(1970, 0, 1, 0, 0, 0);
+        calendar.set(1970, Calendar.JANUARY, 1, 0, 0, 0);
         calendar.setTimeZone(TimeZone.getTimeZone("UTC"));
         calendar.clear(Calendar.MILLISECOND);
 

@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2021, 2022 Oracle and/or its affiliates. All rights reserved.
+ * Copyright (c) 2021, 2023 Oracle and/or its affiliates. All rights reserved.
  *
  * This program and the accompanying materials are made available under the
  * terms of the Eclipse Public License v. 2.0 which is available at
@@ -12,13 +12,12 @@
 
 package org.eclipse.yasson.customization.polymorphism;
 
-import jakarta.json.bind.Jsonb;
-import jakarta.json.bind.JsonbBuilder;
 import jakarta.json.bind.annotation.JsonbSubtype;
 import jakarta.json.bind.annotation.JsonbTypeInfo;
 
 import org.junit.jupiter.api.Test;
 
+import static org.eclipse.yasson.Jsonbs.defaultJsonb;
 import static org.hamcrest.CoreMatchers.instanceOf;
 import static org.hamcrest.CoreMatchers.is;
 import static org.hamcrest.MatcherAssert.assertThat;
@@ -28,19 +27,17 @@ import static org.hamcrest.MatcherAssert.assertThat;
  */
 public class MultiplePolymorphicInfoTest {
 
-    private static final Jsonb JSONB = JsonbBuilder.create();
-
     @Test
     public void testMultiplePolymorphicInfoPropertySerialization() {
         String expected = "{\"@something\":\"animal\",\"@animal\":\"dog\",\"@dogRace\":\"labrador\",\"isLabrador\":true}";
         Labrador labrador = new Labrador();
-        assertThat(JSONB.toJson(labrador), is(expected));
+        assertThat(defaultJsonb.toJson(labrador), is(expected));
     }
 
     @Test
     public void testMultiplePolymorphicInfoPropertyDeserialization() {
         String json = "{\"@something\":\"animal\",\"@animal\":\"dog\",\"@dogRace\":\"labrador\",\"isLabrador\":true}";
-        assertThat(JSONB.fromJson(json, Labrador.class), instanceOf(Labrador.class));
+        assertThat(defaultJsonb.fromJson(json, Labrador.class), instanceOf(Labrador.class));
     }
 
     @Test
@@ -49,13 +46,13 @@ public class MultiplePolymorphicInfoTest {
         Area northAmerica = new Area();
         northAmerica.name = "North America";
         northAmerica.population = 600000000;
-        assertThat(JSONB.toJson(northAmerica), is(expected));
+        assertThat(defaultJsonb.toJson(northAmerica), is(expected));
     }
 
     @Test
     public void testPolymorphicParentInstanceDeserialization() {
         String json = "{\"@type\":\"area\",\"name\":\"North America\",\"population\":600000000}";
-        assertThat(JSONB.fromJson(json, Location.class), instanceOf(Area.class));
+        assertThat(defaultJsonb.fromJson(json, Location.class), instanceOf(Area.class));
     }
 
     @JsonbTypeInfo(key = "@something", value = {

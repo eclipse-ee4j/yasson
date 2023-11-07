@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2019, 2022 Oracle and/or its affiliates. All rights reserved.
+ * Copyright (c) 2019, 2023 Oracle and/or its affiliates. All rights reserved.
  *
  * This program and the accompanying materials are made available under the
  * terms of the Eclipse Public License v. 2.0 which is available at
@@ -12,12 +12,12 @@
 
 package org.eclipse.yasson.defaultmapping;
 
+import static org.eclipse.yasson.Jsonbs.testWithJsonbBuilderCreate;
+
 import org.junit.jupiter.api.*;
 
 import org.eclipse.yasson.serializers.model.Crate;
 
-import jakarta.json.bind.Jsonb;
-import jakarta.json.bind.JsonbBuilder;
 import jakarta.json.bind.JsonbConfig;
 import jakarta.json.bind.annotation.JsonbProperty;
 import jakarta.json.bind.config.PropertyVisibilityStrategy;
@@ -48,7 +48,7 @@ public class SecurityManagerTest {
 
     @Test
     public void testWithSecurityManager() {
-        Jsonb jsonb = JsonbBuilder.create(new JsonbConfig().withPropertyVisibilityStrategy(new PropertyVisibilityStrategy() {
+        JsonbConfig config = new JsonbConfig().withPropertyVisibilityStrategy(new PropertyVisibilityStrategy() {
             @Override
             public boolean isVisible(Field field) {
                 return Modifier.isPublic(field.getModifiers()) || field.getName().equals("privateProperty");
@@ -58,16 +58,18 @@ public class SecurityManagerTest {
             public boolean isVisible(Method method) {
                 return Modifier.isPublic(method.getModifiers());
             }
-        }));
+        });
 
-        Pojo pojo = new Pojo();
-        pojo.setStrProperty("string propery");
-        Crate crate = new Crate();
-        crate.crateBigDec = BigDecimal.TEN;
-        crate.crateStr = "crate string";
-        pojo.setCrate(crate);
+        testWithJsonbBuilderCreate(config, jsonb -> {
+            Pojo pojo = new Pojo();
+            pojo.setStrProperty("string propery");
+            Crate crate = new Crate();
+            crate.crateBigDec = BigDecimal.TEN;
+            crate.crateStr = "crate string";
+            pojo.setCrate(crate);
 
-        String result = jsonb.toJson(pojo);
+            String result = jsonb.toJson(pojo);
+        });
     }
 
 

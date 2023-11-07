@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2019, 2022 Oracle and/or its affiliates. All rights reserved.
+ * Copyright (c) 2019, 2023 Oracle and/or its affiliates. All rights reserved.
  *
  * This program and the accompanying materials are made available under the
  * terms of the Eclipse Public License v. 2.0 which is available at
@@ -13,6 +13,8 @@
 package org.eclipse.yasson.serializers;
 
 import org.junit.jupiter.api.*;
+
+import static org.eclipse.yasson.Jsonbs.testWithJsonbBuilderCreate;
 import static org.junit.jupiter.api.Assertions.*;
 
 import java.io.StringReader;
@@ -30,8 +32,6 @@ import jakarta.json.Json;
 import jakarta.json.JsonArray;
 import jakarta.json.JsonObject;
 import jakarta.json.JsonValue;
-import jakarta.json.bind.Jsonb;
-import jakarta.json.bind.JsonbBuilder;
 import jakarta.json.bind.JsonbConfig;
 import jakarta.json.bind.serializer.DeserializationContext;
 import jakarta.json.bind.serializer.JsonbDeserializer;
@@ -86,7 +86,7 @@ public class MapToEntriesArraySerializerTest {
      * @param source source Map for value verification
      * @param key Map key used to retrieve value
      */
-    private static final <K,V> void verifyMapValues(JsonObject jentry, Map<K,V> source, K key) {
+    private static <K,V> void verifyMapValues(JsonObject jentry, Map<K, V> source, K key) {
         assertNotNull(jentry);
         assertNotNull(source);
         assertNotNull(key);
@@ -129,7 +129,7 @@ public class MapToEntriesArraySerializerTest {
      * @param jentry parsed Map entry as JsonObject
      * @param sourceEntry source Map entry for value verification
      */
-    private static final <K,V> void verifyMapValues(JsonObject jentry, Map.Entry<K[],V> sourceEntry) {
+    private static <K,V> void verifyMapValues(JsonObject jentry, Map.Entry<K[], V> sourceEntry) {
         assertNotNull(jentry);
         assertNotNull(sourceEntry);
         switch (jentry.getValue("/value").getValueType()) {
@@ -143,7 +143,7 @@ public class MapToEntriesArraySerializerTest {
                 break;
             case ARRAY:
                 JsonArray valueArray = jentry.getJsonArray("value");
-                assertTrue(valueArray.size() > 0);
+				assertFalse(valueArray.isEmpty());
                 verifyMapArrayValue(jentry, valueArray, sourceEntry);
                 break;
             case STRING:
@@ -177,7 +177,7 @@ public class MapToEntriesArraySerializerTest {
      * @param keys source map key Set used to check whether all keys were processed. Key will be removed from set on successful match
      * @return Map.Entry matching provided key
      */
-    private static final <K,V> Map.Entry<K[], V> getMapEntryForArrayKey(Map<K[], V> source, K[] key, Comparator<K> cmp, Set<K> keys) {
+    private static <K,V> Map.Entry<K[], V> getMapEntryForArrayKey(Map<K[], V> source, K[] key, Comparator<K> cmp, Set<K> keys) {
         for (Map.Entry<K[], V> entry : source.entrySet()) {
             K[] sourceKey = entry.getKey();
             boolean match = key.length == sourceKey.length;
@@ -206,11 +206,11 @@ public class MapToEntriesArraySerializerTest {
      * @param sourceValue source Map value
      * @param cmp optional comparator to use for verification
      */
-    private static final <V> void verifyMapArrayValues(V[] value, V[] sourceValue, Comparator<V> cmp) {
+    private static <V> void verifyMapArrayValues(V[] value, V[] sourceValue, Comparator<V> cmp) {
         assertEquals(sourceValue.length, value.length);
         for (int i = 0; i < sourceValue.length; i++) {
             if (cmp != null) {
-                assertTrue(cmp.compare(sourceValue[i], value[i]) == 0);
+				assertEquals(0, cmp.compare(sourceValue[i], value[i]));
             } else {
                 assertEquals(sourceValue[i], value[i]);
             }
@@ -224,7 +224,7 @@ public class MapToEntriesArraySerializerTest {
      * @param sourceEntry source Map
      */
     @SuppressWarnings("unchecked")
-    private static final <K,V> void verifyMapArrayValue(JsonObject jentry, final JsonArray valueArray, Map.Entry<K[],V> sourceEntry) {
+    private static <K,V> void verifyMapArrayValue(JsonObject jentry, final JsonArray valueArray, Map.Entry<K[], V> sourceEntry) {
         int size = valueArray.size();
         // All array elements in the tests are of the same type.
         switch (valueArray.get(0).getValueType()) {
@@ -270,7 +270,7 @@ public class MapToEntriesArraySerializerTest {
      * @param source source Map
      */
     @SuppressWarnings("unchecked")
-    private static final <K,V> void verifyMapArrayKey(JsonObject jentry, final JsonArray keyArray, Map<K,V> source, Set<K> keys) {
+    private static <K,V> void verifyMapArrayKey(JsonObject jentry, final JsonArray keyArray, Map<K, V> source, Set<K> keys) {
         int size = keyArray.size();
         // All array elements in the tests are of the same type.
         switch (keyArray.get(0).getValueType()) {
@@ -320,7 +320,7 @@ public class MapToEntriesArraySerializerTest {
      * @param array  serialized Map parsed and provided as JsonArray
      */
     @SuppressWarnings("unchecked")
-    private static final <K,V> void verifySerialization(Map<K, V> source, JsonArray array) {
+    private static <K,V> void verifySerialization(Map<K, V> source, JsonArray array) {
         assertEquals(source.size(), array.size());
         Set<K> keys = source.keySet();
         array.forEach(entry -> {
@@ -337,7 +337,7 @@ public class MapToEntriesArraySerializerTest {
                     break;
                 case ARRAY: {
                     JsonArray keyArray = jentry.getJsonArray("key");
-                    assertTrue(keyArray.size() > 0);
+					assertFalse(keyArray.isEmpty());
                     verifyMapArrayKey(jentry, keyArray, source, keys);
                 }
                     break;
@@ -375,13 +375,14 @@ public class MapToEntriesArraySerializerTest {
 //    @Test
 //    public void testSerializeNumberStringMapToEntriesArray() {
 //        Map<Number, String> map = new TreeMap<>(CMP_NUM);
-//        Jsonb jsonb = JsonbBuilder.create(new JsonbConfig().withFormatting(true));
+//        testWithJsonbBuilderCreate(new JsonbConfig().withFormatting(true), jsonb -> {
 //        map.put(Integer.valueOf(12), "twelve");
 //        map.put(Short.valueOf((short)48), "forty eight");
 //        map.put(Long.valueOf(256), "two hundred fifty-six");
 //        String json = jsonb.toJson(map);
 //        JsonArray jarr = Json.createReader(new StringReader(json)).read().asJsonArray();
 //        verifySerialization(map, jarr);
+//     });
 //    }
 
     /**
@@ -390,14 +391,15 @@ public class MapToEntriesArraySerializerTest {
     @Test
     public void testSerializePoJoPoJoMapToEntriesArray() {
         Map<Trainer, Pokemon> map = new HashMap<>();
-        Jsonb jsonb = JsonbBuilder.create(new JsonbConfig().withFormatting(true));
-        map.put(new Trainer("John Smith", 35), new Pokemon("Charmander", "fire", 980));
-        map.put(new Trainer("Tom Jones", 24), new Pokemon("Caterpie", "bug", 437));
-        map.put(new Trainer("Peter Wright", 27), new Pokemon("Houndour", "dark", 1234));
-        map.put(new Trainer("Bob Parker", 19), new Pokemon("Sneasel", "ice", 2051));
-        String json = jsonb.toJson(map);
-        JsonArray jarr = Json.createReader(new StringReader(json)).read().asJsonArray();
-        verifySerialization(map, jarr);
+        testWithJsonbBuilderCreate(new JsonbConfig().withFormatting(true), jsonb -> {
+            map.put(new Trainer("John Smith", 35), new Pokemon("Charmander", "fire", 980));
+            map.put(new Trainer("Tom Jones", 24), new Pokemon("Caterpie", "bug", 437));
+            map.put(new Trainer("Peter Wright", 27), new Pokemon("Houndour", "dark", 1234));
+            map.put(new Trainer("Bob Parker", 19), new Pokemon("Sneasel", "ice", 2051));
+            String json = jsonb.toJson(map);
+            JsonArray jarr = Json.createReader(new StringReader(json)).read().asJsonArray();
+            verifySerialization(map, jarr);
+        });
     }
 
     /**
@@ -407,12 +409,13 @@ public class MapToEntriesArraySerializerTest {
     public void testSerializeSimpleSimpleMapToEntriesArray() {
         String expected = "{\"false\":true,\"10\":24,\"Name\":\"John Smith\"}";
         Map<Object, Object> map = new HashMap<>();
-        Jsonb jsonb = JsonbBuilder.create(new JsonbConfig());
-        map.put("Name", "John Smith");
-        map.put(Integer.valueOf(10), Long.valueOf(24l));
-        map.put(Boolean.FALSE, Boolean.TRUE);
-        String json = jsonb.toJson(map);
-        assertEquals(expected, json);
+        testWithJsonbBuilderCreate(new JsonbConfig(), jsonb -> {
+            map.put("Name", "John Smith");
+            map.put(10, 24L);
+            map.put(Boolean.FALSE, Boolean.TRUE);
+            String json = jsonb.toJson(map);
+            assertEquals(expected, json);
+        });
     }
 
     /**
@@ -421,15 +424,16 @@ public class MapToEntriesArraySerializerTest {
     @Test
     public void testSerializeSimpleArraySimpleArrayMapToEntriesArray() {
         Map<Object, Object> map = new HashMap<>();
-        Jsonb jsonb = JsonbBuilder.create(new JsonbConfig().withFormatting(true));
-        map.put(new String[] {"John", "Smith"}, new String[] {"first name", "second name"});
-        map.put(new String[] {"Pikachu", "electric"}, new String[] {"pokemon name", "pokemon type"});
-        map.put(
-                new Trainer[] {new Trainer("Bob", 15), new Trainer("Ash", 12)},
-                new Pokemon[] {new Pokemon("Charmander", "fire", 1245), new Pokemon("Kyogre", "water", 3056)});
-        String json = jsonb.toJson(map);
-        JsonArray jarr = Json.createReader(new StringReader(json)).read().asJsonArray();
-        verifySerialization(map, jarr);
+        testWithJsonbBuilderCreate(new JsonbConfig().withFormatting(true), jsonb -> {
+            map.put(new String[] {"John", "Smith"}, new String[] {"first name", "second name"});
+            map.put(new String[] {"Pikachu", "electric"}, new String[] {"pokemon name", "pokemon type"});
+            map.put(
+                    new Trainer[] {new Trainer("Bob", 15), new Trainer("Ash", 12)},
+                    new Pokemon[] {new Pokemon("Charmander", "fire", 1245), new Pokemon("Kyogre", "water", 3056)});
+            String json = jsonb.toJson(map);
+            JsonArray jarr = Json.createReader(new StringReader(json)).read().asJsonArray();
+            verifySerialization(map, jarr);
+        });
     }
 
     /**
@@ -453,34 +457,35 @@ public class MapToEntriesArraySerializerTest {
             "        \"value\": 21" +
             "    }" +
             "]";
-        Jsonb jsonb = JsonbBuilder.create(new JsonbConfig());
-        Map<?, ?> map = jsonb.fromJson(jsonString, Map.class);
-        assertEquals(3, map.size());
-        // Make sure that all 3 pokemons were checked.
-        int valueCheck = 0x00;
-        for (Map.Entry<?, ?> entry : map.entrySet()) {
-            if ((entry.getKey() instanceof String) && "first".equals(entry.getKey())) {
-                assertEquals("Peter Parker", entry.getValue());
-                valueCheck |= 0x01;
+        testWithJsonbBuilderCreate(new JsonbConfig(), jsonb -> {
+            Map<?, ?> map = jsonb.fromJson(jsonString, Map.class);
+            assertEquals(3, map.size());
+            // Make sure that all 3 pokemons were checked.
+            int valueCheck = 0x00;
+            for (Map.Entry<?, ?> entry : map.entrySet()) {
+                if ((entry.getKey() instanceof String) && "first".equals(entry.getKey())) {
+                    assertEquals("Peter Parker", entry.getValue());
+                    valueCheck |= 0x01;
+                }
+                if ((entry.getKey() instanceof Number) && entry.getKey().equals(new BigDecimal(42))) {
+                    assertEquals(true, entry.getValue());
+                    valueCheck |= 0x02;
+                }
+                if ((entry.getKey() instanceof Boolean) && entry.getKey().equals(false)) {
+                    assertEquals(new BigDecimal(21), entry.getValue());
+                    valueCheck |= 0x04;
+                }
             }
-            if ((entry.getKey() instanceof Number) && entry.getKey().equals(new BigDecimal(42))) {
-                assertEquals(true, entry.getValue());
-                valueCheck |= 0x02;
+            if ((valueCheck & 0x01) == 0) {
+                fail("Did not find key \"first\" in the Map");
             }
-            if ((entry.getKey() instanceof Boolean) && entry.getKey().equals(false)) {
-                assertEquals(new BigDecimal(21), entry.getValue());
-                valueCheck |= 0x04;
+            if ((valueCheck & 0x02) == 0) {
+                fail("Did not find key 42 in the Map");
             }
-        }
-        if ((valueCheck & 0x01) == 0) {
-            fail("Did not find key \"first\" in the Map");
-        }
-        if ((valueCheck & 0x02) == 0) {
-            fail("Did not find key 42 in the Map");
-        }
-        if ((valueCheck & 0x04) == 0) {
-            fail("Did not find key false in the Map");
-        }
+            if ((valueCheck & 0x04) == 0) {
+                fail("Did not find key false in the Map");
+            }
+        });
     }
 
     /**
@@ -531,41 +536,42 @@ public class MapToEntriesArraySerializerTest {
                 return null;
             }
         };
-        Jsonb jsonb = JsonbBuilder.create(new JsonbConfig());
-        Map<String, Pokemon> map = jsonb.fromJson(jsonString, pt);
-        assertEquals(3, map.size());
-        // Make sure that all 3 pokemons were checked.
-        int valueCheck = 0x00;
-        for (Map.Entry<String, Pokemon> entry : map.entrySet()) {
-            Pokemon pokemon = entry.getValue();
-            if ("Pikachu".equals(entry.getKey())) {
-                assertEquals("Pikachu", pokemon.name);
-                assertEquals("electric", pokemon.type);
-                assertEquals(456, pokemon.cp);
-                valueCheck |= 0x01;
+        testWithJsonbBuilderCreate(new JsonbConfig(), jsonb -> {
+            Map<String, Pokemon> map = jsonb.fromJson(jsonString, pt);
+            assertEquals(3, map.size());
+            // Make sure that all 3 pokemons were checked.
+            int valueCheck = 0x00;
+            for (Map.Entry<String, Pokemon> entry : map.entrySet()) {
+                Pokemon pokemon = entry.getValue();
+                if ("Pikachu".equals(entry.getKey())) {
+                    assertEquals("Pikachu", pokemon.name);
+                    assertEquals("electric", pokemon.type);
+                    assertEquals(456, pokemon.cp);
+                    valueCheck |= 0x01;
+                }
+                if ("Squirtle".equals(entry.getKey())) {
+                    assertEquals("Squirtle", pokemon.name);
+                    assertEquals("water", pokemon.type);
+                    assertEquals(124, pokemon.cp);
+                    valueCheck |= 0x02;
+                }
+                if ("Rayquaza".equals(entry.getKey())) {
+                    assertEquals("Rayquaza", pokemon.name);
+                    assertEquals("dragon", pokemon.type);
+                    assertEquals(3273, pokemon.cp);
+                    valueCheck |= 0x04;
+                }
             }
-            if ("Squirtle".equals(entry.getKey())) {
-                assertEquals("Squirtle", pokemon.name);
-                assertEquals("water", pokemon.type);
-                assertEquals(124, pokemon.cp);
-                valueCheck |= 0x02;
+            if ((valueCheck & 0x01) == 0) {
+                fail("Did not find key \"Pikachu\" in the Map");
             }
-            if ("Rayquaza".equals(entry.getKey())) {
-                assertEquals("Rayquaza", pokemon.name);
-                assertEquals("dragon", pokemon.type);
-                assertEquals(3273, pokemon.cp);
-                valueCheck |= 0x04;
+            if ((valueCheck & 0x02) == 0) {
+                fail("Did not find key \"Squirtle\" in the Map");
             }
-        }
-        if ((valueCheck & 0x01) == 0) {
-            fail("Did not find key \"Pikachu\" in the Map");
-        }
-        if ((valueCheck & 0x02) == 0) {
-            fail("Did not find key \"Squirtle\" in the Map");
-        }
-        if ((valueCheck & 0x04) == 0) {
-            fail("Did not find key \"Rayquaza\" in the Map");
-        }
+            if ((valueCheck & 0x04) == 0) {
+                fail("Did not find key \"Rayquaza\" in the Map");
+            }
+        });
     }
 
     /**
@@ -624,45 +630,46 @@ public class MapToEntriesArraySerializerTest {
                 return null;
             }
         };
-        Jsonb jsonb = JsonbBuilder.create(new JsonbConfig());
-        Map<Trainer, Pokemon> map = jsonb.fromJson(jsonString, pt);
-        assertEquals(3, map.size());
-        // Make sure that all 3 pokemons were checked.
-        int valueCheck = 0x00;
-        for (Map.Entry<Trainer, Pokemon> entry : map.entrySet()) {
-            Trainer trainer = entry.getKey();
-            Pokemon pokemon = entry.getValue();
-            if ("Bob".equals(trainer.name)) {
-                assertEquals(12, trainer.age);
-                assertEquals("Pikachu", pokemon.name);
-                assertEquals("electric", pokemon.type);
-                assertEquals(456, pokemon.cp);
-                valueCheck |= 0x01;
+        testWithJsonbBuilderCreate(new JsonbConfig(), jsonb -> {
+            Map<Trainer, Pokemon> map = jsonb.fromJson(jsonString, pt);
+            assertEquals(3, map.size());
+            // Make sure that all 3 pokemons were checked.
+            int valueCheck = 0x00;
+            for (Map.Entry<Trainer, Pokemon> entry : map.entrySet()) {
+                Trainer trainer = entry.getKey();
+                Pokemon pokemon = entry.getValue();
+                if ("Bob".equals(trainer.name)) {
+                    assertEquals(12, trainer.age);
+                    assertEquals("Pikachu", pokemon.name);
+                    assertEquals("electric", pokemon.type);
+                    assertEquals(456, pokemon.cp);
+                    valueCheck |= 0x01;
+                }
+                if ("Ash".equals(trainer.name)) {
+                    assertEquals(10, trainer.age);
+                    assertEquals("Squirtle", pokemon.name);
+                    assertEquals("water", pokemon.type);
+                    assertEquals(124, pokemon.cp);
+                    valueCheck |= 0x02;
+                }
+                if ("Joe".equals(trainer.name)) {
+                    assertEquals(15, trainer.age);
+                    assertEquals("Rayquaza", pokemon.name);
+                    assertEquals("dragon", pokemon.type);
+                    assertEquals(3273, pokemon.cp);
+                    valueCheck |= 0x04;
+                }
             }
-            if ("Ash".equals(trainer.name)) {
-                assertEquals(10, trainer.age);
-                assertEquals("Squirtle", pokemon.name);
-                assertEquals("water", pokemon.type);
-                assertEquals(124, pokemon.cp);
-                valueCheck |= 0x02;
+            if ((valueCheck & 0x01) == 0) {
+                fail("Did not find key \"Bob\" in the Map");
             }
-            if ("Joe".equals(trainer.name)) {
-                assertEquals(15, trainer.age);
-                assertEquals("Rayquaza", pokemon.name);
-                assertEquals("dragon", pokemon.type);
-                assertEquals(3273, pokemon.cp);
-                valueCheck |= 0x04;
+            if ((valueCheck & 0x02) == 0) {
+                fail("Did not find key \"Ash\" in the Map");
             }
-        }
-        if ((valueCheck & 0x01) == 0) {
-            fail("Did not find key \"Bob\" in the Map");
-        }
-        if ((valueCheck & 0x02) == 0) {
-            fail("Did not find key \"Ash\" in the Map");
-        }
-        if ((valueCheck & 0x04) == 0) {
-            fail("Did not find key \"Joe\" in the Map");
-        }
+            if ((valueCheck & 0x04) == 0) {
+                fail("Did not find key \"Joe\" in the Map");
+            }
+        });
     }
 
     /**
@@ -703,31 +710,32 @@ public class MapToEntriesArraySerializerTest {
                 return null;
             }
         };
-        Jsonb jsonb = JsonbBuilder.create(new JsonbConfig());
-        Map<Integer[], String[]> map = jsonb.fromJson(jsonString, pt);
-        assertEquals(2, map.size());
-        // Make sure that all map entries were checked.
-        int valueCheck = 0x00;
-        for (Map.Entry<Integer[], String[]> entry : map.entrySet()) {
-            Integer[] key = entry.getKey();
-            String[] value = entry.getValue();
-            if (key[0] == 1 && key[1] == 2) {
-                assertEquals("Bob" ,value[0]);
-                assertEquals("Tom" ,value[1]);
-                valueCheck |= 0x01;
+        testWithJsonbBuilderCreate(new JsonbConfig(), jsonb -> {
+            Map<Integer[], String[]> map = jsonb.fromJson(jsonString, pt);
+            assertEquals(2, map.size());
+            // Make sure that all map entries were checked.
+            int valueCheck = 0x00;
+            for (Map.Entry<Integer[], String[]> entry : map.entrySet()) {
+                Integer[] key = entry.getKey();
+                String[] value = entry.getValue();
+                if (key[0] == 1 && key[1] == 2) {
+                    assertEquals("Bob", value[0]);
+                    assertEquals("Tom", value[1]);
+                    valueCheck |= 0x01;
+                }
+                if (key[0] == 3 && key[1] == 4) {
+                    assertEquals("John", value[0]);
+                    assertEquals("Greg", value[1]);
+                    valueCheck |= 0x02;
+                }
             }
-            if (key[0] == 3 && key[1] == 4) {
-                assertEquals("John" ,value[0]);
-                assertEquals("Greg" ,value[1]);
-                valueCheck |= 0x02;
+            if ((valueCheck & 0x01) == 0) {
+                fail("Did not find key [1,2] in the Map");
             }
-        }
-        if ((valueCheck & 0x01) == 0) {
-            fail("Did not find key [1,2] in the Map");
-        }
-        if ((valueCheck & 0x02) == 0) {
-            fail("Did not find key [3,4] in the Map");
-        }
+            if ((valueCheck & 0x02) == 0) {
+                fail("Did not find key [3,4] in the Map");
+            }
+        });
     }
 
     /**
@@ -797,42 +805,43 @@ public class MapToEntriesArraySerializerTest {
                 return null;
             }
         };
-        Jsonb jsonb = JsonbBuilder.create(new JsonbConfig());
-        Map<Trainer[], Pokemon[]> map = jsonb.fromJson(jsonString, pt);
-        assertEquals(2, map.size());
-        int valueCheck = 0x00;
-        for (Map.Entry<Trainer[], Pokemon[]> entry : map.entrySet()) {
-            Trainer[] key = entry.getKey();
-            Pokemon[] value = entry.getValue();
-            if (key[0].name.equals("Ash") && key[1].name.equals("Joe")) {
-                assertEquals(12, key[0].age);
-                assertEquals(14, key[1].age);
-                assertEquals("Rayquaza", value[0].name);
-                assertEquals("dragon", value[0].type);
-                assertEquals(3273, value[0].cp);
-                assertEquals("Tyranitar", value[1].name);
-                assertEquals("dark", value[1].type);
-                assertEquals(3181, value[1].cp);
-                valueCheck |= 0x01;
+        testWithJsonbBuilderCreate(new JsonbConfig(), jsonb -> {
+            Map<Trainer[], Pokemon[]> map = jsonb.fromJson(jsonString, pt);
+            assertEquals(2, map.size());
+            int valueCheck = 0x00;
+            for (Map.Entry<Trainer[], Pokemon[]> entry : map.entrySet()) {
+                Trainer[] key = entry.getKey();
+                Pokemon[] value = entry.getValue();
+                if (key[0].name.equals("Ash") && key[1].name.equals("Joe")) {
+                    assertEquals(12, key[0].age);
+                    assertEquals(14, key[1].age);
+                    assertEquals("Rayquaza", value[0].name);
+                    assertEquals("dragon", value[0].type);
+                    assertEquals(3273, value[0].cp);
+                    assertEquals("Tyranitar", value[1].name);
+                    assertEquals("dark", value[1].type);
+                    assertEquals(3181, value[1].cp);
+                    valueCheck |= 0x01;
+                }
+                if (key[0].name.equals("Bob") && key[1].name.equals("Maggie")) {
+                    assertEquals(13, key[0].age);
+                    assertEquals(15, key[1].age);
+                    assertEquals("Raikou", value[0].name);
+                    assertEquals("electric", value[0].type);
+                    assertEquals(3095, value[0].cp);
+                    assertEquals("Mamoswine", value[1].name);
+                    assertEquals("ice", value[1].type);
+                    assertEquals(3055, value[1].cp);
+                    valueCheck |= 0x02;
+                }
             }
-            if (key[0].name.equals("Bob") && key[1].name.equals("Maggie")) {
-                assertEquals(13, key[0].age);
-                assertEquals(15, key[1].age);
-                assertEquals("Raikou", value[0].name);
-                assertEquals("electric", value[0].type);
-                assertEquals(3095, value[0].cp);
-                assertEquals("Mamoswine", value[1].name);
-                assertEquals("ice", value[1].type);
-                assertEquals(3055, value[1].cp);
-                valueCheck |= 0x02;
+            if ((valueCheck & 0x01) == 0) {
+                fail("Did not find key with \"Ash\" and \"Joe\" in the Map");
             }
-        }
-        if ((valueCheck & 0x01) == 0) {
-            fail("Did not find key with \"Ash\" and \"Joe\" in the Map");
-        }
-        if ((valueCheck & 0x02) == 0) {
-            fail("Did not find key with \"Bob\" and \"Maggie\" in the Map");
-        }
+            if ((valueCheck & 0x02) == 0) {
+                fail("Did not find key with \"Bob\" and \"Maggie\" in the Map");
+            }
+        });
     }
 
     public static class LocaleSerializer implements JsonbSerializer<Locale> {
@@ -890,7 +899,7 @@ public class MapToEntriesArraySerializerTest {
         }
     }
 
-    public static class MapObjectLocaleString extends MapObject<Locale, String> {};
+    public static class MapObjectLocaleString extends MapObject<Locale, String> {}
 
     private void verifyMapObjectLocaleStringSerialization(JsonObject jsonObject, MapObjectLocaleString mapObject) {
         // Expected serialization is: {"values":[{"key":"lang-tag","value":"string"},...]}
@@ -918,20 +927,21 @@ public class MapToEntriesArraySerializerTest {
      */
     @Test
     public void testMapLocaleString() {
-        Jsonb jsonb = JsonbBuilder.create(new JsonbConfig()
+        testWithJsonbBuilderCreate(new JsonbConfig()
                 .withSerializers(new LocaleSerializer())
-                .withDeserializers(new LocaleDeserializer()));
+                .withDeserializers(new LocaleDeserializer()), jsonb -> {
 
-        MapObjectLocaleString mapObject = new MapObjectLocaleString();
-        mapObject.getValues().put(Locale.US, "us");
-        mapObject.getValues().put(Locale.ENGLISH, "en");
-        mapObject.getValues().put(Locale.JAPAN, "jp");
+            MapObjectLocaleString mapObject = new MapObjectLocaleString();
+            mapObject.getValues().put(Locale.US, "us");
+            mapObject.getValues().put(Locale.ENGLISH, "en");
+            mapObject.getValues().put(Locale.JAPAN, "jp");
 
-        String json = jsonb.toJson(mapObject);
-        JsonObject jsonObject = Json.createReader(new StringReader(json)).read().asJsonObject();
-        verifyMapObjectLocaleStringSerialization(jsonObject, mapObject);
+            String json = jsonb.toJson(mapObject);
+            JsonObject jsonObject = Json.createReader(new StringReader(json)).read().asJsonObject();
+            verifyMapObjectLocaleStringSerialization(jsonObject, mapObject);
 
-        MapObjectLocaleString resObject = jsonb.fromJson(json, MapObjectLocaleString.class);
-        assertEquals(mapObject, resObject);
+            MapObjectLocaleString resObject = jsonb.fromJson(json, MapObjectLocaleString.class);
+            assertEquals(mapObject, resObject);
+        });
     }
 }
