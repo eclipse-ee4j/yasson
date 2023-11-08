@@ -384,7 +384,9 @@ public class AnnotationIntrospector {
             return nillable.map(JsonbNillable::value);
         }
         final Optional<JsonbProperty> jsonbProperty = getAnnotationFromProperty(JsonbProperty.class, property);
-        return jsonbProperty.map(JsonbProperty::nillable);
+        @SuppressWarnings("deprecation")
+        Optional<Boolean> optionalBoolean = jsonbProperty.map(JsonbProperty::nillable);
+        return optionalBoolean;
 
     }
 
