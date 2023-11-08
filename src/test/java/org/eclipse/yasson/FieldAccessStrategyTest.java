@@ -21,7 +21,7 @@ import jakarta.json.bind.config.PropertyVisibilityStrategy;
 import java.lang.reflect.Field;
 import java.lang.reflect.Method;
 
-public class FieldAccessStrategyTest {
+class FieldAccessStrategyTest {
 
     private FieldAccessStrategyTest() {
     }

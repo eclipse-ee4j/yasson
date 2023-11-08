@@ -19,7 +19,7 @@ import org.junit.jupiter.api.Test;
 
 import jakarta.json.bind.JsonbException;
 
-public class Issue456Test {
+class Issue456Test {
 
     private Issue456Test() {
     }

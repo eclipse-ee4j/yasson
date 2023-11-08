@@ -25,7 +25,7 @@ import jakarta.json.bind.annotation.JsonbTypeAdapter;
  * Requires --limit-modules java.base,java.logging,java.sql (to exclude java.naming) to work.
  * See pom.xml surefire plugin configuration.
  */
-public class JavaxNamingExcludedTest {
+class JavaxNamingExcludedTest {
 
     private JavaxNamingExcludedTest() {
     }

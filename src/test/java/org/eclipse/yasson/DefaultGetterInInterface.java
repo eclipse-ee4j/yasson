@@ -27,7 +27,7 @@ import java.lang.reflect.Method;
  *
  * @author Maxence Laurent
  */
-public class DefaultGetterInInterface {
+class DefaultGetterInInterface {
 
     private DefaultGetterInInterface() {
     }

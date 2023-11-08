@@ -21,7 +21,7 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 /**
  * @author Roman Grigoriadi
  */
-public class SimpleTest {
+class SimpleTest {
 
     private SimpleTest() {
     }

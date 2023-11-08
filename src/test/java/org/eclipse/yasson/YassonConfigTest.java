@@ -19,7 +19,7 @@ import org.junit.jupiter.api.Test;
 /**
  * Tests that the names of configuration fields in {@link YassonConfig} do not change.
  */
-public class YassonConfigTest {
+class YassonConfigTest {
 
     private YassonConfigTest() {}
 

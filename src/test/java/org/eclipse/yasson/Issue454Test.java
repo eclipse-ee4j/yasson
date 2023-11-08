@@ -20,7 +20,7 @@ import org.junit.jupiter.api.Test;
 import jakarta.json.bind.JsonbConfig;
 import jakarta.json.bind.annotation.JsonbTransient;
 
-public class Issue454Test {
+class Issue454Test {
 
     private Issue454Test() {
     }
