@@ -49,9 +49,11 @@ public class EnumWithJsonbPropertySerializer<E extends Enum<E>> implements Jsonb
 	}
 
 	private Class<E> getEnumType() {
-		return Class.class.cast(ParameterizedType.class.cast(
+		@SuppressWarnings("unchecked")
+		Class<E> cast = Class.class.cast(ParameterizedType.class.cast(
 						getClass().getGenericSuperclass())
 				.getActualTypeArguments()[0]);
+		return cast;
 	}
 
 	@Override public void serialize(E obj, JsonGenerator generator, SerializationContext ctx) {

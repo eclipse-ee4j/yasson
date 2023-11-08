@@ -51,9 +51,11 @@ public class EnumWithJsonbPropertyAdapter<E extends Enum<E>> implements JsonbAda
 	}
 
 	private Class<E> getEnumType() {
-		return Class.class.cast(ParameterizedType.class.cast(
+		@SuppressWarnings("unchecked")
+		Class<E> cast = Class.class.cast(ParameterizedType.class.cast(
 						getClass().getGenericSuperclass())
 				.getActualTypeArguments()[0]);
+		return cast;
 	}
 
 	@Override
