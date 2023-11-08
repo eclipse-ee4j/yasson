@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2019, 2020 Oracle and/or its affiliates. All rights reserved.
+ * Copyright (c) 2019, 2023 Oracle and/or its affiliates. All rights reserved.
  *
  * This program and the accompanying materials are made available under the
  * terms of the Eclipse Public License v. 2.0 which is available at
@@ -16,6 +16,8 @@ import java.util.Optional;
 import java.util.UUID;
 
 public class UUIDMapperIfcBased implements MultiinterfaceAdapter<UUID, String> {
+
+    private static final long serialVersionUID = 1L;
 
     @Override
     public String adaptToJson(UUID obj) throws Exception {

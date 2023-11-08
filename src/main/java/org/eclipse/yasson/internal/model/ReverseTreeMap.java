@@ -23,6 +23,8 @@ import java.util.TreeMap;
  */
 public class ReverseTreeMap<K extends Comparable<? super K>, V> extends TreeMap<K, V> {
 
+    private static final long serialVersionUID = 1L;
+
     /**
      * Default constructor of a TreeMap with reverse order.
      */
