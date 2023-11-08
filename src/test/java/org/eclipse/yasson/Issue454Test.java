@@ -22,6 +22,9 @@ import jakarta.json.bind.annotation.JsonbTransient;
 
 public class Issue454Test {
 
+    private Issue454Test() {
+    }
+
     @Test
     public void test() {
         final String EXPECTED = "{\"field2\":\"bbb\"}";
@@ -56,6 +59,10 @@ public class Issue454Test {
     }
     
     public static abstract class TheClass {
+
+        private TheClass() {
+        }
+
         @JsonbTransient
         public abstract String getField1();
 
@@ -63,6 +70,10 @@ public class Issue454Test {
     }
 
     public static class TheClass2 extends TheClass {
+
+        private TheClass2() {
+        }
+
         @Override
         public String getField1() {
             return "aaa";

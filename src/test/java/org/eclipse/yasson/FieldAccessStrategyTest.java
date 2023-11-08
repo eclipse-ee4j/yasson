@@ -23,6 +23,9 @@ import java.lang.reflect.Method;
 
 public class FieldAccessStrategyTest {
 
+    private FieldAccessStrategyTest() {
+    }
+
     public static class PrivateFields {
         private String strField;
         @JsonbTransient
@@ -49,6 +52,10 @@ public class FieldAccessStrategyTest {
     }
 
     public static class PublicFields {
+
+        protected PublicFields() {
+        }
+
         public String strField;
     }
 
@@ -109,6 +116,9 @@ public class FieldAccessStrategyTest {
     }
 
     public static class CustomVisibilityStrategy implements PropertyVisibilityStrategy {
+        public CustomVisibilityStrategy() {
+        }
+
         @Override
         public boolean isVisible(Field field) {
             return field.getName().equals("stringInstance");
@@ -121,6 +131,9 @@ public class FieldAccessStrategyTest {
     }
 
     public static class SimpleContainer {
+        protected SimpleContainer() {
+        }
+
         private String stringInstance;
         private Integer integerInstance;
         private Float floatInstance;
@@ -152,6 +165,9 @@ public class FieldAccessStrategyTest {
 
 
     private static final class NoAccessStrategy implements PropertyVisibilityStrategy {
+
+        public NoAccessStrategy() {
+        }
 
         @Override
         public boolean isVisible(Field field) {

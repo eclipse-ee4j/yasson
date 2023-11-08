@@ -21,6 +21,9 @@ import jakarta.json.bind.JsonbException;
 
 public class Issue456Test {
 
+    private Issue456Test() {
+    }
+
     @Test
     public void dontInvokeToString() {
         try {
@@ -32,6 +35,9 @@ public class Issue456Test {
     }
 
     public static class Example {
+
+        protected Example() {
+        }
 
         public String getProperty() {
             throw new RuntimeException("some error");
