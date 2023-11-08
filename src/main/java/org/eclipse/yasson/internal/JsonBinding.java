@@ -12,6 +12,7 @@
 
 package org.eclipse.yasson.internal;
 
+import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
 import java.io.Reader;
@@ -213,8 +214,7 @@ public class JsonBinding implements YassonJsonb {
     }
 
     @Override
-    public void close() throws Exception {
+    public void close() throws IOException {
         jsonbContext.getComponentInstanceCreator().close();
     }
-
 }
