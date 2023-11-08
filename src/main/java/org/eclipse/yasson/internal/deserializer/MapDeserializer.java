@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2021, 2022 Oracle and/or its affiliates. All rights reserved.
+ * Copyright (c) 2021, 2023 Oracle and/or its affiliates. All rights reserved.
  *
  * This program and the accompanying materials are made available under the
  * terms of the Eclipse Public License v. 2.0 which is available at
@@ -33,7 +33,7 @@ class MapDeserializer implements ModelDeserializer<JsonParser> {
         this.valueDelegate = valueDelegate;
     }
 
-    @SuppressWarnings("unchecked")
+    @SuppressWarnings({"unchecked", "fallthrough"})
     @Override
     public Object deserialize(JsonParser parser, DeserializationContextImpl context) {
         Map<Object, Object> map = (Map<Object, Object>) context.getInstance();
