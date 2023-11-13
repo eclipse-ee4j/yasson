@@ -57,6 +57,7 @@ public class JsonParserTestDeserializers {
 		private boolean integralNumber;
 		private String location;
 		private final List<String> keyNames = new ArrayList<>();
+		private final List<JsonParser.Event> parserEvents = new ArrayList<>();
 		private final List<JsonParser.Event> contextEvents = new ArrayList<>();
 
 		@Override
@@ -104,6 +105,7 @@ public class JsonParserTestDeserializers {
 
 		private void skipKey(JsonParser parser, DeserializationContextImpl deserializationContext) {
 			parser.hasNext();
+			parserEvents.add(parser.currentEvent());
 			contextEvents.add(deserializationContext.getLastValueEvent());
 			parser.next();
 			String key = parser.getString();
@@ -121,6 +123,10 @@ public class JsonParserTestDeserializers {
 
 		public List<String> getKeyNames() {
 			return Collections.unmodifiableList(keyNames);
+		}
+
+		public List<JsonParser.Event> getParserEvents() {
+			return Collections.unmodifiableList(parserEvents);
 		}
 
 		public List<JsonParser.Event> getContextEvents() {

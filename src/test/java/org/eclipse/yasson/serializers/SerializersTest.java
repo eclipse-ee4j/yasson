@@ -953,6 +953,7 @@ public class SerializersTest {
                         JsonParser.Event.VALUE_STRING, JsonParser.Event.END_ARRAY, JsonParser.Event.END_ARRAY, JsonParser.Event.END_ARRAY,
                         JsonParser.Event.VALUE_STRING, JsonParser.Event.END_OBJECT, JsonParser.Event.END_OBJECT);
 
+                assertEquals(expectedListOfEvents, deserializer.getParserEvents());
                 assertEquals(expectedListOfEvents, deserializer.getContextEvents());
                 assertEquals("(line no=1, column no=96, offset=95)", deserializer.getLocation());
                 assertTrue(deserializer.isIntegralNumber());

@@ -91,6 +91,11 @@ class YassonParser implements JsonParser {
     }
 
     @Override
+    public Event currentEvent() {
+        return delegate.currentEvent();
+    }
+
+    @Override
     public String getString() {
         return delegate.getString();
     }
