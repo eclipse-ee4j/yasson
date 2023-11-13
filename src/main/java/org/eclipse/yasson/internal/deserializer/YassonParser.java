@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2021, 2022 Oracle and/or its affiliates. All rights reserved.
+ * Copyright (c) 2021, 2023 Oracle and/or its affiliates. All rights reserved.
  *
  * This program and the accompanying materials are made available under the
  * terms of the Eclipse Public License v. 2.0 which is available at
@@ -24,6 +24,7 @@ import jakarta.json.stream.JsonLocation;
 import jakarta.json.stream.JsonParser;
 
 import org.eclipse.yasson.internal.DeserializationContextImpl;
+import org.eclipse.yasson.internal.JsonParserStreamCreator;
 
 /**
  * Yasson {@link YassonParser} parser wrapper.
@@ -34,12 +35,15 @@ class YassonParser implements JsonParser {
 
     private final JsonParser delegate;
     private final DeserializationContextImpl context;
+    private final JsonParserStreamCreator streamCreator;
     private int level;
 
     YassonParser(JsonParser delegate, Event firstEvent, DeserializationContextImpl context) {
         this.delegate = delegate;
         this.context = context;
         this.level = determineLevelValue(firstEvent);
+        streamCreator = new JsonParserStreamCreator(this, false, () -> context.getLastValueEvent() == Event.START_ARRAY,
+                () -> context.getLastValueEvent() == Event.START_OBJECT, () -> level == 1 && context.getLastValueEvent() == Event.START_OBJECT);
     }
 
     private int determineLevelValue(Event firstEvent) {
@@ -150,22 +154,19 @@ class YassonParser implements JsonParser {
     @Override
     public Stream<JsonValue> getArrayStream() {
         validate();
-        level--;
-        return delegate.getArrayStream();
+        return streamCreator.getArrayStream();
     }
 
     @Override
     public Stream<Map.Entry<String, JsonValue>> getObjectStream() {
         validate();
-        level--;
-        return delegate.getObjectStream();
+        return streamCreator.getObjectStream();
     }
 
     @Override
     public Stream<JsonValue> getValueStream() {
         validate();
-        level--;
-        return delegate.getValueStream();
+        return streamCreator.getValueStream();
     }
 
     @Override
@@ -173,6 +174,7 @@ class YassonParser implements JsonParser {
         validate();
         level--;
         delegate.skipArray();
+        context.setLastValueEvent(Event.END_ARRAY);
     }
 
     @Override
@@ -180,6 +182,7 @@ class YassonParser implements JsonParser {
         validate();
         level--;
         delegate.skipObject();
+        context.setLastValueEvent(Event.END_OBJECT);
     }
 
     @Override

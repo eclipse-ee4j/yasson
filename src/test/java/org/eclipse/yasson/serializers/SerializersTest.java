@@ -24,6 +24,7 @@ import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.NoSuchElementException;
 import java.util.Objects;
 import java.util.SortedMap;
 import java.util.TimeZone;
@@ -63,14 +64,18 @@ import org.eclipse.yasson.serializers.model.CrateSerializerWithConversion;
 import org.eclipse.yasson.serializers.model.ExplicitJsonbSerializer;
 import org.eclipse.yasson.serializers.model.GenericPropertyPojo;
 import org.eclipse.yasson.serializers.model.ImplicitJsonbSerializer;
+import org.eclipse.yasson.serializers.model.JsonParserTestDeserializers;
+import org.eclipse.yasson.serializers.model.JsonParserTestPojo;
 import org.eclipse.yasson.serializers.model.NumberDeserializer;
 import org.eclipse.yasson.serializers.model.NumberSerializer;
+import org.eclipse.yasson.serializers.model.TwoObjectsComparer;
 import org.eclipse.yasson.serializers.model.RecursiveDeserializer;
 import org.eclipse.yasson.serializers.model.RecursiveSerializer;
 import org.eclipse.yasson.serializers.model.SimpleAnnotatedSerializedArrayContainer;
 import org.eclipse.yasson.serializers.model.SimpleContainer;
 import org.eclipse.yasson.serializers.model.StringWrapper;
 import org.eclipse.yasson.serializers.model.SupertypeSerializerPojo;
+import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
 
 import static java.util.Collections.singletonMap;
@@ -925,4 +930,64 @@ public class SerializersTest {
         assertEquals(expected, defaultJsonb.fromJson(expectedJson, Cars.class));
     }
 
+    @Nested
+    class YassonParserTests{
+        @Test
+        public void testJsonParserFunctions() {
+            JsonParserTestPojo expected = new JsonParserTestPojo().init();
+
+            JsonParserTestDeserializers.JsonParserTestObjectDeserializer
+                    deserializer = new JsonParserTestDeserializers.JsonParserTestObjectDeserializer();
+            testWithJsonbBuilderCreate(new JsonbConfig().withDeserializers(deserializer), jsonb -> {
+                String expectedJson = new StringBuilder(jsonb.toJson(expected))
+                        .insert(1, "\"stringList_skip\":[\"string7\",\"string8\"],\"subPojo_skip\":{\"name\":\"subPojo_skip\"},").toString();
+
+                assertTrue(TwoObjectsComparer.getDifferentFieldInTwoObjects(expected, jsonb.fromJson(expectedJson, JsonParserTestPojo.class))
+                        .isEmpty());
+                assertEquals(List.of("stringList_skip", "subPojo_skip", "bigDecimal", "integer", "longValue", "string", "stringList",
+                                "stringList_getStream", "stringList_getValue", "string_getValue", "subPojo", "subPojo_getStream", "subPojo_getValue"),
+                        deserializer.getKeyNames());
+
+                List<JsonParser.Event> expectedListOfEvents = List.of(JsonParser.Event.START_OBJECT, JsonParser.Event.END_ARRAY,
+                        JsonParser.Event.END_OBJECT, JsonParser.Event.VALUE_NUMBER, JsonParser.Event.VALUE_NUMBER, JsonParser.Event.VALUE_NUMBER,
+                        JsonParser.Event.VALUE_STRING, JsonParser.Event.END_ARRAY, JsonParser.Event.END_ARRAY, JsonParser.Event.END_ARRAY,
+                        JsonParser.Event.VALUE_STRING, JsonParser.Event.END_OBJECT, JsonParser.Event.END_OBJECT);
+
+                assertEquals(expectedListOfEvents, deserializer.getContextEvents());
+                assertEquals("(line no=1, column no=96, offset=95)", deserializer.getLocation());
+                assertTrue(deserializer.isIntegralNumber());
+            });
+        }
+
+        @Test
+        public void testJsonParserValueStream() {
+            JsonParserTestPojo expected = new JsonParserTestPojo().init();
+
+            JsonParserTestDeserializers.JsonParserTestValueStreamDeserializer
+                    deserializer = new JsonParserTestDeserializers.JsonParserTestValueStreamDeserializer();
+            testWithJsonbBuilderCreate(new JsonbConfig().withDeserializers(deserializer), jsonb -> {
+                String expectedJson = jsonb.toJson(expected);
+
+                assertTrue(TwoObjectsComparer.getDifferentFieldInTwoObjects(expected, jsonb.fromJson(expectedJson, JsonParserTestPojo.class))
+                        .isEmpty());
+            });
+        }
+
+        @Test
+        public void testJsonParser_NoSuchElementException() {
+            JsonParserTestDeserializers.JsonParserTestNoSuchElementExceptionDeserializer
+                    deserializer = new JsonParserTestDeserializers.JsonParserTestNoSuchElementExceptionDeserializer();
+            testWithJsonbBuilderCreate(new JsonbConfig().withDeserializers(deserializer), jsonb -> {
+                Throwable throwable = null;
+                try {
+                    jsonb.fromJson("5", JsonParserTestPojo.class);
+                    fail("NoSuchElementException should be thrown");
+                } catch (JsonbException jbe) {
+                    throwable = jbe.getCause();
+                }
+
+                assertInstanceOf(NoSuchElementException.class, throwable);
+            });
+        }
+    }
 }
