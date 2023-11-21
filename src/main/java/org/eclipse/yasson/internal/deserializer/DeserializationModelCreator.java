@@ -224,17 +224,20 @@ public class DeserializationModelCreator {
         }
         for (String s : params) {
             CreatorModel creatorModel = creator.findByName(s);
-            ModelDeserializer<JsonParser> modelDeserializer = typeProcessor(chain,
-                                                                            creatorModel.getType(),
-                                                                            creatorModel.getCustomization(),
-                                                                            JustReturn.instance());
-            String parameterName = renamer.apply(creatorModel.getName());
-            processors.put(parameterName, modelDeserializer);
-            if (creatorModel.getCustomization().isRequired()) {
-                defaultCreatorValues.put(parameterName, new RequiredCreatorParameter(parameterName));
-            } else {
-                Class<?> rawParamType = ReflectionUtils.getRawType(creatorModel.getType());
-                defaultCreatorValues.put(parameterName, DEFAULT_CREATOR_VALUES.getOrDefault(rawParamType, NULL_PROVIDER));
+            if (creatorModel != null) {
+                ModelDeserializer<JsonParser> modelDeserializer = typeProcessor(chain,
+                        creatorModel.getType(),
+                        creatorModel.getCustomization(),
+                        JustReturn.instance());
+                String parameterName = renamer.apply(creatorModel.getName());
+                processors.put(parameterName, modelDeserializer);
+                if (creatorModel.getCustomization().isRequired()) {
+                    defaultCreatorValues.put(parameterName, new RequiredCreatorParameter(parameterName));
+                } else {
+                    Class<?> rawParamType = ReflectionUtils.getRawType(creatorModel.getType());
+                    defaultCreatorValues.put(parameterName,
+                            DEFAULT_CREATOR_VALUES.getOrDefault(rawParamType, NULL_PROVIDER));
+                }
             }
         }
         ModelDeserializer<JsonParser> instanceCreator;
