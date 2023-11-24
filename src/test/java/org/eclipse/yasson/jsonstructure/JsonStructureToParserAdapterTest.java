@@ -309,15 +309,15 @@ public class JsonStructureToParserAdapterTest {
         });
     }
 
+    private static void testWithParserAdapter(JsonObject jsonObject, Consumer<JsonParser> consumer) {
+        try (JsonStructureToParserAdapter parser = new JsonStructureToParserAdapter(jsonObject, jsonProvider)) {
+            consumer.accept(parser);
+        }
+    }
+
     @Nested
     public class DirectParserTests {
-
-        private static void testWithParserAdapter(JsonObject jsonObject, Consumer<JsonParser> consumer) {
-            try (JsonStructureToParserAdapter parser = new JsonStructureToParserAdapter(jsonObject, jsonProvider)) {
-                consumer.accept(parser);
-            }
-        }
-
+        
         @Test
         void testNumbers() {
             testWithParserAdapter(jsonProvider.createObjectBuilder()
@@ -491,7 +491,7 @@ public class JsonStructureToParserAdapterTest {
     public class StreamTests {
         @Test
         void testGetValueStream_GetOneElement() {
-            DirectParserTests.testWithParserAdapter(TestData.createFamilyPerson(), parser -> {
+            testWithParserAdapter(TestData.createFamilyPerson(), parser -> {
                 JsonString name = (JsonString) parser.getValueStream()
                         .map(JsonValue::asJsonObject)
                         .map(JsonObject::values)
@@ -508,7 +508,7 @@ public class JsonStructureToParserAdapterTest {
 
         @Test
         void testGetValueStream_GetList() {
-            DirectParserTests.testWithParserAdapter(TestData.createFamilyPerson(), parser -> {
+            testWithParserAdapter(TestData.createFamilyPerson(), parser -> {
                 List<String> values = parser.getValueStream().map(value -> Objects.toString(value, "null")).collect(Collectors.toList());
 
                 assertThat(values, contains(TestData.JSON_FAMILY_STRING));
@@ -517,7 +517,7 @@ public class JsonStructureToParserAdapterTest {
 
         @Test
         void testGetArrayStream_GetOneElement() {
-            DirectParserTests.testWithParserAdapter(TestData.createObjectWithArrays(), parser -> {
+            testWithParserAdapter(TestData.createObjectWithArrays(), parser -> {
                 parser.next();
                 parser.next();
                 String key = parser.getString();
@@ -533,7 +533,7 @@ public class JsonStructureToParserAdapterTest {
 
         @Test
         void testGetArrayStream_GetList() {
-            DirectParserTests.testWithParserAdapter(TestData.createObjectWithArrays(), parser -> {
+            testWithParserAdapter(TestData.createObjectWithArrays(), parser -> {
                 parser.next();
                 parser.next();
                 String key = parser.getString();
@@ -547,7 +547,7 @@ public class JsonStructureToParserAdapterTest {
 
         @Test
         void testGetObjectStream_GetOneElement() {
-            DirectParserTests.testWithParserAdapter(TestData.createJsonObject(), parser -> {
+            testWithParserAdapter(TestData.createJsonObject(), parser -> {
                 parser.next();
                 String surname = parser.getObjectStream().filter(e -> e.getKey().equals("firstPerson"))
                         .map(Map.Entry::getValue)
@@ -562,7 +562,7 @@ public class JsonStructureToParserAdapterTest {
 
         @Test
         void testGetObjectStream_GetList() {
-            DirectParserTests.testWithParserAdapter(TestData.createFamilyPerson(), parser -> {
+            testWithParserAdapter(TestData.createFamilyPerson(), parser -> {
                 parser.next();
                 List<String> values = parser.getObjectStream().collect(MAP_TO_LIST_COLLECTOR);
 
@@ -574,7 +574,7 @@ public class JsonStructureToParserAdapterTest {
 	@Nested
     public class JSONPStandardParserTests {
 
-        private static void testWithStringParser(String json, Consumer<JsonParser> consumer) {
+        private void testWithStringParser(String json, Consumer<JsonParser> consumer) {
             try (JsonParser parser = Json.createParser(new StringReader(json))) {
                 consumer.accept(parser);
             }
