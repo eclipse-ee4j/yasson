@@ -15,7 +15,6 @@ package org.eclipse.yasson.internal.jsonstructure;
 import java.math.BigDecimal;
 import java.util.ArrayDeque;
 import java.util.Deque;
-import java.util.EnumSet;
 import java.util.Map;
 import java.util.NoSuchElementException;
 import java.util.Objects;
@@ -45,18 +44,13 @@ import org.eclipse.yasson.internal.properties.Messages;
  */
 public class JsonStructureToParserAdapter implements JsonParser {
 
-    private static final EnumSet<Event> GET_STRING_EVENTS = EnumSet.of(Event.KEY_NAME, Event.VALUE_STRING, Event.VALUE_NUMBER);
-
-    private static final EnumSet<JsonParser.Event> NOT_GET_VALUE_EVENT_ENUM_SET = EnumSet.of(JsonParser.Event.END_OBJECT, JsonParser.Event.END_ARRAY);
-
     private final Deque<JsonStructureIterator> iterators = new ArrayDeque<>();
 
     private final JsonStructure rootStructure;
     private final JsonProvider jsonProvider;
 
-    private final JsonParserStreamCreator streamCreator = new JsonParserStreamCreator(this,
-            //JsonParserImpl delivers the whole object - so we have to call next() before creation of the stream
-            true, () -> iterators.peek() instanceof JsonArrayIterator, () -> iterators.peek() instanceof JsonObjectIterator, iterators::isEmpty);
+    //JsonParserImpl delivers the whole object - so we have to call next() before creation of the stream
+    private final JsonParserStreamCreator streamCreator = new JsonParserStreamCreator(this, true, this::currentEvent, iterators::isEmpty);
 
     private Event currentEvent;
 
@@ -111,12 +105,22 @@ public class JsonStructureToParserAdapter implements JsonParser {
 
     @Override
     public String getString() {
-        JsonStructureIterator iterator = iterators.peek();
-        if (iterator == null || !GET_STRING_EVENTS.contains(currentEvent)) {
-            throw new IllegalStateException(Messages.getMessage(MessageKeys.INTERNAL_ERROR, "getString() call with current event: "
-                    + (iterator == null ? "null" : currentEvent) + "; should be in " + GET_STRING_EVENTS));
-        } else {
-            return iterator.getString();
+        if (currentEvent == null) {
+            throw new IllegalStateException(Messages.getMessage(MessageKeys.INTERNAL_ERROR, "getString() call with current event: null"));
+        }
+
+        switch (currentEvent) {
+            case KEY_NAME:
+            case VALUE_STRING:
+            case VALUE_NUMBER:
+                JsonStructureIterator iterator = iterators.peek();
+                if (iterator == null) {
+                    throw new IllegalStateException(Messages.getMessage(MessageKeys.INTERNAL_ERROR, "getString() call with empty internal stack"));
+                }
+                return iterator.getString();
+            default:
+                throw new IllegalStateException(Messages.getMessage(MessageKeys.INTERNAL_ERROR, "getString() call with current event: "
+                        + currentEvent + "; should be in [KEY_NAME, VALUE_STRING, VALUE_NUMBER]"));
         }
     }
 
@@ -143,12 +147,14 @@ public class JsonStructureToParserAdapter implements JsonParser {
     @Override
     public JsonObject getObject() {
         JsonStructureIterator current = iterators.peek();
-        if (current instanceof JsonObjectIterator) {
+        if (currentEvent == Event.START_OBJECT) {
             //Remove child iterator as getObject() method contract says
             iterators.pop();
-            return current.getValue().asJsonObject();
+            currentEvent = Event.END_OBJECT;
+            JsonValue value = current == null ? null : current.getValue();
+            return value == null ? null : value.asJsonObject();
         } else {
-            throw new IllegalStateException(Messages.getMessage(MessageKeys.INTERNAL_ERROR, "Outside of object context"));
+            throw new IllegalStateException(Messages.getMessage(MessageKeys.INTERNAL_ERROR, "getObject() Not at the beginning of an object"));
         }
     }
 
@@ -171,13 +177,12 @@ public class JsonStructureToParserAdapter implements JsonParser {
 
     @Override
     public JsonValue getValue() {
-        if (currentEvent == null || NOT_GET_VALUE_EVENT_ENUM_SET.contains(currentEvent)) {
-            throw new IllegalStateException(Messages.getMessage(MessageKeys.INTERNAL_ERROR, "getValue() call with current event: "
-                    + currentEvent + "; should not be in " + NOT_GET_VALUE_EVENT_ENUM_SET));
+        if (currentEvent == null) {
+            throw new IllegalStateException(Messages.getMessage(MessageKeys.INTERNAL_ERROR, "getValue() call with current event: null"));
         } else {
             JsonStructureIterator iterator = iterators.peek();
             if (iterator == null) {
-                throw new IllegalStateException(Messages.getMessage(MessageKeys.INTERNAL_ERROR, "getValue() call on empty context"));
+                throw new IllegalStateException(Messages.getMessage(MessageKeys.INTERNAL_ERROR, "getValue() call empty internal stack"));
             } else {
                 switch (currentEvent) {
                     case START_OBJECT:
@@ -186,6 +191,10 @@ public class JsonStructureToParserAdapter implements JsonParser {
                         return getArray();
                     case KEY_NAME:
                         return jsonProvider.createValue(iterator.getString());
+                    case END_ARRAY:
+                    case END_OBJECT:
+                        throw new IllegalStateException(Messages.getMessage(MessageKeys.INTERNAL_ERROR, "getValue() call with current event: "
+                                + currentEvent + "; should not be in [END_OBJECT, END_ARRAY]"));
                     default:
                         return iterator.getValue();
                 }
@@ -195,17 +204,17 @@ public class JsonStructureToParserAdapter implements JsonParser {
 
     @Override
     public JsonArray getArray() {
-        JsonStructureIterator current = iterators.peek();
-        if (current instanceof JsonArrayIterator) {
+        if (currentEvent == Event.START_ARRAY) {
             //Remove child iterator as getArray() method contract says
             iterators.pop();
-            current = iterators.peek();
+            currentEvent = Event.END_ARRAY;
+            JsonStructureIterator current = iterators.peek();
             if (current == null) {
                 throw new NoSuchElementException(Messages.getMessage(MessageKeys.INTERNAL_ERROR, "No more elements in JSON structure"));
             }
             return current.getValue().asJsonArray();
         } else {
-            throw new IllegalStateException(Messages.getMessage(MessageKeys.INTERNAL_ERROR, "Outside of array context"));
+            throw new IllegalStateException(Messages.getMessage(MessageKeys.INTERNAL_ERROR, "getArray() not at the beginning of an array"));
         }
     }
 
@@ -226,20 +235,21 @@ public class JsonStructureToParserAdapter implements JsonParser {
 
     @Override
     public void skipArray() {
-        skipJsonPart(iterator -> iterator instanceof JsonArrayIterator);
+        skipJsonPart(iterator -> iterator instanceof JsonArrayIterator, Event.END_ARRAY);
     }
 
     @Override
     public void skipObject() {
-        skipJsonPart(iterator -> iterator instanceof JsonObjectIterator);
+        skipJsonPart(iterator -> iterator instanceof JsonObjectIterator, Event.END_OBJECT);
     }
 
-    private void skipJsonPart(Predicate<JsonStructureIterator> predicate) {
+    private void skipJsonPart(Predicate<JsonStructureIterator> predicate, Event newCurrentEvent) {
         Objects.requireNonNull(predicate);
         if (!iterators.isEmpty()) {
             JsonStructureIterator current = iterators.peek();
             if (predicate.test(current)) {
                 iterators.pop();
+                currentEvent = newCurrentEvent;
             }
         }
     }

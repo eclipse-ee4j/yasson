@@ -21,6 +21,7 @@ import java.util.stream.Stream;
 import jakarta.json.JsonException;
 import jakarta.json.JsonValue;
 import jakarta.json.stream.JsonParser;
+import jakarta.json.stream.JsonParser.Event;
 
 import org.eclipse.yasson.internal.properties.MessageKeys;
 import org.eclipse.yasson.internal.properties.Messages;
@@ -29,19 +30,16 @@ public class JsonParserStreamCreator {
 
     private final JsonParser parser;
     private final boolean nextBeforeCreationOfValueStream;
-    private final Supplier<Boolean> canProduceArrayStream;
-    private final Supplier<Boolean> canProduceObjectStream;
+    private final Supplier<Event> currenEventSupplier;
     private final Supplier<Boolean> canProduceValueStream;
 
-    public JsonParserStreamCreator(JsonParser parser, boolean nextBeforeCreationOfValueStream, Supplier<Boolean> canProduceArrayStream,
-            Supplier<Boolean> canProduceObjectStream,
+    public JsonParserStreamCreator(JsonParser parser, boolean nextBeforeCreationOfValueStream, Supplier<Event> currenEventSupplier,
             Supplier<Boolean> canProduceValueStream) {
 
         this.parser = Objects.requireNonNull(parser);
         this.nextBeforeCreationOfValueStream = nextBeforeCreationOfValueStream;
-        this.canProduceArrayStream = canProduceArrayStream;
-        this.canProduceObjectStream = canProduceObjectStream;
-        this.canProduceValueStream = canProduceValueStream;
+        this.currenEventSupplier = Objects.requireNonNull(currenEventSupplier);
+        this.canProduceValueStream = Objects.requireNonNull(canProduceValueStream);
     }
 
     /**
@@ -56,20 +54,23 @@ public class JsonParserStreamCreator {
     }
 
     public Stream<JsonValue> getArrayStream() {
-        if (canProduceArrayStream.get()) {
-            return streamFromSupplier(() -> (parser.hasNext() && parser.next() != JsonParser.Event.END_ARRAY) ? parser.getValue() : null);
+        if (currenEventSupplier.get() == Event.START_ARRAY) {
+            return streamFromSupplier(() -> (parser.hasNext() && parser.next() != Event.END_ARRAY) ? parser.getValue() : null);
         } else {
             throw new IllegalStateException(Messages.getMessage(MessageKeys.INTERNAL_ERROR, "Outside of array context"));
         }
     }
 
     public Stream<Map.Entry<String, JsonValue>> getObjectStream() {
-        if (canProduceObjectStream.get()) {
+        if (currenEventSupplier.get() == Event.START_OBJECT) {
             return streamFromSupplier(() -> {
-                JsonParser.Event e = parser.next();
-                if (e == JsonParser.Event.END_OBJECT) {
+                if (!parser.hasNext()) {
                     return null;
-                } else if (e != JsonParser.Event.KEY_NAME) {
+                }
+                Event e = parser.next();
+                if (e == Event.END_OBJECT) {
+                    return null;
+                } else if (e != Event.KEY_NAME) {
                     throw new JsonException(Messages.getMessage(MessageKeys.INTERNAL_ERROR, "Cannot read object key"));
                 } else {
                     String key = parser.getString();

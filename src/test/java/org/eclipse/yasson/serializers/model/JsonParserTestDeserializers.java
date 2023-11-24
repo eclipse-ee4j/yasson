@@ -52,6 +52,47 @@ public class JsonParserTestDeserializers {
 		}
 	}
 
+	public static class JsonParserTestGetObjectDeserializer implements JsonbDeserializer<JsonParserTestPojo> {
+
+		@Override
+		public JsonParserTestPojo deserialize(JsonParser parser, DeserializationContext ctx, Type rtType) {
+			parser.getObject();
+			return new JsonParserTestPojo();
+		}
+	}
+
+	public static class JsonParserTestGetArrayDeserializer implements JsonbDeserializer<JsonParserTestPojo> {
+		@Override
+		public JsonParserTestPojo deserialize(JsonParser parser, DeserializationContext ctx, Type rtType) {
+			parser.getArray();
+			return new JsonParserTestPojo();
+		}
+	}
+
+	public static class JsonParserTestEndOfObjectDeserializer implements JsonbDeserializer<JsonParserTestPojo> {
+		@Override
+		public JsonParserTestPojo deserialize(JsonParser parser, DeserializationContext ctx, Type rtType) {
+			//un-comment as soon as Parsson bug #112 is fixed
+//			parser.next();
+			parser.skipObject();
+			parser.getValue();
+			return new JsonParserTestPojo();
+		}
+	}
+
+	public static class JsonParserTestEndOfArrayDeserializer implements JsonbDeserializer<JsonParserTestPojo> {
+		@Override
+		public JsonParserTestPojo deserialize(JsonParser parser, DeserializationContext ctx, Type rtType) {
+			parser.next();
+			parser.next();
+			parser.getString();
+			parser.next();
+			parser.skipArray();
+			parser.getValue();
+			return new JsonParserTestPojo();
+		}
+	}
+
 	public static class JsonParserTestObjectDeserializer implements JsonbDeserializer<JsonParserTestPojo> {
 
 		private boolean integralNumber;

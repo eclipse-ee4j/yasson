@@ -990,5 +990,73 @@ public class SerializersTest {
                 assertInstanceOf(NoSuchElementException.class, throwable);
             });
         }
+
+        @Test
+        public void testJsonParser_GetObject_NotAtTheStartOfObject_IllegalStateException() {
+            JsonParserTestDeserializers.JsonParserTestGetObjectDeserializer
+                    deserializer = new JsonParserTestDeserializers.JsonParserTestGetObjectDeserializer();
+            testWithJsonbBuilderCreate(new JsonbConfig().withDeserializers(deserializer), jsonb -> {
+                Throwable throwable = null;
+                try {
+                    jsonb.fromJson("5", JsonParserTestPojo.class);
+                    fail("IllegalStateException should be thrown");
+                } catch (JsonbException jbe) {
+                    throwable = jbe.getCause();
+                }
+
+                assertInstanceOf(IllegalStateException.class, throwable);
+            });
+        }
+
+        @Test
+        public void testJsonParser_GetArray_NotAtTheStartOfArray_IllegalStateException() {
+            JsonParserTestDeserializers.JsonParserTestGetArrayDeserializer
+                    deserializer = new JsonParserTestDeserializers.JsonParserTestGetArrayDeserializer();
+            testWithJsonbBuilderCreate(new JsonbConfig().withDeserializers(deserializer), jsonb -> {
+                Throwable throwable = null;
+                try {
+                    jsonb.fromJson("5", JsonParserTestPojo.class);
+                    fail("IllegalStateException should be thrown");
+                } catch (JsonbException jbe) {
+                    throwable = jbe.getCause();
+                }
+
+                assertInstanceOf(IllegalStateException.class, throwable);
+            });
+        }
+
+        @Test
+        public void testJsonParser_GetValueEndOfObject_IllegalStateException() {
+            JsonParserTestDeserializers.JsonParserTestEndOfObjectDeserializer
+                    deserializer = new JsonParserTestDeserializers.JsonParserTestEndOfObjectDeserializer();
+            testWithJsonbBuilderCreate(new JsonbConfig().withDeserializers(deserializer), jsonb -> {
+                Throwable throwable = null;
+                try {
+                    jsonb.fromJson("{\"a\":1}", JsonParserTestPojo.class);
+                    fail("IllegalStateException should be thrown");
+                } catch (JsonbException jbe) {
+                    throwable = jbe.getCause();
+                }
+
+                assertInstanceOf(IllegalStateException.class, throwable);
+            });
+        }
+
+        @Test
+        public void testJsonParser_GetValueEndOfArray_IllegalStateException() {
+            JsonParserTestDeserializers.JsonParserTestEndOfArrayDeserializer
+                    deserializer = new JsonParserTestDeserializers.JsonParserTestEndOfArrayDeserializer();
+            testWithJsonbBuilderCreate(new JsonbConfig().withDeserializers(deserializer), jsonb -> {
+                Throwable throwable = null;
+                try {
+                    jsonb.fromJson("{\"a\":[]]}", JsonParserTestPojo.class);
+                    fail("IllegalStateException should be thrown");
+                } catch (JsonbException jbe) {
+                    throwable = jbe.getCause();
+                }
+
+                assertInstanceOf(IllegalStateException.class, throwable);
+            });
+        }
     }
 }

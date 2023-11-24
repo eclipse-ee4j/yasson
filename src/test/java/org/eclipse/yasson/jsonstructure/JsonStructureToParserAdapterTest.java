@@ -23,6 +23,7 @@ import static org.eclipse.yasson.Jsonbs.*;
 
 import org.eclipse.yasson.TestTypeToken;
 import org.eclipse.yasson.YassonJsonb;
+import org.junit.jupiter.api.function.Executable;
 
 import jakarta.json.Json;
 import jakarta.json.JsonArray;
@@ -44,6 +45,7 @@ import java.util.EnumSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Objects;
+import java.util.function.Consumer;
 import java.util.stream.Collector;
 import java.util.stream.Collectors;
 
@@ -67,7 +69,7 @@ public class JsonStructureToParserAdapterTest {
     private static final JsonProvider jsonProvider = JsonProvider.provider();
 
     @Test
-    public void testBasicJsonObject() {
+    void testBasicJsonObject() {
         JsonObjectBuilder objectBuilder = jsonProvider.createObjectBuilder();
         objectBuilder.add("stringProperty", "value 1");
         objectBuilder.add("bigDecimalProperty", new BigDecimal("1.1"));
@@ -80,7 +82,7 @@ public class JsonStructureToParserAdapterTest {
     }
 
     @Test
-    public void testNullValues() {
+    void testNullValues() {
         JsonObjectBuilder objectBuilder = jsonProvider.createObjectBuilder();
         objectBuilder.addNull("stringProperty");
         objectBuilder.addNull("bigDecimalProperty");
@@ -93,7 +95,7 @@ public class JsonStructureToParserAdapterTest {
     }
 
     @Test
-    public void testInnerJsonObjectWrappedWithProperties() {
+    void testInnerJsonObjectWrappedWithProperties() {
         JsonObjectBuilder innerBuilder = jsonProvider.createObjectBuilder();
         innerBuilder.add("innerFirst", "Inner value 1");
         innerBuilder.add("innerSecond", "Inner value 2");
@@ -115,7 +117,7 @@ public class JsonStructureToParserAdapterTest {
     }
 
     @Test
-    public void testInnerJsonObjectAtEndProperty() {
+    void testInnerJsonObjectAtEndProperty() {
         JsonObjectBuilder innerBuilder = jsonProvider.createObjectBuilder();
         innerBuilder.add("innerFirst", "Inner value 1");
         innerBuilder.add("innerSecond", "Inner value 2");
@@ -139,7 +141,7 @@ public class JsonStructureToParserAdapterTest {
     }
 
     @Test
-    public void testEmptyJsonObject() {
+    void testEmptyJsonObject() {
         JsonObjectBuilder objectBuilder = jsonProvider.createObjectBuilder();
         JsonObject jsonObject = objectBuilder.build();
         Pojo result = yassonJsonb.fromJsonStructure(jsonObject, Pojo.class);
@@ -149,7 +151,7 @@ public class JsonStructureToParserAdapterTest {
     }
 
     @Test
-    public void testEmptyInnerJsonObject() {
+    void testEmptyInnerJsonObject() {
         JsonObjectBuilder objectBuilder = jsonProvider.createObjectBuilder();
 
         JsonObjectBuilder innerBuilder = jsonProvider.createObjectBuilder();
@@ -170,7 +172,7 @@ public class JsonStructureToParserAdapterTest {
     }
 
     @Test
-    public void testSimpleArray() {
+    void testSimpleArray() {
         JsonArrayBuilder arrayBuilder = jsonProvider.createArrayBuilder();
         arrayBuilder.add(BigDecimal.TEN).add("String value").addNull();
         JsonArray jsonArray = arrayBuilder.build();
@@ -182,7 +184,7 @@ public class JsonStructureToParserAdapterTest {
     }
 
     @Test
-    public void testArraysInsideObject() {
+    void testArraysInsideObject() {
         JsonArrayBuilder bigDecBuilder = jsonProvider.createArrayBuilder();
         JsonArrayBuilder strBuilder = jsonProvider.createArrayBuilder();
         JsonArrayBuilder blnBuilder = jsonProvider.createArrayBuilder();
@@ -205,7 +207,7 @@ public class JsonStructureToParserAdapterTest {
     }
 
     @Test
-    public void testNestedArrays() {
+    void testNestedArrays() {
         JsonArrayBuilder arrayBuilder = jsonProvider.createArrayBuilder();
         JsonArrayBuilder innerArrBuilder = jsonProvider.createArrayBuilder();
         innerArrBuilder.add("first").add("second");
@@ -226,7 +228,7 @@ public class JsonStructureToParserAdapterTest {
     }
 
     @Test
-    public void testObjectsNestedInArrays() {
+    void testObjectsNestedInArrays() {
         JsonObjectBuilder objectBuilder = jsonProvider.createObjectBuilder();
         objectBuilder.add("stringProperty", "value 1");
         objectBuilder.add("bigDecimalProperty", new BigDecimal("1.1"));
@@ -254,7 +256,7 @@ public class JsonStructureToParserAdapterTest {
     }
 
     @Test
-    public void testObjectsNestedInArraysRaw() {
+    void testObjectsNestedInArraysRaw() {
         JsonObjectBuilder objectBuilder = jsonProvider.createObjectBuilder();
         objectBuilder.add("stringProperty", "value 1");
         objectBuilder.add("bigDecimalProperty", new BigDecimal("1.1"));
@@ -291,7 +293,7 @@ public class JsonStructureToParserAdapterTest {
 
 
     @Test
-    public void testCustomJsonbDeserializer() {
+    void testCustomJsonbDeserializer() {
         JsonObjectBuilder outerBuilder = jsonProvider.createObjectBuilder();
         JsonObjectBuilder innerBuilder = jsonProvider.createObjectBuilder();
         innerBuilder.add("first", "String value 1");
@@ -309,17 +311,22 @@ public class JsonStructureToParserAdapterTest {
 
     @Nested
     public class DirectParserTests {
+
+        private static void testWithParserAdapter(JsonObject jsonObject, Consumer<JsonParser> consumer) {
+            try (JsonStructureToParserAdapter parser = new JsonStructureToParserAdapter(jsonObject, jsonProvider)) {
+                consumer.accept(parser);
+            }
+        }
+
         @Test
-        public void testNumbers() {
-            JsonObject jsonObject = jsonProvider.createObjectBuilder()
+        void testNumbers() {
+            testWithParserAdapter(jsonProvider.createObjectBuilder()
                     .add("int", 1)
                     .add("long", 1L)
                     .add("double", 1d)
                     .add("BigInteger", BigInteger.TEN)
                     .add("BigDecimal", BigDecimal.TEN)
-                    .build();
-
-            try (JsonStructureToParserAdapter parser = new JsonStructureToParserAdapter(jsonObject, jsonProvider)) {
+                    .build(), parser -> {
                 parser.next();
                 parser.next();
                 parser.getString();
@@ -350,14 +357,12 @@ public class JsonStructureToParserAdapterTest {
                 parser.next();
                 assertTrue(parser.isIntegralNumber());
                 assertEquals(BigDecimal.TEN, parser.getBigDecimal());
-            }
+            });
         }
 
         @Test
-        public void testParser_getString(){
-            JsonObject jsonObject = TestData.createFamilyPerson();
-
-            try (JsonStructureToParserAdapter parser = new JsonStructureToParserAdapter(jsonObject, jsonProvider)) {
+        void testParser_getString(){
+            testWithParserAdapter(TestData.createFamilyPerson(), parser -> {
                 List<String> values = new ArrayList<>();
                 parser.next();
                 while (parser.hasNext()) {
@@ -369,14 +374,12 @@ public class JsonStructureToParserAdapterTest {
                 }
 
                 assertThat(values,TestData.FAMILY_MATCHER_WITH_NO_QUOTATION);
-            }
+            });
         }
 
         @Test
-        public void testParser_getValue(){
-            JsonObject jsonObject = TestData.createFamilyPerson();
-
-            try (JsonStructureToParserAdapter parser = new JsonStructureToParserAdapter(jsonObject, jsonProvider)) {
+        void testParser_getValue(){
+            testWithParserAdapter(TestData.createFamilyPerson(), parser -> {
                 List<String> values = new ArrayList<>();
                 parser.next();
                 while (parser.hasNext()) {
@@ -388,14 +391,12 @@ public class JsonStructureToParserAdapterTest {
                 }
 
                 assertThat(values, TestData.FAMILY_MATCHER_KEYS_WITH_QUOTATION);
-            }
+            });
         }
 
         @Test
-        public void testSkipArray() {
-            JsonObject jsonObject = TestData.createObjectWithArrays();
-
-            try (JsonStructureToParserAdapter parser = new JsonStructureToParserAdapter(jsonObject, jsonProvider)) {
+        void testSkipArray() {
+            testWithParserAdapter(TestData.createObjectWithArrays(), parser -> {
                 parser.next();
                 parser.next();
                 parser.getString();
@@ -405,14 +406,12 @@ public class JsonStructureToParserAdapterTest {
                 String key = parser.getString();
 
                 assertEquals("secondElement", key);
-            }
+            });
         }
 
         @Test
-        public void testSkipObject() {
-            JsonObject jsonObject = TestData.createJsonObject();
-
-            try (JsonStructureToParserAdapter parser = new JsonStructureToParserAdapter(jsonObject, jsonProvider)) {
+        void testSkipObject() {
+            testWithParserAdapter(TestData.createJsonObject(), parser -> {
                 parser.next();
                 parser.next();
                 parser.getString();
@@ -422,17 +421,77 @@ public class JsonStructureToParserAdapterTest {
                 String key = parser.getString();
 
                 assertEquals("secondPerson", key);
-            }
+            });
+        }
+
+        private void assertThrowsIllegalStateException(Executable executable) {
+            assertThrows(IllegalStateException.class, executable);
+        }
+
+        @Test
+        void testErrorGetObject() {
+            assertThrowsIllegalStateException(() -> testWithParserAdapter(TestData.createJsonObject(), JsonParser::getObject));
+        }
+
+        @Test
+        void testErrorGetArray() {
+            assertThrowsIllegalStateException(() -> testWithParserAdapter(TestData.createJsonObject(), parser -> {
+                parser.next();
+                parser.getArray();
+            }));
+        }
+
+        @Test
+        void testErrorGetValueEndOfObject() {
+            assertThrowsIllegalStateException(() -> testWithParserAdapter(TestData.createJsonObject(), parser -> {
+                parser.next();
+                parser.skipObject();
+                parser.getValue();
+            }));
+        }
+
+        @Test
+        void testErrorGetValueEndOfArray() {
+            assertThrowsIllegalStateException(() -> testWithParserAdapter(TestData.createObjectWithArrays(), parser -> {
+                parser.next();
+                parser.next();
+                parser.getString();
+                parser.next();
+                parser.skipArray();
+                parser.getValue();
+            }));
+        }
+
+        @Test
+        void testBooleanNullandCurrentEvent() {
+            testWithParserAdapter(Json.createObjectBuilder()
+                    .add("true", true)
+                    .add("false", false)
+                    .addNull("null")
+                    .build(), parser -> {
+                parser.next();
+                parser.next();
+                parser.getValue();
+                parser.next();
+                assertEquals(JsonValue.ValueType.TRUE, parser.getValue().getValueType());
+                parser.next();
+                parser.getValue();
+                parser.next();
+                assertEquals(JsonValue.ValueType.FALSE, parser.getValue().getValueType());
+                parser.next();
+                parser.getValue();
+                parser.next();
+                assertEquals(JsonValue.ValueType.NULL, parser.getValue().getValueType());
+                assertEquals(JsonParser.Event.VALUE_NULL, parser.currentEvent());
+            });
         }
     }
 
     @Nested
     public class StreamTests {
         @Test
-        public void testGetValueStream_GetOneElement() {
-            JsonObject jsonObject = TestData.createFamilyPerson();
-
-            try (JsonStructureToParserAdapter parser = new JsonStructureToParserAdapter(jsonObject, jsonProvider)) {
+        void testGetValueStream_GetOneElement() {
+            DirectParserTests.testWithParserAdapter(TestData.createFamilyPerson(), parser -> {
                 JsonString name = (JsonString) parser.getValueStream()
                         .map(JsonValue::asJsonObject)
                         .map(JsonObject::values)
@@ -444,25 +503,21 @@ public class JsonStructureToParserAdapterTest {
                         .orElseThrow(() -> new RuntimeException("Name not found"));
 
                 assertEquals("John", name.getString());
-            }
+            });
         }
 
         @Test
-        public void testGetValueStream_GetList() {
-            JsonObject jsonObject = TestData.createFamilyPerson();
-
-            try (JsonStructureToParserAdapter parser = new JsonStructureToParserAdapter(jsonObject, jsonProvider)) {
+        void testGetValueStream_GetList() {
+            DirectParserTests.testWithParserAdapter(TestData.createFamilyPerson(), parser -> {
                 List<String> values = parser.getValueStream().map(value -> Objects.toString(value, "null")).collect(Collectors.toList());
 
                 assertThat(values, contains(TestData.JSON_FAMILY_STRING));
-            }
+            });
         }
 
         @Test
-        public void testGetArrayStream_GetOneElement() {
-            JsonObject jsonObject = TestData.createObjectWithArrays();
-
-            try (JsonStructureToParserAdapter parser = new JsonStructureToParserAdapter(jsonObject, jsonProvider)) {
+        void testGetArrayStream_GetOneElement() {
+            DirectParserTests.testWithParserAdapter(TestData.createObjectWithArrays(), parser -> {
                 parser.next();
                 parser.next();
                 String key = parser.getString();
@@ -473,14 +528,12 @@ public class JsonStructureToParserAdapterTest {
 
                 assertEquals("first", element.getString());
                 assertEquals("firstElement", key);
-            }
+            });
         }
 
         @Test
-        public void testGetArrayStream_GetList() {
-            JsonObject jsonObject = TestData.createObjectWithArrays();
-
-            try (JsonStructureToParserAdapter parser = new JsonStructureToParserAdapter(jsonObject, jsonProvider)) {
+        void testGetArrayStream_GetList() {
+            DirectParserTests.testWithParserAdapter(TestData.createObjectWithArrays(), parser -> {
                 parser.next();
                 parser.next();
                 String key = parser.getString();
@@ -489,14 +542,12 @@ public class JsonStructureToParserAdapterTest {
 
                 assertThat(values, TestData.ARRAY_STREAM_MATCHER);
                 assertEquals("firstElement", key);
-            }
+            });
         }
 
         @Test
-        public void testGetObjectStream_GetOneElement() {
-            JsonObject jsonObject = TestData.createJsonObject();
-
-            try (JsonStructureToParserAdapter parser = new JsonStructureToParserAdapter(jsonObject, jsonProvider)) {
+        void testGetObjectStream_GetOneElement() {
+            DirectParserTests.testWithParserAdapter(TestData.createJsonObject(), parser -> {
                 parser.next();
                 String surname = parser.getObjectStream().filter(e -> e.getKey().equals("firstPerson"))
                         .map(Map.Entry::getValue)
@@ -506,36 +557,41 @@ public class JsonStructureToParserAdapterTest {
                         .orElseThrow(() -> new RuntimeException("Surname not found"));
 
                 assertEquals("Smith", surname);
-            }
+            });
         }
 
         @Test
-        public void testGetObjectStream_GetList() {
-            JsonObject jsonObject = TestData.createFamilyPerson();
-
-            try (JsonStructureToParserAdapter parser = new JsonStructureToParserAdapter(jsonObject, jsonProvider)) {
+        void testGetObjectStream_GetList() {
+            DirectParserTests.testWithParserAdapter(TestData.createFamilyPerson(), parser -> {
                 parser.next();
                 List<String> values = parser.getObjectStream().collect(MAP_TO_LIST_COLLECTOR);
 
                 assertThat(values, TestData.FAMILY_MATCHER_KEYS_WITHOUT_QUOTATION);
-            }
+            });
         }
     }
 
 	@Nested
     public class JSONPStandardParserTests {
-        @Test
-        public void testStandardStringParser_getValueStream() {
-            try (JsonParser parser = Json.createParser(new StringReader(TestData.JSON_FAMILY_STRING))) {
-                List<String> values = parser.getValueStream().map(value -> Objects.toString(value, "null")).collect(Collectors.toList());
 
-                assertThat(values, contains(TestData.JSON_FAMILY_STRING));
+        private static void testWithStringParser(String json, Consumer<JsonParser> consumer) {
+            try (JsonParser parser = Json.createParser(new StringReader(json))) {
+                consumer.accept(parser);
             }
         }
 
         @Test
-        public void testStandardStringParser_getArrayStream() {
-            try (JsonParser parser = Json.createParser(new StringReader("{\"firstElement\":[\"first\", \"second\"],\"secondElement\":[\"third\", \"fourth\"]}"))) {
+        void testStandardStringParser_getValueStream() {
+            testWithStringParser(TestData.JSON_FAMILY_STRING, parser -> {
+                List<String> values = parser.getValueStream().map(value -> Objects.toString(value, "null")).collect(Collectors.toList());
+
+                assertThat(values, contains(TestData.JSON_FAMILY_STRING));
+            });
+        }
+
+        @Test
+        void testStandardStringParser_getArrayStream() {
+            testWithStringParser("{\"firstElement\":[\"first\", \"second\"],\"secondElement\":[\"third\", \"fourth\"]}", parser -> {
                 parser.next();
                 parser.next();
                 String key = parser.getString();
@@ -544,23 +600,23 @@ public class JsonStructureToParserAdapterTest {
 
                 assertThat(values, TestData.ARRAY_STREAM_MATCHER);
                 assertEquals("firstElement", key);
-            }
+            });
         }
 
         @Test
-        public void testStandardStringParser_getObjectStream() {
-            try (JsonParser parser = Json.createParser(new StringReader(TestData.JSON_FAMILY_STRING))) {
+        void testStandardStringParser_getObjectStream() {
+            testWithStringParser(TestData.JSON_FAMILY_STRING, parser -> {
 
                 parser.next();
                 List<String> values = parser.getObjectStream().collect(MAP_TO_LIST_COLLECTOR);
 
                 assertThat(values, TestData.FAMILY_MATCHER_KEYS_WITHOUT_QUOTATION);
-            }
+            });
         }
 
         @Test
-        public void testStandardStringParser_getValue() {
-            try (JsonParser parser = Json.createParser(new StringReader(TestData.JSON_FAMILY_STRING))) {
+        void testStandardStringParser_getValue() {
+            testWithStringParser(TestData.JSON_FAMILY_STRING, parser -> {
                 List<String> values = new ArrayList<>();
                 parser.next();
                 while (parser.hasNext()) {
@@ -572,12 +628,12 @@ public class JsonStructureToParserAdapterTest {
                 }
 
                 assertThat(values, TestData.FAMILY_MATCHER_KEYS_WITH_QUOTATION);
-            }
+            });
         }
 
         @Test
-        public void testStandardStringParser_getString() {
-            try (JsonParser parser = Json.createParser(new StringReader(TestData.JSON_FAMILY_STRING))) {
+        void testStandardStringParser_getString() {
+            testWithStringParser(TestData.JSON_FAMILY_STRING, parser -> {
                 List<String> values = new ArrayList<>();
                 parser.next();
                 while (parser.hasNext()) {
@@ -589,11 +645,11 @@ public class JsonStructureToParserAdapterTest {
                 }
 
                 assertThat(values, TestData.FAMILY_MATCHER_WITH_NO_QUOTATION);
-            }
+            });
         }
 
         @Test
-        public void testStandardStructureParser_getString() {
+        void testStandardStructureParser_getString() {
             JsonParserFactory factory = Json.createParserFactory(Map.of());
             JsonObject jsonObject = TestData.createFamilyPerson();
 
