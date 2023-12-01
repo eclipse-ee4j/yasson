@@ -12,6 +12,7 @@
 
 package org.eclipse.yasson.internal;
 
+import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
 import java.io.Reader;
@@ -19,6 +20,7 @@ import java.io.StringReader;
 import java.io.StringWriter;
 import java.io.Writer;
 import java.lang.reflect.Type;
+import java.nio.CharBuffer;
 import java.nio.charset.Charset;
 import java.util.Map;
 import java.util.Set;
@@ -73,7 +75,7 @@ public class JsonBinding implements YassonJsonb {
 
     @Override
     public <T> T fromJson(Reader reader, Class<T> type) throws JsonbException {
-        try (JsonParser parser = jsonbContext.getJsonProvider().createParser(reader)) {
+        try (JsonParser parser = jsonbContext.getJsonProvider().createParser(new CloseSuppressingReader(reader))) {
             DeserializationContextImpl unmarshaller = new DeserializationContextImpl(jsonbContext);
             return deserialize(type, parser, unmarshaller);
         }
@@ -81,7 +83,7 @@ public class JsonBinding implements YassonJsonb {
 
     @Override
     public <T> T fromJson(Reader reader, Type type) throws JsonbException {
-        try (JsonParser parser = jsonbContext.getJsonProvider().createParser(reader)) {
+        try (JsonParser parser = jsonbContext.getJsonProvider().createParser(new CloseSuppressingReader(reader))) {
             DeserializationContextImpl unmarshaller = new DeserializationContextImpl(jsonbContext);
             return deserialize(type, parser, unmarshaller);
         }
@@ -90,16 +92,16 @@ public class JsonBinding implements YassonJsonb {
     @Override
     public <T> T fromJson(InputStream stream, Class<T> clazz) throws JsonbException {
         DeserializationContextImpl unmarshaller = new DeserializationContextImpl(jsonbContext);
-        try (JsonParser parser = inputStreamParser(stream)) {
-            return deserialize(clazz, inputStreamParser(stream), unmarshaller);
+        try (JsonParser parser = inputStreamParser(new CloseSuppressingInputStream(stream))) {
+            return deserialize(clazz, parser, unmarshaller);
         }
     }
 
     @Override
     public <T> T fromJson(InputStream stream, Type type) throws JsonbException {
         DeserializationContextImpl unmarshaller = new DeserializationContextImpl(jsonbContext);
-        try (JsonParser parser = inputStreamParser(stream)) {
-            return deserialize(type, inputStreamParser(stream), unmarshaller);
+        try (JsonParser parser = inputStreamParser(new CloseSuppressingInputStream(stream))) {
+            return deserialize(type, parser, unmarshaller);
         }
     }
 
@@ -145,7 +147,7 @@ public class JsonBinding implements YassonJsonb {
     @Override
     public void toJson(Object object, Writer writer) throws JsonbException {
         final SerializationContextImpl marshaller = new SerializationContextImpl(jsonbContext);
-        try (JsonGenerator generator = writerGenerator(writer)) {
+        try (JsonGenerator generator = writerGenerator(new CloseSuppressingWriter(writer))) {
             marshaller.marshallWithoutClose(object, generator);
         }
     }
@@ -153,7 +155,7 @@ public class JsonBinding implements YassonJsonb {
     @Override
     public void toJson(Object object, Type type, Writer writer) throws JsonbException {
         final SerializationContextImpl marshaller = new SerializationContextImpl(jsonbContext, type);
-        try (JsonGenerator generator = writerGenerator(writer)) {
+        try (JsonGenerator generator = writerGenerator(new CloseSuppressingWriter(writer))) {
             marshaller.marshallWithoutClose(object, generator);
         }
     }
@@ -169,7 +171,7 @@ public class JsonBinding implements YassonJsonb {
     @Override
     public void toJson(Object object, OutputStream stream) throws JsonbException {
         final SerializationContextImpl marshaller = new SerializationContextImpl(jsonbContext);
-        try (JsonGenerator generator = streamGenerator(stream)) {
+        try (JsonGenerator generator = streamGenerator(new CloseSuppressingOutputStream(stream))) {
             marshaller.marshall(object, generator);
         }
     }
@@ -177,7 +179,7 @@ public class JsonBinding implements YassonJsonb {
     @Override
     public void toJson(Object object, Type type, OutputStream stream) throws JsonbException {
         final SerializationContextImpl marshaller = new SerializationContextImpl(jsonbContext, type);
-        try (JsonGenerator generator = streamGenerator(stream)) {
+        try (JsonGenerator generator = streamGenerator(new CloseSuppressingOutputStream(stream))) {
             marshaller.marshall(object, generator);
         }
     }
@@ -232,6 +234,248 @@ public class JsonBinding implements YassonJsonb {
     @Override
     public void close() throws Exception {
         jsonbContext.getComponentInstanceCreator().close();
+    }
+
+    /**
+     * {@link OutputStream} that suppresses {@link OutputStream#close()}.
+     */
+    static final class CloseSuppressingOutputStream extends OutputStream {
+
+        private final OutputStream delegate;
+
+        CloseSuppressingOutputStream(OutputStream delegate) {
+            this.delegate = delegate;
+        }
+
+        @Override
+        public void close() {
+            // suppress
+        }
+
+        @Override
+        public void write(int b) throws IOException {
+            delegate.write(b);
+        }
+
+        @Override
+        public void write(byte[] b) throws IOException {
+            delegate.write(b);
+        }
+
+        @Override
+        public void write(byte[] b, int off, int len) throws IOException {
+            delegate.write(b, off, len);
+        }
+
+    }
+
+    /**
+     * {@link InputStream} that suppresses {@link InputStream#close()}.
+     */
+    static final class CloseSuppressingInputStream extends InputStream {
+
+        private final InputStream delegate;
+
+        CloseSuppressingInputStream(InputStream delegate) {
+            this.delegate = delegate;
+        }
+
+        @Override
+        public void close() {
+            // suppress
+        }
+
+        @Override
+        public int read() throws IOException {
+            return delegate.read();
+        }
+
+        @Override
+        public int read(byte[] b) throws IOException {
+            return delegate.read(b);
+        }
+
+        @Override
+        public int read(byte[] b, int off, int len) throws IOException {
+            return delegate.read(b, off, len);
+        }
+
+        @Override
+        public byte[] readAllBytes() throws IOException {
+            return delegate.readAllBytes();
+        }
+
+        @Override
+        public byte[] readNBytes(int len) throws IOException {
+            return delegate.readNBytes(len);
+        }
+
+        @Override
+        public int readNBytes(byte[] b, int off, int len) throws IOException {
+            return delegate.readNBytes(b, off, len);
+        }
+
+        @Override
+        public long skip(long n) throws IOException {
+            return delegate.skip(n);
+        }
+
+        @Override
+        public int available() throws IOException {
+            return delegate.available();
+        }
+
+        @Override
+        public void mark(int readlimit) {
+            delegate.mark(readlimit);
+        }
+
+        @Override
+        public void reset() throws IOException {
+            delegate.reset();
+        }
+
+        @Override
+        public boolean markSupported() {
+            return delegate.markSupported();
+        }
+
+        @Override
+        public long transferTo(OutputStream out) throws IOException {
+            return delegate.transferTo(out);
+        }
+
+    }
+
+    /**
+     * {@link Reader} that suppresses {@link Reader#close()}.
+     */
+    static final class CloseSuppressingReader extends Reader {
+
+        private final Reader delegate;
+
+        CloseSuppressingReader(Reader delegate) {
+            this.delegate = delegate;
+        }
+
+        @Override
+        public int read(CharBuffer target) throws IOException {
+            return delegate.read(target);
+        }
+
+        @Override
+        public int read() throws IOException {
+            return delegate.read();
+        }
+
+        @Override
+        public int read(char[] cbuf) throws IOException {
+            return delegate.read(cbuf);
+        }
+
+        @Override
+        public int read(char[] cbuf, int off, int len) throws IOException {
+            return delegate.read(cbuf, off, len);
+        }
+
+        @Override
+        public long skip(long n) throws IOException {
+            return delegate.skip(n);
+        }
+
+        @Override
+        public boolean ready() throws IOException {
+            return delegate.ready();
+        }
+
+        @Override
+        public boolean markSupported() {
+            return delegate.markSupported();
+        }
+
+        @Override
+        public void mark(int readAheadLimit) throws IOException {
+            delegate.mark(readAheadLimit);
+        }
+
+        @Override
+        public void reset() throws IOException {
+            delegate.reset();
+        }
+
+        @Override
+        public void close() {
+            // suppress
+        }
+
+        @Override
+        public long transferTo(Writer out) throws IOException {
+            return delegate.transferTo(out);
+        }
+
+    }
+
+    /**
+     * {@link Writer} that suppresses {@link Writer#close()}.
+     */
+    static final class CloseSuppressingWriter extends Writer {
+
+        private final Writer delegate;
+
+        CloseSuppressingWriter(Writer delegate) {
+            this.delegate = delegate;
+        }
+
+        @Override
+        public void write(int c) throws IOException {
+            delegate.write(c);
+        }
+
+        @Override
+        public void write(char[] cbuf) throws IOException {
+            delegate.write(cbuf);
+        }
+
+        @Override
+        public void write(char[] cbuf, int off, int len) throws IOException {
+            delegate.write(cbuf, off, len);
+        }
+
+        @Override
+        public void write(String str) throws IOException {
+            delegate.write(str);
+        }
+
+        @Override
+        public void write(String str, int off, int len) throws IOException {
+            delegate.write(str, off, len);
+        }
+
+        @Override
+        public Writer append(CharSequence csq) throws IOException {
+            return delegate.append(csq);
+        }
+
+        @Override
+        public Writer append(CharSequence csq, int start, int end) throws IOException {
+            return delegate.append(csq, start, end);
+        }
+
+        @Override
+        public Writer append(char c) throws IOException {
+            return delegate.append(c);
+        }
+
+        @Override
+        public void flush() throws IOException {
+            delegate.flush();
+        }
+
+        @Override
+        public void close() {
+            // suppress
+        }
+
     }
 
 }
