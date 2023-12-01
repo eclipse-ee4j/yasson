@@ -24,21 +24,6 @@ public class Assertions {
 	/**
 	 * Asserts that the given operation will fail with a JsonbException
 	 * @param operation The operation that is expected to fail
-	 */
-	public static void shouldFail(Supplier<?> operation) {
-		shouldFail(operation, JsonbException.class, msg -> true);
-	}
-	
-	public static void shouldFail(Runnable operation) {
-		shouldFail(() -> {
-			operation.run();
-			return null;
-		});
-	}
-	
-	/**
-	 * Asserts that the given operation will fail with a JsonbException
-	 * @param operation The operation that is expected to fail
 	 * @param checkExceptionMessage Any checks that should be made on the exception message. For example, ensuring the exception
 	 * includes a specific token. 
 	 */

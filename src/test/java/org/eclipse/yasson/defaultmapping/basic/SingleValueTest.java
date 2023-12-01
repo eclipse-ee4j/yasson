@@ -83,11 +83,7 @@ public class SingleValueTest {
         assertEquals("5", bindingJsonb.toJson(5));
 
         Jsonb jsonb = new JsonBindingBuilder().withConfig(new JsonbConfig().withStrictIJSON(true)).build();
-        try {
-            jsonb.toJson(5);
-            fail();
-        } catch (JsonbException exception){
-            assertEquals(Messages.getMessage(MessageKeys.IJSON_ENABLED_SINGLE_VALUE), exception.getMessage());
-        }
+        JsonbException exception = assertThrows(JsonbException.class, () -> jsonb.toJson(5));
+        assertEquals(Messages.getMessage(MessageKeys.IJSON_ENABLED_SINGLE_VALUE), exception.getMessage());
     }
 }

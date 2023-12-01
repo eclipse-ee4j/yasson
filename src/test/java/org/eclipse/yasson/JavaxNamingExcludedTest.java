@@ -29,13 +29,10 @@ public class JavaxNamingExcludedTest {
 
     @Test
     public void testNoJavaxNamingModule() {
-        try {
-            Class.forName(JsonbComponentInstanceCreatorFactory.INITIAL_CONTEXT_CLASS);
-            fail("Class [" + JsonbComponentInstanceCreatorFactory.INITIAL_CONTEXT_CLASS
+        //OK, java.naming is not observable
+        assertThrows(ClassNotFoundException.class, () -> Class.forName(JsonbComponentInstanceCreatorFactory.INITIAL_CONTEXT_CLASS),
+            () -> "Class [" + JsonbComponentInstanceCreatorFactory.INITIAL_CONTEXT_CLASS
                     + "] should not be available for this test.");
-        } catch (ClassNotFoundException e) {
-            //OK, java.naming is not observable
-        }
 
         final String result = defaultJsonb.toJson(new AdaptedPojo());
         assertEquals("{\"adaptedValue1\":1111,\"adaptedValue2\":1001,\"adaptedValue3\":1010}", result);
