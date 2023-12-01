@@ -13,7 +13,7 @@
 package org.eclipse.yasson.defaultmapping.specific;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.fail;
+import static org.junit.jupiter.api.Assertions.assertThrows;
 
 import java.util.Arrays;
 
@@ -44,44 +44,32 @@ public class RecursiveReferenceTest {
     public void testSerializeRecursiveReference() {
         Chain recursive = new Chain("test");
         recursive.setLinksTo(recursive);
-        try {
-            Jsonbs.defaultJsonb.toJson(recursive);
-            fail("Exception should be caught");
-        } catch (JsonbException e) {
-            assertEquals(
-                    "Unable to serialize property 'linksTo' from org.eclipse.yasson.adapters.model.Chain",
-                    e.getMessage());
-            assertEquals(
-                    "Recursive reference has been found in class class org.eclipse.yasson.adapters.model.Chain.",
-                    e.getCause().getMessage());
-        }
+        JsonbException e = assertThrows(JsonbException.class, () -> Jsonbs.defaultJsonb.toJson(recursive), "Exception should be caught");
+        assertEquals(
+                "Unable to serialize property 'linksTo' from org.eclipse.yasson.adapters.model.Chain",
+                e.getMessage());
+        assertEquals(
+                "Recursive reference has been found in class class org.eclipse.yasson.adapters.model.Chain.",
+                e.getCause().getMessage());
     }
 
     @Test
     public void testSerializeRecursiveReferenceCustomAdapter() {
         Chain recursive = new Chain("test");
         recursive.setLinksTo(recursive);
-        try {
-            adapterSerializerJsonb.toJson(recursive);
-            fail("Exception should be caught");
-        } catch (JsonbException e) {
-            assertEquals("Problem adapting object of type class org.eclipse.yasson.adapters.model.Chain to java.util.Map<java.lang"
-                            + ".String, java.lang.Object> in class class org.eclipse.yasson.adapters.model.ChainAdapter",
-                    e.getMessage());
-        }
+        JsonbException e = assertThrows(JsonbException.class, () -> adapterSerializerJsonb.toJson(recursive), "Exception should be caught");
+        assertEquals("Problem adapting object of type class org.eclipse.yasson.adapters.model.Chain to java.util.Map<java.lang"
+                + ".String, java.lang.Object> in class class org.eclipse.yasson.adapters.model.ChainAdapter",
+                e.getMessage());
     }
 
     @Test
     public void testSerializeRecursiveReferenceCustomSerializer() {
         Chain recursive = new Chain("test");
         recursive.setLinksTo(recursive);
-        try {
-            userSerializerJsonb.toJson(recursive);
-            fail("Exception should be caught");
-        } catch (JsonbException e) {
-            assertEquals("Recursive reference has been found in class class org.eclipse.yasson.adapters.model.Chain.",
-                         e.getMessage());
-        }
+        JsonbException e = assertThrows(JsonbException.class, () -> userSerializerJsonb.toJson(recursive), "Exception should be caught");
+        assertEquals("Recursive reference has been found in class class org.eclipse.yasson.adapters.model.Chain.",
+                e.getMessage());
     }
 
     @Test
