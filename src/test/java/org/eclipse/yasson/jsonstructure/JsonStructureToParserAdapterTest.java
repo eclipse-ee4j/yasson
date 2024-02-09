@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2019, 2023 Oracle and/or its affiliates. All rights reserved.
+ * Copyright (c) 2019, 2024 Oracle and/or its affiliates. All rights reserved.
  *
  * This program and the accompanying materials are made available under the
  * terms of the Eclipse Public License v. 2.0 which is available at
@@ -219,7 +219,7 @@ public class JsonStructureToParserAdapterTest {
         ArrayList<?> result = yassonJsonb.fromJsonStructure(jsonArray, ArrayList.class);
         assertEquals(2, result.size());
         assertEquals(BigDecimal.TEN, result.get(0));
-        assertTrue(result.get(1) instanceof List);
+		assertInstanceOf(List.class, result.get(1));
         @SuppressWarnings("unchecked")
         List<String> inner = (List<String>) result.get(1);
         assertEquals(2, inner.size());
@@ -244,7 +244,7 @@ public class JsonStructureToParserAdapterTest {
         JsonArray rootArray = arrayBuilder.build();
 
         List<Object> result = yassonJsonb.fromJsonStructure(rootArray, new TestTypeToken<List<Pojo>>(){}.getType());
-        assertTrue(result.get(0) instanceof Pojo);
+		assertInstanceOf(Pojo.class, result.get(0));
         Pojo pojo = (Pojo) result.get(0);
         assertNotNull(pojo);
         assertEquals("value 1", pojo.getStringProperty());
@@ -276,14 +276,14 @@ public class JsonStructureToParserAdapterTest {
 
         List<Object> result = yassonJsonb.fromJsonStructure(rootArray, new TestTypeToken<List<Object>>(){}.getType());
         assertEquals(new BigDecimal("10"), result.get(0));
-        assertTrue(result.get(1) instanceof Map);
+		assertInstanceOf(Map.class, result.get(1));
         @SuppressWarnings("unchecked")
         Map<String, ?> pojo = (Map<String, ?>) result.get(1);
         assertNotNull(pojo);
         assertEquals("value 1", pojo.get("stringProperty"));
         assertEquals(new BigDecimal("1.1"), pojo.get("bigDecimalProperty"));
         assertEquals(new BigDecimal(10), pojo.get("longProperty"));
-        assertTrue(pojo.get("strings") instanceof List);
+		assertInstanceOf(List.class, pojo.get("strings"));
         @SuppressWarnings("unchecked")
         List<String> strings = (List<String>) pojo.get("strings");
         assertNotNull(strings);

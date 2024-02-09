@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2015, 2023 Oracle and/or its affiliates. All rights reserved.
+ * Copyright (c) 2015, 2024 Oracle and/or its affiliates. All rights reserved.
  *
  * This program and the accompanying materials are made available under the
  * terms of the Eclipse Public License v. 2.0 which is available at
@@ -33,7 +33,7 @@ import static org.hamcrest.CoreMatchers.is;
 import static org.hamcrest.CoreMatchers.nullValue;
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertTrue;
+import static org.junit.jupiter.api.Assertions.assertInstanceOf;
 
 /**
  * Default mapping JSONP integration tests.
@@ -209,7 +209,7 @@ public class JsonpTest {
         assertEquals("{\"jsonValue\":\"abc\"}", json);
 
         JsonValueWrapper result = defaultJsonb.fromJson("{\"jsonValue\":\"def\"}", JsonValueWrapper.class);
-        assertTrue(result.jsonValue instanceof  JsonString);
+		assertInstanceOf(JsonString.class, result.jsonValue);
         assertEquals("def", ((JsonString)result.jsonValue).getString());
     }
 
@@ -225,7 +225,7 @@ public class JsonpTest {
         assertEquals(expected, json);
 
         JsonValueWrapper result = defaultJsonb.fromJson(expected, JsonValueWrapper.class);
-        assertTrue(result.jsonValue instanceof JsonObject);
+		assertInstanceOf(JsonObject.class, result.jsonValue);
         JsonObject jsonObject = (JsonObject) result.jsonValue;
         assertEquals("val1", jsonObject.getString("prop1"));
         assertEquals("innerVal1", jsonObject.getJsonObject("innerObj1").getString("inner1"));
@@ -240,7 +240,7 @@ public class JsonpTest {
         assertEquals(expected, json);
 
         JsonValueWrapper result = defaultJsonb.fromJson(expected, JsonValueWrapper.class);
-        assertTrue(result.jsonValue instanceof JsonArray);
+		assertInstanceOf(JsonArray.class, result.jsonValue);
         JsonArray resultArray = (JsonArray) result.jsonValue;
         assertEquals(1, resultArray.getInt(0));
         assertEquals(2, resultArray.getInt(1));

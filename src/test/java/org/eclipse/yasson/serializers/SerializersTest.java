@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2016, 2023 Oracle and/or its affiliates. All rights reserved.
+ * Copyright (c) 2016, 2024 Oracle and/or its affiliates. All rights reserved.
  *
  * This program and the accompanying materials are made available under the
  * terms of the Eclipse Public License v. 2.0 which is available at
@@ -463,10 +463,10 @@ public class SerializersTest {
     public void testObjectDeserializerWithLexOrderStrategy() {
         testWithJsonbBuilderCreate(new JsonbConfig().withPropertyOrderStrategy(PropertyOrderStrategy.LEXICOGRAPHICAL), jsonb -> {
             Object pojo = jsonb.fromJson("{\"first\":{},\"third\":{},\"second\":{\"second\":2,\"first\":1}}", Object.class);
-            assertTrue(pojo instanceof TreeMap, "Pojo is not of type TreeMap");
+			assertInstanceOf(TreeMap.class, pojo, "Pojo is not of type TreeMap");
             @SuppressWarnings("unchecked")
             SortedMap<String, Object> pojoAsMap = (SortedMap<String, Object>) pojo;
-            assertTrue(pojoAsMap.get("second") instanceof TreeMap, "Pojo inner object is not of type TreeMap");
+			assertInstanceOf(TreeMap.class, pojoAsMap.get("second"), "Pojo inner object is not of type TreeMap");
             assertEquals("{\"first\":{},\"second\":{\"first\":1,\"second\":2},\"third\":{}}", jsonb.toJson(pojo));
         });
     }
@@ -475,10 +475,10 @@ public class SerializersTest {
     public void testObjectDeserializerWithReverseOrderStrategy() {
         testWithJsonbBuilderCreate(new JsonbConfig().withPropertyOrderStrategy(PropertyOrderStrategy.REVERSE), jsonb -> {
             Object pojo = jsonb.fromJson("{\"first\":{},\"second\":{\"first\":1,\"second\":2},\"third\":{}}", Object.class);
-            assertTrue(pojo instanceof ReverseTreeMap, "Pojo is not of type ReverseTreeMap");
+			assertInstanceOf(ReverseTreeMap.class, pojo, "Pojo is not of type ReverseTreeMap");
             @SuppressWarnings("unchecked")
             SortedMap<String, Object> pojoAsMap = (SortedMap<String, Object>) pojo;
-            assertTrue(pojoAsMap.get("second") instanceof TreeMap, "Pojo inner object is not of type TreeMap");
+			assertInstanceOf(TreeMap.class, pojoAsMap.get("second"), "Pojo inner object is not of type TreeMap");
             assertEquals("{\"third\":{},\"second\":{\"second\":2,\"first\":1},\"first\":{}}", jsonb.toJson(pojo));
         });
     }
@@ -489,10 +489,10 @@ public class SerializersTest {
         // ANY
         testWithJsonbBuilderCreate(new JsonbConfig().withPropertyOrderStrategy(PropertyOrderStrategy.ANY), jsonb -> {
             Object pojo = jsonb.fromJson(json, Object.class);
-            assertTrue(pojo instanceof HashMap, "Pojo is not of type HashMap with \"ANY\" strategy");
+			assertInstanceOf(HashMap.class, pojo, "Pojo is not of type HashMap with \"ANY\" strategy");
             // none
             pojo = defaultJsonb.fromJson(json, Object.class);
-            assertTrue(pojo instanceof HashMap, "Pojo is not of type HashMap with no strategy");
+			assertInstanceOf(HashMap.class, pojo, "Pojo is not of type HashMap with no strategy");
         });
     }
 
@@ -502,22 +502,22 @@ public class SerializersTest {
 
         testWithJsonbBuilderCreate(new JsonbConfig().withPropertyOrderStrategy(PropertyOrderStrategy.ANY), jsonb -> {
             SortedMap<?, ?> pojo = jsonb.fromJson(json, SortedMap.class);
-            assertTrue(pojo instanceof TreeMap, "Pojo is not of type TreeMap with \"ANY\" strategy");
+			assertInstanceOf(TreeMap.class, pojo, "Pojo is not of type TreeMap with \"ANY\" strategy");
         });
 
         testWithJsonbBuilderCreate(new JsonbConfig().withPropertyOrderStrategy(PropertyOrderStrategy.LEXICOGRAPHICAL), jsonb -> {
             SortedMap<?, ?> pojo = jsonb.fromJson(json, SortedMap.class);
-            assertTrue(pojo instanceof TreeMap, "Pojo is not of type TreeMap with no strategy");
+			assertInstanceOf(TreeMap.class, pojo, "Pojo is not of type TreeMap with no strategy");
             assertEquals("{\"first\":1,\"second\":2,\"third\":3}", jsonb.toJson(pojo));
         });
 
         testWithJsonbBuilderCreate(new JsonbConfig().withPropertyOrderStrategy(PropertyOrderStrategy.REVERSE), jsonb -> {
             SortedMap<?, ?> pojo = jsonb.fromJson(json, SortedMap.class);
-            assertTrue(pojo instanceof ReverseTreeMap, "Pojo is not of type ReverseTreeMap with no strategy");
+			assertInstanceOf(ReverseTreeMap.class, pojo, "Pojo is not of type ReverseTreeMap with no strategy");
             assertEquals("{\"third\":3,\"second\":2,\"first\":1}", jsonb.toJson(pojo));
 
             pojo = defaultJsonb.fromJson(json, SortedMap.class);
-            assertTrue(pojo instanceof TreeMap, "Pojo is not of type TreeMap with no strategy");
+			assertInstanceOf(TreeMap.class, pojo, "Pojo is not of type TreeMap with no strategy");
             assertEquals("{\"first\":1,\"second\":2,\"third\":3}", defaultJsonb.toJson(pojo));
         });
     }

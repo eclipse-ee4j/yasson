@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2019, 2023 Oracle and/or its affiliates. All rights reserved.
+ * Copyright (c) 2019, 2024 Oracle and/or its affiliates. All rights reserved.
  *
  * This program and the accompanying materials are made available under the
  * terms of the Eclipse Public License v. 2.0 which is available at
@@ -63,10 +63,10 @@ public class JsonGeneratorToStructureAdapterTest {
         JsonObject result = (JsonObject) yassonJsonb.toJsonStructure(pojo, Pojo.class);
         assertEquals("String value", getString(result.get("stringProperty")));
         JsonValue bigDecimalProperty = result.get("bigDecimalProperty");
-        assertTrue(bigDecimalProperty instanceof JsonNumber);
+		assertInstanceOf(JsonNumber.class, bigDecimalProperty);
         assertEquals(BigDecimal.TEN, ((JsonNumber) bigDecimalProperty).bigDecimalValue());
         JsonValue longProperty = result.get("longProperty");
-        assertTrue(longProperty instanceof JsonNumber);
+		assertInstanceOf(JsonNumber.class, longProperty);
         assertEquals(10L, ((JsonNumber) longProperty).longValueExact());
 
         JsonValue inner = result.get("inner");

@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2015, 2023 Oracle and/or its affiliates. All rights reserved.
+ * Copyright (c) 2015, 2024 Oracle and/or its affiliates. All rights reserved.
  *
  * This program and the accompanying materials are made available under the
  * terms of the Eclipse Public License v. 2.0 which is available at
@@ -136,7 +136,7 @@ public class UnmarshallingUnsupportedTypesTest {
     	RuntimeException runtimeException
                 = assertThrows(RuntimeException.class, () -> testWithJsonbBuilderCreate(new JsonbConfig().setProperty(FAIL_ON_UNKNOWN_PROPERTIES, true), jsonb -> {
             String json = "{\"nestedPojo\":{\"integerValue\":10,\"missingField\":5},\"optionalLong\":11}";
-            SupportedTypes result = jsonb.fromJson(json, SupportedTypes.class);
+            SupportedTypes result = jsonb.fromJson(json, SupportedTypes.class); //need this variable so the exception is thrown
         }));
 
         assertInstanceOf(JsonbException.class, runtimeException.getCause());

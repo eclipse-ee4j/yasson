@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2015, 2023 Oracle and/or its affiliates. All rights reserved.
+ * Copyright (c) 2015, 2024 Oracle and/or its affiliates. All rights reserved.
  *
  * This program and the accompanying materials are made available under the
  * terms of the Eclipse Public License v. 2.0 which is available at
@@ -15,8 +15,8 @@ package org.eclipse.yasson.defaultmapping.generics;
 import static org.eclipse.yasson.Jsonbs.defaultJsonb;
 import static org.eclipse.yasson.Jsonbs.testWithJsonbBuilderCreate;
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertInstanceOf;
 import static org.junit.jupiter.api.Assertions.assertThrows;
-import static org.junit.jupiter.api.Assertions.assertTrue;
 
 import java.lang.reflect.Field;
 import java.lang.reflect.Type;
@@ -170,7 +170,7 @@ public class GenericsTest {
         assertEquals(expected, defaultJsonb.toJson(genericWithUnboundedWildcardClass));
 
         GenericWithUnboundedWildcardClass result = defaultJsonb.fromJson(expected, GenericWithUnboundedWildcardClass.class);
-        assertTrue(result.wildcardList.get(0) instanceof Map);
+		assertInstanceOf(Map.class, result.wildcardList.get(0));
         assertEquals("v1", ((Map<?, ?>) result.wildcardList.get(0)).get("k1"));
         assertEquals("v2", ((Map<?, ?>) result.wildcardList.get(0)).get("k2"));
     }
@@ -321,7 +321,7 @@ public class GenericsTest {
 	        BoundedGenericClass<HashSet<Integer>, Circle> otherGeneric = defaultJsonb.fromJson("{\"boundedSet\":[3],\"lowerBoundedList\":[{\"radius\":2.5}]}",
 	                new TestTypeToken<BoundedGenericClass<HashSet<Double>, Circle>>(){}.getType());
 	        HashSet<Integer> otherIntSet = otherGeneric.boundedSet;
-	        Integer intValue = otherIntSet.iterator().next();
+	        Integer intValue = otherIntSet.iterator().next(); //need to have a variable for the exception to be thrown
     	});
     }
 

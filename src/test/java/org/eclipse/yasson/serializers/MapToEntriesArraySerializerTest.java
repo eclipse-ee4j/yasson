@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2019, 2023 Oracle and/or its affiliates. All rights reserved.
+ * Copyright (c) 2019, 2024 Oracle and/or its affiliates. All rights reserved.
  *
  * This program and the accompanying materials are made available under the
  * terms of the Eclipse Public License v. 2.0 which is available at
@@ -144,7 +144,7 @@ public class MapToEntriesArraySerializerTest {
             case ARRAY:
                 JsonArray valueArray = jentry.getJsonArray("value");
 				assertFalse(valueArray.isEmpty());
-                verifyMapArrayValue(jentry, valueArray, sourceEntry);
+                verifyMapArrayValue(/*jentry, */valueArray, sourceEntry);
                 break;
             case STRING:
                 String valueString = jentry.getString("value");
@@ -191,7 +191,7 @@ public class MapToEntriesArraySerializerTest {
                 }
                 // Matching key is removed from Set for key processing check
                 if (match) {
-                    keys.remove(entry.getKey());
+                    keys.remove(sourceKey);
                     return entry;
                 }
             }
@@ -220,11 +220,10 @@ public class MapToEntriesArraySerializerTest {
     /**
      * Build Map key as an array. Get corresponding key from source Map.
      *
-     * @param jentry Map key parsed as JsonArray
      * @param sourceEntry source Map
      */
     @SuppressWarnings("unchecked")
-    private static <K,V> void verifyMapArrayValue(JsonObject jentry, final JsonArray valueArray, Map.Entry<K[], V> sourceEntry) {
+    private static <K,V> void verifyMapArrayValue(/*JsonObject jentry, */final JsonArray valueArray, Map.Entry<K[], V> sourceEntry) {
         int size = valueArray.size();
         // All array elements in the tests are of the same type.
         switch (valueArray.get(0).getValueType()) {

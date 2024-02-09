@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2023 Oracle and/or its affiliates. All rights reserved.
+ * Copyright (c) 2024 Oracle and/or its affiliates. All rights reserved.
  *
  * This program and the accompanying materials are made available under the
  * terms of the Eclipse Public License v. 2.0 which is available at
@@ -53,8 +53,7 @@ public class EnumWithJsonbPropertyDeserializer<E extends Enum<E>> implements Jso
 
 	private Class<E> getEnumType() {
 		@SuppressWarnings("unchecked")
-		Class<E> cast = Class.class.cast(ParameterizedType.class.cast(
-						getClass().getGenericSuperclass())
+		Class<E> cast = Class.class.cast(((ParameterizedType) getClass().getGenericSuperclass())
 				.getActualTypeArguments()[0]);
 		return cast;
 	}

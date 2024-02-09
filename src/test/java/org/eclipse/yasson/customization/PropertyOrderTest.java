@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2016, 2023 Oracle and/or its affiliates. All rights reserved.
+ * Copyright (c) 2016, 2024 Oracle and/or its affiliates. All rights reserved.
  *
  * This program and the accompanying materials are made available under the
  * terms of the Eclipse Public License v. 2.0 which is available at
@@ -97,7 +97,7 @@ public class PropertyOrderTest {
                 setLongInstance(1);
             }});
             assertTrue(jsonString.matches(
-                    "\\{\\s*\"first\"\\s*:\\s*0\\s*,\\s*\"second\"\\s*:\\s*\"Test String\"\\s*,\\s*\"third\"\\s*:\\s*1\\s*\\}"));
+                    "\\{\\s*\"first\"\\s*:\\s*0\\s*,\\s*\"second\"\\s*:\\s*\"Test String\"\\s*,\\s*\"third\"\\s*:\\s*1\\s*}"));
 
             RenamedPropertiesContainer unmarshalledObject =
                     jsonb.fromJson("{ \"first\" : 1, \"second\" : \"Test String\", \"third\" : 1 }", RenamedPropertiesContainer.class);
