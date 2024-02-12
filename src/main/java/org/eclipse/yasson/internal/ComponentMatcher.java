@@ -353,7 +353,7 @@ public class ComponentMatcher {
         } else if (adapterTypeArg instanceof TypeVariable) {
             LinkedList<Type> chain = new LinkedList<>();
             chain.add(adapterType);
-            return ReflectionUtils.resolveItemVariableType(chain, (TypeVariable<?>) adapterTypeArg, true);
+            return ReflectionUtils.resolveItemVariableType(chain, (TypeVariable<?>) adapterTypeArg/*, true*/);
         } else {
             return adapterTypeArg;
         }

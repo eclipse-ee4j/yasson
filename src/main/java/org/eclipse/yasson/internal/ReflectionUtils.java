@@ -86,7 +86,7 @@ public class ReflectionUtils {
                 .orElseThrow(() -> new JsonbException(Messages.getMessage(MessageKeys.TYPE_RESOLUTION_ERROR, type)));
     }
 
-    /**
+    /*/**
      * Get a raw type of any type.
      * If type is a {@link TypeVariable} recursively search type chain for resolution of typevar.
      * If type is a {@link WildcardType} find most specific upper / lower bound, which can be used. If most specific
@@ -96,7 +96,7 @@ public class ReflectionUtils {
      * @param type  type to resolve, typically field type or generic bound, not null.
      * @return resolved raw class
      */
-    public static Class<?> resolveRawType(List<Type> chain, Type type) {
+    /*public static Class<?> resolveRawType(List<Type> chain, Type type) {
         if (type instanceof Class) {
             return (Class<?>) type;
         } else if (type instanceof ParameterizedType) {
@@ -104,7 +104,7 @@ public class ReflectionUtils {
         } else {
             return getRawType(resolveType(chain, type));
         }
-    }
+    }*/
 
     /**
      * Resolve a type by chain.
@@ -130,27 +130,27 @@ public class ReflectionUtils {
         if (toResolve instanceof WildcardType) {
             return resolveMostSpecificBound(chain, (WildcardType) toResolve, warn);
         } else if (toResolve instanceof TypeVariable) {
-            return resolveItemVariableType(chain, (TypeVariable<?>) toResolve, warn);
+            return resolveItemVariableType(chain, (TypeVariable<?>) toResolve/*, warn*/);
         } else if (toResolve instanceof ParameterizedType) {
             return resolveTypeArguments((ParameterizedType) toResolve, chain.get(chain.size() - 1));
         }
         return type;
     }
 
-    /**
+    /*/**
      * Resolves type by item information and wraps it with {@link Optional}.
      *
      * @param chain hierarchy of all wrapping types.
      * @param type  type
      * @return resolved type wrapped with Optional
      */
-    public static Optional<Type> resolveOptionalType(List<Type> chain, Type type) {
+    /*public static Optional<Type> resolveOptionalType(List<Type> chain, Type type) {
         try {
             return Optional.of(resolveType(chain, type, false));
         } catch (RuntimeException e) {
             return Optional.empty();
         }
-    }
+    }*/
 
     /**
      * Resolve a bounded type variable type by its wrapper types.
@@ -159,10 +159,10 @@ public class ReflectionUtils {
      *
      * @param chain        chain to search "runtime" generic type of a TypeVariable.
      * @param typeVariable type to search in chain for, not null.
-     * @param warn         whether or not to log a warning message when bounds are not found
+//     * @param warn         whether or not to log a warning message when bounds are not found
      * @return Type of a generic "runtime" bound, not null.
      */
-    public static Type resolveItemVariableType(List<Type> chain, TypeVariable<?> typeVariable, boolean warn) {
+    public static Type resolveItemVariableType(List<Type> chain, TypeVariable<?> typeVariable/*, boolean warn*/) {
         /*if (chain == null) {
         Optional<Class<?>> optionalRawType = getOptionalRawType(typeVariable);
         if (optionalRawType.isPresent()) {
@@ -194,23 +194,23 @@ public class ReflectionUtils {
         }
         return returnType;
 
-//        //Embedded items doesn't hold information about variable types
-//        if (chain instanceof EmbeddedItem) {
-//            return resolveItemVariableType(chain.getWrapper(), typeVariable, warn);
-//        }
-//
-//        ParameterizedType wrapperParameterizedType = findParameterizedSuperclass(chain.getRuntimeType());
-//
-//        VariableTypeInheritanceSearch search = new VariableTypeInheritanceSearch();
-//        Type foundType = search.searchParametrizedType(wrapperParameterizedType, typeVariable);
-//        if (foundType != null) {
-//            if (foundType instanceof TypeVariable) {
-//                return resolveItemVariableType(chain.getWrapper(), (TypeVariable<?>) foundType, warn);
-//            }
-//            return foundType;
-//        }
-//
-//        return resolveItemVariableType(chain.getWrapper(), typeVariable, warn);
+        //Embedded items doesn't hold information about variable types
+        /*if (chain instanceof EmbeddedItem) {
+            return resolveItemVariableType(chain.getWrapper(), typeVariable, warn);
+        }
+
+        ParameterizedType wrapperParameterizedType = findParameterizedSuperclass(chain.getRuntimeType());
+
+        VariableTypeInheritanceSearch search = new VariableTypeInheritanceSearch();
+        Type foundType = search.searchParametrizedType(wrapperParameterizedType, typeVariable);
+        if (foundType != null) {
+            if (foundType instanceof TypeVariable) {
+                return resolveItemVariableType(chain.getWrapper(), (TypeVariable<?>) foundType, warn);
+            }
+            return foundType;
+        }
+
+        return resolveItemVariableType(chain.getWrapper(), typeVariable, warn);*/
     }
 
     /**
