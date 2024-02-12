@@ -15,6 +15,7 @@ package org.eclipse.yasson.internal;
 import java.lang.reflect.ParameterizedType;
 import java.lang.reflect.Type;
 import java.lang.reflect.TypeVariable;
+import java.util.Arrays;
 import java.util.LinkedList;
 import java.util.Objects;
 import java.util.Optional;
@@ -22,6 +23,7 @@ import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ConcurrentMap;
 import java.util.function.BiFunction;
 import java.util.function.Function;
+import java.util.stream.Stream;
 
 import jakarta.json.bind.JsonbConfig;
 import jakarta.json.bind.adapter.JsonbAdapter;
@@ -203,53 +205,47 @@ public class ComponentMatcher {
         return Optional.of(customization.getDeserializeAdapterBinding());
     }
 
-    private <C, T extends AbstractComponentBinding<? extends C>> Optional<T> searchComponentBinding(Type runtimeType, Function<ComponentBindings<?, ?>, T> supplier) {
+    private <C, T extends AbstractComponentBinding<? extends C>> Optional<T> searchComponentBinding(Type runtimeType,
+            Function<ComponentBindings<?, ?>, T> bindingGetter) {
         // First check if there is an exact match
-        Optional<T> match = getMatchingBinding(runtimeType, supplier);
+        Optional<T> match = getMatchingBinding(runtimeType, bindingGetter);
         if (match.isPresent()) {
             return match;
         }
 
         Optional<Class<?>> runtimeClass = ReflectionUtils.getOptionalRawType(runtimeType);
-        if (runtimeClass.isPresent()) {
+        return runtimeClass.map(clazz -> {
             // Check if any interfaces have a match
-            for (Class<?> ifc : runtimeClass.get().getInterfaces()) {
-                match = getMatchingBinding(ifc, supplier);
-                if (match.isPresent()) {
-                    return match;
-                }
+            Optional<T> interfaceMatch = findBindingInClasses(Arrays.stream(clazz.getInterfaces()), ifc -> getMatchingBinding(ifc, bindingGetter));
+            if (interfaceMatch.isPresent()) {
+                return interfaceMatch;
             }
-            
+
             // check if the superclass has a match
-            Class<?> superClass = runtimeClass.get().getSuperclass();
+            Class<?> superClass = clazz.getSuperclass();
             if (superClass != null && superClass != Object.class) {
-                Optional<T> superBinding = searchComponentBinding(superClass, supplier);
+                Optional<T> superBinding =
+                        findBindingInClasses(Stream.of(superClass), superClazz -> searchComponentBinding(superClazz, bindingGetter));
                 if (superBinding.isPresent()) {
                     return superBinding;
                 }
             }
-        }
-        
-        return Optional.empty();
+            return Optional.<T>empty();
+        }).orElse(Optional.empty());
     }
 
-    private <C, T extends AbstractComponentBinding<? extends C>> Optional<T> getMatchingBinding(Type runtimeType, Function<ComponentBindings<?, ?>, T> supplier) {
+    private <T> Optional<T> findBindingInClasses(Stream<Class<?>> stream, Function<Class<?>, Optional<T>> mapper) {
+        return stream
+                .map(mapper)
+                .filter(Optional::isPresent)
+                .findFirst().orElse(Optional.empty());
+    }
+
+    private <C, T extends AbstractComponentBinding<? extends C>> Optional<T> getMatchingBinding(Type runtimeType,
+            Function<ComponentBindings<?, ?>, T> bindingGetter) {
         ComponentBindings<?, ?> binding = userComponents.get(runtimeType);
         if (binding != null) {
-            Optional<T> match = getMatchingBinding(runtimeType, binding, supplier);
-            if (match.isPresent()) {
-                return match;
-            }
-        }
-        return Optional.empty();
-    }
-
-    private <T> Optional<T> getMatchingBinding(Type runtimeType, ComponentBindings<?, ?> binding, Function<ComponentBindings<?, ?>, T> supplier) {
-        if (matches(runtimeType, binding.getBindingType())) {
-            final T component = supplier.apply(binding);
-            if (component != null) {
-                return Optional.of(component);
-            }
+            return (matches(runtimeType, binding.getBindingType())) ? Optional.ofNullable(bindingGetter.apply(binding)) : Optional.empty();
         }
         return Optional.empty();
     }

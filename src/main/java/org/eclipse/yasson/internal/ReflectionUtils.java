@@ -61,16 +61,12 @@ public class ReflectionUtils {
         } else if (type instanceof TypeVariable) {
             TypeVariable<?> typeVariable = TypeVariable.class.cast(type);
             if (Objects.nonNull(typeVariable.getBounds())) {
-                Optional<Class<?>> specializedClass = Optional.empty();
-                for (Type bound : typeVariable.getBounds()) {
-                    Optional<Class<?>> boundRawType = getOptionalRawType(bound);
-                    if (boundRawType.isPresent() && !Object.class.equals(boundRawType.get())) {
-                        if (specializedClass.isEmpty() || specializedClass.get().isAssignableFrom(boundRawType.get())) {
-                            specializedClass = boundRawType;
-                        }
-                    }
-                }
-                return specializedClass;
+                return Arrays.stream(typeVariable.getBounds())
+                        .map(ReflectionUtils::getOptionalRawType)
+                        .filter(Optional::isPresent)
+                        .filter(clazz -> !Object.class.equals(clazz.get()))
+                        .reduce((clazz1, clazz2) -> clazz1.map(clazzGet1 -> clazzGet1.isAssignableFrom(clazz2.get())).orElse(false) ? clazz2 : clazz1)
+                        .orElse(Optional.empty());
             }
         }
         return Optional.empty();
