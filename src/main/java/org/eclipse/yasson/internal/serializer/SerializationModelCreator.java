@@ -404,11 +404,11 @@ public class SerializationModelCreator {
             Function<ModelSerializer, ModelSerializer> wrapAdapterSerializerFunction) {
 
         final ComponentMatcher componentMatcher = jsonbContext.getComponentMatcher();
-		return componentMatcher.getSerializerBinding(type, (ComponentBoundCustomization) customization)
-				.map(SerializerBinding::getComponent)
-				.map(UserDefinedSerializer::new)
-				.map(RecursionChecker::new)
-				.map(serializer -> SerializationModelCreator.wrapInCommonSet(serializer, customization, jsonbContext))
+        return componentMatcher.getSerializerBinding(type, (ComponentBoundCustomization) customization)
+                .map(SerializerBinding::getComponent)
+                .map(UserDefinedSerializer::new)
+                .map(RecursionChecker::new)
+                .map(serializer -> SerializationModelCreator.wrapInCommonSet(serializer, customization, jsonbContext))
                 .orElseGet(() -> {
                     Optional<AdapterBinding<?, ?>> adapterBinding = componentMatcher.getSerializeAdapterBinding(type, (ComponentBoundCustomization) customization);
                     return resolveRootAdapter ? adapterBinding.map(binding -> {
@@ -421,8 +421,8 @@ public class SerializationModelCreator {
                         AdapterSerializer adapterSerializer = new AdapterSerializer(binding, typeSerializer);
                         ModelSerializer wrappedAdapterSerializer = wrapAdapterSerializerFunction.apply(adapterSerializer);
                         return new NullSerializer(wrappedAdapterSerializer, customization, jsonbContext);
-                    }).orElse(null) :
-                    null;
+                    }).orElse(null)
+                    : null;
                 });
     }
 

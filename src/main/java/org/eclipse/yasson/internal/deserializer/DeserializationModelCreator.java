@@ -158,7 +158,7 @@ public class DeserializationModelCreator {
         ModelDeserializer<JsonParser> deserializer = createUserOrAdapterDeserializer(type, (ComponentBoundCustomization) propertyCustomization,
                 (adapterToType) -> {
                     Class<?> toType = ReflectionUtils.getRawType(adapterToType);
-					return typeDeserializer(toType,
+                    return typeDeserializer(toType,
                             jsonbContext.getMappingContext().getOrCreateClassModel(toType).getClassCustomization(),
                             JustReturn.instance());
                 },
@@ -365,9 +365,9 @@ public class DeserializationModelCreator {
     }
 
     private Function<String, String> propertyRenamer() {
-		return jsonbContext.getConfig()
-				.getProperty(PROPERTY_NAMING_STRATEGY)
-				.filter(prop -> prop.equals(PropertyNamingStrategy.CASE_INSENSITIVE))
+        return jsonbContext.getConfig()
+                .getProperty(PROPERTY_NAMING_STRATEGY)
+                .filter(prop -> prop.equals(PropertyNamingStrategy.CASE_INSENSITIVE))
                 .map(val -> (Function<String, String>) String::toLowerCase).orElse(value -> value);
     }
 
@@ -394,9 +394,9 @@ public class DeserializationModelCreator {
         // try to create a deserializer from deserializer configuration
         ComponentMatcher componentMatcher = jsonbContext.getComponentMatcher();
         Optional<DeserializerBinding<?>> deserializerBinding = componentMatcher.getDeserializerBinding(type, customization);
-		return deserializerBinding.map(binding ->
-						(ModelDeserializer<JsonParser>) new UserDefinedDeserializer(binding.getComponent(), delegate, type, deserializerCustomization))
-				.orElseGet(() -> {
+        return deserializerBinding.map(binding ->
+                        (ModelDeserializer<JsonParser>) new UserDefinedDeserializer(binding.getComponent(), delegate, type, deserializerCustomization))
+                .orElseGet(() -> {
                     // otherwise try to create a deserializer from adapter configuration or use alternative deserializer
                     Optional<AdapterBinding<?, ?>> adapterBinding = componentMatcher.getDeserializeAdapterBinding(type, customization);
                     return adapterBinding.map(adapter -> {
@@ -408,7 +408,7 @@ public class DeserializationModelCreator {
                                 adapterDeserializer.deserialize(targetAdapterModel.deserialize(parser, adapterTypeDeserializerContextChangeFunction.apply(context)), context);
                     }).orElseGet(alternativeDeserializerSupplier);
                 });
-	}
+    }
 
     private List<String> creatorParamsList(JsonbCreator creator) {
         return Arrays.stream(creator.getParams()).map(CreatorModel::getName).collect(Collectors.toList());
@@ -457,7 +457,7 @@ public class DeserializationModelCreator {
         if (deserializer != null) {
             return deserializer;
         }
-		return createNewChain(chain, memberDeserializer, resolveImplClass(rawType, customization), resolved, customization);
+        return createNewChain(chain, memberDeserializer, resolveImplClass(rawType, customization), resolved, customization);
     }
 
     private ModelDeserializer<JsonParser> createNewChain(LinkedList<Type> chain,
