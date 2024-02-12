@@ -39,7 +39,7 @@ public class PropertyCustomization extends CustomizationBase {
     private final Class<?> implementationClass;
 
     /**
-     * Copies properties from builder an creates immutable instance.
+     * Copies properties from builder and creates immutable instance.
      *
      * @param builder not null
      */
