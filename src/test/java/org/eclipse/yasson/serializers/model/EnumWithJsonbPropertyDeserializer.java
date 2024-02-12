@@ -16,11 +16,10 @@ import static java.util.Optional.ofNullable;
 
 import java.lang.reflect.ParameterizedType;
 import java.lang.reflect.Type;
-import java.util.HashMap;
 import java.util.Map;
-import java.util.stream.Stream;
 
-import jakarta.json.bind.annotation.JsonbProperty;
+import org.eclipse.yasson.adapters.model.EnumJsonbPropertyMaps;
+
 import jakarta.json.bind.serializer.DeserializationContext;
 import jakarta.json.bind.serializer.JsonbDeserializer;
 import jakarta.json.stream.JsonParser;
@@ -32,23 +31,8 @@ public class EnumWithJsonbPropertyDeserializer<E extends Enum<E>> implements Jso
 	public EnumWithJsonbPropertyDeserializer() {
 		super();
 
-		Class<E> enumType = getEnumType();
-		jsonToJavaMapping = new HashMap<>();
-
-		Stream.of(enumType.getEnumConstants()).forEach(constant -> {
-			final String asString;
-			try {
-				asString = ofNullable(
-						constant.getClass()
-								.getDeclaredField(constant.name())
-								.getAnnotation(JsonbProperty.class))
-						.map(JsonbProperty::value)
-						.orElseGet(constant::name);
-			} catch (final NoSuchFieldException e) {
-				throw new IllegalArgumentException(e);
-			}
-			jsonToJavaMapping.put(asString, constant);
-		});
+		EnumJsonbPropertyMaps<E> enumMappingMaps = new EnumJsonbPropertyMaps<>(getEnumType());
+		jsonToJavaMapping = enumMappingMaps.getJsonToJavaMapping();
 	}
 
 	private Class<E> getEnumType() {
