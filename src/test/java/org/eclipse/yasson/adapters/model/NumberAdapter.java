@@ -18,14 +18,14 @@ import jakarta.json.bind.adapter.JsonbAdapter;
 
 public class NumberAdapter implements JsonbAdapter<Number, String> {
 
-    private final static Counter counter = new Counter();
+    private final static Counter COUNTER = new Counter();
 
     public static Counter getCounter() {
-        return counter;
+        return COUNTER;
     }
 
     {
-        counter.add();
+        COUNTER.add();
     }
 
     @Override

@@ -19,14 +19,14 @@ import java.lang.reflect.Type;
 
 public class NumberDeserializer implements JsonbDeserializer<Number> {
 
-    private final static Counter counter = new Counter();
+    private final static Counter COUNTER = new Counter();
 
     public static Counter getCounter() {
-        return counter;
+        return COUNTER;
     }
 
     {
-        counter.add();
+        COUNTER.add();
     }
 
     @Override

@@ -18,14 +18,14 @@ import jakarta.json.stream.JsonGenerator;
 
 public class NumberSerializer implements JsonbSerializer<Number> {
 
-    private final static Counter counter = new Counter();
+    private final static Counter COUNTER = new Counter();
 
     public static Counter getCounter() {
-        return counter;
+        return COUNTER;
     }
 
     {
-        counter.add();
+        COUNTER.add();
     }
 
     @Override

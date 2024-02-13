@@ -241,8 +241,7 @@ public class AnnotationIntrospector {
         expectedClass.ifPresent(clazz -> {
             if (!ReflectionUtils.getRawType(adapterBinding.getBindingType()).isAssignableFrom(clazz)) {
                 throw new JsonbException(Messages.getMessage(MessageKeys.ADAPTER_INCOMPATIBLE,
-                        adapterBinding.getBindingType(),
-                        clazz));
+                        adapterBinding.getBindingType(), clazz));
             }
         });
         return adapterBinding;

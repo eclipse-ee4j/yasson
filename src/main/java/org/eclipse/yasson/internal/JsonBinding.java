@@ -24,7 +24,6 @@ import java.nio.charset.Charset;
 import java.util.Map;
 import java.util.Objects;
 import java.util.Set;
-import java.util.function.Supplier;
 
 import jakarta.json.JsonStructure;
 import jakarta.json.bind.JsonbConfig;
@@ -54,51 +53,51 @@ public class JsonBinding implements YassonJsonb {
         }
     }
 
-    private <T> T deserialize(final Type type, final Supplier<JsonParser> parserSupplier) {
-        Objects.requireNonNull(parserSupplier);
-        try (JsonParser parser = parserSupplier.get()) {
+    private <T> T deserialize(final Type type, final JsonParser parser) {
+        Objects.requireNonNull(parser);
+        try (parser) {
             return new DeserializationContextImpl(jsonbContext).deserialize(type, parser);
         }
     }
 
     @Override
     public <T> T fromJson(String str, Class<T> type) throws JsonbException {
-        return deserialize(type, () -> jsonbContext.getJsonProvider().createParser(new StringReader(str)));
+        return deserialize(type, jsonbContext.getJsonProvider().createParser(new StringReader(str)));
     }
 
     @Override
     public <T> T fromJson(String str, Type type) throws JsonbException {
-        return deserialize(type, () -> jsonbContext.getJsonProvider().createParser(new StringReader(str)));
+        return deserialize(type, jsonbContext.getJsonProvider().createParser(new StringReader(str)));
     }
 
     @Override
     public <T> T fromJson(Reader reader, Class<T> type) throws JsonbException {
-        return deserialize(type, () -> jsonbContext.getJsonProvider().createParser(reader));
+        return deserialize(type, jsonbContext.getJsonProvider().createParser(reader));
     }
 
     @Override
     public <T> T fromJson(Reader reader, Type type) throws JsonbException {
-        return deserialize(type, () -> jsonbContext.getJsonProvider().createParser(reader));
+        return deserialize(type, jsonbContext.getJsonProvider().createParser(reader));
     }
 
     @Override
     public <T> T fromJson(InputStream stream, Class<T> clazz) throws JsonbException {
-        return deserialize(clazz, () -> inputStreamParser(stream));
+        return deserialize(clazz, inputStreamParser(stream));
     }
 
     @Override
     public <T> T fromJson(InputStream stream, Type type) throws JsonbException {
-        return deserialize(type, () -> inputStreamParser(stream));
+        return deserialize(type, inputStreamParser(stream));
     }
 
     @Override
     public <T> T fromJsonStructure(JsonStructure jsonStructure, Class<T> type) throws JsonbException {
-        return deserialize(type, () -> new JsonStructureToParserAdapter(jsonStructure, jsonbContext.getJsonProvider()));
+        return deserialize(type, new JsonStructureToParserAdapter(jsonStructure, jsonbContext.getJsonProvider()));
     }
 
     @Override
     public <T> T fromJsonStructure(JsonStructure jsonStructure, Type runtimeType) throws JsonbException {
-        return deserialize(runtimeType, () -> new JsonStructureToParserAdapter(jsonStructure, jsonbContext.getJsonProvider()));
+        return deserialize(runtimeType, new JsonStructureToParserAdapter(jsonStructure, jsonbContext.getJsonProvider()));
     }
 
     private JsonParser inputStreamParser(InputStream stream) {
