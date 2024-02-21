@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2021, 2022 Oracle and/or its affiliates. All rights reserved.
+ * Copyright (c) 2021, 2024 Oracle and/or its affiliates. All rights reserved.
  *
  * This program and the accompanying materials are made available under the
  * terms of the Eclipse Public License v. 2.0 which is available at
@@ -30,18 +30,18 @@ class UserDefinedDeserializer implements ModelDeserializer<JsonParser> {
     private final Type rType;
     private final Customization customization;
 
-    //TODO remove or not? deserializer cycle
-    //    public UserDefinedDeserializer(JsonbDeserializer<?> userDefinedDeserializer,
-    //                                   ModelDeserializer<JsonParser> exactType,
-    //                                   ModelDeserializer<Object> delegate,
-    //                                   Type rType,
-    //                                   Customization customization) {
-    //        this.userDefinedDeserializer = userDefinedDeserializer;
-    //        this.exactType = exactType;
-    //        this.delegate = delegate;
-    //        this.rType = rType;
-    //        this.customization = customization;
-    //    }
+    /*TODO remove or not? deserializer cycle
+        public UserDefinedDeserializer(JsonbDeserializer<?> userDefinedDeserializer,
+                                       ModelDeserializer<JsonParser> exactType,
+                                       ModelDeserializer<Object> delegate,
+                                       Type rType,
+                                       Customization customization) {
+            this.userDefinedDeserializer = userDefinedDeserializer;
+            this.exactType = exactType;
+            this.delegate = delegate;
+            this.rType = rType;
+            this.customization = customization;
+        }*/
     UserDefinedDeserializer(JsonbDeserializer<?> userDefinedDeserializer,
                             ModelDeserializer<Object> delegate,
                             Type rType,
@@ -56,15 +56,15 @@ class UserDefinedDeserializer implements ModelDeserializer<JsonParser> {
     public Object deserialize(JsonParser value, DeserializationContextImpl context) {
         DeserializationContextImpl newContext = new DeserializationContextImpl(context);
         newContext.setCustomization(customization);
-        //TODO remove or not? deserializer cycle
-        //        if (context.getUserProcessorChain().contains(userDefinedDeserializer.getClass())) {
-        //            if (context.getLastValueEvent() != JsonParser.Event.START_ARRAY
-        //                    && context.getLastValueEvent() != JsonParser.Event.START_OBJECT) {
-        //                newContext.setDisableNextPositionCheck(true);
-        //            }
-        //            return exactType.deserialize(value, newContext);
-        //        }
-        //        newContext.getUserProcessorChain().add(userDefinedDeserializer.getClass());
+        /*TODO remove or not? deserializer cycle
+                if (context.getUserProcessorChain().contains(userDefinedDeserializer.getClass())) {
+                    if (context.getLastValueEvent() != JsonParser.Event.START_ARRAY
+                            && context.getLastValueEvent() != JsonParser.Event.START_OBJECT) {
+                        newContext.setDisableNextPositionCheck(true);
+                    }
+                    return exactType.deserialize(value, newContext);
+                }
+                newContext.getUserProcessorChain().add(userDefinedDeserializer.getClass());*/
         YassonParser yassonParser = new YassonParser(value, context.getLastValueEvent(), newContext);
         Object object = userDefinedDeserializer.deserialize(yassonParser, newContext, rType);
         yassonParser.skipRemaining();

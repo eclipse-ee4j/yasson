@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2016, 2020 Oracle and/or its affiliates. All rights reserved.
+ * Copyright (c) 2016, 2024 Oracle and/or its affiliates. All rights reserved.
  *
  * This program and the accompanying materials are made available under the
  * terms of the Eclipse Public License v. 2.0 which is available at
@@ -13,6 +13,8 @@
 package org.eclipse.yasson.internal.cdi;
 
 import org.junit.jupiter.api.*;
+
+import static org.eclipse.yasson.Jsonbs.testWithJsonbBuilderCreate;
 import static org.junit.jupiter.api.Assertions.*;
 
 import org.eclipse.yasson.internal.components.JsonbComponentInstanceCreatorFactory;
@@ -75,34 +77,30 @@ public class CdiInjectionTest {
         InitialContext context = new InitialContext();
         context.bind(JsonbComponentInstanceCreatorFactory.BEAN_MANAGER_NAME, new JndiBeanManager());
 
-        String result;
         try {
-            Jsonb jsonb = JsonbBuilder.create();
-            result = jsonb.toJson(new AdaptedPojo());
+            testWithJsonbBuilderCreate(jsonb ->
+                assertEquals("{\"adaptedValue1\":1111,\"adaptedValue2\":1001,\"adaptedValue3\":1010}", jsonb.toJson(new AdaptedPojo())));
         } finally {
             context.unbind(JsonbComponentInstanceCreatorFactory.BEAN_MANAGER_NAME);
         }
-        assertEquals("{\"adaptedValue1\":1111,\"adaptedValue2\":1001,\"adaptedValue3\":1010}", result);
-    }
+	}
 
     @Test
     public void testNonCdiEnvironment() {
-        JsonbConfig config = new JsonbConfig();
+        JsonbConfig config = new JsonbConfig()
         //allow only field with components that doesn't has cdi dependencies.
-        config.withPropertyVisibilityStrategy(new PropertyVisibilityStrategy() {
-            @Override
-            public boolean isVisible(Field field) {
-                return "adaptedValue3".equals(field.getName());
-            }
+            .withPropertyVisibilityStrategy(new PropertyVisibilityStrategy() {
+                @Override
+                public boolean isVisible(Field field) {
+                    return "adaptedValue3".equals(field.getName());
+                }
 
-            @Override
-            public boolean isVisible(Method method) {
-                return false;
-            }
+                @Override
+                public boolean isVisible(Method method) {
+                    return false;
+                }
         });
-        Jsonb jsonb = JsonbBuilder.create(config);
-        final String result = jsonb.toJson(new AdaptedPojo());
-        assertEquals("{\"adaptedValue3\":1010}", result);
+        testWithJsonbBuilderCreate(config, jsonb -> assertEquals("{\"adaptedValue3\":1010}", jsonb.toJson(new AdaptedPojo())));
     }
 
     private CalledMethods getCalledMethods() {

@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2016, 2022 Oracle and/or its affiliates. All rights reserved.
+ * Copyright (c) 2016, 2024 Oracle and/or its affiliates. All rights reserved.
  *
  * This program and the accompanying materials are made available under the
  * terms of the Eclipse Public License v. 2.0 which is available at
@@ -16,12 +16,14 @@ import java.math.BigDecimal;
 import java.time.LocalDate;
 import java.util.Set;
 
+import jakarta.json.bind.JsonbConfig;
 import jakarta.json.bind.JsonbException;
 import jakarta.json.bind.annotation.JsonbCreator;
 import jakarta.json.bind.annotation.JsonbDateFormat;
 import jakarta.json.bind.annotation.JsonbNumberFormat;
 import jakarta.json.bind.annotation.JsonbProperty;
 
+import org.eclipse.yasson.YassonConfig;
 import org.eclipse.yasson.customization.model.CreatorConstructorPojo;
 import org.eclipse.yasson.customization.model.CreatorFactoryMethodPojo;
 import org.eclipse.yasson.customization.model.CreatorIncompatibleTypePojo;
@@ -33,9 +35,11 @@ import org.eclipse.yasson.customization.model.ParameterNameTester;
 import org.junit.jupiter.api.Test;
 
 import static org.eclipse.yasson.Jsonbs.defaultJsonb;
+import static org.eclipse.yasson.Jsonbs.testWithJsonbBuilderNewBuilder;
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.is;
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertInstanceOf;
 import static org.junit.jupiter.api.Assertions.assertNull;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.junit.jupiter.api.Assertions.assertTrue;
@@ -156,11 +160,33 @@ public class JsonbCreatorTest {
     }
 
     @Test
-    public void testGenericCreatorParameter() throws Exception {
+    public void testGenericCreatorParameter() {
         final String json = "{\"persons\": [{\"name\": \"name1\"}]}";
         Persons persons = defaultJsonb.fromJson(json, Persons.class);
         assertEquals(1, persons.hiddenPersons.size());
         assertEquals("name1", persons.hiddenPersons.iterator().next().getName());
+    }
+
+    @Test
+    public void testCreatorParametersRequired() {
+        RuntimeException runtimeException = assertThrows(RuntimeException.class, () ->
+            testWithJsonbBuilderNewBuilder(new JsonbConfig().withCreatorParametersRequired(true), jsonb -> {
+                final String json = "{\"persons1\": [{\"name\": \"name1\"}]}";
+                jsonb.fromJson(json, Persons.class);
+            })
+        );
+        assertInstanceOf(JsonbException.class, runtimeException.getCause());
+    }
+
+    @Test
+    public void testCreatorFailOnUnknownProperties() {
+        RuntimeException runtimeException = assertThrows(RuntimeException.class, () ->
+            testWithJsonbBuilderNewBuilder(new YassonConfig().withFailOnUnknownProperties(true), jsonb -> {
+                final String json = "{\"persons1\": [{\"name\": \"name1\"}]}";
+                jsonb.fromJson(json, Persons.class);
+            })
+        );
+        assertInstanceOf(JsonbException.class, runtimeException.getCause());
     }
 
     public static final class Persons {

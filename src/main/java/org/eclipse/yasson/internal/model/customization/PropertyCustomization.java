@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2015, 2022 Oracle and/or its affiliates. All rights reserved.
+ * Copyright (c) 2015, 2024 Oracle and/or its affiliates. All rights reserved.
  *
  * This program and the accompanying materials are made available under the
  * terms of the Eclipse Public License v. 2.0 which is available at
@@ -30,8 +30,8 @@ public class PropertyCustomization extends CustomizationBase {
     private final JsonbDateFormatter serializeDateFormatter;
     private final JsonbDateFormatter deserializeDateFormatter;
 
-    private final AdapterBinding serializeAdapter;
-    private final AdapterBinding deserializeAdapter;
+    private final AdapterBinding<?, ?> serializeAdapter;
+    private final AdapterBinding<?, ?> deserializeAdapter;
 
     private final boolean readTransient;
     private final boolean writeTransient;
@@ -39,7 +39,7 @@ public class PropertyCustomization extends CustomizationBase {
     private final Class<?> implementationClass;
 
     /**
-     * Copies properties from builder an creates immutable instance.
+     * Copies properties from builder and creates immutable instance.
      *
      * @param builder not null
      */
@@ -132,12 +132,12 @@ public class PropertyCustomization extends CustomizationBase {
     }
 
     @Override
-    public AdapterBinding getDeserializeAdapterBinding() {
+    public AdapterBinding<?, ?> getDeserializeAdapterBinding() {
         return deserializeAdapter;
     }
 
     @Override
-    public AdapterBinding getSerializeAdapterBinding() {
+    public AdapterBinding<?, ?> getSerializeAdapterBinding() {
         return serializeAdapter;
     }
 
@@ -149,8 +149,8 @@ public class PropertyCustomization extends CustomizationBase {
         private JsonbNumberFormatter deserializeNumberFormatter;
         private JsonbDateFormatter serializeDateFormatter;
         private JsonbDateFormatter deserializeDateFormatter;
-        private AdapterBinding serializeAdapter;
-        private AdapterBinding deserializeAdapter;
+        private AdapterBinding<?, ?> serializeAdapter;
+        private AdapterBinding<?, ?> deserializeAdapter;
         private boolean readTransient;
         private boolean writeTransient;
         private Class<?> implementationClass;
@@ -234,12 +234,12 @@ public class PropertyCustomization extends CustomizationBase {
             return this;
         }
 
-        public Builder serializeAdapter(AdapterBinding serializeAdapter) {
+        public Builder serializeAdapter(AdapterBinding<?, ?> serializeAdapter) {
             this.serializeAdapter = serializeAdapter;
             return this;
         }
 
-        public Builder deserializeAdapter(AdapterBinding deserializeAdapter) {
+        public Builder deserializeAdapter(AdapterBinding<?, ?> deserializeAdapter) {
             this.deserializeAdapter = deserializeAdapter;
             return this;
         }

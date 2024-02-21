@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2016, 2022 Oracle and/or its affiliates. All rights reserved.
+ * Copyright (c) 2016, 2024 Oracle and/or its affiliates. All rights reserved.
  *
  * This program and the accompanying materials are made available under the
  * terms of the Eclipse Public License v. 2.0 which is available at
@@ -31,7 +31,7 @@ import org.eclipse.yasson.spi.JsonbComponentInstanceCreator;
  * CDI instance manager.
  * Instances are created and stored per instance of {@link JsonBinding}.
  * Calling close on JsonBinding, cleans up Jsonb CDI instances and in case of "dependant" scope its dependencies.
- *
+ * <p>
  * CDI API dependency is optional, this class is never referenced / loaded if CDI API is not resolvable.
  */
 public class BeanManagerInstanceCreator implements JsonbComponentInstanceCreator {
@@ -61,9 +61,9 @@ public class BeanManagerInstanceCreator implements JsonbComponentInstanceCreator
      * @return New instance of bean class with injected content.
      */
     @Override
-    @SuppressWarnings("unchecked")
     public <T> T getOrCreateComponent(Class<T> componentClass) {
-        return (T) injectionTargets.computeIfAbsent(componentClass, clazz -> {
+        @SuppressWarnings("unchecked")
+        T instance = (T) injectionTargets.computeIfAbsent(componentClass, clazz -> {
             final AnnotatedType<T> aType = beanManager.createAnnotatedType(componentClass);
             final InjectionTarget<T> injectionTarget = beanManager.getInjectionTargetFactory(aType)
                     .createInjectionTarget(null);
@@ -71,8 +71,9 @@ public class BeanManagerInstanceCreator implements JsonbComponentInstanceCreator
             final T beanInstance = injectionTarget.produce(creationalContext);
             injectionTarget.inject(beanInstance, creationalContext);
             injectionTarget.postConstruct(beanInstance);
-            return new CDIManagedBean(beanInstance, injectionTarget, creationalContext);
+            return new CDIManagedBean<>(beanInstance, injectionTarget, creationalContext);
         }).getInstance();
+        return instance;
     }
 
     @Override
@@ -82,9 +83,16 @@ public class BeanManagerInstanceCreator implements JsonbComponentInstanceCreator
     }
 
     private <T> void cleanupBean(CDIManagedBean<T> bean) {
-        bean.getInjectionTarget().preDestroy(bean.getInstance());
-        bean.getInjectionTarget().dispose(bean.getInstance());
-        bean.getCreationalContext().release();
+        InjectionTarget<T> injectionTarget = bean.getInjectionTarget();
+        if (injectionTarget != null) {
+            injectionTarget.preDestroy(bean.getInstance());
+            injectionTarget.dispose(bean.getInstance());
+        }
+
+        CreationalContext<T> creationalContext = bean.getCreationalContext();
+        if (creationalContext != null) {
+            creationalContext.release();
+        }
     }
 
     /**

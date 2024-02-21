@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2022 Oracle and/or its affiliates. All rights reserved.
+ * Copyright (c) 2022, 2024 Oracle and/or its affiliates. All rights reserved.
  *
  * This program and the accompanying materials are made available under the
  * terms of the Eclipse Public License v. 2.0 which is available at
@@ -12,46 +12,57 @@
 
 package org.eclipse.yasson;
 
+import static org.eclipse.yasson.Jsonbs.testWithJsonbBuilderCreate;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 
 import org.junit.jupiter.api.Test;
 
-import jakarta.json.bind.Jsonb;
-import jakarta.json.bind.JsonbBuilder;
 import jakarta.json.bind.JsonbConfig;
 import jakarta.json.bind.annotation.JsonbTransient;
 
-public class Issue454Test {
+class Issue454Test {
+
+    private Issue454Test() {
+    }
 
     @Test
     public void test() {
         final String EXPECTED = "{\"field2\":\"bbb\"}";
-        Jsonb jsonb = JsonbBuilder.create(new JsonbConfig());
-        assertEquals(EXPECTED, jsonb.toJson(new TheInterface() {
+        testWithJsonbBuilderCreate(new JsonbConfig(), jsonb -> {
+            assertEquals(EXPECTED, jsonb.toJson(new TheInterface() {
 
-            @Override
-            public String getField1() {
-                return "aaa";
-            }
+                @Override
+                public String getField1() {
+                    return "aaa";
+                }
 
-            @Override
-            public String getField2() {
-                return "bbb";
-            }}));
-        assertEquals(EXPECTED, jsonb.toJson(new TheClass() {
-            @Override
-            public String getField1() {
-                return "aaa";
-            }
-            @Override
-            public String getField2() {
-                return "bbb";
-            }}));
-        assertEquals(EXPECTED, jsonb.toJson(new TheClass2()));
-        assertEquals(EXPECTED, jsonb.toJson(new TheClass2() {}));
+                @Override
+                public String getField2() {
+                    return "bbb";
+                }
+            }));
+            assertEquals(EXPECTED, jsonb.toJson(new TheClass() {
+                @Override
+                public String getField1() {
+                    return "aaa";
+                }
+
+                @Override
+                public String getField2() {
+                    return "bbb";
+                }
+            }));
+            assertEquals(EXPECTED, jsonb.toJson(new TheClass2()));
+            assertEquals(EXPECTED, jsonb.toJson(new TheClass2() {
+            }));
+        });
     }
     
     public static abstract class TheClass {
+
+        private TheClass() {
+        }
+
         @JsonbTransient
         public abstract String getField1();
 
@@ -59,6 +70,10 @@ public class Issue454Test {
     }
 
     public static class TheClass2 extends TheClass {
+
+        private TheClass2() {
+        }
+
         @Override
         public String getField1() {
             return "aaa";
@@ -69,7 +84,7 @@ public class Issue454Test {
         }
     }
     
-    public static interface TheInterface {
+    public interface TheInterface {
 
         @JsonbTransient
         String getField1();

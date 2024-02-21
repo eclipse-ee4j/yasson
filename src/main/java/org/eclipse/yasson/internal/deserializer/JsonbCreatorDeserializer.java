@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2021, 2022 Oracle and/or its affiliates. All rights reserved.
+ * Copyright (c) 2021, 2024 Oracle and/or its affiliates. All rights reserved.
  *
  * This program and the accompanying materials are made available under the
  * terms of the Eclipse Public License v. 2.0 which is available at
@@ -98,15 +98,9 @@ class JsonbCreatorDeserializer implements ModelDeserializer<JsonParser> {
                 }
                 break;
             case END_OBJECT:
-                Object[] params = new Object[creatorParams.size()];
-                for (int i = 0; i < creatorParams.size(); i++) {
-                    String param = creatorParams.get(i);
-                    if (paramValues.containsKey(param)) {
-                        params[i] = paramValues.get(param);
-                    } else {
-                        params[i] = defaultCreatorValues.get(param).deserialize(null, context);
-                    }
-                }
+                Object[] params = creatorParams.stream()
+                        .map(param -> paramValues.containsKey(param) ? paramValues.get(param) : defaultCreatorValues.get(param).deserialize(null, context))
+                        .toArray();
                 context.setInstance(creator.call(params, clazz));
                 context.getDeferredDeserializers().forEach(Runnable::run);
                 context.getDeferredDeserializers().clear();

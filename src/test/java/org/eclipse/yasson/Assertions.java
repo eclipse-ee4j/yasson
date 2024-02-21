@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2019, 2020 Oracle and/or its affiliates. All rights reserved.
+ * Copyright (c) 2019, 2024 Oracle and/or its affiliates. All rights reserved.
  *
  * This program and the accompanying materials are made available under the
  * terms of the Eclipse Public License v. 2.0 which is available at
@@ -20,6 +20,9 @@ import java.util.function.Supplier;
 import jakarta.json.bind.JsonbException;
 
 public class Assertions {
+
+	private Assertions() {
+	}
 	
 	/**
 	 * Asserts that the given operation will fail with a JsonbException
@@ -58,13 +61,13 @@ public class Assertions {
 			operation.get();
 			fail("The operation should have failed with a " + expectedType.getCanonicalName() + " but it succeeded.");
 		} catch (Throwable t) {
-			String fullErrorMessage = "";
+			StringBuilder fullErrorMessage = new StringBuilder();
 			for (Throwable current = t; current != null && current.getCause() != current; current = current.getCause()) {
-			    fullErrorMessage += current.getClass().getCanonicalName() + ": ";
-				fullErrorMessage += current.getMessage() + "\n";
+			    fullErrorMessage.append(current.getClass().getCanonicalName()).append(": ");
+				fullErrorMessage.append(current.getMessage()).append("\n");
 			}
 			if (expectedType.isAssignableFrom(t.getClass())) {
-				if (!checkExceptionMessage.apply(fullErrorMessage)) {
+				if (!checkExceptionMessage.apply(fullErrorMessage.toString())) {
 					t.printStackTrace();
 					fail("Exception did not contain the proper content: " + fullErrorMessage);
 				}
