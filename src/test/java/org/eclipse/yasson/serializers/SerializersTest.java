@@ -930,6 +930,45 @@ public class SerializersTest {
         assertEquals(expected, defaultJsonb.fromJson(expectedJson, Cars.class));
     }
 
+    @Test
+    void testWildcardType_inGeneric() {
+        Wrapper pojo = new Wrapper(new Wrapped<>("first"));
+        assertEquals("{\"value\":{\"value\":\"first\"}}", defaultJsonb.toJson(pojo));
+    }
+
+    @Test
+    public void testClass_withGenericField_whichIsGenericType() {
+        Wrapper pojo = new Wrapper(new Wrapped<>(new Wrapped<>("one")));
+        assertEquals("{\"value\":{\"value\":{\"value\":\"one\"}}}", defaultJsonb.toJson(pojo));
+        testWithJsonbBuilderCreate(new JsonbConfig().withSerializers(new JsonbSerializer<Wrapped>() {
+            @Override public void serialize(Wrapped obj, JsonGenerator generator, SerializationContext ctx) {
+                generator.writeStartObject();
+                ctx.serialize("value_ser", obj.value, generator);
+                generator.writeEnd();
+            }
+        }), jsonb -> {
+            assertEquals("{\"value\":{\"value\":{\"value\":\"one\"}}}", jsonb.toJson(pojo));
+        });
+    }
+
+    public static class Wrapper {
+        // we need a field of this type for the test, otherwise the constellation is not valid for the test
+        public Wrapped<?> value;
+
+        public Wrapper(Wrapped<?> value) {
+            this.value = value;
+        }
+    }
+
+    public static class Wrapped<T> {
+        public T value;
+
+        // we need a constructor for the test so we could create an instance without explicit generic type specification
+        public Wrapped(T value) {
+            this.value = value;
+        }
+    }
+
     @Nested
     class YassonParserTests{
         @Test

@@ -20,7 +20,6 @@ import java.util.Collection;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.HashSet;
-import java.util.LinkedHashMap;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
@@ -196,30 +195,24 @@ public class DeserializationModelCreator {
         boolean hasCreator = creator != null;
         List<String> params = hasCreator ? creatorParamsList(creator) : Collections.emptyList();
         Function<String, String> renamer = propertyRenamer();
-        Map<String, ModelDeserializer<JsonParser>> processors = new LinkedHashMap<>();
-        Map<String, ModelDeserializer<Object>> defaultCreatorValues = new HashMap<>();
-        for (PropertyModel propertyModel : classModel.getSortedProperties()) {
-            if (!propertyModel.isWritable() || params.contains(propertyModel.getReadName())) {
-                continue;
-            }
-            ModelDeserializer<JsonParser> modelDeserializer = memberTypeProcessor(chain, propertyModel, hasCreator);
-            processors.put(renamer.apply(propertyModel.getReadName()), modelDeserializer);
-        }
-        for (String s : params) {
-            CreatorModel creatorModel = creator.findByName(s);
-            ModelDeserializer<JsonParser> modelDeserializer = typeProcessor(chain,
-                                                                            creatorModel.getType(),
-                                                                            creatorModel.getCustomization(),
-                                                                            JustReturn.instance());
-            String parameterName = renamer.apply(creatorModel.getName());
-            processors.put(parameterName, modelDeserializer);
-            if (creatorModel.getCustomization().isRequired()) {
-                defaultCreatorValues.put(parameterName, new RequiredCreatorParameter(parameterName));
-            } else {
-                Class<?> rawParamType = ReflectionUtils.getRawType(creatorModel.getType());
-                defaultCreatorValues.put(parameterName, DEFAULT_CREATOR_VALUES.getOrDefault(rawParamType, NULL_PROVIDER));
-            }
-        }
+        Map<String, ModelDeserializer<JsonParser>> processors = Arrays.stream(classModel.getSortedProperties())
+                .filter(propertyModel -> propertyModel.isWritable() && !params.contains(propertyModel.getReadName()))
+                .collect(Collectors.toMap(propertyModel -> renamer.apply(propertyModel.getReadName()),
+                        propertyModel -> memberTypeProcessor(chain, propertyModel, hasCreator)));
+        processors.putAll(hasCreator ? params.stream()
+                .map(creator::findByName)
+                .collect(Collectors.toMap(creatorModel -> renamer.apply(creatorModel.getName()),
+                        creatorModel -> typeProcessor(chain,
+                                creatorModel.getType(),
+                                creatorModel.getCustomization(),
+                                JustReturn.instance())))
+                : Collections.emptyMap());
+        Map<String, ModelDeserializer<Object>> defaultCreatorValues = hasCreator ? params.stream()
+                .map(creator::findByName)
+                .collect(Collectors.toMap(creatorModel -> renamer.apply(creatorModel.getName()),
+                        creatorModel -> creatorModel.getCustomization().isRequired() ? new RequiredCreatorParameter(renamer.apply(creatorModel.getName()))
+                                : DEFAULT_CREATOR_VALUES.getOrDefault(ReflectionUtils.getRawType(creatorModel.getType()), NULL_PROVIDER)))
+                : Collections.emptyMap();
         ModelDeserializer<JsonParser> instanceCreator;
         TypeInheritanceConfiguration typeInheritanceConfiguration = classCustomization.getPolymorphismConfig();
         Set<String> ignoredProperties = collectIgnoredProperties(typeInheritanceConfiguration);

@@ -18,7 +18,9 @@ import static org.eclipse.yasson.Jsonbs.defaultJsonb;
 import static org.eclipse.yasson.Jsonbs.testWithJsonbBuilderNewBuilder;
 import static org.eclipse.yasson.Jsonbs.testWithJsonbBuilderCreate;
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertInstanceOf;
 import static org.junit.jupiter.api.Assertions.assertNull;
+import static org.junit.jupiter.api.Assertions.assertThrows;
 
 import java.lang.reflect.Type;
 import java.math.BigDecimal;
@@ -50,6 +52,7 @@ import org.eclipse.yasson.defaultmapping.generics.model.ScalarValueWrapper;
 import org.junit.jupiter.api.Test;
 
 import jakarta.json.bind.JsonbConfig;
+import jakarta.json.bind.JsonbException;
 import jakarta.json.bind.adapter.JsonbAdapter;
 
 /**
@@ -652,5 +655,25 @@ public class AdaptersTest {
         String expectedJson = defaultJsonb.toJson(expected);
 
         assertEquals(expected, defaultJsonb.fromJson(expectedJson, Vegetables.class));
+    }
+
+    @Test
+    void testTypeToSameTypeAdapter_shouldntBeStackOverflowError() {
+        RuntimeException runtimeException
+                = assertThrows(RuntimeException.class, () -> testWithJsonbBuilderNewBuilder(new JsonbConfig().withAdapters(
+                    new JsonbAdapter<Box, Box>() {
+                        @Override
+                        public Box adaptToJson(Box obj) {
+                            return obj;
+                        }
+
+                        @Override
+                        public Box adaptFromJson(Box obj) {
+                            return obj;
+                        }
+                    }),
+                jsonb -> jsonb.toJson(new Box())));
+
+        assertInstanceOf(JsonbException.class, runtimeException.getCause());
     }
 }

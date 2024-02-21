@@ -58,6 +58,8 @@ public class ReflectionUtils {
             return Optional.of((Class<?>) ((ParameterizedType) type).getRawType());
         } else if (type instanceof GenericArrayType) {
             return Optional.of(((GenericArrayType) type).getClass());
+        } else if (type instanceof WildcardType) {
+            return Optional.of((Class<?>) ((WildcardType) type).getUpperBounds()[0]);
         } else if (type instanceof TypeVariable) {
             TypeVariable<?> typeVariable = TypeVariable.class.cast(type);
             if (Objects.nonNull(typeVariable.getBounds())) {
