@@ -29,18 +29,11 @@ jobs:
         with:
           fetch-depth: 0
       - name: Set up compile JDK
-        uses: actions/setup-java@v2
+        uses: actions/setup-java@v4
         with: #Compile java needs to be the highest to ensure proper compilation of the multi-release jar
-          distribution: 'adopt'
+          distribution: 'temurin'
           java-version: 17
-      - name: Maven cache
-        uses: actions/cache@v2
-        env:
-          cache-name: maven-cache
-        with:
-          path:
-            ~/.m2
-          key: build-${{ env.cache-name }}
+          cache: 'maven'
       - name: Copyright
         run: bash etc/copyright.sh
       - name: Checkstyle
@@ -49,10 +42,11 @@ jobs:
 #        run: mvn -U -C -Pstaging clean install -DskipTests
         run: mvn -U -C clean install -DskipTests
       - name: Set up JDK for tests
-        uses: actions/setup-java@v2
+        uses: actions/setup-java@v4
         with:
-          distribution: 'adopt'
+          distribution: 'temurin'
           java-version: ${{ matrix.java_version }}
+          cache: 'maven'
       - name: Yasson tests
         run: mvn -U -B -C -Dmaven.javadoc.skip=true -Pstaging verify
       - name: JSONB-API TCK
