@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2019, 2021 Oracle and/or its affiliates. All rights reserved.
+ * Copyright (c) 2019, 2024 Oracle and/or its affiliates. All rights reserved.
  *
  * This program and the accompanying materials are made available under the
  * terms of the Eclipse Public License v. 2.0 which is available at
@@ -12,14 +12,14 @@
 
 package org.eclipse.yasson.serializers;
 
-import jakarta.json.bind.Jsonb;
-import jakarta.json.bind.JsonbBuilder;
 import jakarta.json.bind.JsonbConfig;
 
 import org.junit.jupiter.api.Test;
 
 import static org.eclipse.yasson.Assertions.shouldFail;
+import static org.eclipse.yasson.Jsonbs.testWithJsonbBuilderCreate;
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertInstanceOf;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
 import java.math.BigInteger;
@@ -40,10 +40,10 @@ public class MapToObjectSerializerTest {
     enum TestEnum {
         ONE, TWO;
 
-        @Override
         /**
          * Force to lower case to check toString is not used during serialization of maps
          */
+        @Override
         public String toString() {
             return this.name().toLowerCase();
         }
@@ -90,29 +90,30 @@ public class MapToObjectSerializerTest {
         }
     }
 
-    public static class MapObjectIntegerString extends MapObject<Integer, String> {};
+    public static class MapObjectIntegerString extends MapObject<Integer, String> {}
 
-    public static class MapObjectBigIntegerString extends MapObject<BigInteger, String> {};
+	public static class MapObjectBigIntegerString extends MapObject<BigInteger, String> {}
 
-    public static class MapObjectEnumString extends MapObject<TestEnum, String> {};
+	public static class MapObjectEnumString extends MapObject<TestEnum, String> {}
 
-    public static class MapObjectStringString extends MapObject<String, String> {};
+	public static class MapObjectStringString extends MapObject<String, String> {}
 
-    public static class MapObjectBooleanString extends MapObject<Boolean, String> {};
+	public static class MapObjectBooleanString extends MapObject<Boolean, String> {}
 
-    /**
+	/**
      * Test serialization of Map with Number keys and String values.
      */
     @Test
     public void testSerializeEnumMapToObject() {
         Map<TestEnum, Object> map = new EnumMap<>(TestEnum.class);
-        Jsonb jsonb = JsonbBuilder.create(new JsonbConfig().withFormatting(true));
-        map.put(TestEnum.ONE, "value1");
-        map.put(TestEnum.TWO, "value2");
-        String json = jsonb.toJson(map);
-        for (TestEnum e : TestEnum.values()) {
-            assertTrue(json.contains(e.name()), "Enumeration not well serialized");
-        }
+        testWithJsonbBuilderCreate(new JsonbConfig().withFormatting(true), jsonb -> {
+            map.put(TestEnum.ONE, "value1");
+            map.put(TestEnum.TWO, "value2");
+            String json = jsonb.toJson(map);
+            for (TestEnum e : TestEnum.values()) {
+                assertTrue(json.contains(e.name()), "Enumeration not well serialized");
+            }
+        });
     }
 
     /**
@@ -120,16 +121,17 @@ public class MapToObjectSerializerTest {
      */
     @Test
     public void testIntegerString() {
-        Jsonb jsonb = JsonbBuilder.create(new JsonbConfig());
+        testWithJsonbBuilderCreate(new JsonbConfig(), jsonb -> {
 
-        MapObjectIntegerString mapObject = new MapObjectIntegerString();
-        mapObject.getValues().put(12, "twelve");
-        mapObject.getValues().put(48, "forty eight");
-        mapObject.getValues().put(256, "two hundred fifty-six");
+            MapObjectIntegerString mapObject = new MapObjectIntegerString();
+            mapObject.getValues().put(12, "twelve");
+            mapObject.getValues().put(48, "forty eight");
+            mapObject.getValues().put(256, "two hundred fifty-six");
 
-        String json = jsonb.toJson(mapObject);
-        MapObjectIntegerString resObject = jsonb.fromJson(json, MapObjectIntegerString.class);
-        assertEquals(mapObject, resObject);
+            String json = jsonb.toJson(mapObject);
+            MapObjectIntegerString resObject = jsonb.fromJson(json, MapObjectIntegerString.class);
+            assertEquals(mapObject, resObject);
+        });
     }
 
     /**
@@ -137,16 +139,17 @@ public class MapToObjectSerializerTest {
      */
     @Test
     public void testBigIntegerString() {
-        Jsonb jsonb = JsonbBuilder.create(new JsonbConfig());
+        testWithJsonbBuilderCreate(new JsonbConfig(), jsonb -> {
 
-        MapObjectBigIntegerString mapObject = new MapObjectBigIntegerString();
-        mapObject.getValues().put(new BigInteger("12"), "twelve");
-        mapObject.getValues().put(new BigInteger("48"), "forty eight");
-        mapObject.getValues().put(new BigInteger("256"), "two hundred fifty-six");
+            MapObjectBigIntegerString mapObject = new MapObjectBigIntegerString();
+            mapObject.getValues().put(new BigInteger("12"), "twelve");
+            mapObject.getValues().put(new BigInteger("48"), "forty eight");
+            mapObject.getValues().put(new BigInteger("256"), "two hundred fifty-six");
 
-        String json = jsonb.toJson(mapObject);
-        MapObjectBigIntegerString resObject = jsonb.fromJson(json, MapObjectBigIntegerString.class);
-        assertEquals(mapObject, resObject);
+            String json = jsonb.toJson(mapObject);
+            MapObjectBigIntegerString resObject = jsonb.fromJson(json, MapObjectBigIntegerString.class);
+            assertEquals(mapObject, resObject);
+        });
     }
 
     /**
@@ -154,15 +157,16 @@ public class MapToObjectSerializerTest {
      */
     @Test
     public void testEnumString() {
-        Jsonb jsonb = JsonbBuilder.create();
+        testWithJsonbBuilderCreate(jsonb -> {
 
-        MapObjectEnumString mapObject = new MapObjectEnumString();
-        mapObject.getValues().put(TestEnum.ONE, "one");
-        mapObject.getValues().put(TestEnum.TWO, "two");
+            MapObjectEnumString mapObject = new MapObjectEnumString();
+            mapObject.getValues().put(TestEnum.ONE, "one");
+            mapObject.getValues().put(TestEnum.TWO, "two");
 
-        String json = jsonb.toJson(mapObject);
-        MapObjectEnumString resObject = jsonb.fromJson(json, MapObjectEnumString.class);
-        assertEquals(mapObject, resObject);
+            String json = jsonb.toJson(mapObject);
+            MapObjectEnumString resObject = jsonb.fromJson(json, MapObjectEnumString.class);
+            assertEquals(mapObject, resObject);
+        });
     }
 
     /**
@@ -170,15 +174,16 @@ public class MapToObjectSerializerTest {
      */
     @Test
     public void testStringString() {
-        Jsonb jsonb = JsonbBuilder.create(new JsonbConfig().setProperty("lala", "lala"));
+        testWithJsonbBuilderCreate(new JsonbConfig().setProperty("lala", "lala"), jsonb -> {
 
-        MapObjectStringString mapObject = new MapObjectStringString();
-        mapObject.getValues().put("one", "one");
-        mapObject.getValues().put("two", "two");
+            MapObjectStringString mapObject = new MapObjectStringString();
+            mapObject.getValues().put("one", "one");
+            mapObject.getValues().put("two", "two");
 
-        String json = jsonb.toJson(mapObject);
-        MapObjectStringString resObject = jsonb.fromJson(json, MapObjectStringString.class);
-        assertEquals(mapObject, resObject);
+            String json = jsonb.toJson(mapObject);
+            MapObjectStringString resObject = jsonb.fromJson(json, MapObjectStringString.class);
+            assertEquals(mapObject, resObject);
+        });
     }
 
     /**
@@ -186,17 +191,18 @@ public class MapToObjectSerializerTest {
      */
     @Test
     public void testNotParametrizedMap() {
-        Jsonb jsonb = JsonbBuilder.create(new JsonbConfig());
+        testWithJsonbBuilderCreate(new JsonbConfig(), jsonb -> {
 
-        Map<Integer, String> mapObject = new HashMap<>();
-        mapObject.put(12, "twelve");
-        mapObject.put(48, "forty eight");
-        mapObject.put(256, "two hundred fifty-six");
+            Map<Integer, String> mapObject = new HashMap<>();
+            mapObject.put(12, "twelve");
+            mapObject.put(48, "forty eight");
+            mapObject.put(256, "two hundred fifty-six");
 
-        String json = jsonb.toJson(mapObject);
-        Map resObject = jsonb.fromJson(json, Map.class);
-        assertEquals(3, resObject.size());
-        assertTrue(resObject.keySet().iterator().next() instanceof String);
+            String json = jsonb.toJson(mapObject);
+            Map<?, ?> resObject = jsonb.fromJson(json, Map.class);
+            assertEquals(3, resObject.size());
+			assertInstanceOf(String.class, resObject.keySet().iterator().next());
+        });
     }
 
     /**
@@ -206,13 +212,14 @@ public class MapToObjectSerializerTest {
      */
     @Test
     public void testBooleanStringMapToObjectSerializer() {
-        Jsonb jsonb = JsonbBuilder.create();
+        testWithJsonbBuilderCreate(jsonb -> {
 
-        String json = "{\"values\":{\"true\":\"TRUE\",\"false\":\"FALSE\"}}";
-        MapObjectBooleanString resObject = jsonb.fromJson(json, MapObjectBooleanString.class);
-        assertEquals(2, resObject.getValues().size());
-        assertEquals("TRUE", resObject.getValues().get(true));
-        assertEquals("FALSE", resObject.getValues().get(false));
+            String json = "{\"values\":{\"true\":\"TRUE\",\"false\":\"FALSE\"}}";
+            MapObjectBooleanString resObject = jsonb.fromJson(json, MapObjectBooleanString.class);
+            assertEquals(2, resObject.getValues().size());
+            assertEquals("TRUE", resObject.getValues().get(true));
+            assertEquals("FALSE", resObject.getValues().get(false));
+        });
     }
 
     /**
@@ -221,9 +228,10 @@ public class MapToObjectSerializerTest {
      */
     @Test
     public void testIncorrectTypeMapToObjectSerializer() {
-        Jsonb jsonb = JsonbBuilder.create();
+        testWithJsonbBuilderCreate(jsonb -> {
 
-        String json = "{\"values\":{\"1\":\"OK\",\"error\":\"KO\"}}";
-        shouldFail(() -> jsonb.fromJson(json, MapObjectIntegerString.class));
+            String json = "{\"values\":{\"1\":\"OK\",\"error\":\"KO\"}}";
+            shouldFail(() -> jsonb.fromJson(json, MapObjectIntegerString.class));
+        });
     }
 }

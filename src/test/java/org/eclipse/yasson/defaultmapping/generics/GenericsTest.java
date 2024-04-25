@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2015, 2023 Oracle and/or its affiliates. All rights reserved.
+ * Copyright (c) 2015, 2024 Oracle and/or its affiliates. All rights reserved.
  *
  * This program and the accompanying materials are made available under the
  * terms of the Eclipse Public License v. 2.0 which is available at
@@ -12,6 +12,13 @@
 
 package org.eclipse.yasson.defaultmapping.generics;
 
+import static org.eclipse.yasson.Jsonbs.defaultJsonb;
+import static org.eclipse.yasson.Jsonbs.testWithJsonbBuilderCreate;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertInstanceOf;
+import static org.junit.jupiter.api.Assertions.assertThrows;
+
+import java.lang.reflect.Field;
 import java.lang.reflect.Type;
 import java.math.BigDecimal;
 import java.text.ParseException;
@@ -26,11 +33,6 @@ import java.util.Map;
 import java.util.Optional;
 import java.util.TimeZone;
 
-import jakarta.json.bind.Jsonb;
-import jakarta.json.bind.JsonbBuilder;
-import jakarta.json.bind.JsonbConfig;
-import java.lang.reflect.Field;
-import java.util.Collection;
 import org.eclipse.yasson.TestTypeToken;
 import org.eclipse.yasson.adapters.model.GenericBox;
 import org.eclipse.yasson.defaultmapping.generics.model.AnotherGenericTestClass;
@@ -44,6 +46,7 @@ import org.eclipse.yasson.defaultmapping.generics.model.FinalMember;
 import org.eclipse.yasson.defaultmapping.generics.model.GenericArrayClass;
 import org.eclipse.yasson.defaultmapping.generics.model.GenericTestClass;
 import org.eclipse.yasson.defaultmapping.generics.model.GenericWithUnboundedWildcardClass;
+import org.eclipse.yasson.defaultmapping.generics.model.LowerBoundTypeVariableWithCollectionAttributeClass;
 import org.eclipse.yasson.defaultmapping.generics.model.MultiLevelExtendedGenericTestClass;
 import org.eclipse.yasson.defaultmapping.generics.model.MultipleBoundsContainer;
 import org.eclipse.yasson.defaultmapping.generics.model.MyCyclicGenericClass;
@@ -55,11 +58,7 @@ import org.eclipse.yasson.serializers.model.Box;
 import org.eclipse.yasson.serializers.model.Crate;
 import org.junit.jupiter.api.Test;
 
-import static org.eclipse.yasson.Jsonbs.defaultJsonb;
-import org.eclipse.yasson.defaultmapping.generics.model.LowerBoundTypeVariableWithCollectionAttributeClass;
-import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertThrows;
-import static org.junit.jupiter.api.Assertions.assertTrue;
+import jakarta.json.bind.JsonbConfig;
 
 /**
  * This class contains JSONB default mapping generics tests.
@@ -171,9 +170,9 @@ public class GenericsTest {
         assertEquals(expected, defaultJsonb.toJson(genericWithUnboundedWildcardClass));
 
         GenericWithUnboundedWildcardClass result = defaultJsonb.fromJson(expected, GenericWithUnboundedWildcardClass.class);
-        assertTrue(result.wildcardList.get(0) instanceof Map);
-        assertEquals("v1", ((Map) result.wildcardList.get(0)).get("k1"));
-        assertEquals("v2", ((Map) result.wildcardList.get(0)).get("k2"));
+		assertInstanceOf(Map.class, result.wildcardList.get(0));
+        assertEquals("v1", ((Map<?, ?>) result.wildcardList.get(0)).get("k1"));
+        assertEquals("v2", ((Map<?, ?>) result.wildcardList.get(0)).get("k2"));
     }
 
     @Test
@@ -270,19 +269,7 @@ public class GenericsTest {
 
     @Test
     public void testFunctional() {
-        FunctionalInterface myFunction = new FunctionalInterface<String>() {
-
-            private String value = "initValue";
-
-            @Override
-            public String getValue() {
-                return value;
-            }
-
-            public void setValue(String value) {
-                this.value = value;
-            }
-        };
+		FunctionalInterface<String> myFunction = () -> "initValue";
 
         assertEquals("{\"value\":\"initValue\"}", defaultJsonb.toJson(myFunction));
     }
@@ -311,18 +298,20 @@ public class GenericsTest {
         String expected = "{\"boundedSet\":[3],\"lowerBoundedList\":[{\"radius\":2.5}],\"upperBoundedList\":[{\"radius\":3.5,\"color\":\"0,0,255\"}]}";
         assertEquals(expected, defaultJsonb.toJson(boundedGenericClass));
 
-        Jsonb localJsonb = JsonbBuilder.create(new JsonbConfig());
-        BoundedGenericClass<HashSet<Integer>, Circle> result = localJsonb.fromJson(expected,
-                new TestTypeToken<BoundedGenericClass<HashSet<Integer>, Circle>>(){}.getType());
-        assertEquals(Circle.class, result.lowerBoundedList.get(0).getClass());
-        assertEquals(Double.valueOf(2.5), ((Circle) result.lowerBoundedList.get(0)).getRadius());
+        testWithJsonbBuilderCreate(new JsonbConfig(), localJsonb -> {
+            BoundedGenericClass<HashSet<Integer>, Circle> result = localJsonb.fromJson(expected,
+                    new TestTypeToken<BoundedGenericClass<HashSet<Integer>, Circle>>() {
+                    }.getType());
+            assertEquals(Circle.class, result.lowerBoundedList.get(0).getClass());
+            assertEquals(Double.valueOf(2.5), ((Circle) result.lowerBoundedList.get(0)).getRadius());
 
-        //There is no way of identifying precise class (ColoredCircle) during json unmarshalling.
-        //Fields that are missing in upper bounds are skipped.
-        assertEquals(Circle.class, result.upperBoundedList.get(0).getClass());
-        assertEquals(Double.valueOf(3.5), result.upperBoundedList.get(0).getRadius());
-        //If it was possible we could assert following, but it is not.
-        //assertEquals("0,0,255", ((ColoredCircle) result.upperBoundedList.get(0)).color);
+            //There is no way of identifying precise class (ColoredCircle) during json unmarshalling.
+            //Fields that are missing in upper bounds are skipped.
+            assertEquals(Circle.class, result.upperBoundedList.get(0).getClass());
+            assertEquals(Double.valueOf(3.5), result.upperBoundedList.get(0).getRadius());
+            //If it was possible we could assert following, but it is not.
+            //assertEquals("0,0,255", ((ColoredCircle) result.upperBoundedList.get(0)).color);
+        });
     }
 
     @Test
@@ -332,7 +321,7 @@ public class GenericsTest {
 	        BoundedGenericClass<HashSet<Integer>, Circle> otherGeneric = defaultJsonb.fromJson("{\"boundedSet\":[3],\"lowerBoundedList\":[{\"radius\":2.5}]}",
 	                new TestTypeToken<BoundedGenericClass<HashSet<Double>, Circle>>(){}.getType());
 	        HashSet<Integer> otherIntSet = otherGeneric.boundedSet;
-	        Integer intValue = otherIntSet.iterator().next();
+	        Integer intValue = otherIntSet.iterator().next(); //need to have a variable for the exception to be thrown
     	});
     }
 
@@ -382,9 +371,8 @@ public class GenericsTest {
     }
 
     @Test
-    @SuppressWarnings("unchecked")
     public void testMarshallRawList() throws ParseException {
-        List rawList = new ArrayList();
+        List<Object> rawList = new ArrayList<>();
         final SimpleDateFormat ddMMyyyy = new SimpleDateFormat("ddMMyyyy");
         ddMMyyyy.setTimeZone(TimeZone.getTimeZone("Z"));
         rawList.add(ddMMyyyy.parse("24031981"));
@@ -401,17 +389,17 @@ public class GenericsTest {
     @Test
     public void testMultipleBounds() {
         final LinkedList<String> list = new LinkedList<>(Arrays.asList("Test 1", "Test 2"));
-        MultipleBoundsContainer<LinkedList<String>> container = new MultipleBoundsContainer<>();
+        MultipleBoundsContainer<String, LinkedList<String>> container = new MultipleBoundsContainer<>();
         container.setInstance(new ArrayList<>());
         container.getInstance().add(list);
 
-        final Type type = new TestTypeToken<MultipleBoundsContainer<LinkedList<String>>>() {
+        final Type type = new TestTypeToken<MultipleBoundsContainer<String, LinkedList<String>>>() {
         }.getType();
 
         String jsonString = defaultJsonb.toJson(container, type);
         assertEquals("{\"instance\":[[\"Test 1\",\"Test 2\"]]}", jsonString);
 
-        MultipleBoundsContainer<LinkedList<String>> result = defaultJsonb.fromJson(jsonString, type);
+        MultipleBoundsContainer<String, LinkedList<String>> result = defaultJsonb.fromJson(jsonString, type);
 
         assertEquals(container.getInstance(), result.getInstance());
     }
@@ -420,7 +408,7 @@ public class GenericsTest {
     @SuppressWarnings("unchecked")
     public void testDeserializeIntoRaw() {
 
-        GenericTestClass result = defaultJsonb.fromJson("{\"field1\":{\"val1\":\"abc\"},\"field2\":{\"val1\":\"def\"}}", GenericTestClass.class);
+        GenericTestClass<?,?> result = defaultJsonb.fromJson("{\"field1\":{\"val1\":\"abc\"},\"field2\":{\"val1\":\"def\"}}", GenericTestClass.class);
         assertEquals(((HashMap<String, ?>) result.getField1()).get("val1"), "abc");
         assertEquals(((HashMap<String, ?>) result.getField2()).get("val1"), "def");
     }
@@ -432,7 +420,7 @@ public class GenericsTest {
 
         collectionWrapper.setWrappedCollection(new ArrayList<>());
         collectionWrapper.setWrappedMap(new HashMap<>());
-        String s = defaultJsonb.toJson(collectionWrapper);
+        defaultJsonb.toJson(collectionWrapper);
     }
 
     @Test
@@ -443,9 +431,8 @@ public class GenericsTest {
         concreteContainer.setMember(member);
 
         String expected = "{\"member\":{\"name\":\"Jason\"}}";
-        Jsonb jsonb = JsonbBuilder.create();
-        assertEquals(expected, jsonb.toJson(concreteContainer));
-        FinalGenericWrapper finalGenericWrapper = jsonb.fromJson(expected, FinalGenericWrapper.class);
+        assertEquals(expected, defaultJsonb.toJson(concreteContainer));
+        FinalGenericWrapper finalGenericWrapper = defaultJsonb.fromJson(expected, FinalGenericWrapper.class);
         assertEquals(concreteContainer, finalGenericWrapper);
     }
 
@@ -459,20 +446,18 @@ public class GenericsTest {
         anotherGenericTestClass.field1 = 6;
         anotherGenericTestClass.field2 = shape;
         
-        List<AnotherGenericTestClass<Integer, Shape>> asList = Arrays.asList(anotherGenericTestClass);
+        List<AnotherGenericTestClass<Integer, Shape>> asList = List.of(anotherGenericTestClass);
         
-        Jsonb jsonb = JsonbBuilder.create();
-        String toJson = jsonb.toJson(asList);
-        
+        String toJson = defaultJsonb.toJson(asList);
+
         Field field = LowerBoundTypeVariableWithCollectionAttributeClass.class.getDeclaredField("value");
-        
+
         Type genericType = field.getGenericType();
-        
-        List<AnotherGenericTestClass<Integer, Shape>> fromJson = jsonb.fromJson(toJson, genericType);
+
+        List<AnotherGenericTestClass<Integer, Shape>> fromJson = defaultJsonb.fromJson(toJson, genericType);
 
         assertEquals(5, fromJson.get(0).field2.getArea());
         assertEquals(6, fromJson.get(0).field1);
-        
     }
     
     public interface FunctionalInterface<T> {
@@ -480,6 +465,7 @@ public class GenericsTest {
     }
 
     public static class ExtendsBigDecimal extends BigDecimal {
+        private static final long serialVersionUID = 1L;
 
         public ExtendsBigDecimal(String val) {
             super(val);
@@ -487,4 +473,3 @@ public class GenericsTest {
     }
 
 }
-

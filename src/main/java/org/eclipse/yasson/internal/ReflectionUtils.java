@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2015, 2023 Oracle and/or its affiliates. All rights reserved.
+ * Copyright (c) 2015, 2024 Oracle and/or its affiliates. All rights reserved.
  *
  * This program and the accompanying materials are made available under the
  * terms of the Eclipse Public License v. 2.0 which is available at
@@ -26,7 +26,6 @@ import java.util.Arrays;
 import java.util.List;
 import java.util.Objects;
 import java.util.Optional;
-import java.util.logging.Logger;
 
 import jakarta.json.bind.JsonbException;
 
@@ -38,7 +37,7 @@ import org.eclipse.yasson.internal.properties.Messages;
  */
 public class ReflectionUtils {
 
-    private static final Logger LOGGER = Logger.getLogger(ReflectionUtils.class.getName());
+    /*private static final Logger LOGGER = Logger.getLogger(ReflectionUtils.class.getName());*/
 
     private ReflectionUtils() {
         throw new IllegalStateException("Utility classes should not be instantiated.");
@@ -47,7 +46,6 @@ public class ReflectionUtils {
     /**
      * Get raw type by type.
      * Only for ParametrizedTypes, GenericArrayTypes and Classes.
-     *
      * Empty optional is returned if raw type cannot be resolved.
      *
      * @param type Type to get class information from, not null.
@@ -60,19 +58,17 @@ public class ReflectionUtils {
             return Optional.of((Class<?>) ((ParameterizedType) type).getRawType());
         } else if (type instanceof GenericArrayType) {
             return Optional.of(((GenericArrayType) type).getClass());
+        } else if (type instanceof WildcardType) {
+            return Optional.of((Class<?>) ((WildcardType) type).getUpperBounds()[0]);
         } else if (type instanceof TypeVariable) {
             TypeVariable<?> typeVariable = TypeVariable.class.cast(type);
             if (Objects.nonNull(typeVariable.getBounds())) {
-                Optional<Class<?>> specializedClass = Optional.empty();
-                for (Type bound : typeVariable.getBounds()) {
-                    Optional<Class<?>> boundRawType = getOptionalRawType(bound);
-                    if (boundRawType.isPresent() && !Object.class.equals(boundRawType.get())) {
-                        if (!specializedClass.isPresent() || specializedClass.get().isAssignableFrom(boundRawType.get())) {
-                            specializedClass = Optional.of(boundRawType.get());
-                        }
-                    }
-                }
-                return specializedClass;
+                return Arrays.stream(typeVariable.getBounds())
+                        .map(ReflectionUtils::getOptionalRawType)
+                        .filter(Optional::isPresent)
+                        .filter(clazz -> !Object.class.equals(clazz.get()))
+                        .reduce((clazz1, clazz2) -> clazz1.map(clazzGet1 -> clazzGet1.isAssignableFrom(clazz2.get())).orElse(false) ? clazz2 : clazz1)
+                        .orElse(Optional.empty());
             }
         }
         return Optional.empty();
@@ -81,7 +77,7 @@ public class ReflectionUtils {
     /**
      * Get raw type by type.
      * Resolves only ParametrizedTypes, GenericArrayTypes and Classes.
-     *
+     * <p>
      * Exception is thrown if raw type cannot be resolved.
      *
      * @param type Type to get class information from, not null.
@@ -92,7 +88,7 @@ public class ReflectionUtils {
                 .orElseThrow(() -> new JsonbException(Messages.getMessage(MessageKeys.TYPE_RESOLUTION_ERROR, type)));
     }
 
-    /**
+    /*/**
      * Get a raw type of any type.
      * If type is a {@link TypeVariable} recursively search type chain for resolution of typevar.
      * If type is a {@link WildcardType} find most specific upper / lower bound, which can be used. If most specific
@@ -102,7 +98,7 @@ public class ReflectionUtils {
      * @param type  type to resolve, typically field type or generic bound, not null.
      * @return resolved raw class
      */
-    public static Class<?> resolveRawType(List<Type> chain, Type type) {
+    /*public static Class<?> resolveRawType(List<Type> chain, Type type) {
         if (type instanceof Class) {
             return (Class<?>) type;
         } else if (type instanceof ParameterizedType) {
@@ -110,7 +106,7 @@ public class ReflectionUtils {
         } else {
             return getRawType(resolveType(chain, type));
         }
-    }
+    }*/
 
     /**
      * Resolve a type by chain.
@@ -136,27 +132,27 @@ public class ReflectionUtils {
         if (toResolve instanceof WildcardType) {
             return resolveMostSpecificBound(chain, (WildcardType) toResolve, warn);
         } else if (toResolve instanceof TypeVariable) {
-            return resolveItemVariableType(chain, (TypeVariable<?>) toResolve, warn);
+            return resolveItemVariableType(chain, (TypeVariable<?>) toResolve/*, warn*/);
         } else if (toResolve instanceof ParameterizedType) {
             return resolveTypeArguments((ParameterizedType) toResolve, chain.get(chain.size() - 1));
         }
         return type;
     }
 
-    /**
+    /*/**
      * Resolves type by item information and wraps it with {@link Optional}.
      *
      * @param chain hierarchy of all wrapping types.
      * @param type  type
      * @return resolved type wrapped with Optional
      */
-    public static Optional<Type> resolveOptionalType(List<Type> chain, Type type) {
+    /*public static Optional<Type> resolveOptionalType(List<Type> chain, Type type) {
         try {
             return Optional.of(resolveType(chain, type, false));
         } catch (RuntimeException e) {
             return Optional.empty();
         }
-    }
+    }*/
 
     /**
      * Resolve a bounded type variable type by its wrapper types.
@@ -165,24 +161,24 @@ public class ReflectionUtils {
      *
      * @param chain        chain to search "runtime" generic type of a TypeVariable.
      * @param typeVariable type to search in chain for, not null.
-     * @param warn         whether or not to log a warning message when bounds are not found
+//     * @param warn         whether or not to log a warning message when bounds are not found
      * @return Type of a generic "runtime" bound, not null.
      */
-    public static Type resolveItemVariableType(List<Type> chain, TypeVariable<?> typeVariable, boolean warn) {
-//        if (chain == null) {
-//        Optional<Class<?>> optionalRawType = getOptionalRawType(typeVariable);
-//        if (optionalRawType.isPresent()) {
-//            return optionalRawType.get();
-//        }
+    public static Type resolveItemVariableType(List<Type> chain, TypeVariable<?> typeVariable/*, boolean warn*/) {
+        /*if (chain == null) {
+        Optional<Class<?>> optionalRawType = getOptionalRawType(typeVariable);
+        if (optionalRawType.isPresent()) {
+            return optionalRawType.get();
+        }
 
-        //            //Bound not found, treat it as an Object.class
-//            if (warn) {
-//                LOGGER.warning(Messages.getMessage(MessageKeys.GENERIC_BOUND_NOT_FOUND,
-//                                                   typeVariable,
-//                                                   typeVariable.getGenericDeclaration()));
-//            }
-//            return Object.class;
-//        }
+            //Bound not found, treat it as an Object.class
+            if (warn) {
+                LOGGER.warning(Messages.getMessage(MessageKeys.GENERIC_BOUND_NOT_FOUND,
+                                                   typeVariable,
+                                                   typeVariable.getGenericDeclaration()));
+            }
+            return Object.class;
+        }*/
         Type returnType = typeVariable;
         for (int i = chain.size() - 1; i >= 0; i--) {
             Type type = chain.get(i);
@@ -200,23 +196,23 @@ public class ReflectionUtils {
         }
         return returnType;
 
-//        //Embedded items doesn't hold information about variable types
-//        if (chain instanceof EmbeddedItem) {
-//            return resolveItemVariableType(chain.getWrapper(), typeVariable, warn);
-//        }
-//
-//        ParameterizedType wrapperParameterizedType = findParameterizedSuperclass(chain.getRuntimeType());
-//
-//        VariableTypeInheritanceSearch search = new VariableTypeInheritanceSearch();
-//        Type foundType = search.searchParametrizedType(wrapperParameterizedType, typeVariable);
-//        if (foundType != null) {
-//            if (foundType instanceof TypeVariable) {
-//                return resolveItemVariableType(chain.getWrapper(), (TypeVariable<?>) foundType, warn);
-//            }
-//            return foundType;
-//        }
-//
-//        return resolveItemVariableType(chain.getWrapper(), typeVariable, warn);
+        //Embedded items doesn't hold information about variable types
+        /*if (chain instanceof EmbeddedItem) {
+            return resolveItemVariableType(chain.getWrapper(), typeVariable, warn);
+        }
+
+        ParameterizedType wrapperParameterizedType = findParameterizedSuperclass(chain.getRuntimeType());
+
+        VariableTypeInheritanceSearch search = new VariableTypeInheritanceSearch();
+        Type foundType = search.searchParametrizedType(wrapperParameterizedType, typeVariable);
+        if (foundType != null) {
+            if (foundType instanceof TypeVariable) {
+                return resolveItemVariableType(chain.getWrapper(), (TypeVariable<?>) foundType, warn);
+            }
+            return foundType;
+        }
+
+        return resolveItemVariableType(chain.getWrapper(), typeVariable, warn);*/
     }
 
     /**
@@ -328,7 +324,7 @@ public class ReflectionUtils {
      * @return type of JsonbAdapter
      */
     public static ParameterizedType findParameterizedType(Class<?> classToSearch, Class<?> parameterizedInterface) {
-        Class current = classToSearch;
+        Class<?> current = classToSearch;
         while (current != Object.class) {
             for (Type currentInterface : current.getGenericInterfaces()) {
                 if (currentInterface instanceof ParameterizedType
@@ -361,15 +357,15 @@ public class ReflectionUtils {
         return type instanceof Class<?>;
     }
 
-    private static ParameterizedType findParameterizedSuperclass(Type type) {
+    /*private static ParameterizedType findParameterizedSuperclass(Type type) {
         if (type == null || type instanceof ParameterizedType) {
             return (ParameterizedType) type;
         }
         if (!(type instanceof Class)) {
             throw new JsonbException("Can't resolve ParameterizedType superclass for: " + type);
         }
-        return findParameterizedSuperclass(((Class) type).getGenericSuperclass());
-    }
+        return findParameterizedSuperclass(((Class<?>) type).getGenericSuperclass());
+    }*/
 
     /**
      * Resolves a wildcard most specific upper or lower bound.
@@ -431,7 +427,6 @@ public class ReflectionUtils {
         public boolean equals(Object o) {
             if (o instanceof GenericArrayType) {
                 GenericArrayType that = (GenericArrayType) o;
-
                 return Objects.equals(genericComponentType, that.getGenericComponentType());
             } else {
                 return false;

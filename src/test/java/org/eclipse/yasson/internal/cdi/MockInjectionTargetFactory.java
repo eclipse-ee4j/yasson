@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2022 Oracle and/or its affiliates. All rights reserved.
+ * Copyright (c) 2024 Oracle and/or its affiliates. All rights reserved.
  *
  * This program and the accompanying materials are made available under the
  * terms of the Eclipse Public License v. 2.0 which is available at
@@ -22,6 +22,8 @@ import jakarta.enterprise.inject.spi.InjectionTargetFactory;
 public class MockInjectionTargetFactory<T> implements InjectionTargetFactory<T> {
     @Override
     public InjectionTarget<T> createInjectionTarget(Bean<T> bean) {
-        return (InjectionTarget<T>) new MockInjectionTarget();
+        @SuppressWarnings("unchecked")
+        InjectionTarget<T> injectionTarget = (InjectionTarget<T>) new MockInjectionTarget();
+        return injectionTarget;
     }
 }

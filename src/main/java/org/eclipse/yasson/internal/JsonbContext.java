@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2016, 2022 Oracle and/or its affiliates. All rights reserved.
+ * Copyright (c) 2016, 2024 Oracle and/or its affiliates. All rights reserved.
  *
  * This program and the accompanying materials are made available under the
  * terms of the Eclipse Public License v. 2.0 which is available at
@@ -177,18 +177,12 @@ public class JsonbContext {
     protected Map<String, ?> createJsonpProperties(JsonbConfig jsonbConfig) {
         //JSONP 1.0 actually ignores the value, just checks the key is present. Only set if JsonbConfig.FORMATTING is true.
         final Optional<Object> property = jsonbConfig.getProperty(JsonbConfig.FORMATTING);
-        final Map<String, Object> factoryProperties = new HashMap<>();
-        if (property.isPresent()) {
-            final Object value = property.get();
+        return property.map(value -> {
             if (!(value instanceof Boolean)) {
                 throw new JsonbException(Messages.getMessage(MessageKeys.JSONB_CONFIG_FORMATTING_ILLEGAL_VALUE));
             }
-            if ((Boolean) value) {
-                factoryProperties.put(JsonGenerator.PRETTY_PRINTING, Boolean.TRUE);
-            }
-            return factoryProperties;
-        }
-        return factoryProperties;
+            return (Boolean) value ? new HashMap<>(Map.of(JsonGenerator.PRETTY_PRINTING, Boolean.TRUE)) : new HashMap<String, Object>();
+        }).orElse(new HashMap<>());
     }
 
     private JsonbComponentInstanceCreator initComponentInstanceCreator() {

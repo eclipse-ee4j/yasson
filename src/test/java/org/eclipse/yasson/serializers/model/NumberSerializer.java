@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2018, 2020 Oracle and/or its affiliates. All rights reserved.
+ * Copyright (c) 2018, 2024 Oracle and/or its affiliates. All rights reserved.
  *
  * This program and the accompanying materials are made available under the
  * terms of the Eclipse Public License v. 2.0 which is available at
@@ -17,6 +17,17 @@ import jakarta.json.bind.serializer.SerializationContext;
 import jakarta.json.stream.JsonGenerator;
 
 public class NumberSerializer implements JsonbSerializer<Number> {
+
+    private final static Counter COUNTER = new Counter();
+
+    public static Counter getCounter() {
+        return COUNTER;
+    }
+
+    {
+        COUNTER.add();
+    }
+
     @Override
     public void serialize(Number obj, JsonGenerator generator, SerializationContext ctx) {
         generator.write(Integer.valueOf(obj.intValue() + 1).toString());

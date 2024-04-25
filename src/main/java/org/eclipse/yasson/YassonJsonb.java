@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2019, 2020 Oracle and/or its affiliates. All rights reserved.
+ * Copyright (c) 2019, 2024 Oracle and/or its affiliates. All rights reserved.
  *
  * This program and the accompanying materials are made available under the
  * terms of the Eclipse Public License v. 2.0 which is available at
@@ -12,6 +12,7 @@
 
 package org.eclipse.yasson;
 
+import java.io.IOException;
 import java.lang.reflect.Type;
 
 import jakarta.json.JsonStructure;
@@ -131,4 +132,13 @@ public interface YassonJsonb extends jakarta.json.bind.Jsonb {
      * @since JSON Binding 1.0
      */
     JsonStructure toJsonStructure(Object object, Type runtimeType) throws JsonbException;
+
+    /**
+     * Closes this Jsonb instance and releases any system resources associated.
+     * See @{@link jakarta.json.bind.Jsonb} and @{@link jakarta.json.bind.Jsonb#close()} for more details on closing.
+     *
+     * @throws IOException if an I/O error occurs; reducing from @{@link Exception} in @{@link AutoCloseable}.
+     */
+    @Override
+    void close() throws IOException;
 }

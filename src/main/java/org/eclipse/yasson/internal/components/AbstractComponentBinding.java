@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2016, 2020 Oracle and/or its affiliates. All rights reserved.
+ * Copyright (c) 2016, 2024 Oracle and/or its affiliates. All rights reserved.
  *
  * This program and the accompanying materials are made available under the
  * terms of the Eclipse Public License v. 2.0 which is available at
@@ -17,24 +17,31 @@ import java.util.Objects;
 
 /**
  * Wrapper for user components, components, (de)serializer.
- * Contains resolved binding type an component.
+ * Contains resolved binding type and component.
+ *
+ * @param <C> type of component
  */
-public abstract class AbstractComponentBinding {
+public abstract class AbstractComponentBinding<C> {
 
     private final Type bindingType;
+
+    private final C component;
 
     /**
      * Creates info.
      *
      * @param bindingType type to which component is bound.
+     * @param component   bound component.
      */
-    public AbstractComponentBinding(Type bindingType) {
+    public AbstractComponentBinding(Type bindingType, C component) {
         Objects.requireNonNull(bindingType);
+        Objects.requireNonNull(component);
         this.bindingType = bindingType;
+        this.component = component;
     }
 
     /**
-     * Resolved binding type of a component.
+     * Resolved binding type of the component.
      *
      * @return binding type
      */
@@ -43,9 +50,20 @@ public abstract class AbstractComponentBinding {
     }
 
     /**
+     * Get actual user component.
+     *
+     * @return user component.
+     */
+    public C getComponent(){
+        return component;
+    }
+
+    /**
      * Class of user component.
      *
      * @return component class
      */
-    public abstract Class<?> getComponentClass();
+    public Class<?> getComponentClass(){
+        return component.getClass();
+    }
 }

@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2021, 2022 Oracle and/or its affiliates. All rights reserved.
+ * Copyright (c) 2021, 2024 Oracle and/or its affiliates. All rights reserved.
  *
  * This program and the accompanying materials are made available under the
  * terms of the Eclipse Public License v. 2.0 which is available at
@@ -26,14 +26,14 @@ import org.eclipse.yasson.internal.properties.Messages;
 class AdapterDeserializer implements ModelDeserializer<Object> {
 
     private final JsonbAdapter<Object, Object> adapter;
-    private final AdapterBinding adapterBinding;
+    private final AdapterBinding<?, ?> adapterBinding;
     private final ModelDeserializer<Object> delegate;
 
     @SuppressWarnings("unchecked")
-    AdapterDeserializer(AdapterBinding adapterBinding,
+    AdapterDeserializer(AdapterBinding<?, ?> adapterBinding,
                         ModelDeserializer<Object> delegate) {
         this.adapterBinding = adapterBinding;
-        this.adapter = (JsonbAdapter<Object, Object>) adapterBinding.getAdapter();
+        this.adapter = (JsonbAdapter<Object, Object>) adapterBinding.getComponent();
         this.delegate = delegate;
     }
 
@@ -45,7 +45,7 @@ class AdapterDeserializer implements ModelDeserializer<Object> {
             throw new JsonbException(Messages.getMessage(MessageKeys.ADAPTER_EXCEPTION,
                                                          adapterBinding.getBindingType(),
                                                          adapterBinding.getToType(),
-                                                         adapterBinding.getAdapter().getClass()), e);
+                                                         adapterBinding.getComponentClass()), e);
         }
     }
 

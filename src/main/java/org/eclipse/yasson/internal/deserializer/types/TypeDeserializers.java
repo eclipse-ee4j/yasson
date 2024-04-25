@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2021, 2022 Oracle and/or its affiliates. All rights reserved.
+ * Copyright (c) 2021, 2024 Oracle and/or its affiliates. All rights reserved.
  *
  * This program and the accompanying materials are made available under the
  * terms of the Eclipse Public License v. 2.0 which is available at
@@ -51,7 +51,7 @@ import jakarta.json.JsonValue;
 import jakarta.json.bind.JsonbException;
 import jakarta.json.stream.JsonParser;
 
-import org.eclipse.yasson.internal.JsonbConfigProperties;
+import org.eclipse.yasson.internal.JsonbContext;
 import org.eclipse.yasson.internal.deserializer.JustReturn;
 import org.eclipse.yasson.internal.deserializer.ModelDeserializer;
 import org.eclipse.yasson.internal.deserializer.NullCheckDeserializer;
@@ -135,14 +135,14 @@ public class TypeDeserializers {
      *
      * @param clazz         type to create deserializer for
      * @param customization type customization
-     * @param properties    config properties
+     * @param jsonbContext    config properties
      * @param delegate      delegate to be called by the created deserializer
      * @param events        expected parser events at the beginning when deserializing the type
      * @return type deserializer
      */
     public static ModelDeserializer<JsonParser> getTypeDeserializer(Class<?> clazz,
                                                                     Customization customization,
-                                                                    JsonbConfigProperties properties,
+                                                                    JsonbContext jsonbContext,
                                                                     ModelDeserializer<Object> delegate,
                                                                     Set<JsonParser.Event> events) {
         JsonParser.Event[] eventArray = events.toArray(new JsonParser.Event[0]);
@@ -150,7 +150,7 @@ public class TypeDeserializers {
             Class<?> optionalType = OPTIONAL_TYPES.get(clazz);
             TypeDeserializerBuilder builder = new TypeDeserializerBuilder(optionalType,
                                                                           customization,
-                                                                          properties,
+                                                                          jsonbContext,
                                                                           JustReturn.instance());
             ValueExtractor valueExtractor = new ValueExtractor(DESERIALIZERS.get(optionalType).apply(builder));
             PositionChecker positionChecker = new PositionChecker(valueExtractor, clazz, eventArray);
@@ -165,7 +165,7 @@ public class TypeDeserializers {
             }
         }
 
-        TypeDeserializerBuilder builder = new TypeDeserializerBuilder(clazz, customization, properties, delegate);
+        TypeDeserializerBuilder builder = new TypeDeserializerBuilder(clazz, customization, jsonbContext, delegate);
         if (DESERIALIZERS.containsKey(clazz)) {
             ValueExtractor valueExtractor = new ValueExtractor(DESERIALIZERS.get(clazz).apply(builder));
             return new NullCheckDeserializer(new PositionChecker(valueExtractor, clazz, eventArray), delegate);

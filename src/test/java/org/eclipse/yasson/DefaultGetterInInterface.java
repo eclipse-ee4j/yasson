@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2018, 2020 Oracle and/or its affiliates. All rights reserved.
+ * Copyright (c) 2018, 2024 Oracle and/or its affiliates. All rights reserved.
  *
  * This program and the accompanying materials are made available under the
  * terms of the Eclipse Public License v. 2.0 which is available at
@@ -27,16 +27,21 @@ import java.lang.reflect.Method;
  *
  * @author Maxence Laurent
  */
-public class DefaultGetterInInterface {
+class DefaultGetterInInterface {
 
-    public static interface Defaulted {
+    private DefaultGetterInInterface() {
+    }
 
-        default public String getGetterA() {
+    public interface Defaulted {
+
+        default String getGetterA() {
             return "valueA";
         }
     }
 
     public static class PojoWithDefault implements Defaulted {
+        protected PojoWithDefault() {
+        }
     }
 
     @Test
@@ -46,13 +51,13 @@ public class DefaultGetterInInterface {
         assertEquals("{\"getterA\":\"valueA\"}", result);
     }
 
-    public static interface WithGetterI {
+    public interface WithGetterI {
 
         @JsonbProperty("withGetterI")
         String getGetterI();
     }
 
-    public static interface WithDefaultGetterI extends WithGetterI {
+    public interface WithDefaultGetterI extends WithGetterI {
 
         @Override
         @JsonbProperty("default")
@@ -61,7 +66,7 @@ public class DefaultGetterInInterface {
         }
     }
 
-    public static interface OtherWithDefaultGetterI extends WithGetterI {
+    public interface OtherWithDefaultGetterI extends WithGetterI {
 
         @Override
         @JsonbProperty("otherDefault")
@@ -71,6 +76,9 @@ public class DefaultGetterInInterface {
     }
 
     public static class Pojo implements WithGetterI {
+
+        protected Pojo() {
+        }
 
         @Override
         @JsonbProperty("implementation")
@@ -82,6 +90,9 @@ public class DefaultGetterInInterface {
 
     public static class PojoNoAnnotation implements WithGetterI {
 
+        protected PojoNoAnnotation() {
+        }
+
         @Override
         public String getGetterI() {
             return "withGetterI";
@@ -89,9 +100,14 @@ public class DefaultGetterInInterface {
     }
 
     public static class PojoWithDefaultSuperImplementation extends Pojo implements WithDefaultGetterI {
+        protected PojoWithDefaultSuperImplementation() {
+        }
     }
 
     public static class PojoWithDefaultImplementation implements WithDefaultGetterI {
+
+        protected PojoWithDefaultImplementation() {
+        }
 
         @Override
         @JsonbProperty("defaultImplementation")
@@ -102,9 +118,13 @@ public class DefaultGetterInInterface {
     }
 
     public static class PojoWithDefaultOnly implements WithDefaultGetterI {
+        protected PojoWithDefaultOnly() {
+        }
     }
 
     public static class PojoGetterDefaultedTwice extends PojoWithDefaultImplementation implements OtherWithDefaultGetterI {
+        protected PojoGetterDefaultedTwice() {
+        }
     }
 
     @Test

@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2017, 2020 Oracle and/or its affiliates. All rights reserved.
+ * Copyright (c) 2017, 2024 Oracle and/or its affiliates. All rights reserved.
  *
  * This program and the accompanying materials are made available under the
  * terms of the Eclipse Public License v. 2.0 which is available at
@@ -28,6 +28,10 @@ import jakarta.json.bind.config.PropertyVisibilityStrategy;
  * when SecurityManager is turned on.</p>
  */
 public class FieldAccessStrategy implements PropertyVisibilityStrategy {
+
+    FieldAccessStrategy() {
+    }
+
     @Override
     public boolean isVisible(Field field) {
         return true;

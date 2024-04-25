@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2015, 2023 Oracle and/or its affiliates. All rights reserved.
+ * Copyright (c) 2015, 2024 Oracle and/or its affiliates. All rights reserved.
  *
  * This program and the accompanying materials are made available under the
  * terms of the Eclipse Public License v. 2.0 which is available at
@@ -25,7 +25,7 @@ import org.eclipse.yasson.internal.model.customization.ClassCustomization;
 /**
  * JSONB mappingContext. Created once per {@link jakarta.json.bind.Jsonb} instance. Represents a global scope.
  * Holds internal model.
- *
+ * <p>
  * Thread safe.
  */
 public class MappingContext {
@@ -90,13 +90,13 @@ public class MappingContext {
                                                      ? ClassCustomization.empty()
                                                      : parentClassModel.getClassCustomization(),
                                              jsonbContext.getConfigProperties().getPropertyNamingStrategy());
-            //            PolymorphismSupport configPolymorphism = jsonbContext.getConfigProperties().getPolymorphismSupport();
-//            if (configPolymorphism != null) {
-//                customization = mergeConfigAndAnnotationPolymorphism(configPolymorphism,
-//                                                                     configPolymorphism.getClassPolymorphism(aClass),
-//                                                                     customization,
-//                                                                     aClass);
-//            }
+            /*PolymorphismSupport configPolymorphism = jsonbContext.getConfigProperties().getPolymorphismSupport();
+            if (configPolymorphism != null) {
+                customization = mergeConfigAndAnnotationPolymorphism(configPolymorphism,
+                                                                     configPolymorphism.getClassPolymorphism(aClass),
+                                                                     customization,
+                                                                     aClass);
+            }*/
             ClassModel newClassModel = new ClassModel(aClass,
                                                       customization,
                                                       parentClassModel,
@@ -108,39 +108,39 @@ public class MappingContext {
         };
     }
 
-//    private static ClassCustomization mergeConfigAndAnnotationPolymorphism(PolymorphismSupport generalPolymorphism,
-//                                                                           Optional<Polymorphism> maybeClassPolymorphism,
-//                                                                           ClassCustomization customization,
-//                                                                           Class<?> aClass) {
-//        PolymorphismConfig polymorphismConfig = customization.getPolymorphismConfig();
-//        PolymorphismConfig.Builder polyConfigBuilder;
-//        if (polymorphismConfig != null) {
-//            polyConfigBuilder = PolymorphismConfig.builder().of(polymorphismConfig);
-//        } else {
-//            polyConfigBuilder = PolymorphismConfig.builder();
-//            maybeClassPolymorphism.ifPresent(classPolymorphism -> polyConfigBuilder
-//                    .inherited(!classPolymorphism.getBoundClass().equals(aClass)));
-//        }
-//        generalPolymorphism.getKeyName().filter(s -> !s.isEmpty()).ifPresent(polyConfigBuilder::fieldName);
-//        generalPolymorphism.useClassNames().ifPresent(polyConfigBuilder::useClassNames);
-//        polyConfigBuilder.whitelistedPackages(generalPolymorphism.getWhitelistedPackages());
-//
-//        maybeClassPolymorphism.ifPresent(classPolymorphism -> {
-//            classPolymorphism.getKeyName().filter(s -> !s.isEmpty()).ifPresent(polyConfigBuilder::fieldName);
-//            classPolymorphism.useClassNames().ifPresent(polyConfigBuilder::useClassNames);
-//            classPolymorphism.getFormat().ifPresent(polyConfigBuilder::format);
-//            classPolymorphism.getAliases().forEach(polyConfigBuilder::alias);
-//            polyConfigBuilder.whitelistedPackages(classPolymorphism.getWhitelistedPackages());
-//        });
-//        PolymorphismConfig polyConfigMerged = polyConfigBuilder.build();
-//        if (polyConfigMerged.getFieldName() == null || polyConfigMerged.getFieldName().isEmpty()) {
-//            throw new JsonbException("Polymorphism type field name cannot be null or empty: " + aClass);
-//        }
-//        return ClassCustomization.builder()
-//                .of(customization)
-//                .polymorphismConfig(polyConfigMerged)
-//                .build();
-//    }
+    /*private static ClassCustomization mergeConfigAndAnnotationPolymorphism(PolymorphismSupport generalPolymorphism,
+                                                                           Optional<Polymorphism> maybeClassPolymorphism,
+                                                                           ClassCustomization customization,
+                                                                           Class<?> aClass) {
+        PolymorphismConfig polymorphismConfig = customization.getPolymorphismConfig();
+        PolymorphismConfig.Builder polyConfigBuilder;
+        if (polymorphismConfig != null) {
+            polyConfigBuilder = PolymorphismConfig.builder().of(polymorphismConfig);
+        } else {
+            polyConfigBuilder = PolymorphismConfig.builder();
+            maybeClassPolymorphism.ifPresent(classPolymorphism -> polyConfigBuilder
+                    .inherited(!classPolymorphism.getBoundClass().equals(aClass)));
+        }
+        generalPolymorphism.getKeyName().filter(s -> !s.isEmpty()).ifPresent(polyConfigBuilder::fieldName);
+        generalPolymorphism.useClassNames().ifPresent(polyConfigBuilder::useClassNames);
+        polyConfigBuilder.whitelistedPackages(generalPolymorphism.getWhitelistedPackages());
+
+        maybeClassPolymorphism.ifPresent(classPolymorphism -> {
+            classPolymorphism.getKeyName().filter(s -> !s.isEmpty()).ifPresent(polyConfigBuilder::fieldName);
+            classPolymorphism.useClassNames().ifPresent(polyConfigBuilder::useClassNames);
+            classPolymorphism.getFormat().ifPresent(polyConfigBuilder::format);
+            classPolymorphism.getAliases().forEach(polyConfigBuilder::alias);
+            polyConfigBuilder.whitelistedPackages(classPolymorphism.getWhitelistedPackages());
+        });
+        PolymorphismConfig polyConfigMerged = polyConfigBuilder.build();
+        if (polyConfigMerged.getFieldName() == null || polyConfigMerged.getFieldName().isEmpty()) {
+            throw new JsonbException("Polymorphism type field name cannot be null or empty: " + aClass);
+        }
+        return ClassCustomization.builder()
+                .of(customization)
+                .polymorphismConfig(polyConfigMerged)
+                .build();
+    }*/
 
     /**
      * Search for class model, without parsing if not found.

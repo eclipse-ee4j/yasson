@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2021, 2022 Oracle and/or its affiliates. All rights reserved.
+ * Copyright (c) 2021, 2024 Oracle and/or its affiliates. All rights reserved.
  *
  * This program and the accompanying materials are made available under the
  * terms of the Eclipse Public License v. 2.0 which is available at
@@ -48,15 +48,13 @@ class InheritanceInstanceCreator implements ModelDeserializer<JsonParser> {
 
     @Override
     public Object deserialize(JsonParser parser, DeserializationContextImpl context) {
-        String alias;
-        JsonParser jsonParser;
         String polymorphismKeyName = typeInheritanceConfiguration.getFieldName();
         JsonObject object = parser.getObject();
-        alias = object.getString(polymorphismKeyName, null);
+        String alias = object.getString(polymorphismKeyName, null);
         JsonObject newJsonObject = context.getJsonbContext().getJsonProvider().createObjectBuilder(object)
                 .remove(polymorphismKeyName)
                 .build();
-        jsonParser = new JsonStructureToParserAdapter(newJsonObject);
+        JsonParser jsonParser = new JsonStructureToParserAdapter(newJsonObject, context.getJsonbContext().getJsonProvider());
         //To get to the first event
         Event event = jsonParser.next();
         context.setLastValueEvent(event);

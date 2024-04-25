@@ -14,4 +14,9 @@ grant {
       permission "java.util.PropertyPermission" "jsonb.creator-parameters-required", "read";
       permission "java.util.PropertyPermission" "yasson.time-in-millis-as-a-string", "read";
       permission "java.util.PropertyPermission" "jakarta.json.provider", "read";
+      permission "java.util.PropertyPermission" "org.eclipse.parsson.maxBigIntegerScale", "read";
+      permission "java.util.PropertyPermission" "org.eclipse.parsson.maxBigDecimalLength", "read";
+      permission "java.util.PropertyPermission" "org.eclipse.parsson.maxDepth", "read";
+      permission "java.util.PropertyPermission" "org.eclipse.parsson.rejectDuplicateKeys", "read";
+      permission "java.util.PropertyPermission" "jakarta.json.stream.JsonGenerator.prettyPrinting", "read";
 };

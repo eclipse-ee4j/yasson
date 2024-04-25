@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2019, 2020 Oracle and/or its affiliates. All rights reserved.
+ * Copyright (c) 2019, 2024 Oracle and/or its affiliates. All rights reserved.
  *
  * This program and the accompanying materials are made available under the
  * terms of the Eclipse Public License v. 2.0 which is available at
@@ -12,6 +12,7 @@
 
 package org.eclipse.yasson.jsonstructure;
 
+import org.eclipse.yasson.Jsonbs;
 import org.junit.jupiter.api.*;
 import static org.junit.jupiter.api.Assertions.*;
 import static org.eclipse.yasson.Jsonbs.*;
@@ -24,7 +25,6 @@ import jakarta.json.JsonObject;
 import jakarta.json.JsonString;
 import jakarta.json.JsonStructure;
 import jakarta.json.JsonValue;
-import jakarta.json.bind.JsonbBuilder;
 import jakarta.json.bind.JsonbConfig;
 import java.math.BigDecimal;
 import java.util.ArrayList;
@@ -63,10 +63,10 @@ public class JsonGeneratorToStructureAdapterTest {
         JsonObject result = (JsonObject) yassonJsonb.toJsonStructure(pojo, Pojo.class);
         assertEquals("String value", getString(result.get("stringProperty")));
         JsonValue bigDecimalProperty = result.get("bigDecimalProperty");
-        assertTrue(bigDecimalProperty instanceof JsonNumber);
+		assertInstanceOf(JsonNumber.class, bigDecimalProperty);
         assertEquals(BigDecimal.TEN, ((JsonNumber) bigDecimalProperty).bigDecimalValue());
         JsonValue longProperty = result.get("longProperty");
-        assertTrue(longProperty instanceof JsonNumber);
+		assertInstanceOf(JsonNumber.class, longProperty);
         assertEquals(10L, ((JsonNumber) longProperty).longValueExact());
 
         JsonValue inner = result.get("inner");
@@ -139,15 +139,16 @@ public class JsonGeneratorToStructureAdapterTest {
         pojo.setInner(new InnerPojo());
         pojo.getInner().setInnerFirst("First value");
         pojo.getInner().setInnerSecond("Second value");
-        YassonJsonb jsonb = (YassonJsonb) JsonbBuilder.create(new JsonbConfig().withSerializers(new InnerPojoSerializer()));
-        JsonStructure result = jsonb.toJsonStructure(pojo);
-        assertEquals(JsonValue.ValueType.OBJECT, result.getValueType());
-        assertEquals(JsonValue.ValueType.OBJECT, ((JsonObject) result).get("inner").getValueType());
-        JsonObject inner = (JsonObject) ((JsonObject) result).get("inner");
-        assertEquals(JsonValue.ValueType.STRING, inner.get("first").getValueType());
-        assertEquals("First value", ((JsonString) inner.get("first")).getString());
-        assertEquals(JsonValue.ValueType.STRING, inner.get("second").getValueType());
-        assertEquals("Second value", ((JsonString) inner.get("second")).getString());
+        Jsonbs.testWithJsonbBuilderCreate(new JsonbConfig().withSerializers(new InnerPojoSerializer()), jsonb -> {
+            JsonStructure result = ((YassonJsonb)jsonb).toJsonStructure(pojo);
+            assertEquals(JsonValue.ValueType.OBJECT, result.getValueType());
+            assertEquals(JsonValue.ValueType.OBJECT, ((JsonObject) result).get("inner").getValueType());
+            JsonObject inner = (JsonObject) ((JsonObject) result).get("inner");
+            assertEquals(JsonValue.ValueType.STRING, inner.get("first").getValueType());
+            assertEquals("First value", ((JsonString) inner.get("first")).getString());
+            assertEquals(JsonValue.ValueType.STRING, inner.get("second").getValueType());
+            assertEquals("Second value", ((JsonString) inner.get("second")).getString());
+        });
     }
 
     private static String getString(JsonValue value) {

@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2016, 2020 Oracle and/or its affiliates. All rights reserved.
+ * Copyright (c) 2016, 2024 Oracle and/or its affiliates. All rights reserved.
  *
  * This program and the accompanying materials are made available under the
  * terms of the Eclipse Public License v. 2.0 which is available at
@@ -14,8 +14,6 @@ package org.eclipse.yasson.customization;
 
 import org.junit.jupiter.api.*;
 
-import jakarta.json.bind.Jsonb;
-import jakarta.json.bind.JsonbBuilder;
 import jakarta.json.bind.annotation.JsonbProperty;
 
 import static org.junit.jupiter.api.Assertions.*;
@@ -65,13 +63,13 @@ public class JsonbNillableTest {
      * Tests inheritance of annotations from interfaces.
      */
     @Test
-    public void testNillableInheritFromInterface() throws Exception {
+    public void testNillableInheritFromInterface() {
         JsonbNillableClassSecondLevel pojo = new JsonbNillableClassSecondLevel();
         assertEquals("{\"classNillable\":null}", defaultJsonb.toJson(pojo));
     }
 
     @Test
-    public void testInheritanceOverride() throws Exception {
+    public void testInheritanceOverride() {
         JsonbNillableOverridesInterface overridesInterface = new JsonbNillableOverridesInterface();
         assertEquals("{}", defaultJsonb.toJson(overridesInterface));
 
@@ -87,6 +85,7 @@ public class JsonbNillableTest {
     
     public static class PrimitiveNullBoolean {
 
+        @SuppressWarnings("deprecation")
         @JsonbProperty(nillable = true)
         private Boolean someBoolean;
 
@@ -96,13 +95,12 @@ public class JsonbNillableTest {
     }
     
     /**
-     * Test for issue https://github.com/eclipse-ee4j/yasson/issues/399
+     * Test for issue <a href="https://github.com/eclipse-ee4j/yasson/issues/399">399</a>
      */
     @Test
     public void testNillableSomeBoolean() {
-    	Jsonb jsonb = JsonbBuilder.create();
         String input = "{\"someBoolean\": null}";
-        PrimitiveNullBoolean deserialized = jsonb.fromJson(input, PrimitiveNullBoolean.class);
+        PrimitiveNullBoolean deserialized = defaultJsonb.fromJson(input, PrimitiveNullBoolean.class);
         assertNull(deserialized.someBoolean);
     }
 }

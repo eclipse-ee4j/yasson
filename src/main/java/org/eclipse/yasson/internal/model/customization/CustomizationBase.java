@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2016, 2022 Oracle and/or its affiliates. All rights reserved.
+ * Copyright (c) 2016, 2024 Oracle and/or its affiliates. All rights reserved.
  *
  * This program and the accompanying materials are made available under the
  * terms of the Eclipse Public License v. 2.0 which is available at
@@ -21,7 +21,7 @@ import org.eclipse.yasson.internal.components.SerializerBinding;
  */
 abstract class CustomizationBase implements Customization, ComponentBoundCustomization {
 
-    private final AdapterBinding adapterBinding;
+    private final AdapterBinding<?, ?> adapterBinding;
     private final SerializerBinding<?> serializerBinding;
     private final DeserializerBinding<?> deserializerBinding;
     private final boolean nillable;
@@ -47,12 +47,12 @@ abstract class CustomizationBase implements Customization, ComponentBoundCustomi
         return nillable;
     }
 
-    public AdapterBinding getSerializeAdapterBinding() {
+    public AdapterBinding<?, ?> getSerializeAdapterBinding() {
         return adapterBinding;
     }
 
     @Override
-    public AdapterBinding getDeserializeAdapterBinding() {
+    public AdapterBinding<?, ?> getDeserializeAdapterBinding() {
         return adapterBinding;
     }
 
@@ -77,7 +77,7 @@ abstract class CustomizationBase implements Customization, ComponentBoundCustomi
     @SuppressWarnings("unchecked")
     abstract static class Builder<T extends Builder<T, B>, B extends CustomizationBase> {
 
-        private AdapterBinding adapterBinding;
+        private AdapterBinding<?, ?> adapterBinding;
         private SerializerBinding<?> serializerBinding;
         private DeserializerBinding<?> deserializerBinding;
         private boolean nillable;
@@ -93,7 +93,7 @@ abstract class CustomizationBase implements Customization, ComponentBoundCustomi
             return (T) this;
         }
 
-        public T adapterBinding(AdapterBinding adapterBinding) {
+        public T adapterBinding(AdapterBinding<?, ?> adapterBinding) {
             this.adapterBinding = adapterBinding;
             return (T) this;
         }

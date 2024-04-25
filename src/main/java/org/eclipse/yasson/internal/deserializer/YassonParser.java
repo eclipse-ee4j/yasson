@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2021, 2022 Oracle and/or its affiliates. All rights reserved.
+ * Copyright (c) 2021, 2024 Oracle and/or its affiliates. All rights reserved.
  *
  * This program and the accompanying materials are made available under the
  * terms of the Eclipse Public License v. 2.0 which is available at
@@ -13,6 +13,8 @@
 package org.eclipse.yasson.internal.deserializer;
 
 import java.math.BigDecimal;
+import java.util.ArrayDeque;
+import java.util.Deque;
 import java.util.Map;
 import java.util.NoSuchElementException;
 import java.util.stream.Stream;
@@ -24,6 +26,9 @@ import jakarta.json.stream.JsonLocation;
 import jakarta.json.stream.JsonParser;
 
 import org.eclipse.yasson.internal.DeserializationContextImpl;
+import org.eclipse.yasson.internal.JsonParserStreamCreator;
+import org.eclipse.yasson.internal.properties.MessageKeys;
+import org.eclipse.yasson.internal.properties.Messages;
 
 /**
  * Yasson {@link YassonParser} parser wrapper.
@@ -34,21 +39,28 @@ class YassonParser implements JsonParser {
 
     private final JsonParser delegate;
     private final DeserializationContextImpl context;
-    private int level;
+    private final JsonParserStreamCreator streamCreator;
+    private final Deque<CurrentContext> contextStack = new ArrayDeque<>();
 
     YassonParser(JsonParser delegate, Event firstEvent, DeserializationContextImpl context) {
         this.delegate = delegate;
         this.context = context;
-        this.level = determineLevelValue(firstEvent);
+        CurrentContext currentContext = determineLevelValue(firstEvent);
+        if (currentContext != null) {
+            contextStack.push(currentContext);
+        }
+        streamCreator = new JsonParserStreamCreator(this, false, context::getLastValueEvent,
+                () -> contextStack.size() == 1 && context.getLastValueEvent() == Event.START_OBJECT);
     }
 
-    private int determineLevelValue(Event firstEvent) {
+    private CurrentContext determineLevelValue(Event firstEvent) {
         switch (firstEvent) {
         case START_ARRAY:
+            return CurrentContext.ARRAY; //container start, there will be more events to come
         case START_OBJECT:
-            return 1; //container start, there will be more events to come
+            return CurrentContext.OBJECT; //container start, there will be more events to come
         default:
-            return 0; //just this single value, do not allow reading more
+            return null; //just this single value, do not allow reading more
         }
     }
 
@@ -60,7 +72,7 @@ class YassonParser implements JsonParser {
 
     @Override
     public boolean hasNext() {
-        if (level < 1) {
+        if (contextStack.isEmpty()) {
             return false;
         }
         return delegate.hasNext();
@@ -74,16 +86,24 @@ class YassonParser implements JsonParser {
         switch (next) {
         case START_OBJECT:
         case START_ARRAY:
-            level++;
+            CurrentContext currentContext = determineLevelValue(next);
+            if (currentContext != null) {
+                contextStack.push(currentContext);
+            }
             break;
         case END_OBJECT:
         case END_ARRAY:
-            level--;
+            contextStack.pop();
             break;
         default:
             //no other changes needed
         }
         return next;
+    }
+
+    @Override
+    public Event currentEvent() {
+        return delegate.currentEvent();
     }
 
     @Override
@@ -118,9 +138,12 @@ class YassonParser implements JsonParser {
 
     @Override
     public JsonObject getObject() {
+        if (delegate.currentEvent() != Event.START_OBJECT) {
+            throw new IllegalStateException(Messages.getMessage(MessageKeys.INTERNAL_ERROR, "getObject() Not at the beginning of an object"));
+        }
         validate();
-        level--;
         JsonObject jsonObject = delegate.getObject();
+        contextStack.pop();
         context.setLastValueEvent(Event.END_OBJECT);
         return jsonObject;
     }
@@ -140,9 +163,12 @@ class YassonParser implements JsonParser {
 
     @Override
     public JsonArray getArray() {
+        if (delegate.currentEvent() != Event.START_ARRAY) {
+            throw new IllegalStateException(Messages.getMessage(MessageKeys.INTERNAL_ERROR, "getArray() Not at the beginning of an array"));
+        }
         validate();
-        level--;
         JsonArray array = delegate.getArray();
+        contextStack.pop();
         context.setLastValueEvent(Event.END_ARRAY);
         return array;
     }
@@ -150,46 +176,52 @@ class YassonParser implements JsonParser {
     @Override
     public Stream<JsonValue> getArrayStream() {
         validate();
-        level--;
-        return delegate.getArrayStream();
+        return streamCreator.getArrayStream();
     }
 
     @Override
     public Stream<Map.Entry<String, JsonValue>> getObjectStream() {
         validate();
-        level--;
-        return delegate.getObjectStream();
+        return streamCreator.getObjectStream();
     }
 
     @Override
     public Stream<JsonValue> getValueStream() {
         validate();
-        level--;
-        return delegate.getValueStream();
+        return streamCreator.getValueStream();
     }
 
     @Override
     public void skipArray() {
-        validate();
-        level--;
-        delegate.skipArray();
+        if (contextStack.peek() == CurrentContext.ARRAY) {
+            delegate.skipArray();
+            contextStack.pop();
+            context.setLastValueEvent(Event.END_ARRAY);
+        }
     }
 
     @Override
     public void skipObject() {
-        validate();
-        level--;
-        delegate.skipObject();
+        if (contextStack.peek() == CurrentContext.OBJECT) {
+            delegate.skipObject();
+            contextStack.pop();
+            context.setLastValueEvent(Event.END_OBJECT);
+        }
     }
 
     @Override
     public void close() {
-        throw new UnsupportedOperationException();
+        delegate.close();
     }
 
     private void validate() {
-        if (level < 1) {
+        if (contextStack.isEmpty()) {
             throw new NoSuchElementException("There are no more elements available!");
         }
+    }
+
+    private enum CurrentContext {
+        OBJECT,
+        ARRAY
     }
 }
