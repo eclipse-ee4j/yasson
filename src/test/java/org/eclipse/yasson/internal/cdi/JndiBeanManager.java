@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2018, 2022 Oracle and/or its affiliates. All rights reserved.
+ * Copyright (c) 2018, 2024 Oracle and/or its affiliates. All rights reserved.
  *
  * This program and the accompanying materials are made available under the
  * terms of the Eclipse Public License v. 2.0 which is available at
@@ -39,6 +39,7 @@ import jakarta.enterprise.inject.spi.ObserverMethod;
 import jakarta.enterprise.inject.spi.ProducerFactory;
 import java.lang.annotation.Annotation;
 import java.lang.reflect.Type;
+import java.util.Collection;
 import java.util.List;
 import java.util.Set;
 
@@ -164,6 +165,11 @@ public class JndiBeanManager implements BeanManager {
     }
 
     @Override
+    public Collection<Context> getContexts(Class<? extends Annotation> aClass) {
+        throw new UnsupportedOperationException("Not implemented");
+    }
+
+    @Override
     public ELResolver getELResolver() {
         throw new UnsupportedOperationException("Not implemented");
     }
@@ -240,6 +246,16 @@ public class JndiBeanManager implements BeanManager {
 
     @Override
     public Instance<Object> createInstance() {
+        throw new UnsupportedOperationException("Not implemented");
+    }
+
+    @Override
+    public boolean isMatchingBean(Set<Type> set, Set<Annotation> set1, Type type, Set<Annotation> set2) {
+        throw new UnsupportedOperationException("Not implemented");
+    }
+
+    @Override
+    public boolean isMatchingEvent(Type type, Set<Annotation> set, Type type1, Set<Annotation> set1) {
         throw new UnsupportedOperationException("Not implemented");
     }
 }
