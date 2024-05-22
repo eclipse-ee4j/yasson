@@ -46,12 +46,11 @@
         <jakarta.parson.version>1.1.5</jakarta.parson.version>
         <junit-jupiter.version>5.10.2</junit-jupiter.version>
         <weld-se-core.version>6.0.0.Beta1</weld-se-core.version>
-        <netbeans.hint.jdkPlatform>JDK_9</netbeans.hint.jdkPlatform>
 
         <!--Plugins-->
         <build-helper-maven-plugin.version>3.6.0</build-helper-maven-plugin.version>
         <buildnumber-maven-plugin.version>3.2.0</buildnumber-maven-plugin.version>
-        <findbugs-maven-plugin.version>3.0.5</findbugs-maven-plugin.version>
+        <spotbugs-maven-plugin.version>4.8.5.0</spotbugs-maven-plugin.version>
         <glassfish-copyright-maven-plugin.version>2.4</glassfish-copyright-maven-plugin.version>
         <maven-bundle-plugin.version>5.1.9</maven-bundle-plugin.version>
         <maven-checkstyle-plugin.version>3.3.1</maven-checkstyle-plugin.version>
@@ -275,83 +274,6 @@
                 </plugins>
             </build>
         </profile>
-        <profile>
-            <id>jdk16</id>
-            <activation>
-                <jdk>[16,)</jdk>
-            </activation>
-            <build>
-                <plugins>
-                    <plugin>
-                        <groupId>org.apache.maven.plugins</groupId>
-                        <artifactId>maven-compiler-plugin</artifactId>
-                        <executions>
-                            <execution>
-                                <id>default-testCompile</id>
-                                <configuration>
-                                    <release>17</release>
-                                    <compileSourceRoots>
-                                        <compileSourceRoot>${project.basedir}/src/test/java</compileSourceRoot>
-                                        <compileSourceRoot>${project.basedir}/src/test/java16</compileSourceRoot>
-                                    </compileSourceRoots>
-                                </configuration>
-                            </execution>
-                        </executions>
-                    </plugin>
-                    <plugin>
-                        <groupId>org.apache.maven.plugins</groupId>
-                        <artifactId>maven-failsafe-plugin</artifactId>
-                        <executions>
-                            <execution>
-                                <goals>
-                                    <goal>integration-test</goal>
-                                    <goal>verify</goal>
-                                </goals>
-                            </execution>
-                        </executions>
-                        <configuration>
-                            <includes>
-                                <include>**/RecordTest.java</include>
-                            </includes>
-                        </configuration>
-                    </plugin>
-                </plugins>
-            </build>
-        </profile>
-
-        <!-- remove when not needed -->
-        <profile>
-            <id>staging</id>
-            <activation>
-                <activeByDefault>false</activeByDefault>
-            </activation>
-            <repositories>
-                <repository>
-                    <id>sonatype-nexus-staging</id>
-                    <name>Sonatype Nexus Staging</name>
-                    <url>${sonatypeOssDistMgmtStagingUrl}</url>
-                    <releases>
-                        <enabled>true</enabled>
-                    </releases>
-                    <snapshots>
-                        <enabled>true</enabled>
-                    </snapshots>
-                </repository>
-            </repositories>
-            <pluginRepositories>
-                <pluginRepository>
-                    <id>sonatype-nexus-staging</id>
-                    <name>Sonatype Nexus Staging</name>
-                    <url>${sonatypeOssDistMgmtStagingUrl}</url>
-                    <releases>
-                        <enabled>true</enabled>
-                    </releases>
-                    <snapshots>
-                        <enabled>true</enabled>
-                    </snapshots>
-                </pluginRepository>
-            </pluginRepositories>
-        </profile>
     </profiles>
 
     <build>
@@ -359,13 +281,11 @@
         <pluginManagement>
             <plugins>
                 <plugin>
-                    <groupId>org.codehaus.mojo</groupId>
-                    <artifactId>findbugs-maven-plugin</artifactId>
-                    <version>${findbugs-maven-plugin.version}</version>
+                    <groupId>com.github.spotbugs</groupId>
+                    <artifactId>spotbugs-maven-plugin</artifactId>
+                    <version>${spotbugs-maven-plugin.version}</version>
                     <configuration>
-                        <effort>Max</effort>
                         <threshold>Low</threshold>
-                        <xmlOutput>true</xmlOutput>
                     </configuration>
                     <executions>
                         <execution>
@@ -580,7 +500,7 @@
                                 <version>[17,)</version>
                             </requireJavaVersion>
                             <requireMavenVersion>
-                                <version>[3.3.9,)</version>
+                                <version>[3.6.0,)</version>
                             </requireMavenVersion>
                             <DependencyConvergence/>
                         </rules>
@@ -694,13 +614,4 @@
             </plugin>
         </plugins>
     </build>
-
-    <reporting>
-        <plugins>
-            <plugin>
-                <groupId>org.codehaus.mojo</groupId>
-                <artifactId>findbugs-maven-plugin</artifactId>
-            </plugin>
-        </plugins>
-    </reporting>
 </project>
