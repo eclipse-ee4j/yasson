@@ -34,16 +34,18 @@
 
     <properties>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
+        <maven.compiler.release>17</maven.compiler.release>
+        <maven.compiler.testRelease>${maven.compiler.release}</maven.compiler.testRelease>
 
         <!--Dependencies-->
         <hamcrest.version>2.2</hamcrest.version>
         <jakarta.annotation-api.version>3.0.0</jakarta.annotation-api.version>
         <jakarta.el-api.version>6.0.0</jakarta.el-api.version>
-        <jakarta.enterprise.cdi-api.version>4.1.0.Beta1</jakarta.enterprise.cdi-api.version>
+        <jakarta.enterprise.cdi-api.version>4.1.0</jakarta.enterprise.cdi-api.version>
         <jakarta.interceptor-api.version>2.2.0</jakarta.interceptor-api.version>
         <jakarta.json.bind.version>3.0.1</jakarta.json.bind.version>
         <jakarta.json.version>2.1.3</jakarta.json.version>
-        <jakarta.parson.version>1.1.5</jakarta.parson.version>
+        <jakarta.parson.version>1.1.6</jakarta.parson.version>
         <junit-jupiter.version>5.10.2</junit-jupiter.version>
         <weld-se-core.version>6.0.0.Beta1</weld-se-core.version>
 
@@ -58,7 +60,7 @@
         <maven-enforcer-plugin.version>3.4.1</maven-enforcer-plugin.version>
         <maven-failsafe-plugin.version>3.2.5</maven-failsafe-plugin.version>
         <maven-jar-plugin.version>3.4.1</maven-jar-plugin.version>
-        <maven-javadoc-plugin.version>3.2.0</maven-javadoc-plugin.version>
+        <maven-javadoc-plugin.version>3.6.3</maven-javadoc-plugin.version>
         <maven-source-plugin.version>3.3.1</maven-source-plugin.version>
         <maven-surefire-plugin.version>3.2.5</maven-surefire-plugin.version>
     </properties>
@@ -306,25 +308,6 @@
                     <groupId>org.apache.maven.plugins</groupId>
                     <artifactId>maven-compiler-plugin</artifactId>
                     <version>${maven-compiler-plugin.version}</version>
-                    <executions>
-                        <execution>
-                            <id>default-compile</id>
-                            <goals>
-                                <goal>compile</goal>
-                            </goals>
-                            <configuration>
-                                <release>17</release>
-                                <source>17</source>
-                                <target>17</target>
-                            </configuration>
-                        </execution>
-                        <execution>
-                            <id>default-testCompile</id>
-                            <configuration>
-                                <release>17</release>
-                            </configuration>
-                        </execution>
-                    </executions>
                     <!-- defaults for compile and testCompile -->
                     <configuration>
                         <compilerArgs>
@@ -370,36 +353,6 @@
                     <groupId>org.apache.maven.plugins</groupId>
                     <artifactId>maven-javadoc-plugin</artifactId>
                     <version>${maven-javadoc-plugin.version}</version>
-                    <configuration>
-                        <doctitle>Yasson</doctitle>
-                        <sourcepath>${basedir}/src/main/java/org/eclipse/yasson</sourcepath>
-                        <additionalJOptions>
-                            <additionalJOption>--add-modules</additionalJOption>
-                            <additionalJOption>jakarta.json.bind,jakarta.json</additionalJOption>
-                        </additionalJOptions>
-                        <source>17</source>
-                    </configuration>
-                    <executions>
-                        <execution>
-                            <id>attach-javadocs</id>
-                            <goals>
-                                <goal>jar</goal>
-                            </goals>
-                        </execution>
-                    </executions>
-                </plugin>
-                <plugin>
-                    <groupId>org.apache.maven.plugins</groupId>
-                    <artifactId>maven-source-plugin</artifactId>
-                    <version>${maven-source-plugin.version}</version>
-                    <executions>
-                        <execution>
-                            <id>attach-sources</id>
-                            <goals>
-                                <goal>jar-no-fork</goal>
-                            </goals>
-                        </execution>
-                    </executions>
                 </plugin>
                 <plugin>
                     <groupId>org.apache.felix</groupId>
