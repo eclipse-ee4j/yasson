@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2016, 2022 Oracle and/or its affiliates. All rights reserved.
+ * Copyright (c) 2016, 2024 Oracle and/or its affiliates. All rights reserved.
  *
  * This program and the accompanying materials are made available under the
  * terms of the Eclipse Public License v. 2.0 which is available at
@@ -91,7 +91,7 @@ public class JsonBinding implements YassonJsonb {
     public <T> T fromJson(InputStream stream, Class<T> clazz) throws JsonbException {
         DeserializationContextImpl unmarshaller = new DeserializationContextImpl(jsonbContext);
         try (JsonParser parser = inputStreamParser(stream)) {
-            return deserialize(clazz, inputStreamParser(stream), unmarshaller);
+            return deserialize(clazz, parser, unmarshaller);
         }
     }
 
@@ -99,7 +99,7 @@ public class JsonBinding implements YassonJsonb {
     public <T> T fromJson(InputStream stream, Type type) throws JsonbException {
         DeserializationContextImpl unmarshaller = new DeserializationContextImpl(jsonbContext);
         try (JsonParser parser = inputStreamParser(stream)) {
-            return deserialize(type, inputStreamParser(stream), unmarshaller);
+            return deserialize(type, parser, unmarshaller);
         }
     }
 
