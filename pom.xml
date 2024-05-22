@@ -285,12 +285,11 @@
                     <plugin>
                         <groupId>org.apache.maven.plugins</groupId>
                         <artifactId>maven-compiler-plugin</artifactId>
-                        <version>3.13.0</version>
                         <executions>
                             <execution>
                                 <id>default-testCompile</id>
                                 <configuration>
-                                    <release>16</release>
+                                    <release>17</release>
                                     <compileSourceRoots>
                                         <compileSourceRoot>${project.basedir}/src/test/java</compileSourceRoot>
                                         <compileSourceRoot>${project.basedir}/src/test/java16</compileSourceRoot>
@@ -394,28 +393,15 @@
                                 <goal>compile</goal>
                             </goals>
                             <configuration>
-                                <release>11</release>
-                                <source>11</source>
-                                <target>11</target>
+                                <release>17</release>
+                                <source>17</source>
+                                <target>17</target>
                             </configuration>
                         </execution>
                         <execution>
                             <id>default-testCompile</id>
                             <configuration>
-                                <release>11</release>
-                            </configuration>
-                        </execution>
-                        <execution>
-                            <id>multi-release-compile-16</id>
-                            <goals>
-                                <goal>compile</goal>
-                            </goals>
-                            <configuration>
-                                <release>16</release>
-                                <compileSourceRoots>
-                                    <compileSourceRoot>${project.basedir}/src/main/java16</compileSourceRoot>
-                                </compileSourceRoots>
-                                <multiReleaseOutput>true</multiReleaseOutput>
+                                <release>17</release>
                             </configuration>
                         </execution>
                     </executions>
@@ -471,7 +457,7 @@
                             <additionalJOption>--add-modules</additionalJOption>
                             <additionalJOption>jakarta.json.bind,jakarta.json</additionalJOption>
                         </additionalJOptions>
-                        <source>11</source>
+                        <source>17</source>
                     </configuration>
                     <executions>
                         <execution>
@@ -591,7 +577,7 @@
                     <configuration>
                         <rules>
                             <requireJavaVersion>
-                                <version>[11,)</version>
+                                <version>[17,)</version>
                             </requireJavaVersion>
                             <requireMavenVersion>
                                 <version>[3.3.9,)</version>
@@ -714,7 +700,6 @@
             <plugin>
                 <groupId>org.codehaus.mojo</groupId>
                 <artifactId>findbugs-maven-plugin</artifactId>
-                <version>${findbugs-maven-plugin.version}</version>
             </plugin>
         </plugins>
     </reporting>
