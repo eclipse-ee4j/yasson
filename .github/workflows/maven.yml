@@ -16,13 +16,12 @@ on: [push, pull_request]
 
 jobs:
   build:
-    name: Yasson pipeline tests
-    #name: Test on JDK ${{ matrix.java_version }}
+    name: Test on JDK ${{ matrix.java_version }}
     runs-on: ubuntu-latest
 
-#    strategy:
-#      matrix:
-#        java_version: [ 17 ]
+    strategy:
+      matrix:
+        java_version: [ 17, 21 ]
 
     steps:
       - name: Checkout for build
@@ -31,24 +30,16 @@ jobs:
           fetch-depth: 0
       - name: Set up compile JDK
         uses: actions/setup-java@v4
-        with: #Compile java needs to be the highest to ensure proper compilation of the multi-release jar
+        with:
           distribution: 'temurin'
-          java-version: 17
+          java-version: ${{ matrix.java_version }}
           cache: 'maven'
       - name: Copyright
         run: bash etc/copyright.sh
       - name: Checkstyle
         run: mvn -B checkstyle:checkstyle
       - name: Yasson install
-#        run: mvn -U -C -Pstaging clean install -DskipTests
         run: mvn -U -C clean install -DskipTests
-      - name: Set up JDK for tests
-        uses: actions/setup-java@v4
-        with:
-          distribution: 'temurin'
-          #java-version: ${{ matrix.java_version }}
-          java-version: 17
-          cache: 'maven'
       - name: Yasson tests
         run: mvn -U -B -C -Dmaven.javadoc.skip=true -Pstaging verify
       - name: JSONB-API TCK
