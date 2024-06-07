@@ -37,10 +37,10 @@ jobs:
       - name: Copyright
         run: bash etc/copyright.sh
       - name: Checkstyle
-        run: mvn -B checkstyle:checkstyle
+        run: mvn -B checkstyle:checkstyle -Pstaging
       - name: Yasson install
-        run: mvn -U -C clean install -DskipTests
+        run: mvn -U -C clean install -Pstaging -DskipTests
       - name: Yasson tests
         run: mvn -U -B -C -Dmaven.javadoc.skip=true -Pstaging verify
       - name: JSONB-API TCK
-        run: cd yasson-tck && mvn -U -B test -DargLine="-Djava.locale.providers=COMPAT"
+        run: cd yasson-tck && mvn -U -B test -DargLine="-Djava.locale.providers=COMPAT" -Pstaging
