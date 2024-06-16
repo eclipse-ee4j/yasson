@@ -12,7 +12,7 @@
 
 package org.eclipse.yasson;
 
-import static org.junit.jupiter.api.Assertions.fail;
+import static org.junit.jupiter.api.Assertions.assertThrows;
 
 import org.junit.jupiter.api.Test;
 
@@ -23,12 +23,7 @@ public class Issue456Test {
 
     @Test
     public void dontInvokeToString() {
-        try {
-            JsonbBuilder.create().toJson(new Example());
-            fail("JsonbException is expected");
-        } catch (JsonbException e) {
-            // Expected
-        }
+        assertThrows(JsonbException.class, () -> JsonbBuilder.create().toJson(new Example()));
     }
 
     public static class Example {
