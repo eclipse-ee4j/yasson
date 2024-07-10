@@ -14,8 +14,8 @@
         <yasson.version>3.0.4-SNAPSHOT</yasson.version>
         <jakarta.json.bind.version>3.0.1</jakarta.json.bind.version>
         <jakarta.json.version>2.1.3</jakarta.json.version>
-        <maven.compiler.source>17</maven.compiler.source>
-        <maven.compiler.target>17</maven.compiler.target>
+        <maven.compiler.source>11</maven.compiler.source>
+        <maven.compiler.target>11</maven.compiler.target>
     </properties>
 
     <!-- TODO: Temporarily enable snapshot repository -->
