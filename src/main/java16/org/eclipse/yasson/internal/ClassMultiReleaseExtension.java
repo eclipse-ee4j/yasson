@@ -22,6 +22,8 @@ import jakarta.json.bind.config.PropertyNamingStrategy;
 
 import org.eclipse.yasson.internal.model.JsonbCreator;
 import org.eclipse.yasson.internal.model.Property;
+import org.eclipse.yasson.internal.properties.MessageKeys;
+import org.eclipse.yasson.internal.properties.Messages;
 
 /**
  * Search for instance creator from other sources.
@@ -34,25 +36,38 @@ public class ClassMultiReleaseExtension {
     }
 
     static boolean shouldTransformToPropertyName(Method method) {
-        return true;
+        return !method.getDeclaringClass().isRecord();
     }
 
     static boolean isSpecialAccessorMethod(Method method, Map<String, Property> classProperties) {
-        return false;
+        return isRecord(method.getDeclaringClass())
+                && method.getParameterCount() == 0
+                && !void.class.equals(method.getReturnType())
+                && classProperties.containsKey(method.getName());
     }
 
     static JsonbCreator findCreator(Class<?> clazz,
                                     Constructor<?>[] declaredConstructors,
                                     AnnotationIntrospector introspector,
                                     PropertyNamingStrategy propertyNamingStrategy) {
+        if (clazz.isRecord()) {
+            if (declaredConstructors.length == 1) {
+                return introspector.createJsonbCreator(declaredConstructors[0], null, clazz, propertyNamingStrategy);
+            }
+        }
         return null;
     }
 
     public static boolean isRecord(Class<?> clazz) {
-        return false;
+        return clazz.isRecord();
     }
 
     public static Optional<JsonbException> exceptionToThrow(Class<?> clazz) {
+        if (clazz.isRecord()) {
+            if (clazz.getDeclaredConstructors().length > 1) {
+                return Optional.of(new JsonbException(Messages.getMessage(MessageKeys.RECORD_MULTIPLE_CONSTRUCTORS, clazz)));
+            }
+        }
         return Optional.empty();
     }
 
