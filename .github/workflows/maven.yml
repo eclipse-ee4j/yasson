@@ -30,9 +30,9 @@ jobs:
           fetch-depth: 0
       - name: Set up compile JDK
         uses: actions/setup-java@v4
-        with:
+        with: #Compile java needs to be the highest to ensure proper compilation of the multi-release jar
           distribution: 'temurin'
-          java-version: ${{ matrix.java_version }}
+          java-version: 17
           cache: 'maven'
       - name: Copyright
         run: bash etc/copyright.sh
