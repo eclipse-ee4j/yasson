@@ -70,11 +70,11 @@
                 <artifactId>jakarta.enterprise.cdi-api</artifactId>
                 <version>${jakarta.enterprise.cdi-api.version}</version>
             </dependency>
-            <dependency>
-                <groupId>jakarta.el</groupId>
-                <artifactId>jakarta.el-api</artifactId>
-                <version>${jakarta.el-api.version}</version>
-            </dependency>
+<!--            <dependency>-->
+<!--                <groupId>jakarta.el</groupId>-->
+<!--                <artifactId>jakarta.el-api</artifactId>-->
+<!--                <version>${jakarta.el-api.version}</version>-->
+<!--            </dependency>-->
             <dependency>
                 <groupId>jakarta.interceptor</groupId>
                 <artifactId>jakarta.interceptor-api</artifactId>
