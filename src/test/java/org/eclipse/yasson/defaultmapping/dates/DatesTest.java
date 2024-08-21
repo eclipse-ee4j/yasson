@@ -82,7 +82,7 @@ import static org.junit.jupiter.api.Assertions.fail;
  * @author Dmitry Kornilov
  */
 public class DatesTest {
-    
+
     private static LocalDate localDate = LocalDate.of(2018, 1, 31);
 
     @SuppressWarnings("serial")
@@ -98,7 +98,7 @@ public class DatesTest {
         public java.util.Date utilDate = java.sql.Date.valueOf("2018-01-31");
 
     }
-    
+
     public static class SqlDateFormatted {
         @JsonbDateFormat(value = "yyyy-MM-dd")
         public java.sql.Date sqlDate;
@@ -126,14 +126,14 @@ public class DatesTest {
         assertEquals("2018-01-31", result.sqlDate.toString());
         assertEquals("2018-01-31", result.utilDate.toString());
     }
-    
+
     @Test
     public void testSqlDateTimeZonesFormatted() {
         testSqlDateWithTZFormatted(TimeZone.getTimeZone(ZoneId.of("Europe/Sofia")));
         testSqlDateWithTZFormatted(TimeZone.getTimeZone(ZoneId.of("US/Hawaii")));
         testSqlDateWithTZFormatted(TimeZone.getTimeZone(ZoneId.of("Australia/Sydney")));
     }
-    
+
     private void testSqlDateWithTZFormatted(TimeZone tz) {
         final TimeZone originalTZ = TimeZone.getDefault();
         TimeZone.setDefault(tz);
@@ -147,14 +147,14 @@ public class DatesTest {
             TimeZone.setDefault(originalTZ);
         }
     }
-    
+
     @Test
     public void testSqlDateTimeZonesMillis() {
         testSqlDateTimeZonesMillis(TimeZone.getTimeZone(ZoneId.of("Europe/Sofia")), -99712800000L);
         testSqlDateTimeZonesMillis(TimeZone.getTimeZone(ZoneId.of("US/Hawaii")), -99669600000L);
         testSqlDateTimeZonesMillis(TimeZone.getTimeZone(ZoneId.of("Australia/Sydney")), -99741600000L);
     }
-    
+
     private void testSqlDateTimeZonesMillis(TimeZone tz, long expectedMs) {
         final TimeZone originalTZ = TimeZone.getDefault();
         TimeZone.setDefault(tz);
@@ -170,14 +170,14 @@ public class DatesTest {
             TimeZone.setDefault(originalTZ);
         }
     }
-    
+
     @Test
     public void testSqlDateTimeZones() {
         testSqlDateWithTZ(TimeZone.getTimeZone(ZoneId.of("Europe/Sofia")));
         testSqlDateWithTZ(TimeZone.getTimeZone(ZoneId.of("US/Hawaii")));
         testSqlDateWithTZ(TimeZone.getTimeZone(ZoneId.of("Australia/Sydney")));
     }
-    
+
     private void testSqlDateWithTZ(TimeZone tz) {
         final TimeZone originalTZ = TimeZone.getDefault();
         TimeZone.setDefault(tz);
@@ -229,29 +229,58 @@ public class DatesTest {
     }
 
     @Test
+    public void testDateIn_ISO_DATE_format() throws ParseException {
+        final SimpleDateFormat sdf = new SimpleDateFormat("dd.MM.yyyy");
+        final TimeZone defaultTimeZone = TimeZone.getDefault();
+        final TimeZone testTimeZone = TimeZone.getTimeZone(ZoneOffset.ofHours(1));
+
+        sdf.setTimeZone(testTimeZone);
+        final Date parsedDate = sdf.parse("04.03.2015");
+
+        // defaultFormatted in ISO_DATE format
+        final String jsonText = "{\"defaultFormatted\":\"2015-03-04\"," +
+                "\"millisFormatted\":" + parsedDate.getTime()+ "," +
+                "\"customDate\":\"00:00:00 | 04-03-2015\"}";
+
+        // marshal to ISO format, UTC, which is testTimeZone - 1
+        final String expected = "{\"defaultFormatted\":\"2015-03-03T23:00:00Z[UTC]\"," +
+                "\"millisFormatted\":" + parsedDate.getTime()+ "," +
+                "\"customDate\":\"00:00:00 | 04-03-2015\"}";
+
+        TimeZone.setDefault(testTimeZone);
+        try {
+            final DatePojo pojo = bindingJsonb.fromJson(jsonText, DatePojo.class);
+            assertEquals(parsedDate, pojo.defaultFormatted);
+            assertEquals(expected, bindingJsonb.toJson(pojo));
+        } finally {
+            TimeZone.setDefault(defaultTimeZone);
+        }
+    }
+
+    @Test
     public void testDateWithZoneOffset() throws ParseException {
         // Test for Yasson-172
         final SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ssXXX");
         final Date parsedDate = sdf.parse("2018-11-02T00:00:00+01:00");
-    	
+
     	String jsonDateWithZone = "{\"dateWithZone\":\"2018-11-02T00:00:00+01:00\"}";
     	final DateWithZonePojo result = bindingJsonb.fromJson(jsonDateWithZone, DateWithZonePojo.class);
-    	
+
     	assertEquals(parsedDate, result.dateWithZone);
     }
-    
+
     @Test
     public void testDateWithZoneId() throws ParseException {
         // Test for Yasson-172
         final SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ssXXX");
         final Date parsedDate = sdf.parse("2018-11-02T00:00:00+01:00");
-    	
+
     	String jsonDateWithZone = "{\"dateWithZone\":\"2018-11-02T00:00:00+01:00[Europe/Berlin]\"}";
     	final DateWithZonePojo result = bindingJsonb.fromJson(jsonDateWithZone, DateWithZonePojo.class);
-    	
+
     	assertEquals(parsedDate, result.dateWithZone);
     }
-    
+
     @Test
     public void testCalendar() {
         final Calendar timeCalendar = new Calendar.Builder()

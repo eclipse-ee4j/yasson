@@ -13,10 +13,14 @@
 package org.eclipse.yasson.internal.deserializer.types;
 
 import java.time.Instant;
+import java.time.LocalDate;
 import java.time.ZonedDateTime;
 import java.time.format.DateTimeFormatter;
+import java.time.format.DateTimeParseException;
 import java.util.Date;
 import java.util.Locale;
+
+import static java.time.ZoneId.systemDefault;
 
 /**
  * Deserializer of the {@link Date} type.
@@ -36,7 +40,12 @@ class DateDeserializer extends AbstractDateDeserializer<Date> {
 
     @Override
     Date parseDefault(String jsonValue, Locale locale) {
-        return parseWithOrWithoutZone(jsonValue, DEFAULT_DATE_TIME_FORMATTER.withLocale(locale));
+        try {
+            return parseWithOrWithoutZone(jsonValue, DEFAULT_DATE_TIME_FORMATTER.withLocale(locale));
+        } catch (DateTimeParseException e3) {
+            LocalDate localDate = LocalDate.parse(jsonValue, DateTimeFormatter.ISO_DATE);
+            return Date.from(localDate.atStartOfDay(systemDefault()).toInstant());
+        }
     }
 
     @Override
