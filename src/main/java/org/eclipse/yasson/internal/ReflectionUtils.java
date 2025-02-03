@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2015, 2023 Oracle and/or its affiliates. All rights reserved.
+ * Copyright (c) 2015 Oracle and/or its affiliates. All rights reserved.
  *
  * This program and the accompanying materials are made available under the
  * terms of the Eclipse Public License v. 2.0 which is available at
@@ -189,6 +189,10 @@ public class ReflectionUtils {
             Type tmp = new VariableTypeInheritanceSearch().searchParametrizedType(type, (TypeVariable<?>) returnType);
             if (tmp != null) {
                 returnType = tmp;
+            }
+            // If the type is a WildcardType we need to resolve the most specific type
+            if (returnType instanceof WildcardType) {
+                return resolveMostSpecificBound(chain, (WildcardType) returnType, warn);
             }
             if (!(returnType instanceof TypeVariable)) {
                 break;
