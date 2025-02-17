@@ -275,6 +275,10 @@
                     <plugin>
                         <groupId>org.glassfish.copyright</groupId>
                         <artifactId>glassfish-copyright-maven-plugin</artifactId>
+                        <configuration>
+                            <!-- Ignore the year to comply with Eclipse Foundation. -->
+                            <ignoreYear>true</ignoreYear>
+                        </configuration>
                         <executions>
                             <!--Copyright goal does not fail when copyright is not properly updated,
                                 but prints out which file has incorrect copyright.-->
