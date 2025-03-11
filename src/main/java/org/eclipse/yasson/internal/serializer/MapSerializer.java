@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2021, 2022 Oracle and/or its affiliates. All rights reserved.
+ * Copyright (c) 2021, 2025 Oracle and/or its affiliates. All rights reserved.
  *
  * This program and the accompanying materials are made available under the
  * terms of the Eclipse Public License v. 2.0 which is available at
@@ -14,9 +14,12 @@ package org.eclipse.yasson.internal.serializer;
 
 import java.util.Map;
 
+import jakarta.json.bind.serializer.JsonbSerializer;
 import jakarta.json.stream.JsonGenerator;
 
+import org.eclipse.yasson.internal.JsonbContext;
 import org.eclipse.yasson.internal.SerializationContextImpl;
+import org.eclipse.yasson.internal.components.ComponentBindings;
 import org.eclipse.yasson.internal.serializer.types.TypeSerializers;
 
 /**
@@ -40,9 +43,15 @@ abstract class MapSerializer implements ModelSerializer {
         return valueSerializer;
     }
 
-    static MapSerializer create(Class<?> keyClass, ModelSerializer keySerializer, ModelSerializer valueSerializer) {
+    static MapSerializer create(Class<?> keyClass, ModelSerializer keySerializer, ModelSerializer valueSerializer, JsonbContext jsonbContext) {
         if (TypeSerializers.isSupportedMapKey(keyClass)) {
-            return new StringKeyMapSerializer(keySerializer, valueSerializer);
+            //Issue #663: A custom JsonbSerializer is available for an already supported Map key. Serialization must
+            //not use normal key:value map. No further checking needed. Wrapping object needs to be used.
+            if (TypeSerializers.hasCustomJsonbSerializer(keyClass, jsonbContext)) {
+                return new ObjectKeyMapSerializer(keySerializer, valueSerializer);
+            } else {
+                return new StringKeyMapSerializer(keySerializer, valueSerializer);
+            }
         } else if (Object.class.equals(keyClass)) {
             return new DynamicMapSerializer(keySerializer, valueSerializer);
         }
@@ -79,7 +88,17 @@ abstract class MapSerializer implements ModelSerializer {
                     }
                     Class<?> keyClass = key.getClass();
                     if (TypeSerializers.isSupportedMapKey(keyClass)) {
-                        continue;
+
+                        //Issue #663: A custom JsonbSerializer is available for an already supported Map key.
+                        //Serialization must not use normal key:value map. No further checking needed. Wrapping object
+                        //needs to be used.
+                        if (TypeSerializers.hasCustomJsonbSerializer(keyClass, context.getJsonbContext())) {
+                            suitable = false;
+                            break;
+                        }
+                        else {
+                            continue;
+                        }
                     }
                     //No other checks needed. Map is not suitable for normal key:value map. Wrapping object needs to be used.
                     suitable = false;

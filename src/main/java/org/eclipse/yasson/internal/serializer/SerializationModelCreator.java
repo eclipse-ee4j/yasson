@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2021, 2023 Oracle and/or its affiliates. All rights reserved.
+ * Copyright (c) 2021, 2025 Oracle and/or its affiliates. All rights reserved.
  *
  * This program and the accompanying materials are made available under the
  * terms of the Eclipse Public License v. 2.0 which is available at
@@ -303,7 +303,7 @@ public class SerializationModelCreator {
         Class<?> rawClass = ReflectionUtils.getRawType(resolvedKey);
         ModelSerializer keySerializer = memberSerializer(chain, keyType, ClassCustomization.empty(), true);
         ModelSerializer valueSerializer = memberSerializer(chain, valueType, propertyCustomization, false);
-        MapSerializer mapSerializer = MapSerializer.create(rawClass, keySerializer, valueSerializer);
+        MapSerializer mapSerializer = MapSerializer.create(rawClass, keySerializer, valueSerializer, jsonbContext);
         KeyWriter keyWriter = new KeyWriter(mapSerializer);
         NullVisibilitySwitcher nullVisibilitySwitcher = new NullVisibilitySwitcher(true, keyWriter);
         return new NullSerializer(nullVisibilitySwitcher, propertyCustomization, jsonbContext);
