@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2016, 2023 Oracle and/or its affiliates. All rights reserved.
+ * Copyright (c) 2016, 2025 Oracle and/or its affiliates. All rights reserved.
  *
  * This program and the accompanying materials are made available under the
  * terms of the Eclipse Public License v. 2.0 which is available at
@@ -16,6 +16,7 @@ import java.io.StringReader;
 import java.lang.reflect.ParameterizedType;
 import java.lang.reflect.Type;
 import java.math.BigDecimal;
+import java.sql.Timestamp;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Calendar;
@@ -163,7 +164,7 @@ public class SerializersTest {
         JsonbConfig config = new JsonbConfig().withDeserializers(new CrateDeserializer());
         Jsonb jsonb = JsonbBuilder.create(config);
 
-        Box box = createPojoWithDates();
+        Box box = createPojoWithDates(getExpectedDate());
 
         String expected = "{\"boxStr\":\"Box string\",\"crate\":{\"crateInner\":{\"crateInnerBigDec\":10,\"crate_inner_str\":\"Single inner\",\"date\":\"14.05.2015 || 11:10:01\"},\"crateInnerList\":[{\"crateInnerBigDec\":10,\"crate_inner_str\":\"List inner 0\"},{\"crateInnerBigDec\":10,\"crate_inner_str\":\"List inner 1\"}],\"date\":\"2015-05-14T11:10:01\"},\"secondBoxStr\":\"Second box string\"}";
 
@@ -251,12 +252,18 @@ public class SerializersTest {
     }
 
     @Test
+    public void testSqlTimestampSerialization() {
+        Box box = createPojoWithTimestamp(new Timestamp(getExpectedDate().getTime()));
+        assertTrue(defaultJsonb.toJson(box).contains("\"timestamp\":\"05/14/2015 @ 11:10\""));
+    }
+
+    @Test
     public void testSerializationUsingConversion() {
         JsonbConfig config = new JsonbConfig().withSerializers(new CrateSerializerWithConversion());
         Jsonb jsonb = JsonbBuilder.create(config);
 
         String json = "{\"boxStr\":\"Box string\",\"crate\":{\"crateStr\":\"REPLACED crate str\",\"crateInner\":{\"crateInnerBigDec\":10,\"crate_inner_str\":\"Single inner\",\"date\":\"14.05.2015 || 11:10:01\"},\"crateInnerList\":[{\"crateInnerBigDec\":10,\"crate_inner_str\":\"List inner 0\"},{\"crateInnerBigDec\":10,\"crate_inner_str\":\"List inner 1\"}],\"crateBigDec\":54321,\"date-converted\":\"2015-05-14T11:10:01Z[UTC]\"},\"secondBoxStr\":\"Second box string\"}";
-        assertEquals(json, jsonb.toJson(createPojoWithDates()));
+        assertEquals(json, jsonb.toJson(createPojoWithDates(getExpectedDate())));
     }
 
     @Test
@@ -567,8 +574,13 @@ public class SerializersTest {
         }
     }
 
-    private static Box createPojoWithDates() {
-        Date date = getExpectedDate();
+    private static Box createPojoWithTimestamp(Timestamp timestamp) {
+        Box box = createPojo();
+        box.crate.timestamp = timestamp;
+        return box;
+    }
+
+    private static Box createPojoWithDates(Date date) {
         Box box = createPojo();
         box.crate.date = date;
         box.crate.crateInner.date = date;
@@ -580,7 +592,6 @@ public class SerializersTest {
         box.boxStr = "Box string";
         box.crate = new Crate();
         box.secondBoxStr = "Second box string";
-
 
         box.crate.crateInner = createCrateInner("Single inner");
 
