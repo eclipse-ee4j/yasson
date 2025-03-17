@@ -109,7 +109,20 @@ public class JsonStructureToParserAdapter implements JsonParser {
         if (current instanceof JsonObjectIterator) {
             //Remove child iterator as getObject() method contract says
             iterators.pop();
+
             return current.getValue().asJsonObject();
+        } else {
+            throw new JsonbException(Messages.getMessage(MessageKeys.INTERNAL_ERROR, "Outside of object context"));
+        }
+    }
+
+    @Override
+    public JsonArray getArray() {
+        JsonStructureIterator current = iterators.peek();
+        if (current instanceof JsonArrayIterator) {
+            //Remove child iterator as getObject() method contract says
+            iterators.pop();
+            return current.getValue().asJsonArray();
         } else {
             throw new JsonbException(Messages.getMessage(MessageKeys.INTERNAL_ERROR, "Outside of object context"));
         }
