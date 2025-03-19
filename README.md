@@ -45,6 +45,6 @@ Something not working right? Have an idea for an enhancement? Get in touch with 
 
 ## Links
 - Yasson home page: https://projects.eclipse.org/projects/ee4j.yasson
-- JSON-B official web site: https://eclipse-ee4j.github.io/jsonb-api/
-- JSON-B API & spec project: https://github.com/eclipse-ee4j/jsonb-api
+- JSON-B official web site: https://jakartaee.github.io/jsonb-api/
+- JSON-B API & spec project: https://github.com/jakartaee/jsonb-api
 - JSR-367 page on JCP site: https://jcp.org/en/jsr/detail?id=367
