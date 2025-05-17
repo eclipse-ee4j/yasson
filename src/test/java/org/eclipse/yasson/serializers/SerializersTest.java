@@ -79,8 +79,8 @@ import static org.eclipse.yasson.Jsonbs.defaultJsonb;
 import static org.eclipse.yasson.Jsonbs.nullableJsonb;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNull;
+import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.junit.jupiter.api.Assertions.assertTrue;
-import static org.junit.jupiter.api.Assertions.fail;
 import static org.hamcrest.CoreMatchers.is;
 import static org.hamcrest.MatcherAssert.assertThat;
 
@@ -368,17 +368,9 @@ public class SerializersTest {
 
         Box box = new Box();
         box.boxStr = "Box to serialize";
-        try {
-            jsonb.toJson(box);
-            fail();
-        } catch (JsonbException ex) {
-        }
+        assertThrows(JsonbException.class, () -> jsonb.toJson(box));
 
-        try {
-            jsonb.fromJson("{\"boxStr\":\"Box to deserialize\"}", Box.class);
-            fail();
-        } catch (StackOverflowError error){
-        }
+        assertThrows(StackOverflowError.class, () -> jsonb.fromJson("{\"boxStr\":\"Box to deserialize\"}", Box.class));
     }
 
     @Test

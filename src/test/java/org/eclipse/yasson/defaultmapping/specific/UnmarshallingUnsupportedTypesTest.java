@@ -43,7 +43,6 @@ import static org.hamcrest.Matchers.is;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.junit.jupiter.api.Assertions.assertTrue;
-import static org.junit.jupiter.api.Assertions.fail;
 
 /**
  * @author Roman Grigoriadi
@@ -68,13 +67,9 @@ public class UnmarshallingUnsupportedTypesTest {
         };
         String expected = "{\"customInterface\":{\"value\":\"value1\"}}";
         assertEquals(expected, defaultJsonb.toJson(unsupported));
-        try {
-        	defaultJsonb.fromJson(expected, ClassWithUnsupportedFields.class);
-            fail("Should report an error");
-        } catch (JsonbException e) {
-            assertTrue(e.getMessage().contains("Cannot infer a type"));
-            assertTrue(e.getMessage().contains("customInterface"));
-        }
+        JsonbException e = assertThrows(JsonbException.class, () -> defaultJsonb.fromJson(expected, ClassWithUnsupportedFields.class), "Should report an error");
+        assertTrue(e.getMessage().contains("Cannot infer a type"));
+        assertTrue(e.getMessage().contains("customInterface"));
     }
 
     @Test
@@ -225,14 +220,9 @@ public class UnmarshallingUnsupportedTypesTest {
     }
 
     private void assertFail(String json, Type type, String failureProperty, Class<?> failurePropertyClass) {
-        try {
-        	defaultJsonb.fromJson(json, type);
-            fail();
-        } catch (JsonbException e) {
-            if(!e.getMessage().contains(failureProperty) || !e.getMessage().contains(failurePropertyClass.getName())) {
-                fail("Expected error message to contain '" + failureProperty + "' and '" + failurePropertyClass.getName() + "', but was: " +
-                 e.getMessage());
-            }
-        }
+        JsonbException e = assertThrows(JsonbException.class, () -> defaultJsonb.fromJson(json, type));
+        assertTrue(e.getMessage().contains(failureProperty) && e.getMessage().contains(failurePropertyClass.getName()), () -> 
+            "Expected error message to contain '" + failureProperty + "' and '" + failurePropertyClass.getName() + "', but was: " +
+                    e.getMessage());
     }
 }

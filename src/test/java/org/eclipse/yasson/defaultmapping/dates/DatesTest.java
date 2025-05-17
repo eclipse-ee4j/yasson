@@ -74,7 +74,7 @@ import org.junit.jupiter.api.Test;
 import static org.eclipse.yasson.Jsonbs.bindingJsonb;
 import static org.eclipse.yasson.Jsonbs.defaultJsonb;
 import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.fail;
+import static org.junit.jupiter.api.Assertions.assertFalse;
 
 /**
  * This class contains tests for marshalling/unmarshalling dates.
@@ -194,9 +194,7 @@ public class DatesTest {
     @Test
     public void testMarshallLocalDate() {
         String jsonString = bindingJsonb.toJson(new LocalDateObj());
-        if (jsonString.contains("T")) {
-            fail("JSON contains time for a non Date that doesn't include time");
-        }
+        assertFalse(jsonString.contains("T"), "JSON contains time for a non Date that doesn't include time");
     }
 
     @Test
