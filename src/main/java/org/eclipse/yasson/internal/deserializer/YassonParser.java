@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2021, 2022 Oracle and/or its affiliates. All rights reserved.
+ * Copyright (c) 2021, 2023 Oracle and/or its affiliates. All rights reserved.
  *
  * This program and the accompanying materials are made available under the
  * terms of the Eclipse Public License v. 2.0 which is available at
@@ -23,8 +23,6 @@ import jakarta.json.JsonValue;
 import jakarta.json.stream.JsonLocation;
 import jakarta.json.stream.JsonParser;
 
-import org.eclipse.yasson.internal.DeserializationContextImpl;
-
 /**
  * Yasson {@link YassonParser} parser wrapper.
  * <br>
@@ -33,12 +31,10 @@ import org.eclipse.yasson.internal.DeserializationContextImpl;
 class YassonParser implements JsonParser {
 
     private final JsonParser delegate;
-    private final DeserializationContextImpl context;
     private int level;
 
-    YassonParser(JsonParser delegate, Event firstEvent, DeserializationContextImpl context) {
+    YassonParser(JsonParser delegate, Event firstEvent) {
         this.delegate = delegate;
-        this.context = context;
         this.level = determineLevelValue(firstEvent);
     }
 
@@ -67,10 +63,14 @@ class YassonParser implements JsonParser {
     }
 
     @Override
+    public Event currentEvent() {
+        return delegate.currentEvent();
+    }
+
+    @Override
     public Event next() {
         validate();
         Event next = delegate.next();
-        context.setLastValueEvent(next);
         switch (next) {
         case START_OBJECT:
         case START_ARRAY:
@@ -120,14 +120,12 @@ class YassonParser implements JsonParser {
     public JsonObject getObject() {
         validate();
         level--;
-        JsonObject jsonObject = delegate.getObject();
-        context.setLastValueEvent(Event.END_OBJECT);
-        return jsonObject;
+        return delegate.getObject();
     }
 
     @Override
     public JsonValue getValue() {
-        final Event currentLevel = context.getLastValueEvent();
+        final Event currentLevel = delegate.currentEvent();
         switch (currentLevel) {
         case START_ARRAY:
             return getArray();
@@ -142,9 +140,7 @@ class YassonParser implements JsonParser {
     public JsonArray getArray() {
         validate();
         level--;
-        JsonArray array = delegate.getArray();
-        context.setLastValueEvent(Event.END_ARRAY);
-        return array;
+        return delegate.getArray();
     }
 
     @Override
