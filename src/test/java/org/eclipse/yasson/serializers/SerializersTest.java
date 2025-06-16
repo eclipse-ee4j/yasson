@@ -69,6 +69,7 @@ import org.eclipse.yasson.serializers.model.RecursiveDeserializer;
 import org.eclipse.yasson.serializers.model.RecursiveSerializer;
 import org.eclipse.yasson.serializers.model.SimpleAnnotatedSerializedArrayContainer;
 import org.eclipse.yasson.serializers.model.SimpleContainer;
+import org.eclipse.yasson.serializers.model.SqlTimeBean;
 import org.eclipse.yasson.serializers.model.StringWrapper;
 import org.eclipse.yasson.serializers.model.SupertypeSerializerPojo;
 import org.junit.jupiter.api.Test;
@@ -199,6 +200,19 @@ public class SerializersTest {
         assertNull(result.crate.crateStr);
         assertEquals(pojo.crate.crateInner.crateInnerStr, result.crate.crateInner.crateInnerStr);
         assertEquals(pojo.crate.crateInner.crateInnerBigDec, result.crate.crateInner.crateInnerBigDec);
+    }
+
+    @Test
+    public void testSerializerSerializationOfSqlTime() {
+        JsonbConfig config = new JsonbConfig().withSerializers(new CrateSerializer());
+        Jsonb jsonb = JsonbBuilder.create(config);
+        String expected = "{\"time\":\"1970-01-01T11:00:00Z[UTC]\"}";
+
+        SqlTimeBean value = new SqlTimeBean();
+        TimeZone.setDefault(TimeZone.getTimeZone("UTC"));
+        value.setTime(java.sql.Time.valueOf("11:00:00"));
+
+        assertEquals(expected, jsonb.toJson(value));
     }
 
     @Test
