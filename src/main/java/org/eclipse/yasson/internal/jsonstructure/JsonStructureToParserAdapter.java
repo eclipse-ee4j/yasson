@@ -122,7 +122,13 @@ public class JsonStructureToParserAdapter implements JsonParser {
 
     @Override
     public JsonArray getArray() {
-        throw new UnsupportedOperationException();
+        JsonStructureIterator current = iterators.peek();
+        if (current instanceof JsonArrayIterator) {
+            iterators.pop();
+            return getValue().asJsonArray();
+        } else {
+            throw new JsonbException(Messages.getMessage(MessageKeys.INTERNAL_ERROR, "Outside of array context"));
+        }
     }
     
     private JsonNumber getJsonNumberValue() {
