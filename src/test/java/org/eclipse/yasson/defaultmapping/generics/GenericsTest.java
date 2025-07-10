@@ -12,13 +12,19 @@
 
 package org.eclipse.yasson.defaultmapping.generics;
 
+import static org.eclipse.yasson.Jsonbs.defaultJsonb;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertThrows;
+import static org.junit.jupiter.api.Assertions.assertTrue;
+
+import java.lang.reflect.Field;
 import java.lang.reflect.Type;
-import java.lang.reflect.WildcardType;
 import java.math.BigDecimal;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Collection;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.LinkedList;
@@ -30,8 +36,6 @@ import java.util.TimeZone;
 import jakarta.json.bind.Jsonb;
 import jakarta.json.bind.JsonbBuilder;
 import jakarta.json.bind.JsonbConfig;
-import java.lang.reflect.Field;
-import java.util.Collection;
 import org.eclipse.yasson.TestTypeToken;
 import org.eclipse.yasson.adapters.model.GenericBox;
 import org.eclipse.yasson.defaultmapping.generics.model.AnotherGenericTestClass;
@@ -48,23 +52,20 @@ import org.eclipse.yasson.defaultmapping.generics.model.FinalMember;
 import org.eclipse.yasson.defaultmapping.generics.model.GenericArrayClass;
 import org.eclipse.yasson.defaultmapping.generics.model.GenericTestClass;
 import org.eclipse.yasson.defaultmapping.generics.model.GenericWithUnboundedWildcardClass;
+import org.eclipse.yasson.defaultmapping.generics.model.LowerBoundTypeVariableWithCollectionAttributeClass;
 import org.eclipse.yasson.defaultmapping.generics.model.MultiLevelExtendedGenericTestClass;
 import org.eclipse.yasson.defaultmapping.generics.model.MultipleBoundsContainer;
 import org.eclipse.yasson.defaultmapping.generics.model.MyCyclicGenericClass;
 import org.eclipse.yasson.defaultmapping.generics.model.PropagatedGenericClass;
 import org.eclipse.yasson.defaultmapping.generics.model.Shape;
 import org.eclipse.yasson.defaultmapping.generics.model.StaticCreatorContainer;
+import org.eclipse.yasson.defaultmapping.generics.model.TreeContainer;
+import org.eclipse.yasson.defaultmapping.generics.model.TreeElement;
 import org.eclipse.yasson.defaultmapping.generics.model.WildCardClass;
 import org.eclipse.yasson.defaultmapping.generics.model.WildcardMultipleBoundsClass;
 import org.eclipse.yasson.serializers.model.Box;
 import org.eclipse.yasson.serializers.model.Crate;
 import org.junit.jupiter.api.Test;
-
-import static org.eclipse.yasson.Jsonbs.defaultJsonb;
-import org.eclipse.yasson.defaultmapping.generics.model.LowerBoundTypeVariableWithCollectionAttributeClass;
-import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertThrows;
-import static org.junit.jupiter.api.Assertions.assertTrue;
 
 /**
  * This class contains JSONB default mapping generics tests.
@@ -512,6 +513,18 @@ public class GenericsTest {
         assertEquals(expectedJson, defaultJsonb.toJson(collectionContainer));
         final CollectionContainer result = defaultJsonb.fromJson(expectedJson, CollectionContainer.class);
         assertEquals(collectionContainer, result);
+    }
+
+    @Test
+    public void genericUpperBoundContainer() {
+        final String expectedJson = "{\"tree\":{\"children\":[{\"children\":[],\"name\":\"child\"}],\"name\":\"parent\"}}";
+        final TreeContainer<TreeElement> container = new TreeContainer<>();
+        final TreeElement parent = new TreeElement("parent");
+        parent.setChildren(List.of(new TreeElement("child")));
+        container.setTree(parent);
+
+        assertEquals(expectedJson, defaultJsonb.toJson(container));
+
     }
     
     public interface FunctionalInterface<T> {

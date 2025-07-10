@@ -252,7 +252,7 @@ public class ReflectionUtils {
                     }
                 }
                 
-                if (resolvedArgs[i] == null) {
+                if (resolvedArgs[i] == null || resolvedArgs[i].equals(typeToResolve)) {
                     if (typeToSearch instanceof Class) {
                         return Object.class;
                     }
