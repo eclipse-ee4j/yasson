@@ -303,7 +303,7 @@ public class SerializationModelCreator {
         Class<?> rawClass = ReflectionUtils.getRawType(resolvedKey);
         ModelSerializer keySerializer = memberSerializer(chain, keyType, ClassCustomization.empty(), true);
         ModelSerializer valueSerializer = memberSerializer(chain, valueType, propertyCustomization, false);
-        MapSerializer mapSerializer = MapSerializer.create(rawClass, keySerializer, valueSerializer);
+        MapSerializer mapSerializer = MapSerializer.create(rawClass, keySerializer, valueSerializer, jsonbContext);
         KeyWriter keyWriter = new KeyWriter(mapSerializer);
         NullVisibilitySwitcher nullVisibilitySwitcher = new NullVisibilitySwitcher(true, keyWriter);
         return new NullSerializer(nullVisibilitySwitcher, propertyCustomization, jsonbContext);

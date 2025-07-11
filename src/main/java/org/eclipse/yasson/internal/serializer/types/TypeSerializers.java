@@ -54,6 +54,7 @@ import jakarta.json.JsonString;
 import jakarta.json.JsonValue;
 import jakarta.json.bind.JsonbException;
 
+import jakarta.json.bind.serializer.JsonbSerializer;
 import org.eclipse.yasson.internal.JsonbContext;
 import org.eclipse.yasson.internal.model.customization.Customization;
 import org.eclipse.yasson.internal.serializer.ModelSerializer;
@@ -151,6 +152,17 @@ public class TypeSerializers {
      */
     public static boolean isSupportedMapKey(Class<?> clazz) {
         return Enum.class.isAssignableFrom(clazz) || SUPPORTED_MAP_KEYS.contains(clazz);
+    }
+
+    /**
+     * Whether type has a custom {@link JsonbSerializer} implementation.
+     *
+     * @param clazz        type to serialize
+     * @param jsonbContext jsonb context
+     * @return whether a custom JsonSerializer for the type is available
+     */
+    public static boolean hasCustomJsonbSerializer(Class<?> clazz, JsonbContext jsonbContext) {
+        return jsonbContext.getComponentMatcher().getSerializerBinding(clazz, null).isPresent();
     }
 
     /**

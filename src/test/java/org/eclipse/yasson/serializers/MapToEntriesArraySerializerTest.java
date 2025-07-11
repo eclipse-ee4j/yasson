@@ -13,12 +13,17 @@
 package org.eclipse.yasson.serializers;
 
 import org.junit.jupiter.api.*;
+import static org.hamcrest.CoreMatchers.instanceOf;
+import static org.hamcrest.MatcherAssert.assertThat;
 import static org.junit.jupiter.api.Assertions.*;
 
 import java.io.StringReader;
 import java.lang.reflect.ParameterizedType;
 import java.lang.reflect.Type;
 import java.math.BigDecimal;
+import java.time.LocalDate;
+import java.time.format.DateTimeFormatter;
+import java.time.format.FormatStyle;
 import java.util.Comparator;
 import java.util.HashMap;
 import java.util.Locale;
@@ -851,6 +856,26 @@ public class MapToEntriesArraySerializerTest {
         }
     }
 
+    public static class LocalDateSerializer implements JsonbSerializer<LocalDate> {
+
+        private static final DateTimeFormatter SHORT_FORMAT = DateTimeFormatter.ofLocalizedDate(FormatStyle.SHORT);
+
+        @Override
+        public void serialize(LocalDate obj, JsonGenerator generator, SerializationContext ctx) {
+            generator.write(SHORT_FORMAT.format(obj));
+        }
+    }
+
+    public static class LocalDateDeserializer implements JsonbDeserializer<LocalDate> {
+
+        private static final DateTimeFormatter SHORT_FORMAT = DateTimeFormatter.ofLocalizedDate(FormatStyle.SHORT);
+
+        @Override
+        public LocalDate deserialize(JsonParser parser, DeserializationContext ctx, Type rtType) {
+            return LocalDate.parse(parser.getString(), SHORT_FORMAT);
+        }
+    }
+
     public static class MapObject<K, V> {
 
         private Map<K, V> values;
@@ -933,5 +958,54 @@ public class MapToEntriesArraySerializerTest {
 
         MapObjectLocaleString resObject = jsonb.fromJson(json, MapObjectLocaleString.class);
         assertEquals(mapObject, resObject);
+    }
+
+    public static class MapObjectLocalDateString extends MapObject<LocalDate, String> {};
+
+    private void verifyMapObjectCustomLocalDateStringSerialization(JsonObject jsonObject, MapObjectLocalDateString mapObject) {
+
+        // Expected serialization is: {"values":[{"key":"short-local-date","value":"string"},...]}
+        assertEquals(1, jsonObject.size());
+        assertNotNull(jsonObject.get("values"));
+        assertEquals(JsonValue.ValueType.ARRAY, jsonObject.get("values").getValueType());
+        JsonArray jsonArray = jsonObject.getJsonArray("values");
+        assertEquals(mapObject.getValues().size(), jsonArray.size());
+        MapObjectLocalDateString resObject = new MapObjectLocalDateString();
+        for (JsonValue jsonValue : jsonArray) {
+            assertEquals(JsonValue.ValueType.OBJECT, jsonValue.getValueType());
+            JsonObject entry = jsonValue.asJsonObject();
+            assertEquals(2, entry.size());
+            assertNotNull(entry.get("key"));
+            assertEquals(JsonValue.ValueType.STRING, entry.get("key").getValueType());
+            assertNotNull(entry.get("value"));
+            assertEquals(JsonValue.ValueType.STRING, entry.get("value").getValueType());
+            resObject.getValues().put(LocalDate.parse(entry.getString("key"), DateTimeFormatter.ofLocalizedDate(FormatStyle.SHORT)), entry.getString("value"));
+        }
+        assertEquals(mapObject, resObject);
+    }
+
+    /**
+     * Test for issue #663...
+     * Test a LocalDate/String map as member in a custom class, using a custom LocalDate serializer and deserializer,
+     * even though there's a build-in {@link org.eclipse.yasson.internal.serializer.types.TypeSerializers#isSupportedMapKey(Class)}
+     */
+    @Test
+    public void testMapLocalDateKeyStringValueAsMember() {
+        Jsonb jsonb = JsonbBuilder.create(new JsonbConfig()
+                .withSerializers(new LocalDateSerializer())
+                .withDeserializers(new LocalDateDeserializer()));
+
+        MapObjectLocalDateString mapObject = new MapObjectLocalDateString();
+        mapObject.getValues().put(LocalDate.now(), "today");
+        mapObject.getValues().put(LocalDate.now().plusDays(1), "tomorrow");
+
+        String json = jsonb.toJson(mapObject);
+
+        JsonObject jsonObject = Json.createReader(new StringReader(json)).read().asJsonObject();
+        verifyMapObjectCustomLocalDateStringSerialization(jsonObject, mapObject);
+        MapObjectLocalDateString resObject = jsonb.fromJson(json, MapObjectLocalDateString.class);
+        assertEquals(mapObject, resObject);
+        // ensure the keys are of type java.time.LocalDate
+        assertThat(resObject.getValues().keySet().iterator().next(), instanceOf(LocalDate.class));
     }
 }
