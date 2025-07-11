@@ -93,8 +93,7 @@ abstract class MapSerializer implements ModelSerializer {
                         if (TypeSerializers.hasCustomJsonbSerializer(keyClass, context.getJsonbContext())) {
                             suitable = false;
                             break;
-                        }
-                        else {
+                        } else {
                             continue;
                         }
                     }
