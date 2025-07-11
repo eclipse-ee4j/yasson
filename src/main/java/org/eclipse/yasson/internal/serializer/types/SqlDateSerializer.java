@@ -13,7 +13,10 @@
 package org.eclipse.yasson.internal.serializer.types;
 
 import java.time.Instant;
+import java.time.LocalDate;
+import java.time.ZoneId;
 import java.time.format.DateTimeFormatter;
+import java.time.temporal.UnsupportedTemporalTypeException;
 import java.util.Date;
 import java.util.Locale;
 
@@ -49,9 +52,22 @@ class SqlDateSerializer extends DateSerializer<Date> {
     @Override
     protected String formatWithFormatter(Date value, DateTimeFormatter formatter) {
         if (value instanceof java.sql.Date) {
-            return ((java.sql.Date) value).toLocalDate().format(formatter);
+            LocalDate localDate = ((java.sql.Date) value).toLocalDate();
+            if (formatterRequiresTimeFields(formatter)) {
+                return localDate.atStartOfDay(ZoneId.of("UTC")).format(formatter);
+            }
+            return localDate.format(formatter);
         } else {
             return super.formatWithFormatter(value, formatter);
+        }
+    }
+
+    private boolean formatterRequiresTimeFields(DateTimeFormatter formatter) {
+        try {
+            formatter.format(LocalDate.of(2000, 1, 1));
+            return false;
+        } catch (UnsupportedTemporalTypeException e) {
+            return true;
         }
     }
 }
