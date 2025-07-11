@@ -14,13 +14,17 @@ package org.eclipse.yasson.internal.serializer.types;
 
 import java.time.Instant;
 import java.time.format.DateTimeFormatter;
+import java.time.temporal.UnsupportedTemporalTypeException;
 import java.util.Date;
 import java.util.Locale;
+import java.util.logging.Logger;
 
 /**
  * Common serializer for {@link Date} and {@link java.sql.Date} types.
  */
 class SqlDateSerializer extends DateSerializer<Date> {
+
+    private static final Logger LOGGER = Logger.getLogger(SqlDateSerializer.class.getName());
 
     SqlDateSerializer(TypeSerializerBuilder serializerBuilder) {
         super(serializerBuilder);
@@ -49,9 +53,12 @@ class SqlDateSerializer extends DateSerializer<Date> {
     @Override
     protected String formatWithFormatter(Date value, DateTimeFormatter formatter) {
         if (value instanceof java.sql.Date) {
-            return ((java.sql.Date) value).toLocalDate().format(formatter);
-        } else {
-            return super.formatWithFormatter(value, formatter);
+            try {
+                return ((java.sql.Date) value).toLocalDate().format(formatter);
+            } catch (UnsupportedTemporalTypeException exception) {
+                LOGGER.warning(exception.getMessage());
+            }
         }
+        return super.formatWithFormatter(value, formatter);
     }
 }
