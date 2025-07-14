@@ -69,6 +69,7 @@ import org.eclipse.yasson.serializers.model.RecursiveDeserializer;
 import org.eclipse.yasson.serializers.model.RecursiveSerializer;
 import org.eclipse.yasson.serializers.model.SimpleAnnotatedSerializedArrayContainer;
 import org.eclipse.yasson.serializers.model.SimpleContainer;
+import org.eclipse.yasson.serializers.model.SqlDateBean;
 import org.eclipse.yasson.serializers.model.StringWrapper;
 import org.eclipse.yasson.serializers.model.SupertypeSerializerPojo;
 import org.junit.jupiter.api.Test;
@@ -199,6 +200,19 @@ public class SerializersTest {
         assertNull(result.crate.crateStr);
         assertEquals(pojo.crate.crateInner.crateInnerStr, result.crate.crateInner.crateInnerStr);
         assertEquals(pojo.crate.crateInner.crateInnerBigDec, result.crate.crateInner.crateInnerBigDec);
+    }
+
+    @Test
+    public void testSerializationOfSqlDateWithFormatter() {
+        JsonbConfig config = new JsonbConfig().withSerializers(new CrateSerializer());
+        Jsonb jsonb = JsonbBuilder.create(config);
+        String expected = "{\"date\":\"2019-01-26T00:00:00.000+0000\"}";
+
+        SqlDateBean value = new SqlDateBean();
+        TimeZone.setDefault(TimeZone.getTimeZone("UTC"));
+        value.setDate(java.sql.Date.valueOf("2019-01-26"));
+
+        assertEquals(expected, jsonb.toJson(value));
     }
 
     @Test
