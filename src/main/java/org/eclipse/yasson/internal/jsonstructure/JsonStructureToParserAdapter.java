@@ -79,6 +79,11 @@ public class JsonStructureToParserAdapter implements JsonParser {
     }
 
     @Override
+    public Event currentEvent() {
+        return iterators.peek().getValueEvent(getValue());
+    }
+    
+    @Override
     public String getString() {
         return iterators.peek().getString();
     }
@@ -104,6 +109,11 @@ public class JsonStructureToParserAdapter implements JsonParser {
     }
 
     @Override
+    public JsonValue getValue() {
+        return iterators.peek().getValue();
+    }
+
+    @Override
     public JsonObject getObject() {
         JsonStructureIterator current = iterators.peek();
         if (current instanceof JsonObjectIterator) {
@@ -115,6 +125,17 @@ public class JsonStructureToParserAdapter implements JsonParser {
         }
     }
 
+    @Override
+    public JsonArray getArray() {
+        JsonStructureIterator current = iterators.peek();
+        if (current instanceof JsonArrayIterator) {
+            iterators.pop();
+            return getValue().asJsonArray();
+        } else {
+            throw new JsonbException(Messages.getMessage(MessageKeys.INTERNAL_ERROR, "Outside of array context"));
+        }
+    }
+    
     private JsonNumber getJsonNumberValue() {
         JsonStructureIterator iterator = iterators.peek();
         JsonValue value = iterator.getValue();
@@ -123,7 +144,7 @@ public class JsonStructureToParserAdapter implements JsonParser {
         }
         return (JsonNumber) value;
     }
-
+    
     @Override
     public JsonLocation getLocation() {
         throw new JsonbException("Operation not supported");
