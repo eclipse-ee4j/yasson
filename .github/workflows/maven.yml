@@ -40,6 +40,12 @@ jobs:
         run: mvn -B checkstyle:checkstyle -Pstaging
       - name: Yasson install
         run: mvn -U -C clean install -Pstaging -DskipTests
+      - name: Set up JDK for tests
+        uses: actions/setup-java@v4
+        with:
+          distribution: 'temurin'
+          java-version: ${{ matrix.java_version }}
+          cache: 'maven'
       - name: Yasson tests
         run: mvn -U -B -C -Dmaven.javadoc.skip=true -Pstaging verify
       - name: JSONB-API TCK
