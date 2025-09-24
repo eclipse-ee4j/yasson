@@ -52,6 +52,7 @@ import org.eclipse.yasson.defaultmapping.generics.model.FinalMember;
 import org.eclipse.yasson.defaultmapping.generics.model.GenericArrayClass;
 import org.eclipse.yasson.defaultmapping.generics.model.GenericTestClass;
 import org.eclipse.yasson.defaultmapping.generics.model.GenericWithUnboundedWildcardClass;
+import org.eclipse.yasson.defaultmapping.generics.model.ListContainer;
 import org.eclipse.yasson.defaultmapping.generics.model.LowerBoundTypeVariableWithCollectionAttributeClass;
 import org.eclipse.yasson.defaultmapping.generics.model.MultiLevelExtendedGenericTestClass;
 import org.eclipse.yasson.defaultmapping.generics.model.MultipleBoundsContainer;
@@ -516,14 +517,32 @@ public class GenericsTest {
     }
 
     @Test
-    public void genericUpperBoundContainer() {
-        final String expectedJson = "{\"tree\":{\"children\":[{\"children\":[],\"name\":\"child\"}],\"name\":\"parent\"}}";
+    public void genericUpperBoundContainer() throws Exception {
+        final String expectedJson = "{\"tree\":{\"children\":[{\"name\":\"child\"}],\"name\":\"parent\"}}";
         final TreeContainer<TreeElement> container = new TreeContainer<>();
         final TreeElement parent = new TreeElement("parent");
         parent.setChildren(List.of(new TreeElement("child")));
         container.setTree(parent);
 
-        assertEquals(expectedJson, defaultJsonb.toJson(container));
+        // Use a new instance of Jsonb to avoid any caching
+        try (var jsonb = JsonbBuilder.create()) {
+            assertEquals(expectedJson, jsonb.toJson(container));
+        }
+
+    }
+
+    @Test
+    public void genericUpperBoundContainerWithListContainer() throws Exception {
+        final String expectedJson = "{\"list\":[{\"children\":[{\"name\":\"child\"}],\"name\":\"parent\"}]}";
+        final ListContainer<TreeElement> container = new ListContainer<>();
+        final TreeElement parent = new TreeElement("parent");
+        parent.setChildren(List.of(new TreeElement("child")));
+        container.setList(List.of(parent));
+
+        // Use a new instance of Jsonb to avoid any caching
+        try (var jsonb = JsonbBuilder.create()) {
+            assertEquals(expectedJson, jsonb.toJson(container));
+        }
 
     }
     

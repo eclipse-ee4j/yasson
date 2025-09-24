@@ -252,7 +252,7 @@ public class ReflectionUtils {
                     }
                 }
                 
-                if (resolvedArgs[i] == null || resolvedArgs[i].equals(typeToResolve)) {
+                if (resolvedArgs[i] == null) {
                     if (typeToSearch instanceof Class) {
                         return Object.class;
                     }
@@ -261,6 +261,10 @@ public class ReflectionUtils {
                                                                         variableType,
                                                                         typeToSearch));
                 }
+            }
+            // The expected type and the resolved type are the same, simply return the type
+            if (resolvedArgs[i].equals(typeToResolve)) {
+                return typeToResolve;
             }
             if (resolvedArgs[i] instanceof ParameterizedType) {
                 resolvedArgs[i] = resolveTypeArguments((ParameterizedType) resolvedArgs[i], typeToSearch);
