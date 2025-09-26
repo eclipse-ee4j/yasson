@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2021, 2023 Oracle and/or its affiliates. All rights reserved.
+ * Copyright (c) 2021, 2025 Oracle and/or its affiliates. All rights reserved.
  *
  * This program and the accompanying materials are made available under the
  * terms of the Eclipse Public License v. 2.0 which is available at
@@ -22,6 +22,7 @@ import java.util.LinkedHashMap;
 import java.util.LinkedList;
 import java.util.ListIterator;
 import java.util.Map;
+import java.util.Objects;
 import java.util.Optional;
 import java.util.concurrent.ConcurrentHashMap;
 
@@ -142,17 +143,10 @@ public class SerializationModelCreator {
                                                     boolean rootValue,
                                                     boolean isKey,
                                                     boolean resolveRootAdapter) {
-        if (explicitChain.containsKey(type)) {
-            return explicitChain.get(type);
-        }
-        Class<?> rawType = ReflectionUtils.getRawType(type);
-        Optional<ModelSerializer> serializerBinding = userSerializer(type,
-                                                                     (ComponentBoundCustomization) propertyCustomization);
-        if (serializerBinding.isPresent()) {
-            return serializerBinding.get();
-        }
-        if (resolveRootAdapter) {
-            Optional<AdapterBinding> maybeAdapter = adapterBinding(type, (ComponentBoundCustomization) propertyCustomization);
+        // Check for adapter binding first, even if we have a cached serializer
+        if (resolveRootAdapter && propertyCustomization instanceof ComponentBoundCustomization) {
+            ComponentBoundCustomization componentBound = (ComponentBoundCustomization) propertyCustomization;
+            Optional<AdapterBinding> maybeAdapter = adapterBinding(type, componentBound);
             if (maybeAdapter.isPresent()) {
                 AdapterBinding adapterBinding = maybeAdapter.get();
                 Type toType = adapterBinding.getToType();
@@ -168,6 +162,17 @@ public class SerializationModelCreator {
                 explicitChain.put(type, nullSerializer);
                 return nullSerializer;
             }
+        }
+
+        if (explicitChain.containsKey(type)) {
+            return explicitChain.get(type);
+        }
+        Class<?> rawType = ReflectionUtils.getRawType(type);
+        Optional<ModelSerializer> serializerBinding = propertyCustomization instanceof ComponentBoundCustomization
+                ? userSerializer(type, (ComponentBoundCustomization) propertyCustomization)
+                : Optional.empty();
+        if (serializerBinding.isPresent()) {
+            return serializerBinding.get();
         }
 
         ModelSerializer typeSerializer = null;
@@ -356,6 +361,17 @@ public class SerializationModelCreator {
             return serializerBinding.get();
         }
         Optional<AdapterBinding> maybeAdapter = adapterBinding(resolved, (ComponentBoundCustomization) customization);
+        // If no adapter found, also check the type's own class customization as a fallback
+        // This ensures class-level @JsonbTypeAdapter annotations are always considered
+        if (maybeAdapter.isEmpty()) {
+            ClassModel classModel = jsonbContext.getMappingContext().getOrCreateClassModel(rawType);
+            ComponentBoundCustomization classCustomization = classModel.getClassCustomization();
+            // Only check class customization if it's different from what we already checked
+            if (customization == null || !Objects.equals(classCustomization, customization)) {
+                maybeAdapter = adapterBinding(resolved, classCustomization);
+            }
+        }
+        
         if (maybeAdapter.isPresent()) {
             AdapterBinding adapterBinding = maybeAdapter.get();
             Type toType = adapterBinding.getToType();
