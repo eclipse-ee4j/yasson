@@ -302,7 +302,9 @@ public class SerializationModelCreator {
         Type resolvedKey = ReflectionUtils.resolveType(chain, keyType);
         Class<?> rawClass = ReflectionUtils.getRawType(resolvedKey);
         ModelSerializer keySerializer = memberSerializer(chain, keyType, ClassCustomization.empty(), true);
-        ModelSerializer valueSerializer = memberSerializer(chain, valueType, propertyCustomization, false);
+        Type resolvedValue = ReflectionUtils.resolveType(chain, valueType);
+        ClassModel valueClassModel = jsonbContext.getMappingContext().getOrCreateClassModel(ReflectionUtils.getRawType(resolvedValue));
+        ModelSerializer valueSerializer = memberSerializer(chain, valueType, valueClassModel.getClassCustomization(), false);
         MapSerializer mapSerializer = MapSerializer.create(rawClass, keySerializer, valueSerializer, jsonbContext);
         KeyWriter keyWriter = new KeyWriter(mapSerializer);
         NullVisibilitySwitcher nullVisibilitySwitcher = new NullVisibilitySwitcher(true, keyWriter);
@@ -313,7 +315,8 @@ public class SerializationModelCreator {
                                                   Class<?> raw,
                                                   Customization propertyCustomization) {
         Class<?> arrayComponent = raw.getComponentType();
-        ModelSerializer modelSerializer = memberSerializer(chain, arrayComponent, propertyCustomization, false);
+        ClassModel classModel = jsonbContext.getMappingContext().getOrCreateClassModel(arrayComponent);
+        ModelSerializer modelSerializer = memberSerializer(chain, arrayComponent, classModel.getClassCustomization(), false);
         ModelSerializer arraySerializer = ArraySerializer.create(raw, jsonbContext, modelSerializer);
         KeyWriter keyWriter = new KeyWriter(arraySerializer);
         NullVisibilitySwitcher nullVisibilitySwitcher = new NullVisibilitySwitcher(true, keyWriter);
@@ -325,7 +328,8 @@ public class SerializationModelCreator {
                                                          Customization propertyCustomization) {
         Class<?> raw = ReflectionUtils.getRawType(type);
         Class<?> component = ReflectionUtils.getRawType(((GenericArrayType) type).getGenericComponentType());
-        ModelSerializer modelSerializer = memberSerializer(chain, component, propertyCustomization, false);
+        ClassModel classModel = jsonbContext.getMappingContext().getOrCreateClassModel(component);
+        ModelSerializer modelSerializer = memberSerializer(chain, component, classModel.getClassCustomization(), false);
         ModelSerializer arraySerializer = ArraySerializer.create(raw, jsonbContext, modelSerializer);
         KeyWriter keyWriter = new KeyWriter(arraySerializer);
         NullVisibilitySwitcher nullVisibilitySwitcher = new NullVisibilitySwitcher(true, keyWriter);
@@ -339,7 +343,9 @@ public class SerializationModelCreator {
         Type optType = type instanceof ParameterizedType
                 ? ((ParameterizedType) type).getActualTypeArguments()[0]
                 : Object.class;
-        ModelSerializer modelSerializer = memberSerializer(chain, optType, propertyCustomization, isKey);
+        Type resolvedOptType = ReflectionUtils.resolveType(chain, optType);
+        ClassModel classModel = jsonbContext.getMappingContext().getOrCreateClassModel(ReflectionUtils.getRawType(resolvedOptType));
+        ModelSerializer modelSerializer = memberSerializer(chain, optType, classModel.getClassCustomization(), isKey);
         return new OptionalSerializer(modelSerializer);
     }
 
