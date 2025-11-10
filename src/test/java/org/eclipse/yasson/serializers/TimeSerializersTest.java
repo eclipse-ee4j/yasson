@@ -51,7 +51,7 @@ public class TimeSerializersTest {
         assertEquals(EPOCH_CUSTOM, JSONB_CUSTOM.toJson(date));
     }
 
-    @Test // TODO: Fails with ClassCastException
+    @Test
     public void serializeSqlTimestampCustom() {
         Timestamp ts = new Timestamp(0l);
         assertEquals(EPOCH_CUSTOM, JSONB_CUSTOM.toJson(ts));
