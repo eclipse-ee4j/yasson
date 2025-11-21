@@ -79,19 +79,23 @@ public class TypeDeserializerOnContainersTest {
     // Container classes for testing
     public static class MapContainer {
         public Map<String, TestInterface> map;
+        public Map<?, ?> questionKeyMap;
+        public Map<String, ?> questionValueMap;
     }
 
     public static class ListContainer {
         public List<TestInterface> list;
+        public List<?> questionList;
     }
 
     public static class ArrayContainer {
         public TestInterface[] array;
     }
 
+    @SuppressWarnings("OptionalUsedAsFieldOrParameterType")
     public static class OptionalContainer {
-        @SuppressWarnings("OptionalUsedAsFieldOrParameterType")
         public Optional<TestInterface> optional;
+        public Optional<?> questionOptional;
     }
 
     public static class ByteArrayContainer {
@@ -115,7 +119,7 @@ public class TypeDeserializerOnContainersTest {
 
     @Test
     public void testTypeDeserializerOnMapValues() {
-        final String json = "{\"map\":{\"key1\":{\"value\":\"value1\"},\"key2\":{\"value\":\"value2\"}}}";
+        final String json = "{\"map\":{\"key1\":{\"value\":\"value1\"},\"key2\":{\"value\":\"value2\"}}, \"questionKeyMap\":{\"qKey1\":\"value1\",\"qKey2\":\"value2\"},\"questionValueMap\":{\"key1\":\"qValue1\",\"key2\":\"qValue2\"}}";
 
         final MapContainer result = jsonb.fromJson(json, MapContainer.class);
 
@@ -123,11 +127,21 @@ public class TypeDeserializerOnContainersTest {
         Assertions.assertEquals(2, result.map.size(), () -> String.format("Expected two entries got %s", result.map));
         Assertions.assertEquals("DESERIALIZED:value1", result.map.get("key1").getValue());
         Assertions.assertEquals("DESERIALIZED:value2", result.map.get("key2").getValue());
+
+        Assertions.assertNotNull(result.questionKeyMap);
+        Assertions.assertEquals(2, result.questionKeyMap.size(), () -> String.format("Expected two entries got %s", result.questionKeyMap));
+        Assertions.assertEquals("value1", result.questionKeyMap.get("qKey1"));
+        Assertions.assertEquals("value2", result.questionKeyMap.get("qKey2"));
+
+        Assertions.assertNotNull(result.questionValueMap);
+        Assertions.assertEquals(2, result.questionValueMap.size(), () -> String.format("Expected two entries got %s", result.questionValueMap));
+        Assertions.assertEquals("qValue1", result.questionValueMap.get("key1"));
+        Assertions.assertEquals("qValue2", result.questionValueMap.get("key2"));
     }
 
     @Test
     public void testTypeDeserializerOnListElements() {
-        final String json = "{\"list\":[{\"value\":\"value1\"},{\"value\":\"value2\"}]}";
+        final String json = "{\"list\":[{\"value\":\"value1\"},{\"value\":\"value2\"}], \"questionList\": [\"value1\", \"value2\"]}";
 
         final ListContainer result = jsonb.fromJson(json, ListContainer.class);
 
@@ -135,6 +149,11 @@ public class TypeDeserializerOnContainersTest {
         Assertions.assertEquals(2, result.list.size(), () -> String.format("Expected two entries got %s", result.list));
         Assertions.assertEquals("DESERIALIZED:value1", result.list.get(0).getValue());
         Assertions.assertEquals("DESERIALIZED:value2", result.list.get(1).getValue());
+
+        Assertions.assertNotNull(result.questionList);
+        Assertions.assertEquals(2, result.questionList.size(), () -> String.format("Expected two entries got %s", result.questionList));
+        Assertions.assertEquals("value1", result.questionList.get(0));
+        Assertions.assertEquals("value2", result.questionList.get(1));
     }
 
     @Test
@@ -151,13 +170,17 @@ public class TypeDeserializerOnContainersTest {
 
     @Test
     public void testTypeDeserializerOnOptionalValue() {
-        final String json = "{\"optional\":{\"value\":\"value1\"}}";
+        final String json = "{\"optional\":{\"value\":\"value1\"},\"questionOptional\":\"value2\"}";
 
         final OptionalContainer result = jsonb.fromJson(json, OptionalContainer.class);
 
         Assertions.assertNotNull(result.optional);
         Assertions.assertTrue(result.optional.isPresent(), "Expected value to be present, but the optional was empty.");
         Assertions.assertEquals("DESERIALIZED:value1", result.optional.get().getValue());
+
+        Assertions.assertNotNull(result.questionOptional);
+        Assertions.assertTrue(result.questionOptional.isPresent(), "Expected value to be present, but the optional was empty.");
+        Assertions.assertEquals("value2", result.questionOptional.get());
     }
 
     @Test

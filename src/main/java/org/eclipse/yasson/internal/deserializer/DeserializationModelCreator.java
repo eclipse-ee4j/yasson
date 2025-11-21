@@ -296,7 +296,7 @@ public class DeserializationModelCreator {
                                                                    ClassCustomization.empty(),
                                                                    JustReturn.instance(),
                                                                    MAP_KEY_EVENTS);
-        ClassModel valueClassModel = jsonbContext.getMappingContext().getOrCreateClassModel(ReflectionUtils.getRawType(valueType));
+        ClassModel valueClassModel = jsonbContext.getMappingContext().getOrCreateClassModel(ReflectionUtils.resolveRawType(chain, valueType));
         ModelDeserializer<JsonParser> valueProcessor = typeProcessor(chain,
                                                                      valueType,
                                                                      valueClassModel.getClassCustomization(),

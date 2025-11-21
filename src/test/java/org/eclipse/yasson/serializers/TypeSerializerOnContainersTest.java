@@ -12,12 +12,19 @@
 
 package org.eclipse.yasson.serializers;
 
+import java.io.StringReader;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
+import java.util.function.Supplier;
 
+import jakarta.json.Json;
+import jakarta.json.JsonArray;
+import jakarta.json.JsonObject;
+import jakarta.json.JsonReader;
 import jakarta.json.bind.Jsonb;
 import jakarta.json.bind.JsonbBuilder;
+import jakarta.json.bind.JsonbException;
 import jakarta.json.bind.annotation.JsonbTypeSerializer;
 import jakarta.json.bind.serializer.JsonbSerializer;
 import jakarta.json.bind.serializer.SerializationContext;
@@ -66,35 +73,43 @@ public class TypeSerializerOnContainersTest {
 
     // Container classes for testing
     public static class MapContainer {
-        public Map<String, TestInterface> map;
+        public final Map<String, TestInterface> map;
+        public final Map<?, ?> questionKeyMap;
+        public final Map<String, ?> questionValueMap;
 
-        public MapContainer(Map<String, TestInterface> map) {
+        public MapContainer(final Map<String, TestInterface> map, final Map<?, ?> questionKeyMap, final Map<String, ?> questionValueMap) {
             this.map = map;
+            this.questionKeyMap = questionKeyMap;
+            this.questionValueMap = questionValueMap;
         }
     }
 
     public static class ListContainer {
-        public List<TestInterface> list;
+        public final List<TestInterface> list;
+        public final List<?> questionList;
 
-        public ListContainer(List<TestInterface> list) {
+        public ListContainer(final List<TestInterface> list, final List<?> questionList) {
             this.list = list;
+            this.questionList = questionList;
         }
     }
 
     public static class ArrayContainer {
-        public TestInterface[] array;
+        public final TestInterface[] array;
 
         public ArrayContainer(TestInterface[] array) {
             this.array = array;
         }
     }
 
+    @SuppressWarnings("OptionalUsedAsFieldOrParameterType")
     public static class OptionalContainer {
-        @SuppressWarnings("OptionalUsedAsFieldOrParameterType")
-        public Optional<TestInterface> optional;
+        public final Optional<TestInterface> optional;
+        public final Optional<?> questionOptional;
 
-        public OptionalContainer(Optional<TestInterface> optional) {
+        public OptionalContainer(final Optional<TestInterface> optional, final Optional<?> questionOptional) {
             this.optional = optional;
+            this.questionOptional = questionOptional;
         }
     }
 
@@ -118,14 +133,28 @@ public class TypeSerializerOnContainersTest {
         final MapContainer container = new MapContainer(Map.of(
                 "key1", new TestImpl("value1"),
                 "key2", new TestImpl("value2")
-        ));
+        ), Map.of("qKey1", "value1", "qKey2", "value2"),
+                Map.of("key1", "qValue1", "key2", "qValue2")
+        );
 
-        final String json = jsonb.toJson(container);
+        final JsonObject json = toJsonObject(container);
+        final JsonObject map = json.getJsonObject("map");
+        final JsonObject questionKeyMap = json.getJsonObject("questionKeyMap");
+        final JsonObject questionValueMap = json.getJsonObject("questionValueMap");
 
-        Assertions.assertTrue(json.contains("\"key1\":\"SERIALIZED:value1\""),
-                "Expected serialized value1 but got: " + json);
-        Assertions.assertTrue(json.contains("\"key2\":\"SERIALIZED:value2\""),
-                "Expected serialized value2 but got: " + json);
+        Supplier<String> errorMessage = () -> String.format("Expected value not found in %s", map);
+        Assertions.assertEquals("SERIALIZED:value1", map.getString("key1"), errorMessage);
+        Assertions.assertEquals("SERIALIZED:value2", map.getString("key2"), errorMessage);
+
+
+        errorMessage = () -> String.format("Expected value not found in %s", questionKeyMap);
+        Assertions.assertEquals("value1", questionKeyMap.getString("qKey1"), errorMessage);
+        Assertions.assertEquals("value2", questionKeyMap.getString("qKey2"), errorMessage);
+
+
+        errorMessage = () -> String.format("Expected value not found in %s", questionValueMap);
+        Assertions.assertEquals("qValue1", questionValueMap.getString("key1"), errorMessage);
+        Assertions.assertEquals("qValue2", questionValueMap.getString("key2"), errorMessage);
     }
 
     @Test
@@ -133,16 +162,26 @@ public class TypeSerializerOnContainersTest {
         final ListContainer container = new ListContainer(List.of(
                 new TestImpl("value1"),
                 new TestImpl("value2")
-        ));
+        ), List.of("qValue1", "qValue2"));
 
-        final String json = jsonb.toJson(container);
+        final JsonObject json = toJsonObject(container);
+        final JsonArray list = json.getJsonArray("list");
+        final JsonArray questionList = json.getJsonArray("questionList");
 
-        Assertions.assertEquals("{\"list\":[\"SERIALIZED:value1\",\"SERIALIZED:value2\"]}", json);
+        Supplier<String> errorMessage = () -> String.format("Expected value not found in %s", list);
+        Assertions.assertEquals(2, list.size(), () -> String.format("Expected a size of 2 in %s", list));
+        Assertions.assertEquals("SERIALIZED:value1", list.getString(0), errorMessage);
+        Assertions.assertEquals("SERIALIZED:value2", list.getString(1), errorMessage);
+
+        errorMessage = () -> String.format("Expected value not found in %s", questionList);
+        Assertions.assertEquals(2, questionList.size(), () -> String.format("Expected a size of 2 in %s", questionList));
+        Assertions.assertEquals("qValue1", questionList.getString(0), errorMessage);
+        Assertions.assertEquals("qValue2", questionList.getString(1), errorMessage);
     }
 
     @Test
     public void testTypeSerializerOnArrayElements() {
-        final ArrayContainer container = new ArrayContainer(new TestInterface[]{
+        final ArrayContainer container = new ArrayContainer(new TestInterface[] {
                 new TestImpl("value1"),
                 new TestImpl("value2")
         });
@@ -154,10 +193,21 @@ public class TypeSerializerOnContainersTest {
 
     @Test
     public void testTypeSerializerOnOptionalValue() {
-        final OptionalContainer container = new OptionalContainer(Optional.of(new TestImpl("value1")));
+        final OptionalContainer container = new OptionalContainer(Optional.of(new TestImpl("value1")), Optional.of("value2"));
 
-        final String json = jsonb.toJson(container);
+        final JsonObject json = toJsonObject(container);
 
-        Assertions.assertEquals("{\"optional\":\"SERIALIZED:value1\"}", json);
+        Assertions.assertEquals("SERIALIZED:value1", json.getString("optional"));
+        Assertions.assertEquals("value2", json.getString("questionOptional"));
+    }
+
+    private JsonObject toJsonObject(final Object object) throws JsonbException {
+        final String value = jsonb.toJson(object);
+        try (
+                StringReader reader = new StringReader(value);
+                JsonReader jsonReader = Json.createReader(reader)
+        ) {
+            return jsonReader.readObject();
+        }
     }
 }
