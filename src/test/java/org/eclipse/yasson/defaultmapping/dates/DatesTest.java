@@ -104,6 +104,11 @@ public class DatesTest {
         public java.sql.Date sqlDate;
     }
 
+    public static class UtilDateWithDateFormat {
+        @JsonbDateFormat(value = "yyyy-MM-dd")
+        public java.util.Date utilDate;
+    }
+
     @Test
     public void testSqlTimestamp() {
         Timestamp expectedTimestamp = Timestamp.from(Instant.now());
@@ -189,6 +194,13 @@ public class DatesTest {
         } finally {
             TimeZone.setDefault(originalTZ);
         }
+    }
+
+    @Test
+    public void testUtilDateWithDateOnlyFormat() {
+        UtilDateWithDateFormat result = bindingJsonb.fromJson("{\"utilDate\":\"2026-02-25\"}", UtilDateWithDateFormat.class);
+        LocalDate expected = LocalDate.of(2026, 2, 25);
+        assertEquals(expected, result.utilDate.toInstant().atZone(ZoneOffset.UTC).toLocalDate());
     }
 
     @Test

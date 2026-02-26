@@ -13,8 +13,10 @@
 package org.eclipse.yasson.internal.deserializer.types;
 
 import java.time.Instant;
+import java.time.LocalDate;
 import java.time.ZonedDateTime;
 import java.time.format.DateTimeFormatter;
+import java.time.temporal.TemporalAccessor;
 import java.util.Date;
 import java.util.Locale;
 
@@ -45,13 +47,12 @@ class DateDeserializer extends AbstractDateDeserializer<Date> {
     }
 
     private static Date parseWithOrWithoutZone(String jsonValue, DateTimeFormatter formatter) {
-        ZonedDateTime parsed;
-        if (formatter.getZone() == null) {
-            parsed = ZonedDateTime.parse(jsonValue, formatter.withZone(UTC));
-        } else {
-            parsed = ZonedDateTime.parse(jsonValue, formatter);
+        DateTimeFormatter formatterWithZone = formatter.getZone() == null ? formatter.withZone(UTC) : formatter;
+        TemporalAccessor parsed = formatterWithZone.parseBest(jsonValue, ZonedDateTime::from, LocalDate::from);
+        if (parsed instanceof ZonedDateTime) {
+            return Date.from(((ZonedDateTime) parsed).toInstant());
         }
-        return Date.from(parsed.toInstant());
+        return Date.from(((LocalDate) parsed).atStartOfDay(UTC).toInstant());
     }
 
 }
