@@ -29,7 +29,8 @@ import java.util.Locale;
  *
  * <p>
  * For date-only patterns (e.g., "yyyy-MM-dd"), this deserializer uses {@link DateTimeFormatter#parseBest} to detect the
- * appropriate temporal type (LocalDate, LocalDateTime, etc.) and creates the Date object at midnight in the specified
+ * appropriate temporal type [ZonedDateTime, LocalDateTime, LocalDate, or YearMonth]
+ * and creates the Date object at midnight in the specified
  * timezone. When no timezone is specified in the pattern, UTC is used as required by Jakarta JSON Binding specification
  * section 3.5.
  * </p>
