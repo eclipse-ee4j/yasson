@@ -35,9 +35,7 @@ import java.util.Locale;
  * section 3.5.
  * </p>
  * <p>
- * <b>Important:</b> Date objects created from date-only patterns represent midnight UTC, which may display as a
- * different calendar day when viewed in local timezone. For date values where preserving the local calendar date is
- * critical, use {@link java.sql.Date} or better {@link java.time.LocalDate} instead.
+ * critical, use {@link java.time.LocalDate} (recommended) or {@link java.sql.Date}.
  * </p>
  */
 class DateDeserializer extends AbstractDateDeserializer<Date> {
