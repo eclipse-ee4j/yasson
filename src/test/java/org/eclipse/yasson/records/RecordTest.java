@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2021, 2024 Oracle and/or its affiliates. All rights reserved.
+ * Copyright (c) 2021, 2025 Oracle and/or its affiliates. All rights reserved.
  *
  * This program and the accompanying materials are made available under the
  * terms of the Eclipse Public License v. 2.0 which is available at
@@ -15,6 +15,7 @@ package org.eclipse.yasson.records;
 import jakarta.json.bind.JsonbException;
 
 import org.eclipse.yasson.Jsonbs;
+import org.eclipse.yasson.TestTypeToken;
 import org.eclipse.yasson.internal.properties.MessageKeys;
 import org.eclipse.yasson.internal.properties.Messages;
 import org.junit.jupiter.api.Test;
@@ -106,4 +107,16 @@ public class RecordTest {
         assertThrows(JsonbException.class, () -> Jsonbs.defaultJsonb.fromJson(expected, CarWithDefaultConstructor.class));
     }
 
+    @Test
+    public void testRecordWithGenerics() {
+        CarWithGenerics<Color> car = new CarWithGenerics<>("skoda", new Color("green", "#00FF00"));
+        String expected = "{\"color\":{\"code\":\"#00FF00\",\"name\":\"green\"},\"type\":\"skoda\"}";
+
+        String json = Jsonbs.defaultJsonb.toJson(car);
+        assertThat(json, is(expected));
+        
+        CarWithGenerics<Color> deserialized = Jsonbs.defaultJsonb
+                .fromJson(expected, new TestTypeToken<CarWithGenerics<Color>>() {}.getType());
+        assertThat(deserialized, is(car));  
+    }
 }
