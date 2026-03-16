@@ -102,6 +102,10 @@ public class DatesTest {
     public static class SqlDateFormatted {
         @JsonbDateFormat(value = "yyyy-MM-dd")
         public java.sql.Date sqlDate;
+        @JsonbDateFormat(value = "yyyy-MM-dd")
+        public java.util.Date utilDate;
+
+
     }
 
     @Test
@@ -126,7 +130,101 @@ public class DatesTest {
         assertEquals("2018-01-31", result.sqlDate.toString());
         assertEquals("2018-01-31", result.utilDate.toString());
     }
-    
+
+    @Test
+    public void testMarshallSqlDateFormatted() {
+        final String date = "2026-02-25";
+        final String expectedJson = String.format("{\"sqlDate\":\"%1$s\",\"utilDate\":\"%1$s\"}", date);
+
+        final SqlDateFormatted sqlDateFormatted = new SqlDateFormatted();
+        sqlDateFormatted.sqlDate = java.sql.Date.valueOf(date);
+        // We use a java.sql.Date here as we want to test as if this was a Jakarta Persistence temporal date
+        sqlDateFormatted.utilDate = java.sql.Date.valueOf(date);
+        String jsonString = bindingJsonb.toJson(sqlDateFormatted);
+        assertEquals(expectedJson, jsonString);
+
+        // Unmarshal the object
+        final SqlDateFormatted result = bindingJsonb.fromJson(jsonString, SqlDateFormatted.class);
+        assertEquals(sqlDateFormatted.sqlDate, result.sqlDate);
+        // The Date objects will not be equal unless user.timezone is set to UTC. The sqlDateFormatted.utilDate is
+        // created at midnight in the current timezone (via valueOf()), while result.utilDate is created at midnight UTC
+        // per the JSON-B specification. To verify both represent the same calendar date, we convert each to LocalDate
+        // using its respective timezone: the original uses systemDefault(), the deserialized uses UTC.
+        assertEquals(Instant.ofEpochMilli(sqlDateFormatted.utilDate.getTime()).atZone(ZoneId.systemDefault()).toLocalDate(),
+                result.utilDate.toInstant().atZone(ZoneOffset.UTC).toLocalDate());
+    }
+
+    @Test
+    public void testUnmarshallSqlDateFormatted() {
+        final String date = "2026-02-25";
+        final String expectedString = String.format("{\"sqlDate\":\"%1$s\",\"utilDate\":\"%1$s\"}", date);
+
+        final SqlDateFormatted sqlDateFormatted = bindingJsonb.fromJson(expectedString, SqlDateFormatted.class);
+        assertEquals(date, sqlDateFormatted.sqlDate.toString());
+        // Convert java.util.Date to LocalDate for comparison
+        final LocalDate resultDate = sqlDateFormatted.utilDate.toInstant()
+                .atZone(ZoneOffset.UTC)
+                .toLocalDate();
+        assertEquals(LocalDate.parse(date),  resultDate);
+
+        // Unmarshal the object
+        final String result = bindingJsonb.toJson(sqlDateFormatted);
+        assertEquals(expectedString, result);
+    }
+
+    public static class YearMonthFormatted {
+        @JsonbDateFormat(value = "yyyy-MM")
+        public java.util.Date date;
+    }
+
+    @Test
+    public void testMarshallYearMonthFormat() {
+        final YearMonthFormatted yearMonthFormatted = new YearMonthFormatted();
+        yearMonthFormatted.date = java.sql.Date.valueOf("2026-02-25");
+        String jsonString = bindingJsonb.toJson(yearMonthFormatted);
+        assertEquals("{\"date\":\"2026-02\"}", jsonString);
+    }
+
+    @Test
+    public void testUnmarshallYearMonthFormat() {
+        final YearMonthFormatted yearMonthFormatted = bindingJsonb.fromJson(
+                "{\"date\":\"2026-02\"}",
+                YearMonthFormatted.class);
+        final LocalDate resultDate = yearMonthFormatted.date.toInstant()
+                .atZone(ZoneOffset.UTC)
+                .toLocalDate();
+        assertEquals(LocalDate.of(2026, 2, 1), resultDate);
+    }
+
+    @Test
+    public void testDateOnlyPatternEdgeCases() {
+        // Test various edge cases to ensure date values are preserved correctly
+        testDateRoundTrip("2028-03-01"); // Day after leap year
+        testDateRoundTrip("2026-12-31"); // Last day of year
+        testDateRoundTrip("2028-02-29"); // Leap year day
+        testDateRoundTrip("2027-01-01"); // First day of year
+        testDateRoundTrip("2028-01-31"); // Last day of January
+        testDateRoundTrip("2028-02-01"); // First day of February
+    }
+
+    private void testDateRoundTrip(final String date) {
+        final String json = String.format("{\"sqlDate\":\"%1$s\",\"utilDate\":\"%1$s\"}", date);
+
+        // Deserialize
+        final SqlDateFormatted deserialized = bindingJsonb.fromJson(json, SqlDateFormatted.class);
+
+        // Verify utilDate represents midnight UTC for the specified date
+        final LocalDate resultDate = deserialized.utilDate.toInstant()
+                .atZone(ZoneOffset.UTC)
+                .toLocalDate();
+        assertEquals(LocalDate.parse(date), resultDate, () -> String.format("Date should be %s when viewed in UTC", date));
+
+        // Verify JSON round-trip
+        final String roundTripped = bindingJsonb.toJson(deserialized);
+        assertEquals(json, roundTripped, () -> String.format("JSON should round-trip correctly for %s", date));
+    }
+
+
     @Test
     public void testSqlDateTimeZonesFormatted() {
         testSqlDateWithTZFormatted(TimeZone.getTimeZone(ZoneId.of("Europe/Sofia")));
