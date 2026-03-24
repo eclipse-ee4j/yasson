@@ -5,3 +5,6 @@
 .idea/
 .settings/
 /.DS_Store
+bin/
+.envrc
+.vscode/
