@@ -36,6 +36,7 @@
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
         <maven.compiler.release>11</maven.compiler.release>
         <maven.compiler.testRelease>${maven.compiler.release}</maven.compiler.testRelease>
+        <nexus.staging.repository>yasson-maven2-staging</nexus.staging.repository>
 
         <!--Dependencies-->
         <hamcrest.version>2.2</hamcrest.version>
