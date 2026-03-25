@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2015, 2022 Oracle and/or its affiliates. All rights reserved.
+ * Copyright (c) 2015, 2026 Oracle and/or its affiliates. All rights reserved.
  *
  * This program and the accompanying materials are made available under the
  * terms of the Eclipse Public License v. 2.0 which is available at
@@ -15,6 +15,8 @@ package org.eclipse.yasson.defaultmapping.specific;
 import java.lang.reflect.Type;
 import java.math.BigDecimal;
 import java.math.BigInteger;
+import java.net.URI;
+import java.net.URL;
 import java.time.Instant;
 import java.time.LocalDateTime;
 import java.time.ZoneId;
@@ -30,6 +32,7 @@ import jakarta.json.bind.JsonbException;
 
 import org.eclipse.yasson.TestTypeToken;
 import org.eclipse.yasson.defaultmapping.generics.model.GenericTestClass;
+import org.eclipse.yasson.defaultmapping.generics.model.ScalarValueWrapper;
 import org.eclipse.yasson.defaultmapping.specific.model.ClassWithUnsupportedFields;
 import org.eclipse.yasson.defaultmapping.specific.model.CustomUnsupportedInterface;
 import org.eclipse.yasson.defaultmapping.specific.model.SupportedTypes;
@@ -223,11 +226,23 @@ public class UnmarshallingUnsupportedTypesTest {
         Type type = new TestTypeToken<GenericTestClass<OptionalLong, OptionalLong>>(){}.getType();
         assertFail("{\"field1\":\"\"}", type,"field1", Long.class); //We are reusing Long deserializer
     }
+    
+    @Test
+    public void testMalformedURL() {
+    	Type type = new TestTypeToken<ScalarValueWrapper<URL>>(){}.getType();
+    	assertFail("{\"value\":\"www.oracle.com\"}", type, "value", URL.class);
+    }
+    
+    @Test
+    public void testMalformedURI() {
+    	Type type = new TestTypeToken<ScalarValueWrapper<URI>>(){}.getType();
+    	assertFail("{\"value\":\"www .oracle .com\"}", type, "value", URI.class);
+    }
 
     private void assertFail(String json, Type type, String failureProperty, Class<?> failurePropertyClass) {
         try {
         	defaultJsonb.fromJson(json, type);
-            fail();
+            fail("Expected to catch JsonbException but did not");
         } catch (JsonbException e) {
             if(!e.getMessage().contains(failureProperty) || !e.getMessage().contains(failurePropertyClass.getName())) {
                 fail("Expected error message to contain '" + failureProperty + "' and '" + failurePropertyClass.getName() + "', but was: " +
