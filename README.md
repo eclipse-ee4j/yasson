@@ -4,7 +4,7 @@
 [![Jakarta Staging (Snapshots)](https://img.shields.io/nexus/s/https/jakarta.oss.sonatype.org/org.eclipse/yasson.svg)](https://jakarta.oss.sonatype.org/content/repositories/staging/org/eclipse/yasson/)
 [![Gitter](https://badges.gitter.im/eclipse/yasson.svg)](https://gitter.im/eclipse/yasson)
 [![Javadocs](https://www.javadoc.io/badge/org.eclipse/yasson.svg)](https://www.javadoc.io/doc/org.eclipse/yasson)
-[![Build Status](https://github.com/eclipse-ee4j/yasson/actions/workflows/maven.yml/badge.svg?branch=master)](https://github.com/eclipse-ee4j/yasson/actions/workflows/maven.yml?branch=master)
+[![Build Status](https://github.com/eclipse-ee4j/yasson/actions/workflows/maven.yml/badge.svg?branch=main)](https://github.com/eclipse-ee4j/yasson/actions/workflows/maven.yml?branch=main)
 [![License](https://img.shields.io/badge/License-EPL%202.0-green.svg)](https://opensource.org/licenses/EPL-2.0)
 
 Yasson is a Java framework which provides a standard binding layer between Java classes and JSON documents. This is similar to what JAXB is doing in the XML world. Yasson is an official reference implementation of JSON Binding ([JSR-367](https://jcp.org/en/jsr/detail?id=367)).
