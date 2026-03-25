@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2015, 2022 Oracle and/or its affiliates. All rights reserved.
+ * Copyright (c) 2015, 2026 Oracle and/or its affiliates. All rights reserved.
  *
  * This program and the accompanying materials are made available under the
  * terms of the Eclipse Public License v. 2.0 which is available at
@@ -15,6 +15,8 @@ package org.eclipse.yasson.defaultmapping.specific;
 import java.lang.reflect.Type;
 import java.math.BigDecimal;
 import java.math.BigInteger;
+import java.net.URI;
+import java.net.URL;
 import java.time.Instant;
 import java.time.LocalDateTime;
 import java.time.ZoneId;
@@ -30,6 +32,7 @@ import jakarta.json.bind.JsonbException;
 
 import org.eclipse.yasson.TestTypeToken;
 import org.eclipse.yasson.defaultmapping.generics.model.GenericTestClass;
+import org.eclipse.yasson.defaultmapping.generics.model.ScalarValueWrapper;
 import org.eclipse.yasson.defaultmapping.specific.model.ClassWithUnsupportedFields;
 import org.eclipse.yasson.defaultmapping.specific.model.CustomUnsupportedInterface;
 import org.eclipse.yasson.defaultmapping.specific.model.SupportedTypes;
@@ -69,7 +72,7 @@ public class UnmarshallingUnsupportedTypesTest {
         String expected = "{\"customInterface\":{\"value\":\"value1\"}}";
         assertEquals(expected, defaultJsonb.toJson(unsupported));
         try {
-        	defaultJsonb.fromJson(expected, ClassWithUnsupportedFields.class);
+            defaultJsonb.fromJson(expected, ClassWithUnsupportedFields.class);
             fail("Should report an error");
         } catch (JsonbException e) {
             assertTrue(e.getMessage().contains("Cannot infer a type"));
@@ -133,11 +136,11 @@ public class UnmarshallingUnsupportedTypesTest {
 
     @Test
     public void testMissingFieldIgnored() {
-    	assertThrows(JsonbException.class, () -> {
-	        Jsonb defaultConfig = JsonbBuilder.create(new JsonbConfig().setProperty(FAIL_ON_UNKNOWN_PROPERTIES, true));
-	        String json  = "{\"nestedPojo\":{\"integerValue\":10,\"missingField\":5},\"optionalLong\":11}";
-	        SupportedTypes result = defaultConfig.fromJson(json, SupportedTypes.class);
-    	});
+        assertThrows(JsonbException.class, () -> {
+            Jsonb defaultConfig = JsonbBuilder.create(new JsonbConfig().setProperty(FAIL_ON_UNKNOWN_PROPERTIES, true));
+            String json  = "{\"nestedPojo\":{\"integerValue\":10,\"missingField\":5},\"optionalLong\":11}";
+            SupportedTypes result = defaultConfig.fromJson(json, SupportedTypes.class);
+        });
     }
 
     @Test
@@ -223,11 +226,23 @@ public class UnmarshallingUnsupportedTypesTest {
         Type type = new TestTypeToken<GenericTestClass<OptionalLong, OptionalLong>>(){}.getType();
         assertFail("{\"field1\":\"\"}", type,"field1", Long.class); //We are reusing Long deserializer
     }
+    
+    @Test
+    public void testMalformedURL() {
+        Type type = new TestTypeToken<ScalarValueWrapper<URL>>(){}.getType();
+        assertFail("{\"value\":\"www.oracle.com\"}", type, "value", URL.class);
+    }
+    
+    @Test
+    public void testMalformedURI() {
+        Type type = new TestTypeToken<ScalarValueWrapper<URI>>(){}.getType();
+        assertFail("{\"value\":\"www .oracle .com\"}", type, "value", URI.class);
+    }
 
     private void assertFail(String json, Type type, String failureProperty, Class<?> failurePropertyClass) {
         try {
-        	defaultJsonb.fromJson(json, type);
-            fail();
+            defaultJsonb.fromJson(json, type);
+            fail("Expected to catch JsonbException but did not");
         } catch (JsonbException e) {
             if(!e.getMessage().contains(failureProperty) || !e.getMessage().contains(failurePropertyClass.getName())) {
                 fail("Expected error message to contain '" + failureProperty + "' and '" + failurePropertyClass.getName() + "', but was: " +
