@@ -72,7 +72,7 @@ public class UnmarshallingUnsupportedTypesTest {
         String expected = "{\"customInterface\":{\"value\":\"value1\"}}";
         assertEquals(expected, defaultJsonb.toJson(unsupported));
         try {
-        	defaultJsonb.fromJson(expected, ClassWithUnsupportedFields.class);
+            defaultJsonb.fromJson(expected, ClassWithUnsupportedFields.class);
             fail("Should report an error");
         } catch (JsonbException e) {
             assertTrue(e.getMessage().contains("Cannot infer a type"));
@@ -136,11 +136,11 @@ public class UnmarshallingUnsupportedTypesTest {
 
     @Test
     public void testMissingFieldIgnored() {
-    	assertThrows(JsonbException.class, () -> {
-	        Jsonb defaultConfig = JsonbBuilder.create(new JsonbConfig().setProperty(FAIL_ON_UNKNOWN_PROPERTIES, true));
-	        String json  = "{\"nestedPojo\":{\"integerValue\":10,\"missingField\":5},\"optionalLong\":11}";
-	        SupportedTypes result = defaultConfig.fromJson(json, SupportedTypes.class);
-    	});
+        assertThrows(JsonbException.class, () -> {
+            Jsonb defaultConfig = JsonbBuilder.create(new JsonbConfig().setProperty(FAIL_ON_UNKNOWN_PROPERTIES, true));
+            String json  = "{\"nestedPojo\":{\"integerValue\":10,\"missingField\":5},\"optionalLong\":11}";
+            SupportedTypes result = defaultConfig.fromJson(json, SupportedTypes.class);
+        });
     }
 
     @Test
@@ -229,19 +229,19 @@ public class UnmarshallingUnsupportedTypesTest {
     
     @Test
     public void testMalformedURL() {
-    	Type type = new TestTypeToken<ScalarValueWrapper<URL>>(){}.getType();
-    	assertFail("{\"value\":\"www.oracle.com\"}", type, "value", URL.class);
+        Type type = new TestTypeToken<ScalarValueWrapper<URL>>(){}.getType();
+        assertFail("{\"value\":\"www.oracle.com\"}", type, "value", URL.class);
     }
     
     @Test
     public void testMalformedURI() {
-    	Type type = new TestTypeToken<ScalarValueWrapper<URI>>(){}.getType();
-    	assertFail("{\"value\":\"www .oracle .com\"}", type, "value", URI.class);
+        Type type = new TestTypeToken<ScalarValueWrapper<URI>>(){}.getType();
+        assertFail("{\"value\":\"www .oracle .com\"}", type, "value", URI.class);
     }
 
     private void assertFail(String json, Type type, String failureProperty, Class<?> failurePropertyClass) {
         try {
-        	defaultJsonb.fromJson(json, type);
+            defaultJsonb.fromJson(json, type);
             fail("Expected to catch JsonbException but did not");
         } catch (JsonbException e) {
             if(!e.getMessage().contains(failureProperty) || !e.getMessage().contains(failurePropertyClass.getName())) {

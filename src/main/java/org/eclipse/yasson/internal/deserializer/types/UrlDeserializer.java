@@ -12,11 +12,11 @@
 
 package org.eclipse.yasson.internal.deserializer.types;
 
-import jakarta.json.bind.JsonbException;
-
 import java.lang.reflect.Type;
 import java.net.MalformedURLException;
 import java.net.URL;
+
+import jakarta.json.bind.JsonbException;
 
 import org.eclipse.yasson.internal.DeserializationContextImpl;
 
@@ -34,7 +34,8 @@ class UrlDeserializer extends TypeDeserializer {
         try {
             return new URL(value);
         } catch (MalformedURLException e) {
-        	throw new JsonbException("java.net.URL could not parse value " + value, e);
+            // Exception will be caught and wrapped
+            throw new JsonbException("java.net.URL could not parse value " + value, e);
         }
     }
 }
