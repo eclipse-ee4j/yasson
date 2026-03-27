@@ -17,9 +17,14 @@ import java.util.List;
 /**
  * @author <a href="mailto:jperkins@redhat.com">James R. Perkins</a>
  */
-public interface TreeTypeContainer<T extends TreeTypeContainer<T>> {
+public class TreeTypeContainer<T extends TreeTypeContainer<T>> {
+    private List<T> children;
 
-    List<T> getChildren();
+    public List<T> getChildren() {
+        return children;
+    }
 
-    void setChildren(List<T> children);
+    public void setChildren(final List<T> children) {
+        this.children = children;
+    }
 }

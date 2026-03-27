@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2025 Red Hat, Inc. and/or its affiliates.
+ * Copyright (c) 2025 IBM, Inc. and/or its affiliates.
  *
  * This program and the accompanying materials are made available under the
  * terms of the Eclipse Public License v. 2.0 which is available at
@@ -12,18 +12,22 @@
 
 package org.eclipse.yasson.defaultmapping.generics.model;
 
+import java.util.List;
+
 /**
- * @author <a href="mailto:jperkins@redhat.com">James R. Perkins</a>
+ *
+ * @author <a href="mailto:jperkins@ibm.com">James R. Perkins</a>
  */
-public class TreeElement extends TreeTypeContainer<TreeElement> {
+public class ListContainer<T> {
 
-    private final String name;
+    private List<T> list;
 
-    public TreeElement(final String name) {
-        this.name = name;
+    public List<T> getList() {
+        return list;
     }
 
-    public String getName() {
-        return name;
+    public void setList(List<T> list) {
+        this.list = list;
     }
+
 }
