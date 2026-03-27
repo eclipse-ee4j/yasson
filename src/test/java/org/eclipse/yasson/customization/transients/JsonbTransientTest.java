@@ -67,12 +67,8 @@ public class JsonbTransientTest {
         JsonbTransientCollisionOnProperty pojo = new JsonbTransientCollisionOnProperty();
         pojo.setTransientProperty("TRANSIENT");
 
-        try {
-        	defaultJsonb.toJson(pojo);
-            fail();
-        } catch (JsonbException e) {
-            assertTrue(e.getMessage().startsWith("JsonbTransient annotation cannot be used with other jsonb annotations on the same property."));
-        }
+        JsonbException e = assertThrows(JsonbException.class, () -> defaultJsonb.toJson(pojo));
+        assertTrue(e.getMessage().startsWith("JsonbTransient annotation cannot be used with other jsonb annotations on the same property."));
     }
 
     @Test
@@ -80,12 +76,8 @@ public class JsonbTransientTest {
         JsonbTransientCollisionOnGetter pojo = new JsonbTransientCollisionOnGetter();
         pojo.setTransientProperty("TRANSIENT");
 
-        try {
-        	defaultJsonb.toJson(pojo);
-            fail();
-        } catch (JsonbException e) {
-            assertTrue(e.getMessage().startsWith("JsonbTransient annotation cannot be used with other jsonb annotations on the same property."));
-        }
+        JsonbException e = assertThrows(JsonbException.class, () -> defaultJsonb.toJson(pojo));
+        assertTrue(e.getMessage().startsWith("JsonbTransient annotation cannot be used with other jsonb annotations on the same property."));
     }
 
     @Test
@@ -93,12 +85,8 @@ public class JsonbTransientTest {
         JsonbTransientCollisionOnPropertyAndGetter pojo = new JsonbTransientCollisionOnPropertyAndGetter();
         pojo.setTransientProperty("TRANSIENT");
 
-        try {
-        	defaultJsonb.toJson(pojo);
-            fail();
-        } catch (JsonbException e) {
-            assertTrue(e.getMessage().startsWith("JsonbTransient annotation cannot be used with other jsonb annotations on the same property."));
-        }
+        JsonbException e = assertThrows(JsonbException.class, () -> defaultJsonb.toJson(pojo));
+        assertTrue(e.getMessage().startsWith("JsonbTransient annotation cannot be used with other jsonb annotations on the same property."));
     }
 
     @Test
@@ -106,12 +94,8 @@ public class JsonbTransientTest {
         JsonbTransientCollisionOnSetter pojo = new JsonbTransientCollisionOnSetter();
         pojo.setTransientProperty("TRANSIENT");
 
-        try {
-        	defaultJsonb.toJson(pojo);
-            fail();
-        } catch (JsonbException e) {
-            assertTrue(e.getMessage().startsWith("JsonbTransient annotation cannot be used with other jsonb annotations on the same property."));
-        }
+        JsonbException e = assertThrows(JsonbException.class, () -> defaultJsonb.toJson(pojo));
+        assertTrue(e.getMessage().startsWith("JsonbTransient annotation cannot be used with other jsonb annotations on the same property."));
     }
 
     @Test
@@ -119,12 +103,8 @@ public class JsonbTransientTest {
         JsonbTransientCollisionOnPropertyAndSetter pojo = new JsonbTransientCollisionOnPropertyAndSetter();
         pojo.setTransientProperty("TRANSIENT");
 
-        try {
-        	defaultJsonb.toJson(pojo);
-            fail();
-        } catch (JsonbException e) {
-            assertTrue(e.getMessage().startsWith("JsonbTransient annotation cannot be used with other jsonb annotations on the same property."));
-        }
+        JsonbException e = assertThrows(JsonbException.class, () -> defaultJsonb.toJson(pojo));
+        assertTrue(e.getMessage().startsWith("JsonbTransient annotation cannot be used with other jsonb annotations on the same property."));
     }
 
     @Test
@@ -132,12 +112,8 @@ public class JsonbTransientTest {
         JsonbTransientCollisionOnPropertyAndGetterAndSetter pojo = new JsonbTransientCollisionOnPropertyAndGetterAndSetter();
         pojo.setTransientProperty("TRANSIENT");
 
-        try {
-        	defaultJsonb.toJson(pojo);
-            fail();
-        } catch (JsonbException e) {
-            assertTrue(e.getMessage().startsWith("JsonbTransient annotation cannot be used with other jsonb annotations on the same property."));
-        }
+        JsonbException e = assertThrows(JsonbException.class, () -> defaultJsonb.toJson(pojo));
+        assertTrue(e.getMessage().startsWith("JsonbTransient annotation cannot be used with other jsonb annotations on the same property."));
     }
 
     @Test
