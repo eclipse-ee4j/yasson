@@ -29,7 +29,7 @@ import org.eclipse.yasson.internal.properties.Messages;
 public class JsonArrayIterator extends JsonStructureIterator {
 
     private final Iterator<JsonValue> valueIterator;
-
+    private final JsonArray jsonArray;
     private JsonValue currentValue;
 
     /**
@@ -38,6 +38,7 @@ public class JsonArrayIterator extends JsonStructureIterator {
      * @param jsonArray json array
      */
     public JsonArrayIterator(JsonArray jsonArray) {
+        this.jsonArray = jsonArray;
         this.valueIterator = jsonArray.iterator();
     }
 
@@ -62,6 +63,9 @@ public class JsonArrayIterator extends JsonStructureIterator {
 
     @Override
     JsonValue getValue() {
+        if (currentValue == null) {
+            return jsonArray;
+        }
         return currentValue;
     }
 
