@@ -121,7 +121,7 @@ public class TypeSerializers {
         if (isClassAvailable("java.sql.Date")) {
             cache.put(Date.class, SqlDateSerializer::new);
             cache.put(java.sql.Date.class, SqlDateSerializer::new);
-            cache.put(java.sql.Timestamp.class, SqlTimestampSerializer::new);
+            cache.put(java.sql.Timestamp.class, SqlDateSerializer::new);
         }
         SERIALIZERS = Map.copyOf(cache);
 
