@@ -27,4 +27,21 @@ public class TreeTypeContainer<T extends TreeTypeContainer<T>> {
     public void setChildren(final List<T> children) {
         this.children = children;
     }
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) {
+            return true;
+        }
+        if (o == null || getClass() != o.getClass()) {
+            return false;
+        }
+        
+        TreeTypeContainer<?> that = (TreeTypeContainer<?>) o;
+        if (children == null) {
+            return that.children == null;
+        }
+        
+        return children.containsAll(that.children) && that.children.containsAll(children); 
+    }
 }

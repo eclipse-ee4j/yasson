@@ -17,7 +17,10 @@ package org.eclipse.yasson.defaultmapping.generics.model;
  */
 public class TreeElement extends TreeTypeContainer<TreeElement> {
 
-    private final String name;
+    private String name;
+
+    public TreeElement() {
+    }
 
     public TreeElement(final String name) {
         this.name = name;
@@ -25,5 +28,26 @@ public class TreeElement extends TreeTypeContainer<TreeElement> {
 
     public String getName() {
         return name;
+    }
+
+    public void setName(final String name) {
+        this.name = name;
+    }
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) {
+            return true;
+        }
+        if (o == null || getClass() != o.getClass()) {
+            return false;
+        }
+        
+        if (!super.equals(o)) {
+            return false;
+        }
+        
+        TreeElement that = (TreeElement) o;
+        return name != null ? name.equals(that.name) : that.name == null;
     }
 }

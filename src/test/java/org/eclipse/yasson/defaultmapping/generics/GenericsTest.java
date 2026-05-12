@@ -527,6 +527,8 @@ public class GenericsTest {
         // Use a new instance of Jsonb to avoid any caching
         try (var jsonb = JsonbBuilder.create()) {
             assertEquals(expectedJson, jsonb.toJson(container));
+            TreeContainer<TreeElement> result = jsonb.fromJson(expectedJson, new TestTypeToken<TreeContainer<TreeElement>>() {}.getType());
+            assertIterableEquals(container.getTree().getChildren(), result.getTree().getChildren());
         }
 
     }
@@ -542,6 +544,8 @@ public class GenericsTest {
         // Use a new instance of Jsonb to avoid any caching
         try (var jsonb = JsonbBuilder.create()) {
             assertEquals(expectedJson, jsonb.toJson(container));
+            ListContainer<TreeElement> result = jsonb.fromJson(expectedJson, new TestTypeToken<ListContainer<TreeElement>>() {}.getType());
+            assertIterableEquals(container.getList(), result.getList());
         }
 
     }
