@@ -39,7 +39,6 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNull;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.junit.jupiter.api.Assertions.assertTrue;
-import static org.junit.jupiter.api.Assertions.fail;
 
 /**
  * @author Roman Grigoriadi
@@ -79,22 +78,14 @@ public class JsonbCreatorTest {
 
     @Test
     public void testIncompatibleFactoryMethodReturnType() {
-        try {
-        	defaultJsonb.fromJson("{\"s1\":\"abc\"}", CreatorIncompatibleTypePojo.class);
-            fail();
-        } catch (JsonbException e) {
-            assertTrue(e.getMessage().startsWith("Return type of creator"));
-        }
+        JsonbException e = assertThrows(JsonbException.class, () -> defaultJsonb.fromJson("{\"s1\":\"abc\"}", CreatorIncompatibleTypePojo.class));
+        assertTrue(e.getMessage().startsWith("Return type of creator"));
     }
 
     @Test
     public void testMultipleCreatorsError() {
-        try {
-        	defaultJsonb.fromJson("{\"s1\":\"abc\"}", CreatorMultipleDeclarationErrorPojo.class);
-            fail();
-        } catch (JsonbException e) {
-            assertTrue(e.getMessage().startsWith("More than one @JsonbCreator"));
-        }
+        JsonbException e = assertThrows(JsonbException.class, () -> defaultJsonb.fromJson("{\"s1\":\"abc\"}", CreatorMultipleDeclarationErrorPojo.class));
+        assertTrue(e.getMessage().startsWith("More than one @JsonbCreator"));
     }
 
     @Test

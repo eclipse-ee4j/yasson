@@ -25,6 +25,7 @@ import jakarta.json.Json;
 import jakarta.json.JsonObject;
 import jakarta.json.JsonObjectBuilder;
 import jakarta.json.JsonWriter;
+import jakarta.json.bind.JsonbException;
 import jakarta.json.stream.JsonGenerator;
 
 import java.io.StringWriter;
@@ -216,7 +217,7 @@ public class NumberTest {
     
     @Test
     public void testSerializeInvalidDouble() {
-        shouldFail(() -> defaultJsonb.toJson(Double.POSITIVE_INFINITY));
+        assertThrows(JsonbException.class, () -> defaultJsonb.toJson(Double.POSITIVE_INFINITY));
 
         NumberContainer obj = new NumberContainer();
         obj.doubleProp = Double.POSITIVE_INFINITY;

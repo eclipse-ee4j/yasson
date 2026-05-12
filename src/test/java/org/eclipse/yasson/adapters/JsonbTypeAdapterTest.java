@@ -63,13 +63,9 @@ public class JsonbTypeAdapterTest {
     public void testIncompatibleAdapter() throws Exception {
         IncompatibleAdapterPojo incompatibleAdapterFieldPojo = new IncompatibleAdapterPojo();
         incompatibleAdapterFieldPojo.str = "STR";
-        try {
-            defaultJsonb.toJson(incompatibleAdapterFieldPojo);
-            fail();
-        } catch (JsonbException e) {
-            assertTrue(e.getMessage().startsWith("Adapter of runtime type class"));
-            assertTrue(e.getMessage().contains("does not match property type "));
-        }
+        JsonbException e = assertThrows(JsonbException.class, () -> defaultJsonb.toJson(incompatibleAdapterFieldPojo));
+        assertTrue(e.getMessage().startsWith("Adapter of runtime type class"));
+        assertTrue(e.getMessage().contains("does not match property type "));
     }
 
     @Test
