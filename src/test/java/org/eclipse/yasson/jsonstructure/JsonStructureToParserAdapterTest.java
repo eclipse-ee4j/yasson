@@ -285,7 +285,7 @@ public class JsonStructureToParserAdapterTest {
         
         Jsonb jsonb = JsonbBuilder.create();
         Issue673.LocationInterface result = jsonb.fromJson(json, Issue673.LocationInterface.class);
-	        
+            
         assertNotNull(result);
         assertTrue(result instanceof Issue673.Location);
         Issue673.Location location = (Issue673.Location) result;
