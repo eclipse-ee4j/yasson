@@ -322,4 +322,69 @@ public class JsonStructureToParserAdapterTest {
         assertEquals("test1, test2", tags);
     }
 
+    /**
+     * Test for Issue #707: isIntegralNumber() should throw IllegalStateException, not JsonbException
+     * when called on a non-numeric value.
+     *
+     * This test verifies that the user's code pattern from the issue works correctly:
+     * - When the value is a string, isIntegralNumber() throws IllegalStateException
+     * - The exception can be caught and the value read as a string
+     */
+    @Test
+    public void isIntegralNumberThrowsIllegalStateException() {
+        // Test with string ID - should catch IllegalStateException and handle gracefully
+        // This test uses fromJsonStructure to exercise JsonStructureToParserAdapter
+        JsonObjectBuilder objectBuilder = jsonProvider.createObjectBuilder();
+        objectBuilder.add("id", "abc123");
+        JsonObject jsonObject = objectBuilder.build();
+        
+        YassonJsonb jsonb = (YassonJsonb) JsonbBuilder.create();
+        Issue707.Request result = jsonb.fromJsonStructure(jsonObject, Issue707.Request.class);
+        
+        assertNotNull(result);
+        assertNotNull(result.getId());
+        assertEquals("abc123", result.getId().getValue());
+    }
+    
+    /**
+     * Test for Issue #707: Verify that an integral ID still works correctly.
+     */
+    @Test
+    public void isIntegralNumberWithNumericValue() {
+        // Test with numeric ID - should work without throwing any exception
+        // This test uses fromJsonStructure to exercise JsonStructureToParserAdapter
+        JsonObjectBuilder objectBuilder = jsonProvider.createObjectBuilder();
+        objectBuilder.add("id", 12345);
+        JsonObject jsonObject = objectBuilder.build();
+        
+        YassonJsonb jsonb = (YassonJsonb) JsonbBuilder.create();
+        Issue707.Request result = jsonb.fromJsonStructure(jsonObject, Issue707.Request.class);
+        
+        assertNotNull(result);
+        assertNotNull(result.getId());
+        assertEquals("12345", result.getId().getValue());
+    }
+    
+    /**
+     * Test for Issue #707: Verify that floating point numbers are handled correctly.
+     * isIntegralNumber() should return false for non-integral numbers.
+     * isIntegralNumber() should not throw an exception for floating point numbers.
+     */
+    @Test
+    public void isIntegralNumberWithFloatingPoint() {
+        // Test with floating point ID - isIntegralNumber() returns false,
+        // so the else block handles it as a string
+        // This test uses fromJsonStructure to exercise JsonStructureToParserAdapter
+        JsonObjectBuilder objectBuilder = jsonProvider.createObjectBuilder();
+        objectBuilder.add("id", 123.45);
+        JsonObject jsonObject = objectBuilder.build();
+        
+        YassonJsonb jsonb = (YassonJsonb) JsonbBuilder.create();
+        Issue707.Request result = jsonb.fromJsonStructure(jsonObject, Issue707.Request.class);
+        
+        assertNotNull(result);
+        assertNotNull(result.getId());
+        // The deserializer will read it as a string when isIntegralNumber() returns false
+        assertEquals("123.45", result.getId().getValue());
+    }
 }

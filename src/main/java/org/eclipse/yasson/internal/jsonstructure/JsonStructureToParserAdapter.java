@@ -141,7 +141,7 @@ public class JsonStructureToParserAdapter implements JsonParser {
         JsonStructureIterator iterator = iterators.peek();
         JsonValue value = iterator.getValue();
         if (value.getValueType() != JsonValue.ValueType.NUMBER) {
-            throw iterator.createIncompatibleValueError();
+            throw new IllegalStateException(iterator.createIncompatibleValueError().getMessage());
         }
         return (JsonNumber) value;
     }
