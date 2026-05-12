@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2019, 2022 Oracle and/or its affiliates. All rights reserved.
+ * Copyright (c) 2019, 2025 Oracle and/or its affiliates. All rights reserved.
  *
  * This program and the accompanying materials are made available under the
  * terms of the Eclipse Public License v. 2.0 which is available at
@@ -14,7 +14,9 @@ package org.eclipse.yasson.internal.serializer.types;
 
 import java.sql.Timestamp;
 import java.time.Instant;
+import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
+import java.time.temporal.TemporalAccessor;
 import java.util.Locale;
 
 /**
@@ -29,6 +31,12 @@ class SqlTimestampSerializer extends AbstractDateSerializer<Timestamp> {
 
     SqlTimestampSerializer(TypeSerializerBuilder serializerBuilder) {
         super(serializerBuilder);
+    }
+
+    @Override
+    protected TemporalAccessor toTemporalAccessor(Timestamp value) {
+        // convert SQL Timestamp into a LocalDateTime to unlock TemporalAccessor access
+        return LocalDateTime.ofInstant(value.toInstant(), UTC);
     }
 
     @Override
