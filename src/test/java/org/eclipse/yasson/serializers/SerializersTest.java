@@ -35,6 +35,7 @@ import jakarta.json.bind.Jsonb;
 import jakarta.json.bind.JsonbBuilder;
 import jakarta.json.bind.JsonbConfig;
 import jakarta.json.bind.JsonbException;
+import jakarta.json.bind.annotation.JsonbTypeSerializer;
 import jakarta.json.bind.config.PropertyOrderStrategy;
 import jakarta.json.bind.serializer.DeserializationContext;
 import jakarta.json.bind.serializer.JsonbDeserializer;
@@ -78,6 +79,7 @@ import static java.util.Collections.singletonMap;
 import static org.eclipse.yasson.Jsonbs.defaultJsonb;
 import static org.eclipse.yasson.Jsonbs.nullableJsonb;
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertInstanceOf;
 import static org.junit.jupiter.api.Assertions.assertNull;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.junit.jupiter.api.Assertions.fail;
@@ -810,6 +812,94 @@ public class SerializersTest {
 
         assertEquals(expected, jsonb.fromJson(expectedJson, Container.class));
 
+    }
+
+    /**
+     * Test that annotation-based serializers work when property is declared as Object
+     * but the runtime type has @JsonbTypeSerializer annotation.
+     * This is a regression test for issue #689.
+     */
+    @Test
+    public void testAnnotationBasedSerializerWithObjectTypedProperty() throws Exception {
+        try (Jsonb jsonb = JsonbBuilder.create()) {
+
+            final ObjectPropertyContainer container = new ObjectPropertyContainer();
+            final AnnotatedWithSerializerType objectInstance = new AnnotatedWithSerializerType();
+            objectInstance.value = "test";
+            container.annotatedAsObject = objectInstance;
+            container.annotatedConcrete = new AnnotatedWithSerializerType();
+            container.annotatedConcrete.value = "test2";
+
+            final String result = jsonb.toJson(container);
+
+            // Both properties should use the annotation-based serializer
+            final String expected = "{\"annotatedAsObject\":{\"valueField\":\"replaced value\"},\"annotatedConcrete\":{\"valueField\":\"replaced value\"}}";
+            assertEquals(expected, result);
+
+            // Deserialization: annotatedConcrete uses annotation-based deserializer
+            // annotatedAsObject is declared as Object so JSON-B creates a HashMap (expected behavior)
+            final ObjectPropertyContainer deserialized = jsonb.fromJson(expected, ObjectPropertyContainer.class);
+            //  In the JSON, the type looks like an object and therefore is a map
+            assertInstanceOf(Map.class, deserialized.annotatedAsObject, "Object property deserializes to Map");
+            final Map<?, ?> map =  (Map<?, ?>) deserialized.annotatedAsObject;
+            assertTrue(map.containsKey("valueField"));
+            assertEquals("replaced value", map.get("valueField"));
+            assertEquals("replaced value", deserialized.annotatedConcrete.value);
+        }
+    }
+
+    /**
+     * Test that field-level and method-level @JsonbTypeSerializer annotations work on Object-typed properties.
+     * This tests existing AnnotationIntrospector code (not runtime discovery).
+     */
+    @Test
+    public void testFieldAndMethodLevelSerializerOnObjectType() throws Exception {
+        try (Jsonb jsonb = JsonbBuilder.create()) {
+            final ObjectWithAnnotatedFields container = new ObjectWithAnnotatedFields();
+            container.fieldAnnotated = "test field";
+            container.setMethodAnnotated("test method");
+
+            final String result = jsonb.toJson(container);
+
+            // Both should use their respective serializers
+            final String expected = "{\"fieldAnnotated\":\"FIELD:test field\",\"methodAnnotated\":\"METHOD:test method\"}";
+            assertEquals(expected, result);
+        }
+    }
+
+    public static class ObjectWithAnnotatedFields {
+        @JsonbTypeSerializer(ObjectFieldSerializer.class)
+        public Object fieldAnnotated;
+
+        private Object methodAnnotated;
+
+        @JsonbTypeSerializer(ObjectMethodSerializer.class)
+        public Object getMethodAnnotated() {
+            return methodAnnotated;
+        }
+
+        public void setMethodAnnotated(Object methodAnnotated) {
+            this.methodAnnotated = methodAnnotated;
+        }
+    }
+
+    public static class ObjectFieldSerializer implements JsonbSerializer<Object> {
+        @Override
+        public void serialize(Object obj, JsonGenerator generator, SerializationContext ctx) {
+            generator.write("FIELD:" + obj.toString());
+        }
+    }
+
+    public static class ObjectMethodSerializer implements JsonbSerializer<Object> {
+        @Override
+        public void serialize(Object obj, JsonGenerator generator, SerializationContext ctx) {
+            generator.write("METHOD:" + obj.toString());
+        }
+    }
+
+    public static class ObjectPropertyContainer {
+        public Object annotatedAsObject;  // Declared as Object - this was the bug scenario
+        public AnnotatedWithSerializerType annotatedConcrete;  // Declared concretely - should always work
     }
 
 }

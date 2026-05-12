@@ -24,6 +24,7 @@ import java.util.function.Function;
 
 import jakarta.json.bind.JsonbConfig;
 import jakarta.json.bind.adapter.JsonbAdapter;
+import jakarta.json.bind.annotation.JsonbTypeSerializer;
 import jakarta.json.bind.serializer.JsonbDeserializer;
 import jakarta.json.bind.serializer.JsonbSerializer;
 
@@ -142,9 +143,28 @@ public class ComponentMatcher {
                                                                ComponentBoundCustomization customization) {
 
         if (customization == null || customization.getSerializerBinding() == null) {
-            return searchComponentBinding(propertyRuntimeType, ComponentBindings::getSerializer);
+            return searchComponentBinding(propertyRuntimeType, ComponentBindings::getSerializer, this::getAnnotationBasedSerializer);
         }
-        return Optional.of(customization.getSerializerBinding());
+        final SerializerBinding<?> binding = customization.getSerializerBinding();
+
+        // If the binding type exactly matches the runtime type, use it (optimization)
+        if (binding.getBindingType().equals(propertyRuntimeType)) {
+            return Optional.of(binding);
+        }
+
+        // Special handling for Object type: search for more specific serializers based on runtime type
+        // This allows annotation-based or config-based serializers on concrete types to be found
+        // when the property is declared as Object but has a specific runtime type
+        if (Object.class.equals(binding.getBindingType())) {
+            final Optional<SerializerBinding<?>> moreSpecific = searchComponentBinding(propertyRuntimeType,
+                ComponentBindings::getSerializer, this::getAnnotationBasedSerializer);
+            if (moreSpecific.isPresent()) {
+                return moreSpecific;
+            }
+        }
+
+        // Use the customization binding (user explicitly configured it for this property)
+        return Optional.of(binding);
     }
 
     /**
@@ -175,7 +195,14 @@ public class ComponentMatcher {
         if (customization == null || customization.getSerializeAdapterBinding() == null) {
             return searchComponentBinding(propertyRuntimeType, ComponentBindings::getAdapterInfo);
         }
-        return Optional.of(customization.getSerializeAdapterBinding());
+        // Check if the customization's adapter binding matches the runtime type
+        AdapterBinding binding = customization.getSerializeAdapterBinding();
+        if (matches(propertyRuntimeType, binding.getBindingType())) {
+            return Optional.of(binding);
+        }
+        // The annotation-based adapter doesn't match the runtime type,
+        // fall through to search for a better match based on runtime type
+        return searchComponentBinding(propertyRuntimeType, ComponentBindings::getAdapterInfo);
     }
 
     /**
@@ -194,7 +221,19 @@ public class ComponentMatcher {
         return Optional.of(customization.getDeserializeAdapterBinding());
     }
 
-    private <T extends AbstractComponentBinding> Optional<T> searchComponentBinding(Type runtimeType, Function<ComponentBindings, T> supplier) {
+    /**
+     * Search for a component binding for the given runtime type.
+     *
+     * @param runtimeType         The runtime type to find a component for
+     * @param supplier            Function to extract the desired component from ComponentBindings
+     * @param annotationDiscovery Optional function for runtime annotation discovery (null if not applicable)
+     * @param <T>                 The type of component binding to search for
+     * @return Optional containing the component binding if found
+     */
+    private <T extends AbstractComponentBinding> Optional<T> searchComponentBinding(
+            Type runtimeType,
+            Function<ComponentBindings, T> supplier,
+            Function<Class<?>, Optional<T>> annotationDiscovery) {
         // First check if there is an exact match
         ComponentBindings binding = userComponents.get(runtimeType);
         if (binding != null) {
@@ -206,6 +245,15 @@ public class ComponentMatcher {
         
         Optional<Class<?>> runtimeClass = ReflectionUtils.getOptionalRawType(runtimeType);
         if (runtimeClass.isPresent()) {
+            // Check for annotation-based component on the runtime type itself
+            // Currently only used for @JsonbTypeSerializer during serialization
+            if (annotationDiscovery != null) {
+                Optional<T> annotationBased = annotationDiscovery.apply(runtimeClass.get());
+                if (annotationBased.isPresent()) {
+                    return annotationBased;
+                }
+            }
+
             // Check if any interfaces have a match
             for (Class<?> ifc : runtimeClass.get().getInterfaces()) {
                 ComponentBindings ifcBinding = userComponents.get(ifc);
@@ -220,7 +268,7 @@ public class ComponentMatcher {
             // check if the superclass has a match
             Class<?> superClass = runtimeClass.get().getSuperclass();
             if (superClass != null && superClass != Object.class) {
-                Optional<T> superBinding = searchComponentBinding(superClass, supplier);
+                Optional<T> superBinding = searchComponentBinding(superClass, supplier, annotationDiscovery);
                 if (superBinding.isPresent()) {
                     return superBinding;
                 }
@@ -229,7 +277,64 @@ public class ComponentMatcher {
         
         return Optional.empty();
     }
-    
+
+    // Convenience overload for components without annotation discovery (deserializers, adapters)
+    private <T extends AbstractComponentBinding> Optional<T> searchComponentBinding(
+            final Type runtimeType,
+            final Function<ComponentBindings, T> supplier) {
+        return searchComponentBinding(runtimeType, supplier, null);
+    }
+
+    /**
+     * Discovers and caches a serializer defined by @JsonbTypeSerializer annotation on a runtime type.
+     *
+     * <p>This method performs <strong>runtime</strong> annotation discovery during serialization,
+     * which is distinct from the build-time annotation introspection performed by AnnotationIntrospector.
+     * It is invoked when serializing a property where the runtime type is more specific than the
+     * declared type (e.g., a property declared as {@code Object} containing an instance of a class
+     * annotated with @JsonbTypeSerializer).</p>
+     *
+     * <p>Note: Only @JsonbTypeSerializer is checked, not @JsonbTypeAdapter or @JsonbTypeDeserializer,
+     * because:</p>
+     * <ul>
+     *   <li>Serializers are unidirectional (serialization only), so runtime discovery is complete</li>
+     *   <li>Deserializers don't apply - we lack runtime type information during deserialization</li>
+     *   <li>Adapters are bidirectional - discovering them only at runtime during serialization
+     *       would be incomplete since they couldn't be discovered during deserialization</li>
+     * </ul>
+     *
+     * @param clazz The runtime class to check for @JsonbTypeSerializer annotation
+     * @return SerializerBinding if annotation is present and successfully introspected, empty otherwise
+     */
+    private Optional<SerializerBinding<?>> getAnnotationBasedSerializer(final Class<?> clazz) {
+        // Check if the class has a @JsonbTypeSerializer annotation
+        final JsonbTypeSerializer annotation = clazz.getAnnotation(JsonbTypeSerializer.class);
+        if (annotation == null) {
+            return Optional.empty();
+        }
+
+        // Thread-safe get-or-create using compute
+       final SerializerBinding<?> binding = userComponents.compute(clazz, (type, bindings) -> {
+            // If already cached, return as-is
+            if (bindings != null && bindings.getSerializer() != null) {
+                return bindings;
+            }
+
+            // Create new serializer binding
+            final Class<? extends JsonbSerializer> serializerClass = annotation.value();
+            final JsonbSerializer<?> serializer = jsonbContext.getComponentInstanceCreator().getOrCreateComponent(serializerClass);
+            final SerializerBinding<?> newBinding = new SerializerBinding<>(clazz, serializer);
+
+            // Create or update ComponentBindings
+            if (bindings == null) {
+                return new ComponentBindings(clazz, newBinding, null, null);
+            }
+            return new ComponentBindings(clazz, newBinding, bindings.getDeserializer(), bindings.getAdapterInfo());
+        }).getSerializer();
+
+        return Optional.ofNullable(binding);
+    }
+
     private <T> Optional<T> getMatchingBinding(Type runtimeType, ComponentBindings binding, Function<ComponentBindings, T> supplier) {
         final T component = supplier.apply(binding);
         if (component != null && matches(runtimeType, binding.getBindingType())) {
