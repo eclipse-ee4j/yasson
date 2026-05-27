@@ -20,7 +20,7 @@
     <parent>
         <groupId>org.eclipse.ee4j</groupId>
         <artifactId>project</artifactId>
-        <version>2.0.2</version>
+        <version>2.0.4</version>
     </parent>
 
     <groupId>org.eclipse</groupId>
@@ -34,21 +34,30 @@
 
     <properties>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
+
         <maven.compiler.release>11</maven.compiler.release>
+        <maven.compiler.target>11</maven.compiler.target>
         <maven.compiler.testRelease>${maven.compiler.release}</maven.compiler.testRelease>
+        
         <nexus.staging.repository>yasson-maven2-staging</nexus.staging.repository>
 
         <!--Dependencies-->
         <hamcrest.version>2.2</hamcrest.version>
+        
+        <!-- Jakarta API -->
         <jakarta.annotation-api.version>3.0.0</jakarta.annotation-api.version>
         <jakarta.el-api.version>6.0.0</jakarta.el-api.version>
         <jakarta.enterprise.cdi-api.version>4.1.0</jakarta.enterprise.cdi-api.version>
         <jakarta.interceptor-api.version>2.2.0</jakarta.interceptor-api.version>
         <jakarta.json.bind.version>3.0.1</jakarta.json.bind.version>
         <jakarta.json.version>2.1.3</jakarta.json.version>
-        <jakarta.parson.version>1.1.7</jakarta.parson.version>
-        <junit-jupiter.version>5.10.2</junit-jupiter.version>
-        <weld-se-core.version>6.0.0.Beta1</weld-se-core.version>
+
+        <!-- Jakarta Implementation -->
+        <jakarta.parson.version>1.1.9</jakarta.parson.version>
+
+        <!-- Test dependencies-->
+        <junit-jupiter.version>5.14.4</junit-jupiter.version> <!-- TODO update to Junit 6 when running on Java 17+ -->
+        <weld-se-core.version>6.0.4.Final</weld-se-core.version>
 
         <!--Plugins-->
         <build-helper-maven-plugin.version>3.6.0</build-helper-maven-plugin.version>
@@ -365,9 +374,9 @@
                                 <goal>compile</goal>
                             </goals>
                             <configuration>
-                                <release>11</release>
-                                <source>11</source>
-                                <target>11</target>
+                                <release>${maven.compiler.release}</release>
+                                <source>${maven.compiler.release}</source>
+                                <target>${maven.compiler.release}</target>
                             </configuration>
                         </execution>
                         <execution>
@@ -434,7 +443,7 @@
                     <artifactId>maven-javadoc-plugin</artifactId>
                     <version>${maven-javadoc-plugin.version}</version>
                     <configuration>
-                        <bottom><![CDATA[Copyright &#169; 2017, 2024 Oracle Corporation. All rights reserved.<br>]]></bottom>
+                        <bottom><![CDATA[Copyright &#169; 2017, 2026 Oracle Corporation. All rights reserved.<br>]]></bottom>
                     </configuration>
                 </plugin>
                 <plugin>
