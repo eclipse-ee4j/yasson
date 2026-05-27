@@ -5,6 +5,12 @@
 
     <modelVersion>4.0.0</modelVersion>
 
+    <parent>
+        <groupId>org.eclipse.ee4j</groupId>
+        <artifactId>project</artifactId>
+        <version>2.0.4</version>
+    </parent>
+
     <groupId>org.eclipse.yasson</groupId>
     <artifactId>yasson-jmh</artifactId>
     <version>1.0-SNAPSHOT</version>
@@ -14,7 +20,7 @@
 
     <properties>
         <jmh.version>1.21</jmh.version>
-        <yasson.version>2.0.2-SNAPSHOT</yasson.version>
+        <yasson.version>3.0.5-SNAPSHOT</yasson.version>
     </properties>
 
 
