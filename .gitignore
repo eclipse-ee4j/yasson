@@ -4,7 +4,7 @@
 .project
 .idea/
 .settings/
-/.DS_Store
+.DS_Store
 bin/
 .envrc
 .vscode/

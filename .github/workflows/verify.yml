@@ -1,0 +1,54 @@
+#
+# Copyright (c) 2026 Eclipse Foundation and/or its affiliates. All rights reserved.
+#
+# This program and the accompanying materials are made available under the
+# terms of the Eclipse Public License v. 2.0 which is available at
+# http://www.eclipse.org/legal/epl-2.0,
+# or the Eclipse Distribution License v. 1.0 which is available at
+# http://www.eclipse.org/org/documents/edl-v10.php.
+#
+# SPDX-License-Identifier: EPL-2.0 OR BSD-3-Clause
+#
+
+# This workflow is used to verify this project against staged versions of the API and TCK. 
+# It is not intended to be used for regular CI builds, but rather as a manual workflow that can be triggered when needed.
+
+name: Verify
+
+on:
+    workflow_dispatch:
+        inputs:
+            jsonb_version:
+                description: 'The version of the TCK to verify against (e.g. 3.1.0-M1)'
+                required: true
+
+jobs:
+    verify:
+        name: Verify against staged API or TCK
+        runs-on: ubuntu-latest
+
+        steps:
+            - name: Checkout for verify
+              uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd # v6.0.2
+              with:
+                fetch-depth: 0
+            - name: Set up compile JDK
+              uses: actions/setup-java@be666c2fcd27ec809703dec50e508c2fdc7f6654 # v5.2.0
+              with: #Compile java needs to be the highest to ensure proper compilation of the multi-release jar
+                distribution: 'temurin'
+                java-version: 17
+                cache: 'maven'
+            - name: Compile Yasson
+              run: |
+                mvn -U -C clean install \
+                    -Pstaged \
+                    -Djakarta.json.bind.version=${{ github.event.inputs.jsonb_version }} \
+                    -DskipTests
+            - name: Run TCK
+              run: |
+                cd yasson-tck
+                mvn -U -B test \
+                    -Pstaged \
+                    -Djakarta.json.bind.version=${{ github.event.inputs.jsonb_version }} \
+                    -Djsonb.tck.version=${{ github.event.inputs.jsonb_version }} \
+                    -DargLine="-Djava.locale.providers=COMPAT"

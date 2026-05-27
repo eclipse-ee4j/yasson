@@ -1,0 +1,62 @@
+#
+# Copyright (c) 2026 Eclipse Foundation and/or its affiliates. All rights reserved.
+#
+# This program and the accompanying materials are made available under the
+# terms of the Eclipse Public License v. 2.0 which is available at
+# http://www.eclipse.org/legal/epl-2.0,
+# or the Eclipse Distribution License v. 1.0 which is available at
+# http://www.eclipse.org/org/documents/edl-v10.php.
+#
+# SPDX-License-Identifier: EPL-2.0 OR BSD-3-Clause
+#
+
+# This workflow performs performance testing using JMH.
+# It is intended to be run on a schedule (e.g. weekly) to track performance over time, but can also be triggered manually when needed.
+# Persist results to github pages for continuous line graphs and regression alerts.
+
+name: Performance
+
+on:
+    schedule:
+        # Runs every Tuesday at 4:13 AM UTC (avoid peak hours for better performance results)
+        - cron: '13 4 * * 2' 
+    workflow_dispatch:
+    
+jobs:
+    performance:
+        name: Run JMH performance tests
+        runs-on: ubuntu-latest
+
+        steps:
+            - name: Checkout for performance
+              uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd # v6.0.2
+              with:
+                fetch-depth: 0
+            - name: Set up compile JDK
+              uses: actions/setup-java@be666c2fcd27ec809703dec50e508c2fdc7f6654 # v5.2.0
+              with: #Compile java needs to be the highest to ensure proper compilation of the multi-release jar
+                distribution: 'temurin'
+                java-version: 17
+                cache: 'maven'
+            - name: Compile Yasson
+              run: |
+                mvn -U -C clean install -DskipTests
+            - name: Run JMH performance tests
+              run: |
+                cd yasson-jmh
+                mvn -U -B clean package
+                java -jar target/yasson-jmh.jar -rf json -rff jmh-result.json
+            - name: Persist JMH results
+              uses: benchmark-action/github-action-benchmark@52576c92bccf6ac60c8223ec7eb2565637cae9ba # v1.22.1
+              with:
+                name: Java JMH Benchmark
+                tool: 'jmh'
+                output-file-path: jmh-result.json
+                github-token: ${{ secrets.GITHUB_TOKEN }}
+            
+                # Enable deployment to GitHub Pages for continuous line graphs
+                auto-push: true
+                comment-on-alert: true       # Creates a comment if performance degrades
+                fail-on-alert: true          # Fails the workflow run on regression
+                alert-threshold: '200%'      # Triggers an alert if execution time doubles
+
