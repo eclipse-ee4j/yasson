@@ -35,8 +35,8 @@ class SqlTimestampSerializer extends AbstractDateSerializer<Timestamp> {
 
     @Override
     protected TemporalAccessor toTemporalAccessor(Timestamp value) {
-        // convert SQL Timestamp into a LocalDateTime to unlock TemporalAccessor access
-        return LocalDateTime.ofInstant(value.toInstant(), UTC);
+        // convert SQL Timestamp into a Instant to unlock TemporalAccessor access
+        return toInstant(value);
     }
 
     @Override
