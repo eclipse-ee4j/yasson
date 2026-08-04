@@ -15,7 +15,7 @@ package org.eclipse.yasson.internal;
 import static org.eclipse.yasson.internal.AnnotationIntrospectorTestAsserts.assertCreatedInstanceContainsAllParameters;
 import static org.eclipse.yasson.internal.AnnotationIntrospectorTestAsserts.assertParameters;
 import static org.junit.jupiter.api.Assertions.assertNull;
-import static org.junit.jupiter.api.Assertions.fail;
+import static org.junit.jupiter.api.Assertions.assertThrows;
 
 import jakarta.json.bind.JsonbConfig;
 import jakarta.json.bind.config.PropertyNamingStrategy;
@@ -48,12 +48,8 @@ public class AnnotationIntrospectorWithoutOptionalModulesTest {
     @Test
     public void testNoConstructorPropertiesAnnotationWithoutOptionalModules() {
         String className = "java.beans.ConstructorProperties";
-        try {
-            Class.forName(className);
-            fail("Class [" + className + "] should not be available for this test.");
-        } catch (ClassNotFoundException e) {
-            // OK, as expected
-        }
+        assertThrows(ClassNotFoundException.class, () -> Class.forName(className),
+            () -> "Class [" + className + "] should not be available for this test.");
     }
 
     @Test

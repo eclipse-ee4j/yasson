@@ -16,7 +16,6 @@ import org.junit.jupiter.api.*;
 import static org.junit.jupiter.api.Assertions.*;
 import static org.eclipse.yasson.Jsonbs.*;
 
-import org.eclipse.yasson.Assertions;
 import org.eclipse.yasson.TestTypeToken;
 
 import jakarta.json.bind.JsonbException;
@@ -24,7 +23,6 @@ import jakarta.json.stream.JsonGenerator;
 import jakarta.json.stream.JsonParser;
 import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
-import java.util.List;
 
 public class PreinstantiatedJsonpTest {
 
@@ -138,12 +136,9 @@ public class PreinstantiatedJsonpTest {
         parser.next(); //START_OBJECT
         //should be advanced further
 
-        try {
-        	bindingYassonJsonb.fromJson(parser, Dog.class);
-            fail("JsonbException not thrown");
-        } catch (JsonbException e) {
-            //OK, parser in inconsistent state
-        }
+        //OK, parser in inconsistent state
+        assertThrows(JsonbException.class, () -> bindingYassonJsonb.fromJson(parser, Dog.class),
+            "JsonbException not thrown");
     }
 
     @Test
@@ -154,7 +149,7 @@ public class PreinstantiatedJsonpTest {
         generator.writeStartObject();
         //key not written
 
-        Assertions.shouldFail(() -> bindingYassonJsonb.toJson(dog, generator));
+        assertThrows(JsonbException.class, () -> bindingYassonJsonb.toJson(dog, generator));
     }
 
     @Test

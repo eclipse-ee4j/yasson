@@ -56,19 +56,11 @@ public class DefaultMappingModifiersTest {
 
     @Test
     public void testConstructorModifiers() {
-        try{
-            ProtectedConstructorClass instance = defaultJsonb.fromJson("{\"randomField\":\"test\"}", ProtectedConstructorClass.class);
-            assertEquals(instance.randomField, "test");
-        } catch (JsonbException e){
-            fail("No exception should be thrown for protected constructor");
-            throw e;
-        }
-        try {
-        	defaultJsonb.fromJson("{\"randomField\":\"test\"}", PrivateConstructorClass.class);
-            fail("Exception should have been thrown");
-        }catch (JsonbException e){
-            assertTrue(e.getMessage().endsWith("Can't create instance"));
-        }
+        ProtectedConstructorClass instance = assertDoesNotThrow(() -> defaultJsonb.fromJson("{\"randomField\":\"test\"}", ProtectedConstructorClass.class), "No exception should be thrown for protected constructor");
+        assertEquals(instance.randomField, "test");
+
+        JsonbException e = assertThrows(JsonbException.class, () -> defaultJsonb.fromJson("{\"randomField\":\"test\"}", PrivateConstructorClass.class), "Exception should have been thrown");
+        assertTrue(e.getMessage().endsWith("Can't create instance"));
     }
 
     @Test

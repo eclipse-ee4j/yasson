@@ -15,11 +15,12 @@ package org.eclipse.yasson.serializers;
 import jakarta.json.bind.Jsonb;
 import jakarta.json.bind.JsonbBuilder;
 import jakarta.json.bind.JsonbConfig;
+import jakarta.json.bind.JsonbException;
 
 import org.junit.jupiter.api.Test;
 
-import static org.eclipse.yasson.Assertions.shouldFail;
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
 import java.math.BigInteger;
@@ -224,6 +225,6 @@ public class MapToObjectSerializerTest {
         Jsonb jsonb = JsonbBuilder.create();
 
         String json = "{\"values\":{\"1\":\"OK\",\"error\":\"KO\"}}";
-        shouldFail(() -> jsonb.fromJson(json, MapObjectIntegerString.class));
+        assertThrows(JsonbException.class, () -> jsonb.fromJson(json, MapObjectIntegerString.class));
     }
 }
