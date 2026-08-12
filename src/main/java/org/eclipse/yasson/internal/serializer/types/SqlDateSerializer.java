@@ -28,7 +28,7 @@ class SqlDateSerializer extends DateSerializer<Date> {
 
     @Override
     protected Instant toInstant(Date value) {
-        if (value instanceof java.sql.Date) {
+        if (value instanceof java.sql.Date || value instanceof java.sql.Time) {
             // java.sql.Date doesn't have a time component, so do our best if TIME_IN_MILLIS is requested
             // In the future (at a breaking change boundary) we should probably reject this code path
             return Instant.ofEpochMilli(value.getTime());
