@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2016, 2022 Oracle and/or its affiliates. All rights reserved.
+ * Copyright (c) 2016, 2026 Oracle and/or its affiliates. All rights reserved.
  *
  * This program and the accompanying materials are made available under the
  * terms of the Eclipse Public License v. 2.0 which is available at
@@ -39,12 +39,13 @@ public class CreatorModel {
      * Creates a new instance.
      *  @param name      Parameter name
      * @param parameter constructor parameter
+     * @param index     index of the parameter within the executable
      * @param executable creator executable
      * @param context   jsonb context
      */
-    public CreatorModel(String name, Parameter parameter, Executable executable, JsonbContext context) {
+    public CreatorModel(String name, Parameter parameter, int index, Executable executable, JsonbContext context) {
         this.name = name;
-        this.type = parameter.getParameterizedType();
+        this.type = resolveType(parameter, index, executable);
 
         AnnotationIntrospector annotationIntrospector = context.getAnnotationIntrospector();
 
@@ -83,6 +84,26 @@ public class CreatorModel {
 
     public CreatorCustomization getCustomization() {
         return creatorCustomization;
+    }
+
+    /*
+     * Parameter#getParameterizedType() resolves against the executable's full parameter list,
+     * which includes implicit and synthetic parameters. Since JDK 22 that lookup yields the raw
+     * type for the mandated parameters of a record's canonical constructor whenever the record
+     * declares a compact constructor, so a component such as List<Photo> is seen as a raw List
+     * and its elements are deserialized into maps.
+     *
+     * Executable#getGenericParameterTypes() still carries the generic signature, so prefer it.
+     * It omits implicit and synthetic parameters, and therefore may be shorter than the
+     * parameter array (an inner class constructor, for instance), in which case the indexes do
+     * not line up and the original lookup is kept.
+     */
+    private static Type resolveType(Parameter parameter, int index, Executable executable) {
+        Type[] genericParameterTypes = executable.getGenericParameterTypes();
+        if (genericParameterTypes.length == executable.getParameterCount() && index < genericParameterTypes.length) {
+            return genericParameterTypes[index];
+        }
+        return parameter.getParameterizedType();
     }
 
     /**
