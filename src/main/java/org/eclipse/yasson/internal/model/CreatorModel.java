@@ -88,7 +88,7 @@ public class CreatorModel {
 
     /*
      * Parameter#getParameterizedType() resolves against the executable's full parameter list,
-     * which includes implicit and synthetic parameters. Since JDK 22 that lookup yields the raw
+     * which includes implicit and synthetic parameters. Between JDK 22 and 25 that lookup yields the raw
      * type for the mandated parameters of a record's canonical constructor whenever the record
      * declares a compact constructor, so a component such as List<Photo> is seen as a raw List
      * and its elements are deserialized into maps.

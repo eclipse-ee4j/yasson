@@ -17,5 +17,6 @@ import java.util.List;
 public record CarWithCompactConstructor(String type, List<Color> colors) {
 
     public CarWithCompactConstructor {
+        // compact constructor - triggers JDK 22 raw-type regression
     }
 }
