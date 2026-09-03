@@ -1,5 +1,6 @@
 /*
  * Copyright (c) 2021, 2025 Oracle and/or its affiliates. All rights reserved.
+ * Copyright (c) 2026 Contributors to the Eclipse Foundation
  *
  * This program and the accompanying materials are made available under the
  * terms of the Eclipse Public License v. 2.0 which is available at
@@ -21,7 +22,9 @@ import org.eclipse.yasson.internal.properties.Messages;
 import org.junit.jupiter.api.Test;
 
 import static org.hamcrest.MatcherAssert.assertThat;
+import static org.hamcrest.Matchers.containsString;
 import static org.hamcrest.Matchers.is;
+import static org.hamcrest.Matchers.not;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 
@@ -118,5 +121,91 @@ public class RecordTest {
         CarWithGenerics<Color> deserialized = Jsonbs.defaultJsonb
                 .fromJson(expected, new TestTypeToken<CarWithGenerics<Color>>() {}.getType());
         assertThat(deserialized, is(car));  
+    }
+    // -----------------------------------------------------------------
+    // isVirtualAccessorMethod — virtual (computed) record attributes
+    // -----------------------------------------------------------------
+
+    /**
+     * A record's zero-parameter, non-void method whose name does not match any
+     * component must be serialized as a JSON property (virtual attribute).
+     */
+    @Test
+    public void testRecordVirtualAttributeIsIncludedInJson() {
+        RecordWithVirtualAttributes record = new RecordWithVirtualAttributes("skoda", "green");
+        String json = Jsonbs.defaultJsonb.toJson(record);
+
+        assertThat(json, containsString("\"displayName\":\"skoda (green)\""));
+        assertThat(json, containsString("\"componentCount\":2"));
+    }
+
+    /**
+     * The standard record components must still appear alongside the virtual attributes.
+     */
+    @Test
+    public void testRecordVirtualAttributeDoesNotSuppressComponents() {
+        RecordWithVirtualAttributes record = new RecordWithVirtualAttributes("skoda", "green");
+        String json = Jsonbs.defaultJsonb.toJson(record);
+
+        assertThat(json, containsString("\"type\":\"skoda\""));
+        assertThat(json, containsString("\"color\":\"green\""));
+    }
+
+    /**
+     * {@code hashCode()} is explicitly excluded by {@code isVirtualAccessorMethod}
+     * and must not appear in the serialized JSON.
+     */
+    @Test
+    public void testRecordHashCodeMethodIsNotIncludedInJson() {
+        RecordWithVirtualAttributes record = new RecordWithVirtualAttributes("skoda", "green");
+        String json = Jsonbs.defaultJsonb.toJson(record);
+
+        assertThat(json, not(containsString("\"hashCode\"")));
+    }
+
+    /**
+     * {@code toString()} is explicitly excluded by {@code isVirtualAccessorMethod}
+     * and must not appear in the serialized JSON.
+     */
+    @Test
+    public void testRecordToStringMethodIsNotIncludedInJson() {
+        RecordWithVirtualAttributes record = new RecordWithVirtualAttributes("skoda", "green");
+        String json = Jsonbs.defaultJsonb.toJson(record);
+
+        assertThat(json, not(containsString("\"toString\"")));
+    }
+
+    /**
+     * Virtual attributes are read-only; deserialization of the underlying components
+     * must still work correctly even when virtual attribute keys are present in the JSON.
+     * Unknown virtual attribute keys are simply ignored on the way in.
+     */
+    @Test
+    public void testRecordVirtualAttributeIsIgnoredDuringDeserialization() {
+        String json = "{\"type\":\"skoda\",\"color\":\"green\","
+                + "\"displayName\":\"skoda (green)\",\"componentCount\":2}";
+        RecordWithVirtualAttributes deserialized =
+                Jsonbs.defaultJsonb.fromJson(json, RecordWithVirtualAttributes.class);
+
+        assertThat(deserialized.type(), is("skoda"));
+        assertThat(deserialized.color(), is("green"));
+    }
+
+    /**
+     * A virtual accessor method whose name starts with {@code get} must NOT have its
+     * prefix stripped when serialized from a record.  JavaBean name-mangling only applies
+     * to regular classes; for records the raw method name is used as the JSON key.
+     * <p>
+     * So {@code getDisplayName()} on a record must serialize as {@code "getDisplayName"},
+     * not as {@code "displayName"}.
+     */
+    @Test
+    public void testRecordGetterStyleVirtualAttributeIsNotStripped() {
+        RecordWithGetterStyleVirtualAttribute record =
+                new RecordWithGetterStyleVirtualAttribute("skoda", "green");
+        String json = Jsonbs.defaultJsonb.toJson(record);
+
+        assertThat(json, containsString("\"getDisplayName\":\"skoda (green)\""));
+        assertThat(json, not(containsString("\"displayName\"")));
     }
 }

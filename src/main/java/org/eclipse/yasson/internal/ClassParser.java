@@ -197,12 +197,16 @@ class ClassParser {
         Method[] declaredMethods = AccessController.doPrivileged((PrivilegedAction<Method[]>) clazz::getDeclaredMethods);
         for (Method method : declaredMethods) {
             String name = method.getName();
+
             //isBridge method filters out methods inherited from interfaces
             boolean isAccessorMethod = isSpecialAccessorMethod(method, classProperties)
+                    || isVirtualAccessorMethod(method)
                     || isPropertyMethod(method);
+
             if (!isAccessorMethod || method.isBridge() || isSpecialCaseMethod(clazz, method)) {
                 continue;
             }
+            
             final String propertyName = method.getDeclaringClass().isRecord()
                     ? name
                     : toPropertyMethod(name);
@@ -270,6 +274,14 @@ class ClassParser {
                 && method.getParameterCount() == 0
                 && !void.class.equals(method.getReturnType())
                 && classProperties.containsKey(method.getName());
+    }
+
+    private static boolean isVirtualAccessorMethod(Method method) {
+        return method.getDeclaringClass().isRecord()
+                && method.getParameterCount() == 0
+                && !void.class.equals(method.getReturnType())
+                && !"hashCode".equals(method.getName())
+                && !"toString".equals(method.getName());
     }
 
     private static void parseFields(JsonbAnnotatedElement<Class<?>> classElement, Map<String, Property> classProperties) {
