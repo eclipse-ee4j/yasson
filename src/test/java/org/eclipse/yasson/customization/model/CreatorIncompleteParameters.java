@@ -11,6 +11,8 @@
  */
 package org.eclipse.yasson.customization.model;
 
+import java.util.Locale;
+
 import jakarta.json.bind.annotation.JsonbCreator;
 import jakarta.json.bind.annotation.JsonbProperty;
 
@@ -33,7 +35,7 @@ public class CreatorIncompleteParameters {
 
     @JsonbCreator
     public CreatorIncompleteParameters(@JsonbProperty("declaredField") String declaredField) {
-        this.declaredField = declaredField.toUpperCase();
+        this.declaredField = declaredField.toUpperCase(Locale.ROOT);
     }
 
     public void setNotDeclaredSetter(String notDeclaredSetter) {

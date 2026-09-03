@@ -12,6 +12,8 @@
 
 package org.eclipse.yasson.customization.model;
 
+import java.util.Locale;
+
 import jakarta.json.bind.annotation.JsonbCreator;
 import jakarta.json.bind.annotation.JsonbProperty;
 
@@ -36,7 +38,7 @@ public class CreatorConstructorSetterConflicts {
 
     @JsonbCreator
     public CreatorConstructorSetterConflicts(@JsonbProperty("value") String value) {
-        this.creatorValue = value.toUpperCase();
+        this.creatorValue = value.toUpperCase(Locale.ROOT);
     }
 
     public String getValue() {
