@@ -208,10 +208,10 @@ public class AnnotationIntrospector {
             final Parameter parameter = parameters[i];
             final JsonbProperty jsonbPropertyAnnotation = parameter.getAnnotation(JsonbProperty.class);
             if (jsonbPropertyAnnotation != null && !jsonbPropertyAnnotation.value().isEmpty()) {
-                creatorModels[i] = new CreatorModel(jsonbPropertyAnnotation.value(), parameter, executable, jsonbContext);
+                creatorModels[i] = new CreatorModel(jsonbPropertyAnnotation.value(), parameter, i, executable, jsonbContext);
             } else {
                 final String translatedParameterName = propertyNamingStrategy.translateName(parameter.getName());
-                creatorModels[i] = new CreatorModel(translatedParameterName, parameter, executable, jsonbContext);
+                creatorModels[i] = new CreatorModel(translatedParameterName, parameter, i, executable, jsonbContext);
             }
         }
 
