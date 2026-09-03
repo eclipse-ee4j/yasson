@@ -24,6 +24,9 @@ import jakarta.json.bind.annotation.JsonbProperty;
 
 import org.eclipse.yasson.customization.model.CreatorConstructorPojo;
 import org.eclipse.yasson.customization.model.CreatorFactoryMethodPojo;
+import org.eclipse.yasson.customization.model.CreatorConstructorSetterConflicts;
+import org.eclipse.yasson.customization.model.CreatorFactoryNameConflicts;
+import org.eclipse.yasson.customization.model.CreatorFactorySetterConflicts;
 import org.eclipse.yasson.customization.model.CreatorIncompatibleTypePojo;
 import org.eclipse.yasson.customization.model.CreatorIncompleteParameters;
 import org.eclipse.yasson.customization.model.CreatorMultipleDeclarationErrorPojo;
@@ -155,6 +158,30 @@ public class JsonbCreatorTest {
         ParameterNameTester result = defaultJsonb.fromJson(json, ParameterNameTester.class);
         assertEquals("someText", result.name);
         assertNull(result.secondParam);
+    }
+
+    @Test
+    public void testFactoryCreatorNameConflicts() {
+        String json = "{\"value\":\"hello\"}";
+        CreatorFactoryNameConflicts result = defaultJsonb.fromJson(json, CreatorFactoryNameConflicts.class);
+        assertNull(result.value, "value should have been claimed by the factory method parameter, not set on the field.");
+        assertEquals("HELLO", result.creatorValue, "value should have been routed to creatorValue via the factory method.");
+    }
+
+    @Test
+    public void testConstructorCreatorSetterConflicts() {
+        String json = "{\"value\":\"hello\"}";
+        CreatorConstructorSetterConflicts result = defaultJsonb.fromJson(json, CreatorConstructorSetterConflicts.class);
+        assertNull(result.getValue(), "value should have been claimed by the constructor parameter, not set via the setter.");
+        assertEquals("HELLO", result.creatorValue, "value should have been routed to creatorValue via the constructor.");
+    }
+
+    @Test
+    public void testFactoryCreatorSetterConflicts() {
+        String json = "{\"value\":\"hello\"}";
+        CreatorFactorySetterConflicts result = defaultJsonb.fromJson(json, CreatorFactorySetterConflicts.class);
+        assertNull(result.getValue(), "value should have been claimed by the factory method parameter, not set via the setter.");
+        assertEquals("HELLO", result.creatorValue, "value should have been routed to creatorValue via the factory method.");
     }
 
     @Test
