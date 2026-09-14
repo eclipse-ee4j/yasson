@@ -189,21 +189,20 @@ public class JsonbTransientTest {
     @Test
     public void testJsonbTransientInheritedFromAbstractMethodInInterfaceAndClass() {
         final String EXPECTED = "{\"field2\":\"bbb\"}";
-        Jsonb jsonb = JsonbBuilder.create(new JsonbConfig());
-        assertEquals(EXPECTED, jsonb.toJson(new TransientAbstractInterface() {
+        assertEquals(EXPECTED, defaultJsonb.toJson(new TransientAbstractInterface() {
             @Override
             public String getField1() { return "aaa"; }
             @Override
             public String getField2() { return "bbb"; }
         }));
-        assertEquals(EXPECTED, jsonb.toJson(new TransientAbstractClass() {
+        assertEquals(EXPECTED, defaultJsonb.toJson(new TransientAbstractClass() {
             @Override
             public String getField1() { return "aaa"; }
             @Override
             public String getField2() { return "bbb"; }
         }));
-        assertEquals(EXPECTED, jsonb.toJson(new TransientAbstractClassImpl()));
-        assertEquals(EXPECTED, jsonb.toJson(new TransientAbstractClassImpl() {}));
+        assertEquals(EXPECTED, defaultJsonb.toJson(new TransientAbstractClassImpl()));
+        assertEquals(EXPECTED, defaultJsonb.toJson(new TransientAbstractClassImpl() {}));
     }
 
     /** Interface whose {@code getField1} getter is annotated {@link JsonbTransient}. */

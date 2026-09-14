@@ -13,6 +13,7 @@
 
 package org.eclipse.yasson.defaultmapping.specific;
 
+import static org.eclipse.yasson.Jsonbs.defaultJsonb;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 
 import org.junit.jupiter.api.Test;
@@ -40,7 +41,7 @@ public class SerializationExceptionTest {
      */
     @Test
     public void getterExceptionPropagatesAsJsonbException() {
-        assertThrows(JsonbException.class, () -> JsonbBuilder.create().toJson(new BrokenGetterPojo()));
+        assertThrows(JsonbException.class, () -> defaultJsonb.toJson(new BrokenGetterPojo()));
     }
 
     /**
@@ -58,7 +59,7 @@ public class SerializationExceptionTest {
 
         @Override
         public String toString() {
-            return JsonbBuilder.create().toJson(this);
+            return defaultJsonb.toJson(this);
         }
     }
 }
