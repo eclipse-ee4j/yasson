@@ -65,4 +65,4 @@ jobs:
             -Duser.country="${LANG_TAG##*_}" \
             verify
       - name: Jakarta JSON-B TCK
-        run: cd yasson-tck && mvn -U -B test -DargLine="-Djava.locale.providers=COMPAT"
+        run: cd yasson-tck && mvn -U -B test
