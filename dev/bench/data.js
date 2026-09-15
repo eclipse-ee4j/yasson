@@ -1,5 +1,5 @@
 window.BENCHMARK_DATA = {
-  "lastUpdate": 1788843638581,
+  "lastUpdate": 1789448453699,
   "repoUrl": "https://github.com/eclipse-ee4j/yasson",
   "entries": {
     "Java JMH Benchmark": [
@@ -258,6 +258,58 @@ window.BENCHMARK_DATA = {
           {
             "name": "org.eclipse.yasson.jmh.TenPropertySerializationTest.testSerialize",
             "value": 874.2374624338257,
+            "unit": "ops/ms",
+            "extra": "iterations: 5\nforks: 5\nthreads: 1"
+          }
+        ]
+      },
+      {
+        "commit": {
+          "author": {
+            "name": "Kyle Aure",
+            "username": "KyleAure",
+            "email": "KyleJAure@gmail.com"
+          },
+          "committer": {
+            "name": "GitHub",
+            "username": "web-flow",
+            "email": "noreply@github.com"
+          },
+          "id": "626aac53e64e8c51fa0e1579b5b564166a923c93",
+          "message": "Merge pull request #758 from eclipse-ee4j/dependabot/github_actions/actions/setup-java-6.0.1\n\nbuild(deps): bump actions/setup-java from 6.0.0 to 6.0.1",
+          "timestamp": "2026-09-14T13:33:20Z",
+          "url": "https://github.com/eclipse-ee4j/yasson/commit/626aac53e64e8c51fa0e1579b5b564166a923c93"
+        },
+        "date": 1789448452989,
+        "tool": "jmh",
+        "benches": [
+          {
+            "name": "org.eclipse.yasson.jmh.CollectionsTest.testDeserialize",
+            "value": 24.785233607619134,
+            "unit": "ops/ms",
+            "extra": "iterations: 5\nforks: 5\nthreads: 1"
+          },
+          {
+            "name": "org.eclipse.yasson.jmh.CollectionsTest.testSerialize",
+            "value": 50.35266788289784,
+            "unit": "ops/ms",
+            "extra": "iterations: 5\nforks: 5\nthreads: 1"
+          },
+          {
+            "name": "org.eclipse.yasson.jmh.ScalarDataTest.testDeserialize",
+            "value": 2022.8175597917236,
+            "unit": "ops/ms",
+            "extra": "iterations: 5\nforks: 5\nthreads: 1"
+          },
+          {
+            "name": "org.eclipse.yasson.jmh.ScalarDataTest.testSerialize",
+            "value": 3113.4569981946775,
+            "unit": "ops/ms",
+            "extra": "iterations: 5\nforks: 5\nthreads: 1"
+          },
+          {
+            "name": "org.eclipse.yasson.jmh.TenPropertySerializationTest.testSerialize",
+            "value": 856.6348024622837,
             "unit": "ops/ms",
             "extra": "iterations: 5\nforks: 5\nthreads: 1"
           }
