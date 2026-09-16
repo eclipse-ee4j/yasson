@@ -28,22 +28,24 @@ import java.util.Collections;
 import java.util.stream.Collectors;
 
 /**
- * Test case for Issue #673: Custom deserializers with polymorphic types and JSON structure API.
+ * Test fixtures for custom deserializers combined with polymorphic types and the JSON-P structure API.
  *
- * <p>This test validates the interaction between:
+ * <p>These classes support tests that validate the interaction between:
  * <ul>
  *   <li>Custom {@link JsonbDeserializer} implementations</li>
  *   <li>Polymorphic type handling via {@link JsonbTypeInfo} and {@link JsonbSubtype}</li>
  *   <li>JSON-P structure API ({@link JsonArray}, {@link JsonObject}, {@link JsonValue})</li>
  * </ul>
  *
- * <p>The test ensures that custom deserializers can properly access and process JSON structure
- * objects when deserializing complex types with polymorphic behavior.
+ * <p>Specifically, the fixtures ensure that custom deserializers can properly access and process
+ * JSON structure objects when deserializing complex types with polymorphic behaviour.
  *
  * @see <a href="https://github.com/eclipse-ee4j/yasson/issues/673">Issue #673</a>
+ * @see JsonStructureToParserAdapterTest#testGetValue()
+ * @see JsonStructureToParserAdapterTest#testGetArray()
  */
-public class Issue673 {
-    
+public class PolymorphicDeserializerFixtures {
+
     /**
      * Marker interface for objects that can be referenced.
      * Implemented by both {@link Reference} and {@link IRIReference}.
@@ -134,7 +136,7 @@ public class Issue673 {
         public void setTags(String tags) {
             this.tags = tags;
         }
-        
+
         /**
          * Gets the reference object.
          * Uses custom deserializer to handle polymorphic deserialization
@@ -176,7 +178,7 @@ public class Issue673 {
         }
 
     }
-    
+
     /**
      * Custom deserializer that handles polymorphic deserialization of {@link Referenceable} objects.
      *

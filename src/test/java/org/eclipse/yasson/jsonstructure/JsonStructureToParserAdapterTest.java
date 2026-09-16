@@ -1,6 +1,6 @@
 /*
  * Copyright (c) 2019, 2020 Oracle and/or its affiliates. All rights reserved.
- * Copyright (c) 2026 Contributors to the Eclipse Foundation.
+ * Copyright (c) 2026 Contributors to the Eclipse Foundation
  *
  * This program and the accompanying materials are made available under the
  * terms of the Eclipse Public License v. 2.0 which is available at
@@ -273,9 +273,15 @@ public class JsonStructureToParserAdapterTest {
         assertEquals("String value 2", result.getInner().getInnerSecond());
     }
     
+    /**
+     * Tests that a custom deserializer can call {@link jakarta.json.stream.JsonParser#getValue()}
+     * to access a JSON-P value object when deserializing a polymorphic type.
+     *
+     * @see <a href="https://github.com/eclipse-ee4j/yasson/issues/673">Issue #673</a>
+     */
     @Test
     public void testGetValue() {
-        final String json = 
+        final String json =
         """
         {
             "type": "Location",
@@ -284,24 +290,30 @@ public class JsonStructureToParserAdapterTest {
         """;
         
         Jsonb jsonb = JsonbBuilder.create();
-        Issue673.LocationInterface result = jsonb.fromJson(json, Issue673.LocationInterface.class);
+        PolymorphicDeserializerFixtures.LocationInterface result = jsonb.fromJson(json, PolymorphicDeserializerFixtures.LocationInterface.class);
             
         assertNotNull(result);
-        assertTrue(result instanceof Issue673.Location);
-        Issue673.Location location = (Issue673.Location) result;
+        assertTrue(result instanceof PolymorphicDeserializerFixtures.Location);
+        PolymorphicDeserializerFixtures.Location location = (PolymorphicDeserializerFixtures.Location) result;
 
-        Issue673.Referenceable refAble = location.getReference();
+        PolymorphicDeserializerFixtures.Referenceable refAble = location.getReference();
         assertNotNull(refAble);
-        assertFalse(refAble instanceof Issue673.Reference);
-        assertTrue(refAble instanceof Issue673.IRIReference);
-        Issue673.IRIReference ref = (Issue673.IRIReference) refAble;
+        assertFalse(refAble instanceof PolymorphicDeserializerFixtures.Reference);
+        assertTrue(refAble instanceof PolymorphicDeserializerFixtures.IRIReference);
+        PolymorphicDeserializerFixtures.IRIReference ref = (PolymorphicDeserializerFixtures.IRIReference) refAble;
 
         assertEquals("dummy reference", ref.getValue());
     }
-    
+
+    /**
+     * Tests that a custom deserializer can call {@link jakarta.json.stream.JsonParser#getArray()}
+     * to access a JSON-P array object when deserializing a polymorphic type.
+     *
+     * @see <a href="https://github.com/eclipse-ee4j/yasson/issues/673">Issue #673</a>
+     */
     @Test
     public void testGetArray() {
-        final String json = 
+        final String json =
         """
         {
             "type": "Location",
@@ -310,11 +322,11 @@ public class JsonStructureToParserAdapterTest {
         """;
         
         Jsonb jsonb = JsonbBuilder.create();
-        Issue673.LocationInterface result = jsonb.fromJson(json, Issue673.LocationInterface.class);
+        PolymorphicDeserializerFixtures.LocationInterface result = jsonb.fromJson(json, PolymorphicDeserializerFixtures.LocationInterface.class);
         
         assertNotNull(result);
-        assertTrue(result instanceof Issue673.Location);
-        Issue673.Location location = (Issue673.Location) result;
+        assertTrue(result instanceof PolymorphicDeserializerFixtures.Location);
+        PolymorphicDeserializerFixtures.Location location = (PolymorphicDeserializerFixtures.Location) result;
         
         String tags = location.getTags();
         assertNotNull(tags);
@@ -323,68 +335,64 @@ public class JsonStructureToParserAdapterTest {
     }
 
     /**
-     * Test for Issue #707: isIntegralNumber() should throw IllegalStateException, not JsonbException
-     * when called on a non-numeric value.
+     * Tests that {@link jakarta.json.stream.JsonParser#isIntegralNumber()} throws
+     * {@link IllegalStateException} (not {@code JsonbException}) when called on a non-numeric
+     * token, allowing callers to catch it and fall back to {@link JsonParser#getString()}.
      *
-     * This test verifies that the user's code pattern from the issue works correctly:
-     * - When the value is a string, isIntegralNumber() throws IllegalStateException
-     * - The exception can be caught and the value read as a string
+     * @see <a href="https://github.com/eclipse-ee4j/yasson/issues/707">Issue #707</a>
      */
     @Test
     public void isIntegralNumberThrowsIllegalStateException() {
-        // Test with string ID - should catch IllegalStateException and handle gracefully
-        // This test uses fromJsonStructure to exercise JsonStructureToParserAdapter
         JsonObjectBuilder objectBuilder = jsonProvider.createObjectBuilder();
         objectBuilder.add("id", "abc123");
         JsonObject jsonObject = objectBuilder.build();
         
         YassonJsonb jsonb = (YassonJsonb) JsonbBuilder.create();
-        Issue707.Request result = jsonb.fromJsonStructure(jsonObject, Issue707.Request.class);
+        IntegralNumberDeserializerFixtures.Request result = jsonb.fromJsonStructure(jsonObject, IntegralNumberDeserializerFixtures.Request.class);
         
         assertNotNull(result);
         assertNotNull(result.getId());
         assertEquals("abc123", result.getId().getValue());
     }
-    
+
     /**
-     * Test for Issue #707: Verify that an integral ID still works correctly.
+     * Tests that an integral numeric ID is deserialized correctly when
+     * {@link jakarta.json.stream.JsonParser#isIntegralNumber()} returns {@code true}.
+     *
+     * @see <a href="https://github.com/eclipse-ee4j/yasson/issues/707">Issue #707</a>
      */
     @Test
     public void isIntegralNumberWithNumericValue() {
-        // Test with numeric ID - should work without throwing any exception
-        // This test uses fromJsonStructure to exercise JsonStructureToParserAdapter
         JsonObjectBuilder objectBuilder = jsonProvider.createObjectBuilder();
         objectBuilder.add("id", 12345);
         JsonObject jsonObject = objectBuilder.build();
         
         YassonJsonb jsonb = (YassonJsonb) JsonbBuilder.create();
-        Issue707.Request result = jsonb.fromJsonStructure(jsonObject, Issue707.Request.class);
+        IntegralNumberDeserializerFixtures.Request result = jsonb.fromJsonStructure(jsonObject, IntegralNumberDeserializerFixtures.Request.class);
         
         assertNotNull(result);
         assertNotNull(result.getId());
         assertEquals("12345", result.getId().getValue());
     }
-    
+
     /**
-     * Test for Issue #707: Verify that floating point numbers are handled correctly.
-     * isIntegralNumber() should return false for non-integral numbers.
-     * isIntegralNumber() should not throw an exception for floating point numbers.
+     * Tests that a floating-point numeric ID is deserialized correctly: {@code isIntegralNumber()}
+     * returns {@code false} without throwing, and the value is read via
+     * {@link jakarta.json.stream.JsonParser#getBigDecimal()}.
+     *
+     * @see <a href="https://github.com/eclipse-ee4j/yasson/issues/707">Issue #707</a>
      */
     @Test
     public void isIntegralNumberWithFloatingPoint() {
-        // Test with floating point ID - isIntegralNumber() returns false,
-        // so the else block handles it as a string
-        // This test uses fromJsonStructure to exercise JsonStructureToParserAdapter
         JsonObjectBuilder objectBuilder = jsonProvider.createObjectBuilder();
         objectBuilder.add("id", 123.45);
         JsonObject jsonObject = objectBuilder.build();
         
         YassonJsonb jsonb = (YassonJsonb) JsonbBuilder.create();
-        Issue707.Request result = jsonb.fromJsonStructure(jsonObject, Issue707.Request.class);
+        IntegralNumberDeserializerFixtures.Request result = jsonb.fromJsonStructure(jsonObject, IntegralNumberDeserializerFixtures.Request.class);
         
         assertNotNull(result);
         assertNotNull(result.getId());
-        // The deserializer will read it as a string when isIntegralNumber() returns false
         assertEquals("123.45", result.getId().getValue());
     }
 }

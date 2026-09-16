@@ -1,5 +1,6 @@
 /*
  * Copyright (c) 2016, 2020 Oracle and/or its affiliates. All rights reserved.
+ * Copyright (c) 2026 Contributors to the Eclipse Foundation
  *
  * This program and the accompanying materials are made available under the
  * terms of the Eclipse Public License v. 2.0 which is available at
@@ -18,6 +19,10 @@ import static org.eclipse.yasson.Jsonbs.*;
 
 import org.eclipse.yasson.customization.transients.models.*;
 import jakarta.json.bind.JsonbException;
+import jakarta.json.bind.Jsonb;
+import jakarta.json.bind.JsonbBuilder;
+import jakarta.json.bind.JsonbConfig;
+import jakarta.json.bind.annotation.JsonbTransient;
 
 /**
  * @author Roman Grigoriadi
@@ -166,5 +171,62 @@ public class JsonbTransientTest {
     public void testTransientGetterNoField() {
         TransientGetterNoField pojo = new TransientGetterNoField();
         assertEquals("{}", defaultJsonb.toJson(pojo));
+    }
+
+    /**
+     * Tests that {@link JsonbTransient} declared on an abstract method in an interface or abstract
+     * class is honoured when serializing a concrete subtype, including anonymous subclasses.
+     *
+     * <p>Verifies that:
+     * <ul>
+     *   <li>An interface getter annotated with {@code @JsonbTransient} is excluded from the output</li>
+     *   <li>An abstract-class getter annotated with {@code @JsonbTransient} is excluded from the output</li>
+     *   <li>The same exclusion applies to concrete subclasses and anonymous subclasses</li>
+     * </ul>
+     *
+     * @see <a href="https://github.com/eclipse-ee4j/yasson/issues/454">Issue #454</a>
+     */
+    @Test
+    public void testJsonbTransientInheritedFromAbstractMethodInInterfaceAndClass() {
+        final String EXPECTED = "{\"field2\":\"bbb\"}";
+        assertEquals(EXPECTED, defaultJsonb.toJson(new TransientAbstractInterface() {
+            @Override
+            public String getField1() { return "aaa"; }
+            @Override
+            public String getField2() { return "bbb"; }
+        }));
+        assertEquals(EXPECTED, defaultJsonb.toJson(new TransientAbstractClass() {
+            @Override
+            public String getField1() { return "aaa"; }
+            @Override
+            public String getField2() { return "bbb"; }
+        }));
+        assertEquals(EXPECTED, defaultJsonb.toJson(new TransientAbstractClassImpl()));
+        assertEquals(EXPECTED, defaultJsonb.toJson(new TransientAbstractClassImpl() {}));
+    }
+
+    /** Interface whose {@code getField1} getter is annotated {@link JsonbTransient}. */
+    public static abstract class TransientAbstractClass {
+        @JsonbTransient
+        public abstract String getField1();
+
+        public abstract String getField2();
+    }
+
+    /** Concrete implementation of {@link TransientAbstractClass}. */
+    public static class TransientAbstractClassImpl extends TransientAbstractClass {
+        @Override
+        public String getField1() { return "aaa"; }
+
+        @Override
+        public String getField2() { return "bbb"; }
+    }
+
+    /** Abstract class whose {@code getField1} getter is annotated {@link JsonbTransient}. */
+    public interface TransientAbstractInterface {
+        @JsonbTransient
+        String getField1();
+
+        String getField2();
     }
 }
