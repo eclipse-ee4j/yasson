@@ -215,6 +215,78 @@ public class JsonbTransientTest {
         assertNull(result.componentAndAccessorTransient());
     }
 
+    /**
+     * Verifies that all meaningful combinations of {@link JsonbTransient} placement on fields,
+     * getters, and setters are correctly honoured when deserialization goes through an explicit
+     * {@link jakarta.json.bind.annotation.JsonbCreator} constructor.
+     *
+     * <p>Combinations verified:
+     * <ul>
+     *   <li>field only          → write-transient: JSON value ignored, constructor gets {@code null}</li>
+     *   <li>getter only         → read-transient only: JSON value still bound (write allowed)</li>
+     *   <li>setter only         → write-transient: JSON value ignored, constructor gets {@code null}</li>
+     *   <li>field + getter      → write-transient: JSON value ignored</li>
+     *   <li>field + setter      → write-transient: JSON value ignored</li>
+     *   <li>getter + setter     → write-transient: JSON value ignored</li>
+     *   <li>field + getter + setter → write-transient: JSON value ignored</li>
+     * </ul>
+     */
+    @Test
+    public void testJsonbTransientWithCreatorDeserialize() {
+        JsonbTransientWithCreator result = defaultJsonb.fromJson(
+                "{" +
+                "\"plainProperty\":\"plain value\"," +
+                "\"fieldTransient\":\"field transient value\"," +
+                "\"getterTransient\":\"getter transient value\"," +
+                "\"setterTransient\":\"setter transient value\"," +
+                "\"fieldAndGetterTransient\":\"field+getter transient value\"," +
+                "\"fieldAndSetterTransient\":\"field+setter transient value\"," +
+                "\"getterAndSetterTransient\":\"getter+setter transient value\"," +
+                "\"allTransient\":\"all transient value\"" +
+                "}",
+                JsonbTransientWithCreator.class);
+
+        // Not transient — always populated
+        assertEquals("plain value", result.plainProperty);
+
+        // Write-transient cases: JSON value must be discarded; constructor slot receives null
+        assertNull(result.fieldTransient,          "@JsonbTransient on field: should suppress deserialization via @JsonbCreator");
+        assertNull(result.setterTransient,         "@JsonbTransient on setter: should suppress deserialization via @JsonbCreator");
+        assertNull(result.fieldAndGetterTransient, "@JsonbTransient on field+getter: should suppress deserialization via @JsonbCreator");
+        assertNull(result.fieldAndSetterTransient, "@JsonbTransient on field+setter: should suppress deserialization via @JsonbCreator");
+        assertNull(result.getterAndSetterTransient,"@JsonbTransient on getter+setter: should suppress deserialization via @JsonbCreator");
+        assertNull(result.allTransient,            "@JsonbTransient on field+getter+setter: should suppress deserialization via @JsonbCreator");
+
+        // Getter-only transient: read-transient only, write is still allowed
+        assertEquals("getter transient value", result.getterTransient,
+                "@JsonbTransient on getter only: deserialization should still be allowed via @JsonbCreator");
+    }
+
+    /**
+     * Verifies that the serialization side of {@link JsonbTransient} on a class with a
+     * {@link jakarta.json.bind.annotation.JsonbCreator} constructor is also respected.
+     */
+    @Test
+    public void testJsonbTransientWithCreatorSerialize() {
+        JsonbTransientWithCreator instance = new JsonbTransientWithCreator(
+                "plain value",
+                "field transient value",
+                "getter transient value",
+                "setter transient value",
+                "field+getter transient value",
+                "field+setter transient value",
+                "getter+setter transient value",
+                "all transient value"
+        );
+
+        // Only plainProperty and setterTransient should appear:
+        //   - setterTransient has @JsonbTransient only on setter → read-transient=false → serialized
+        //   - getterTransient has @JsonbTransient on getter → read-transient=true → suppressed
+        //   - everything else is fully transient
+        assertEquals("{\"plainProperty\":\"plain value\",\"setterTransient\":\"setter transient value\"}",
+                defaultJsonb.toJson(instance));
+    }
+
     @Test
     public void testTransientGetterNoField() {
         TransientGetterNoField pojo = new TransientGetterNoField();
