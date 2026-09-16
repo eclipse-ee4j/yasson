@@ -50,5 +50,4 @@ jobs:
                 mvn -U -B test \
                     -Pstaged \
                     -Djakarta.json.bind.version=${{ github.event.inputs.jsonb_version }} \
-                    -Djsonb.tck.version=${{ github.event.inputs.jsonb_version }} \
-                    -DargLine="-Djava.locale.providers=COMPAT"
+                    -Djsonb.tck.version=${{ github.event.inputs.jsonb_version }}
