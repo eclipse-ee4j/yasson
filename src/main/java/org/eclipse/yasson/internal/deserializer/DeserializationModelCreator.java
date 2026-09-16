@@ -1,6 +1,7 @@
 /*
  * Copyright (c) 2021 Oracle and/or its affiliates. All rights reserved.
- *
+ * Copyright (c) 2026 Contributors to the Eclipse Foundation
+ * 
  * This program and the accompanying materials are made available under the
  * terms of the Eclipse Public License v. 2.0 which is available at
  * http://www.eclipse.org/legal/epl-2.0,
@@ -224,12 +225,20 @@ public class DeserializationModelCreator {
         }
         for (String s : params) {
             CreatorModel creatorModel = creator.findByName(s);
-            ModelDeserializer<JsonParser> modelDeserializer = typeProcessor(chain,
-                                                                            creatorModel.getType(),
-                                                                            creatorModel.getCustomization(),
-                                                                            JustReturn.instance());
             String parameterName = renamer.apply(creatorModel.getName());
-            processors.put(parameterName, modelDeserializer);
+            // If the corresponding property model is write-transient (e.g. @JsonbTransient on a
+            // record component), do not register a processor for this parameter so that any JSON
+            // value under that key is silently ignored.  The default-value entry is still required
+            // so the constructor receives null / the type default for that slot.
+            PropertyModel propertyModel = classModel.getPropertyModel(s);
+            boolean writeTransient = propertyModel != null && propertyModel.getCustomization().isWriteTransient();
+            if (!writeTransient) {
+                ModelDeserializer<JsonParser> modelDeserializer = typeProcessor(chain,
+                                                                                creatorModel.getType(),
+                                                                                creatorModel.getCustomization(),
+                                                                                JustReturn.instance());
+                processors.put(parameterName, modelDeserializer);
+            }
             if (creatorModel.getCustomization().isRequired()) {
                 defaultCreatorValues.put(parameterName, new RequiredCreatorParameter(parameterName));
             } else {
