@@ -19,9 +19,6 @@ import static org.eclipse.yasson.Jsonbs.*;
 
 import org.eclipse.yasson.customization.transients.models.*;
 import jakarta.json.bind.JsonbException;
-import jakarta.json.bind.Jsonb;
-import jakarta.json.bind.JsonbBuilder;
-import jakarta.json.bind.JsonbConfig;
 import jakarta.json.bind.annotation.JsonbTransient;
 
 /**
@@ -165,6 +162,57 @@ public class JsonbTransientTest {
     public void testTransientSetterplusJsonbPropertyGetter() {
         TransientSetterPlusCustomizationAnnotatedGetterContainer pojo = new TransientSetterPlusCustomizationAnnotatedGetterContainer();
         assertEquals("{\"instance\":\"INSTANCE\"}", defaultJsonb.toJson(pojo));
+    }
+
+    // -------------------------------------------------------------------------
+    // Record variants
+    // -------------------------------------------------------------------------
+
+    /**
+     * Serialization: verifies that {@link JsonbTransient} on a record component,
+     * on an accessor method, on both together, and on a virtual (non-component)
+     * accessor method each suppress the property from the JSON output, while an
+     * unannotated component remains visible.
+     */
+    @Test
+    public void testJsonbTransientRecordSerialize() {
+        JsonbTransientRecord record = new JsonbTransientRecord(
+                "non transient",
+                "component transient value",
+                "accessor transient value",
+                "component and accessor transient value"
+        );
+
+        assertEquals("{\"plainProperty\":\"non transient\"}", defaultJsonb.toJson(record));
+    }
+
+    /**
+     * Deserialization: verifies the correct transient semantics for records:
+     * <ul>
+     *   <li>{@link JsonbTransient} on a record <b>component</b> (backing field) suppresses
+     *       both serialization and deserialization — the JSON value is not bound.</li>
+     *   <li>{@link JsonbTransient} on the <b>accessor method</b> only suppresses serialization;
+     *       the component is still populated during deserialization because the accessor
+     *       annotation is the equivalent of a getter annotation on a regular class.</li>
+     *   <li>When present on both component and accessor, the component annotation governs
+     *       and the value is not bound.</li>
+     * </ul>
+     */
+    @Test
+    public void testJsonbTransientRecordDeserialize() {
+        JsonbTransientRecord result = defaultJsonb.fromJson(
+                "{\"plainProperty\":\"plainProperty value\"," +
+                "\"componentTransient\":\"component transient value\"," +
+                "\"accessorTransient\":\"accessor transient value\"," +
+                "\"componentAndAccessorTransient\":\"component and accessor transient value\"," +
+                "\"virtualAttributeTransient\":\"virtual transient value\"" +
+                "}",
+                JsonbTransientRecord.class);
+
+        assertEquals("plainProperty value", result.plainProperty());
+        assertNull(result.componentTransient());
+        assertEquals("accessor transient value", result.accessorTransient());
+        assertNull(result.componentAndAccessorTransient());
     }
 
     @Test
