@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2021, 2022 Oracle and/or its affiliates. All rights reserved.
+ * Copyright (c) 2021, 2023 Oracle and/or its affiliates. All rights reserved.
  *
  * This program and the accompanying materials are made available under the
  * terms of the Eclipse Public License v. 2.0 which is available at
@@ -31,7 +31,6 @@ import org.eclipse.yasson.internal.properties.Messages;
  */
 public class DeserializationContextImpl extends ProcessingContext implements DeserializationContext {
     private final List<Runnable> delayedSetters = new ArrayList<>();
-    private JsonParser.Event lastValueEvent;
     private Customization customization = ClassCustomization.empty();
     private Object instance;
 
@@ -51,7 +50,6 @@ public class DeserializationContextImpl extends ProcessingContext implements Des
      */
     public DeserializationContextImpl(DeserializationContextImpl context) {
         super(context.getJsonbContext());
-        this.lastValueEvent = context.lastValueEvent;
     }
 
     /**
@@ -79,24 +77,6 @@ public class DeserializationContextImpl extends ProcessingContext implements Des
      */
     public List<Runnable> getDeferredDeserializers() {
         return delayedSetters;
-    }
-
-    /**
-     * Return last obtained {@link JsonParser.Event} event.
-     *
-     * @return last obtained event
-     */
-    public JsonParser.Event getLastValueEvent() {
-        return lastValueEvent;
-    }
-
-    /**
-     * Set last obtained {@link JsonParser.Event} event.
-     *
-     * @param lastValueEvent last obtained event
-     */
-    public void setLastValueEvent(JsonParser.Event lastValueEvent) {
-        this.lastValueEvent = lastValueEvent;
     }
 
     /**
@@ -130,9 +110,10 @@ public class DeserializationContextImpl extends ProcessingContext implements Des
     @SuppressWarnings("unchecked")
     private <T> T deserializeItem(Type type, JsonParser parser) {
         try {
-            if (lastValueEvent == null) {
-                lastValueEvent = parser.next();
-                checkState();
+            JsonParser.Event startingEvent = parser.currentEvent();
+            if (startingEvent == null || startingEvent == JsonParser.Event.KEY_NAME) {
+                parser.next();
+                checkState(parser);
             }
             ModelDeserializer<JsonParser> modelDeserializer = getJsonbContext().getChainModelCreator().deserializerChain(type);
             return (T) modelDeserializer.deserialize(parser, this);
@@ -143,8 +124,8 @@ public class DeserializationContextImpl extends ProcessingContext implements Des
         }
     }
 
-    private void checkState() {
-        if (lastValueEvent == JsonParser.Event.KEY_NAME) {
+    private void checkState(JsonParser parser) {
+        if (parser.currentEvent() == JsonParser.Event.KEY_NAME) {
             throw new JsonbException("JsonParser has incorrect position as the first event: KEY_NAME");
         }
     }
