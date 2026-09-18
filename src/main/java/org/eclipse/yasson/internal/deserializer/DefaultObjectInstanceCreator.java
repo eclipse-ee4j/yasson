@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2021, 2022 Oracle and/or its affiliates. All rights reserved.
+ * Copyright (c) 2021, 2026 Oracle and/or its affiliates. All rights reserved.
  *
  * This program and the accompanying materials are made available under the
  * terms of the Eclipse Public License v. 2.0 which is available at
@@ -17,7 +17,6 @@ import java.lang.reflect.Constructor;
 import jakarta.json.bind.JsonbException;
 import jakarta.json.stream.JsonParser;
 
-import org.eclipse.yasson.internal.ClassMultiReleaseExtension;
 import org.eclipse.yasson.internal.DeserializationContextImpl;
 import org.eclipse.yasson.internal.ReflectionUtils;
 import org.eclipse.yasson.internal.properties.MessageKeys;
@@ -40,8 +39,11 @@ class DefaultObjectInstanceCreator implements ModelDeserializer<JsonParser> {
         if (clazz.isInterface()) {
             this.exception = new JsonbException(Messages.getMessage(MessageKeys.INFER_TYPE_FOR_UNMARSHALL, clazz.getName()));
         } else if (defaultConstructor == null) {
-            this.exception = ClassMultiReleaseExtension.exceptionToThrow(clazz)
-                    .orElse(new JsonbException(Messages.getMessage(MessageKeys.NO_DEFAULT_CONSTRUCTOR, clazz)));
+            if (clazz.isRecord() && clazz.getDeclaredConstructors().length > 1) {
+                this.exception = new JsonbException(Messages.getMessage(MessageKeys.RECORD_MULTIPLE_CONSTRUCTORS, clazz));
+            } else {
+                this.exception = new JsonbException(Messages.getMessage(MessageKeys.NO_DEFAULT_CONSTRUCTOR, clazz));
+            }
         } else {
             this.exception = null;
         }

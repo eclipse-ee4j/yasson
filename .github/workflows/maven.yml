@@ -1,5 +1,5 @@
 #
-# Copyright (c) 2021, 2022 Oracle and/or its affiliates. All rights reserved.
+# Copyright (c) 2021, 2026 Oracle and/or its affiliates. All rights reserved.
 #
 # This program and the accompanying materials are made available under the
 # terms of the Eclipse Public License v. 2.0 which is available at
@@ -12,48 +12,57 @@
 
 name: Yasson
 
-on: [push, pull_request]
+on:
+  push:
+    branches:
+      - 'main'
+      - '*-RELEASE'
+  pull_request:
+    branches:
+      - 'main'
+      - '*-RELEASE'
 
 jobs:
   build:
-    name: Test on JDK ${{ matrix.java_version }}
+    name: Test on JDK ${{ matrix.java_version }} locale ${{ matrix.locale }}
     runs-on: ubuntu-latest
 
     strategy:
       matrix:
-        java_version: [ 11, 17 ]
+        java_version: [ 17, 21, 25 ]
+        include:
+          - locale: en_US
+          # Use a different locale when running against one of the java versions
+          # to ensure we correctly write tests that account for localization differences.
+          - locale: de_AT
+            java_version: 21
 
     steps:
       - name: Checkout for build
-        uses: actions/checkout@v2.3.4
+        uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
         with:
           fetch-depth: 0
       - name: Set up compile JDK
-        uses: actions/setup-java@v2
+        uses: actions/setup-java@de7274f081f381c8f8158605e0321c36c376e2e6 # v6.0.1
         with: #Compile java needs to be the highest to ensure proper compilation of the multi-release jar
-          distribution: 'adopt'
+          distribution: 'temurin'
           java-version: 17
-      - name: Maven cache
-        uses: actions/cache@v2
-        env:
-          cache-name: maven-cache
-        with:
-          path:
-            ~/.m2
-          key: build-${{ env.cache-name }}
+          cache: 'maven'
       - name: Copyright
         run: bash etc/copyright.sh
       - name: Checkstyle
         run: mvn -B checkstyle:checkstyle
       - name: Yasson install
-#        run: mvn -U -C -Pstaging clean install -DskipTests
         run: mvn -U -C clean install -DskipTests
-      - name: Set up JDK for tests
-        uses: actions/setup-java@v2
-        with:
-          distribution: 'adopt'
-          java-version: ${{ matrix.java_version }}
+      - name: Yasson jmh package
+        run: mvn -U -C -f yasson-jmh/pom.xml clean package
       - name: Yasson tests
-        run: mvn -U -B -C -Dmaven.javadoc.skip=true -Pstaging verify
-      - name: JSONB-API TCK
-        run: cd yasson-tck && mvn -U -B test -DargLine="-Djava.locale.providers=COMPAT"
+        run: |
+          export LANG_TAG="${{ matrix.locale }}"
+          mvn -U -B -C \
+            -Dmaven.javadoc.skip=true \
+            -Duser.language="${LANG_TAG%%_*}" \
+            -Duser.country="${LANG_TAG##*_}" \
+            verify
+      - name: Jakarta JSON-B TCK
+        run: cd yasson-tck && mvn -U -B test

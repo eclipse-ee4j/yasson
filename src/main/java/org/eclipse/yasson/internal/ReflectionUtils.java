@@ -190,6 +190,10 @@ public class ReflectionUtils {
             if (tmp != null) {
                 returnType = tmp;
             }
+            // If the type is a WildcardType we need to resolve the most specific type
+            if (returnType instanceof WildcardType) {
+                return resolveMostSpecificBound(chain, (WildcardType) returnType, warn);
+            }
             if (!(returnType instanceof TypeVariable)) {
                 break;
             }
@@ -257,6 +261,10 @@ public class ReflectionUtils {
                                                                         variableType,
                                                                         typeToSearch));
                 }
+            }
+            // The expected type and the resolved type are the same, simply return the type
+            if (resolvedArgs[i].equals(typeToResolve)) {
+                return typeToResolve;
             }
             if (resolvedArgs[i] instanceof ParameterizedType) {
                 resolvedArgs[i] = resolveTypeArguments((ParameterizedType) resolvedArgs[i], typeToSearch);

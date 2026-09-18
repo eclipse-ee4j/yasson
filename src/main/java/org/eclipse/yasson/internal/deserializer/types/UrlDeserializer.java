@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2021, 2022 Oracle and/or its affiliates. All rights reserved.
+ * Copyright (c) 2021, 2026 Oracle and/or its affiliates. All rights reserved.
  *
  * This program and the accompanying materials are made available under the
  * terms of the Eclipse Public License v. 2.0 which is available at
@@ -16,7 +16,11 @@ import java.lang.reflect.Type;
 import java.net.MalformedURLException;
 import java.net.URL;
 
+import jakarta.json.bind.JsonbException;
+
 import org.eclipse.yasson.internal.DeserializationContextImpl;
+import org.eclipse.yasson.internal.properties.MessageKeys;
+import org.eclipse.yasson.internal.properties.Messages;
 
 /**
  * Deserializer of the {@link URL} type.
@@ -29,12 +33,10 @@ class UrlDeserializer extends TypeDeserializer {
 
     @Override
     Object deserializeStringValue(String value, DeserializationContextImpl context, Type rType) {
-        URL url = null;
         try {
-            url = new URL(value);
+            return new URL(value);
         } catch (MalformedURLException e) {
-            e.printStackTrace();
+            throw new JsonbException(Messages.getMessage(MessageKeys.URL_PARSE_ERROR, value), e);
         }
-        return url;
     }
 }

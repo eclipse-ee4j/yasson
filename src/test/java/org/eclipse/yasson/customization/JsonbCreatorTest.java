@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2016, 2022 Oracle and/or its affiliates. All rights reserved.
+ * Copyright (c) 2016, 2026 Oracle and/or its affiliates. All rights reserved.
  *
  * This program and the accompanying materials are made available under the
  * terms of the Eclipse Public License v. 2.0 which is available at
@@ -24,8 +24,13 @@ import jakarta.json.bind.annotation.JsonbProperty;
 
 import org.eclipse.yasson.customization.model.CreatorConstructorPojo;
 import org.eclipse.yasson.customization.model.CreatorFactoryMethodPojo;
+import org.eclipse.yasson.customization.model.CreatorConstructorSetterConflicts;
+import org.eclipse.yasson.customization.model.CreatorFactoryNameConflicts;
+import org.eclipse.yasson.customization.model.CreatorFactorySetterConflicts;
 import org.eclipse.yasson.customization.model.CreatorIncompatibleTypePojo;
+import org.eclipse.yasson.customization.model.CreatorIncompleteParameters;
 import org.eclipse.yasson.customization.model.CreatorMultipleDeclarationErrorPojo;
+import org.eclipse.yasson.customization.model.CreatorNameConflicts;
 import org.eclipse.yasson.customization.model.CreatorPackagePrivateConstructor;
 import org.eclipse.yasson.customization.model.CreatorWithoutJavabeanProperty;
 import org.eclipse.yasson.customization.model.CreatorWithoutJsonbProperty1;
@@ -153,6 +158,49 @@ public class JsonbCreatorTest {
         ParameterNameTester result = defaultJsonb.fromJson(json, ParameterNameTester.class);
         assertEquals("someText", result.name);
         assertNull(result.secondParam);
+    }
+
+    @Test
+    public void testFactoryCreatorNameConflicts() {
+        String json = "{\"value\":\"hello\"}";
+        CreatorFactoryNameConflicts result = defaultJsonb.fromJson(json, CreatorFactoryNameConflicts.class);
+        assertNull(result.value, "value should have been claimed by the factory method parameter, not set on the field.");
+        assertEquals("HELLO", result.creatorValue, "value should have been routed to creatorValue via the factory method.");
+    }
+
+    @Test
+    public void testConstructorCreatorSetterConflicts() {
+        String json = "{\"value\":\"hello\"}";
+        CreatorConstructorSetterConflicts result = defaultJsonb.fromJson(json, CreatorConstructorSetterConflicts.class);
+        assertNull(result.getValue(), "value should have been claimed by the constructor parameter, not set via the setter.");
+        assertEquals("HELLO", result.creatorValue, "value should have been routed to creatorValue via the constructor.");
+    }
+
+    @Test
+    public void testFactoryCreatorSetterConflicts() {
+        String json = "{\"value\":\"hello\"}";
+        CreatorFactorySetterConflicts result = defaultJsonb.fromJson(json, CreatorFactorySetterConflicts.class);
+        assertNull(result.getValue(), "value should have been claimed by the factory method parameter, not set via the setter.");
+        assertEquals("HELLO", result.creatorValue, "value should have been routed to creatorValue via the factory method.");
+    }
+
+    @Test
+    public void testCreatorNameConflicts() {
+        String json = "{\"fromJson\":\"jsonValue\"}";
+        CreatorNameConflicts result = defaultJsonb.fromJson(json, CreatorNameConflicts.class);
+        assertNull(result.fromJson, "fromJson should have been routed to fromCreator using the @JsonbProperty annotation on the constructor parameter.");
+        assertEquals("JSONVALUE", result.fromCreator, "fromJson should have been routed to fromCreator using the @JsonbProperty annotation on the constructor parameter.");
+        assertNull(result.notProvided, "notProvided was not provided in the JSON, so it should be null.");
+        assertEquals(0, result.notDeclared, "notDeclared should have been set to a default value.");
+    }
+
+    @Test
+    public void testCreatorPassthroughFields() {
+        String json = "{\"declaredField\":\"declaredValue\", \"notDeclaredField\":\"notDeclaredValue\", \"notDeclaredSetter\":\"notDeclaredSetterValue\"}";
+        CreatorIncompleteParameters result = defaultJsonb.fromJson(json, CreatorIncompleteParameters.class);
+        assertEquals("DECLAREDVALUE", result.declaredField, "declaredField should have been set from the @JsonbCreator.");
+        assertEquals("notDeclaredValue", result.notDeclaredField, "notDeclaredField should have been set via the normal deserialization pathway.");
+        assertEquals("notDeclaredSetterValue", result.getNotDeclaredSetter(), "notDeclaredSetter should have been set via the normal deserialization pathway.");
     }
 
     @Test

@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2015, 2022 Oracle and/or its affiliates. All rights reserved.
+ * Copyright (c) 2015, 2026 Oracle and/or its affiliates. All rights reserved.
  *
  * This program and the accompanying materials are made available under the
  * terms of the Eclipse Public License v. 2.0 which is available at
@@ -197,15 +197,19 @@ class ClassParser {
         Method[] declaredMethods = AccessController.doPrivileged((PrivilegedAction<Method[]>) clazz::getDeclaredMethods);
         for (Method method : declaredMethods) {
             String name = method.getName();
+
             //isBridge method filters out methods inherited from interfaces
-            boolean isAccessorMethod = ClassMultiReleaseExtension.isSpecialAccessorMethod(method, classProperties)
+            boolean isAccessorMethod = isSpecialAccessorMethod(method, classProperties)
+                    || isVirtualAccessorMethod(method)
                     || isPropertyMethod(method);
+
             if (!isAccessorMethod || method.isBridge() || isSpecialCaseMethod(clazz, method)) {
                 continue;
             }
-            final String propertyName = ClassMultiReleaseExtension.shouldTransformToPropertyName(method)
-                    ? toPropertyMethod(name)
-                    : name;
+            
+            final String propertyName = method.getDeclaringClass().isRecord()
+                    ? name
+                    : toPropertyMethod(name);
 
             registerMethod(propertyName, method, classElement, classProperties);
         }
@@ -263,6 +267,21 @@ class ClassParser {
 
     private static boolean isPropertyMethod(Method m) {
         return isGetter(m) || isSetter(m);
+    }
+
+    private static boolean isSpecialAccessorMethod(Method method, Map<String, Property> classProperties) {
+        return method.getDeclaringClass().isRecord()
+                && method.getParameterCount() == 0
+                && !void.class.equals(method.getReturnType())
+                && classProperties.containsKey(method.getName());
+    }
+
+    private static boolean isVirtualAccessorMethod(Method method) {
+        return method.getDeclaringClass().isRecord()
+                && method.getParameterCount() == 0
+                && !void.class.equals(method.getReturnType())
+                && !"hashCode".equals(method.getName())
+                && !"toString".equals(method.getName());
     }
 
     private static void parseFields(JsonbAnnotatedElement<Class<?>> classElement, Map<String, Property> classProperties) {
