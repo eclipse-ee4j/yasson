@@ -13,6 +13,7 @@
 package org.eclipse.yasson.defaultmapping.jsonp;
 
 import java.math.BigDecimal;
+import java.util.List;
 
 import jakarta.json.Json;
 import jakarta.json.JsonArray;
@@ -29,6 +30,7 @@ import jakarta.json.spi.JsonProvider;
 import org.eclipse.yasson.defaultmapping.jsonp.model.JsonpPojo;
 import org.junit.jupiter.api.Test;
 
+import static org.eclipse.yasson.Assertions.shouldFail;
 import static org.eclipse.yasson.Jsonbs.defaultJsonb;
 import static org.hamcrest.CoreMatchers.is;
 import static org.hamcrest.CoreMatchers.nullValue;
@@ -83,6 +85,16 @@ public class JsonpTest {
         assertEquals("abc123", result.getJsonObject("cust").getString("f1"));
         assertEquals("abc123", result.getJsonObject("cust").getString("f1"));
 
+    }
+
+    @Test
+    public void testDeserializeNonObject() {
+        final JsonValue jsonString = Json.createValue("test");
+        final JsonValue jsonNumber = Json.createValue(1);
+        for (JsonValue v : List.of(jsonString, jsonNumber, JsonValue.TRUE, JsonValue.EMPTY_JSON_ARRAY)) {
+            // Non-object JSON input should not be serialized into JsonObject
+            shouldFail(() -> defaultJsonb.fromJson(v.toString(), JsonObject.class));
+        }
     }
 
     @Test

@@ -47,6 +47,7 @@ import java.util.function.Function;
 
 import javax.xml.datatype.XMLGregorianCalendar;
 
+import jakarta.json.JsonObject;
 import jakarta.json.JsonValue;
 import jakarta.json.bind.JsonbException;
 import jakarta.json.stream.JsonParser;
@@ -173,6 +174,8 @@ public class TypeDeserializers {
 
         if (JsonValue.class.equals(clazz)) {
             return new JsonValueDeserializer(builder, JsonValue.NULL);
+        } else if (JsonObject.class.equals(clazz)) {
+            return new JsonObjectDeserializer(builder);
         } else if (JsonValue.class.isAssignableFrom(clazz)) {
             return new JsonValueDeserializer(builder, null);
         }
