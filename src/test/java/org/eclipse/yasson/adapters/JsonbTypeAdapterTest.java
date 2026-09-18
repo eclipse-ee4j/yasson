@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2016, 2020 Oracle and/or its affiliates. All rights reserved.
+ * Copyright (c) 2016, 2026 Oracle and/or its affiliates. All rights reserved.
  *
  * This program and the accompanying materials are made available under the
  * terms of the Eclipse Public License v. 2.0 which is available at
@@ -22,6 +22,7 @@ import org.eclipse.yasson.adapters.model.*;
 import jakarta.json.bind.JsonbException;
 import jakarta.json.bind.adapter.JsonbAdapter;
 import jakarta.json.bind.annotation.JsonbTypeAdapter;
+import jakarta.json.bind.annotation.JsonbTypeDeserializer;
 
 /**
  * @author Roman Grigoriadi
@@ -119,5 +120,27 @@ public class JsonbTypeAdapterTest {
         BoxWithDeserializer result = defaultJsonb.fromJson("{\"boxInteger\":101,\"boxStr\":\"STR\"}", BoxWithDeserializer.class);
         assertEquals("STR", result.getBoxStrField());
         assertEquals(Integer.valueOf(101), result.getBoxIntegerField());
+    }
+
+    public static class BoxWithPrimitiveBooleanDeserializer {
+        @JsonbTypeDeserializer(CustomBooleanDeserializer.class)
+        public boolean bool;
+    }
+
+    @Test
+    public void testPrimitiveDeserialzier() {
+        String successfulJson = "{\"bool\":true}";
+        BoxWithPrimitiveBooleanDeserializer result = defaultJsonb.fromJson(successfulJson, BoxWithPrimitiveBooleanDeserializer.class);
+        assertTrue(result.bool);
+
+        String failingJson = "{\"bool\":\"true\"}";
+        try {
+            defaultJsonb.fromJson(failingJson, BoxWithPrimitiveBooleanDeserializer.class);
+            fail();
+        } catch (JsonbException e) {
+            assertTrue(e.getCause() instanceof IllegalStateException);
+            assertEquals("Unexpected value: VALUE_STRING", e.getCause().getMessage());
+        }
+
     }
 }
