@@ -224,6 +224,9 @@ public class DeserializationModelCreator {
         }
         for (String s : params) {
             CreatorModel creatorModel = creator.findByName(s);
+            if (creatorModel == null) {
+                continue; 
+            }
             ModelDeserializer<JsonParser> modelDeserializer = typeProcessor(chain,
                                                                             creatorModel.getType(),
                                                                             creatorModel.getCustomization(),
