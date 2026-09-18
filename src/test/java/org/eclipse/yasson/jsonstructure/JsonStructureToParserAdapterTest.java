@@ -19,6 +19,7 @@ import static org.eclipse.yasson.Jsonbs.*;
 
 import org.eclipse.yasson.TestTypeToken;
 import org.eclipse.yasson.YassonJsonb;
+import org.eclipse.yasson.internal.jsonstructure.JsonStructureToParserAdapter;
 
 import jakarta.json.JsonArray;
 import jakarta.json.JsonArrayBuilder;
@@ -28,6 +29,7 @@ import jakarta.json.bind.Jsonb;
 import jakarta.json.bind.JsonbBuilder;
 import jakarta.json.bind.JsonbConfig;
 import jakarta.json.spi.JsonProvider;
+import jakarta.json.stream.JsonParser;
 import java.math.BigDecimal;
 import java.util.ArrayList;
 import java.util.List;
@@ -394,5 +396,114 @@ public class JsonStructureToParserAdapterTest {
         assertNotNull(result);
         assertNotNull(result.getId());
         assertEquals("123.45", result.getId().getValue());
+    }
+
+    /**
+     * Regression test for the bug where {@link org.eclipse.yasson.internal.jsonstructure.JsonStructureIterator#getValueEvent}
+     * incorrectly mapped {@code TRUE} and {@code FALSE} {@link jakarta.json.JsonValue.ValueType}s to
+     * {@link JsonParser.Event#VALUE_STRING} instead of {@link JsonParser.Event#VALUE_TRUE} and
+     * {@link JsonParser.Event#VALUE_FALSE}.
+     *
+     * <p>Drives {@link JsonStructureToParserAdapter} directly so that the wrong event would be visible
+     * at the parser level regardless of how Yasson's deserialization chain handles it internally.
+     */
+    @Test
+    public void booleanValuesInArrayProduceCorrectEvents() {
+        JsonArray jsonArray = jsonProvider.createArrayBuilder()
+                .add(true)
+                .add(false)
+                .build();
+
+        try (JsonStructureToParserAdapter parser = new JsonStructureToParserAdapter(jsonArray)) {
+            // Verify currentEvent() is null before any next() call
+            assertNull(parser.currentEvent(), "currentEvent() must be null before the first next() call");
+
+            JsonParser.Event e1 = parser.next();
+            assertEquals(JsonParser.Event.START_ARRAY, e1);
+            assertEquals(JsonParser.Event.START_ARRAY, parser.currentEvent(),
+                    "currentEvent() must equal the last event returned by next()");
+
+            JsonParser.Event e2 = parser.next();
+            assertEquals(JsonParser.Event.VALUE_TRUE, e2,
+                    "JsonValue.TRUE must produce VALUE_TRUE, not VALUE_STRING");
+            assertEquals(JsonParser.Event.VALUE_TRUE, parser.currentEvent(),
+                    "currentEvent() must reflect VALUE_TRUE after advancing");
+
+            JsonParser.Event e3 = parser.next();
+            assertEquals(JsonParser.Event.VALUE_FALSE, e3,
+                    "JsonValue.FALSE must produce VALUE_FALSE, not VALUE_STRING");
+            assertEquals(JsonParser.Event.VALUE_FALSE, parser.currentEvent(),
+                    "currentEvent() must reflect VALUE_FALSE after advancing");
+
+            JsonParser.Event e4 = parser.next();
+            assertEquals(JsonParser.Event.END_ARRAY, e4);
+            assertEquals(JsonParser.Event.END_ARRAY, parser.currentEvent());
+        }
+    }
+
+    /**
+     * Regression test verifying that boolean object properties produce the correct parser events
+     * ({@link JsonParser.Event#VALUE_TRUE} and {@link JsonParser.Event#VALUE_FALSE})
+     * when iterating through a {@link JsonObject} via {@link JsonStructureToParserAdapter}.
+     *
+     * <p>In the original buggy code the {@code TRUE}/{@code FALSE} switch cases fell through to
+     * {@code VALUE_STRING}, which would silently produce wrong events for object-valued booleans.
+     */
+    @Test
+    public void booleanValuesInObjectProduceCorrectEvents() {
+        JsonObject jsonObject = jsonProvider.createObjectBuilder()
+                .add("flagTrue", true)
+                .add("flagFalse", false)
+                .build();
+
+        try (JsonStructureToParserAdapter parser = new JsonStructureToParserAdapter(jsonObject)) {
+            assertEquals(JsonParser.Event.START_OBJECT, parser.next());
+
+            // flagTrue key
+            assertEquals(JsonParser.Event.KEY_NAME, parser.next());
+            assertEquals("flagTrue", parser.getString());
+
+            JsonParser.Event trueEvent = parser.next();
+            assertEquals(JsonParser.Event.VALUE_TRUE, trueEvent,
+                    "JsonValue.TRUE in an object must produce VALUE_TRUE, not VALUE_STRING");
+            assertEquals(JsonParser.Event.VALUE_TRUE, parser.currentEvent());
+
+            // flagFalse key
+            assertEquals(JsonParser.Event.KEY_NAME, parser.next());
+            assertEquals("flagFalse", parser.getString());
+
+            JsonParser.Event falseEvent = parser.next();
+            assertEquals(JsonParser.Event.VALUE_FALSE, falseEvent,
+                    "JsonValue.FALSE in an object must produce VALUE_FALSE, not VALUE_STRING");
+            assertEquals(JsonParser.Event.VALUE_FALSE, parser.currentEvent());
+
+            assertEquals(JsonParser.Event.END_OBJECT, parser.next());
+        }
+    }
+
+    /**
+     * End-to-end regression that boolean fields on a POJO round-trip correctly through
+     * {@link org.eclipse.yasson.YassonJsonb#fromJsonStructure} when the source is a {@link JsonObject}.
+     *
+     * <p>Prior to the fix, {@code VALUE_TRUE}/{@code VALUE_FALSE} were reported as {@code VALUE_STRING},
+     * causing Yasson's type-switch to fall through to its default case and throw a {@link jakarta.json.bind.JsonbException}.
+     */
+    @Test
+    public void booleanFieldsDeserializeCorrectlyFromJsonStructure() {
+        JsonObject jsonObject = jsonProvider.createObjectBuilder()
+                .add("booleans", jsonProvider.createArrayBuilder()
+                        .add(true)
+                        .add(false)
+                        .build())
+                .build();
+
+        Pojo result = yassonJsonb.fromJsonStructure(jsonObject, Pojo.class);
+
+        assertNotNull(result.getBooleans(), "booleans list must not be null");
+        assertEquals(2, result.getBooleans().size());
+        assertEquals(Boolean.TRUE, result.getBooleans().get(0),
+                "First boolean element must deserialize to TRUE");
+        assertEquals(Boolean.FALSE, result.getBooleans().get(1),
+                "Second boolean element must deserialize to FALSE");
     }
 }

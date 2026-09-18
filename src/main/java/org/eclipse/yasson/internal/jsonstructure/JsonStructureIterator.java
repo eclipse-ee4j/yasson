@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2019, 2020 Oracle and/or its affiliates. All rights reserved.
+ * Copyright (c) 2019, 2023 Oracle and/or its affiliates. All rights reserved.
  *
  * This program and the accompanying materials are made available under the
  * terms of the Eclipse Public License v. 2.0 which is available at
@@ -67,9 +67,11 @@ abstract class JsonStructureIterator implements Iterator<JsonParser.Event> {
         case NUMBER:
             return JsonParser.Event.VALUE_NUMBER;
         case STRING:
-        case TRUE:
-        case FALSE:
             return JsonParser.Event.VALUE_STRING;
+        case TRUE:
+            return JsonParser.Event.VALUE_TRUE;
+        case FALSE:
+            return JsonParser.Event.VALUE_FALSE;
         case OBJECT:
             return JsonParser.Event.START_OBJECT;
         case ARRAY:
