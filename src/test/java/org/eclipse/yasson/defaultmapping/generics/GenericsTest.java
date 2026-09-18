@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2015, 2022 Oracle and/or its affiliates. All rights reserved.
+ * Copyright (c) 2015, 2023 Oracle and/or its affiliates. All rights reserved.
  *
  * This program and the accompanying materials are made available under the
  * terms of the Eclipse Public License v. 2.0 which is available at
@@ -12,12 +12,20 @@
 
 package org.eclipse.yasson.defaultmapping.generics;
 
+import static org.eclipse.yasson.Jsonbs.defaultJsonb;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertIterableEquals;
+import static org.junit.jupiter.api.Assertions.assertThrows;
+import static org.junit.jupiter.api.Assertions.assertTrue;
+
+import java.lang.reflect.Field;
 import java.lang.reflect.Type;
 import java.math.BigDecimal;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Collection;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.LinkedList;
@@ -34,29 +42,32 @@ import org.eclipse.yasson.adapters.model.GenericBox;
 import org.eclipse.yasson.defaultmapping.generics.model.AnotherGenericTestClass;
 import org.eclipse.yasson.defaultmapping.generics.model.BoundedGenericClass;
 import org.eclipse.yasson.defaultmapping.generics.model.Circle;
+import org.eclipse.yasson.defaultmapping.generics.model.CollectionContainer;
+import org.eclipse.yasson.defaultmapping.generics.model.CollectionElement;
 import org.eclipse.yasson.defaultmapping.generics.model.CollectionWrapper;
 import org.eclipse.yasson.defaultmapping.generics.model.ColoredCircle;
+import org.eclipse.yasson.defaultmapping.generics.model.ConstructorContainer;
 import org.eclipse.yasson.defaultmapping.generics.model.CyclicSubClass;
 import org.eclipse.yasson.defaultmapping.generics.model.FinalGenericWrapper;
 import org.eclipse.yasson.defaultmapping.generics.model.FinalMember;
 import org.eclipse.yasson.defaultmapping.generics.model.GenericArrayClass;
 import org.eclipse.yasson.defaultmapping.generics.model.GenericTestClass;
 import org.eclipse.yasson.defaultmapping.generics.model.GenericWithUnboundedWildcardClass;
+import org.eclipse.yasson.defaultmapping.generics.model.ListContainer;
+import org.eclipse.yasson.defaultmapping.generics.model.LowerBoundTypeVariableWithCollectionAttributeClass;
 import org.eclipse.yasson.defaultmapping.generics.model.MultiLevelExtendedGenericTestClass;
 import org.eclipse.yasson.defaultmapping.generics.model.MultipleBoundsContainer;
 import org.eclipse.yasson.defaultmapping.generics.model.MyCyclicGenericClass;
 import org.eclipse.yasson.defaultmapping.generics.model.PropagatedGenericClass;
 import org.eclipse.yasson.defaultmapping.generics.model.Shape;
+import org.eclipse.yasson.defaultmapping.generics.model.StaticCreatorContainer;
+import org.eclipse.yasson.defaultmapping.generics.model.TreeContainer;
+import org.eclipse.yasson.defaultmapping.generics.model.TreeElement;
 import org.eclipse.yasson.defaultmapping.generics.model.WildCardClass;
 import org.eclipse.yasson.defaultmapping.generics.model.WildcardMultipleBoundsClass;
 import org.eclipse.yasson.serializers.model.Box;
 import org.eclipse.yasson.serializers.model.Crate;
 import org.junit.jupiter.api.Test;
-
-import static org.eclipse.yasson.Jsonbs.defaultJsonb;
-import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertThrows;
-import static org.junit.jupiter.api.Assertions.assertTrue;
 
 /**
  * This class contains JSONB default mapping generics tests.
@@ -446,6 +457,100 @@ public class GenericsTest {
         assertEquals(concreteContainer, finalGenericWrapper);
     }
 
+    @Test
+    public void lowerBoundTypeVariableInCollectionAttribute() throws Exception {
+        
+        Shape shape = new Shape();
+        shape.setArea(5D);
+        
+        AnotherGenericTestClass<Integer, Shape> anotherGenericTestClass = new AnotherGenericTestClass<>();
+        anotherGenericTestClass.field1 = 6;
+        anotherGenericTestClass.field2 = shape;
+        
+        List<AnotherGenericTestClass<Integer, Shape>> asList = Arrays.asList(anotherGenericTestClass);
+        
+        Jsonb jsonb = JsonbBuilder.create();
+        String toJson = jsonb.toJson(asList);
+        
+        Field field = LowerBoundTypeVariableWithCollectionAttributeClass.class.getDeclaredField("value");
+        
+        Type genericType = field.getGenericType();
+        
+        List<AnotherGenericTestClass<Integer, Shape>> fromJson = jsonb.fromJson(toJson, genericType);
+
+        assertEquals(5, fromJson.get(0).field2.getArea());
+        assertEquals(6, fromJson.get(0).field1);
+        
+    }
+
+    @Test
+    public void genericConstructorCreator() {
+        final String expectedJson = "{\"value\":\"Test\"}";
+        final ConstructorContainer<String> container = new ConstructorContainer<>("Test");
+
+        assertEquals(expectedJson, defaultJsonb.toJson(container));
+        assertEquals(container, defaultJsonb.fromJson(expectedJson, ConstructorContainer.class));
+    }
+
+    @Test
+    public void genericStaticCreator() {
+        final String expectedJson = "{\"value\":\"static\"}";
+        final StaticCreatorContainer<String> container = StaticCreatorContainer.create("static");
+
+        assertEquals(expectedJson, defaultJsonb.toJson(container));
+        assertEquals(container, defaultJsonb.fromJson(expectedJson, StaticCreatorContainer.class));
+    }
+
+    @Test
+    public void wildcardCollectionContainer() {
+        final String expectedJson = "{\"collection\":{\"collection\":[{\"wrapped\":\"wrappedElement\"}]}}";
+        final CollectionContainer collectionContainer = new CollectionContainer();
+        final CollectionWrapper<CollectionElement<?>> collectionWrapper = new CollectionWrapper<>();
+        final CollectionElement<String> wildcardType = new CollectionElement<>();
+        wildcardType.setWrapped("wrappedElement");
+        final Collection<CollectionElement<?>> list = List.of(wildcardType);
+        collectionWrapper.setCollection(list);
+        collectionContainer.setCollection(collectionWrapper);
+
+        assertEquals(expectedJson, defaultJsonb.toJson(collectionContainer));
+        final CollectionContainer result = defaultJsonb.fromJson(expectedJson, CollectionContainer.class);
+        assertEquals(collectionContainer, result);
+    }
+
+    @Test
+    public void genericUpperBoundContainer() throws Exception {
+        final String expectedJson = "{\"tree\":{\"children\":[{\"name\":\"child\"}],\"name\":\"parent\"}}";
+        final TreeContainer<TreeElement> container = new TreeContainer<>();
+        final TreeElement parent = new TreeElement("parent");
+        parent.setChildren(List.of(new TreeElement("child")));
+        container.setTree(parent);
+
+        // Use a new instance of Jsonb to avoid any caching
+        try (var jsonb = JsonbBuilder.create()) {
+            assertEquals(expectedJson, jsonb.toJson(container));
+            TreeContainer<TreeElement> result = jsonb.fromJson(expectedJson, new TestTypeToken<TreeContainer<TreeElement>>() {}.getType());
+            assertIterableEquals(container.getTree().getChildren(), result.getTree().getChildren());
+        }
+
+    }
+
+    @Test
+    public void genericUpperBoundContainerWithListContainer() throws Exception {
+        final String expectedJson = "{\"list\":[{\"children\":[{\"name\":\"child\"}],\"name\":\"parent\"}]}";
+        final ListContainer<TreeElement> container = new ListContainer<>();
+        final TreeElement parent = new TreeElement("parent");
+        parent.setChildren(List.of(new TreeElement("child")));
+        container.setList(List.of(parent));
+
+        // Use a new instance of Jsonb to avoid any caching
+        try (var jsonb = JsonbBuilder.create()) {
+            assertEquals(expectedJson, jsonb.toJson(container));
+            ListContainer<TreeElement> result = jsonb.fromJson(expectedJson, new TestTypeToken<ListContainer<TreeElement>>() {}.getType());
+            assertIterableEquals(container.getList(), result.getList());
+        }
+
+    }
+    
     public interface FunctionalInterface<T> {
         T getValue();
     }

@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2022 Oracle and/or its affiliates. All rights reserved.
+ * Copyright (c) 2025 Red Hat, Inc. and/or its affiliates.
  *
  * This program and the accompanying materials are made available under the
  * terms of the Eclipse Public License v. 2.0 which is available at
@@ -10,12 +10,19 @@
  * SPDX-License-Identifier: EPL-2.0 OR BSD-3-Clause
  */
 
-package org.eclipse.yasson.records;
+package org.eclipse.yasson.serializers.model;
 
-public record CarWithMultipleConstructors(String type, String color) {
+import java.sql.Time;
 
-    public CarWithMultipleConstructors(String type) {
-        this(type, "red");
+public class SqlTimeBean {
+
+    private java.sql.Time time;
+
+    public Time getTime() {
+        return time;
     }
 
+    public void setTime(Time time) {
+        this.time = time;
+    }
 }

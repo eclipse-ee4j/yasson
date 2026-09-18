@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2015, 2022 Oracle and/or its affiliates. All rights reserved.
+ * Copyright (c) 2015, 2026 Oracle and/or its affiliates. All rights reserved.
  *
  * This program and the accompanying materials are made available under the
  * terms of the Eclipse Public License v. 2.0 which is available at
@@ -23,7 +23,6 @@ import java.util.stream.Collectors;
 
 import jakarta.json.bind.config.PropertyNamingStrategy;
 
-import org.eclipse.yasson.internal.ClassMultiReleaseExtension;
 import org.eclipse.yasson.internal.ReflectionUtils;
 import org.eclipse.yasson.internal.model.customization.ClassCustomization;
 import org.eclipse.yasson.internal.model.customization.StrategiesProvider;
@@ -191,7 +190,7 @@ public class ClassModel {
         // Example: Deserialization into Map won't use this constructor, and therefore never needs to call this method.
         // Note: Null is a valid result and needs to be cached.
         if (!isInitialized.get()) {
-            if (ClassMultiReleaseExtension.isRecord(clazz)) {
+            if (clazz.isRecord()) {
                 //No default constructor should be used in case of records
                 defaultConstructor = null;
             } else {

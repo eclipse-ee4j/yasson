@@ -1,10 +1,12 @@
 # Eclipse Yasson
 
-[![Maven Central](https://img.shields.io/maven-central/v/org.eclipse/yasson.svg?label=Maven%20Central)](https://mvnrepository.com/artifact/org.eclipse/yasson)
-[![Jakarta Staging (Snapshots)](https://img.shields.io/nexus/s/https/jakarta.oss.sonatype.org/org.eclipse/yasson.svg)](https://jakarta.oss.sonatype.org/content/repositories/staging/org/eclipse/yasson/)
+[![Maven Central](https://img.shields.io/maven-central/v/org.eclipse.yasson/yasson.svg?label=Maven%20Central)](https://mvnrepository.com/artifact/org.eclipse.yasson/yasson)
+<!-- TODO reenable once snapshots can be browsed via https://central.sonatype.com/service/rest/repository/browse/maven-snapshots
+[![Jakarta Staging (Snapshots)](https://img.shields.io/nexus/s/https/jakarta.oss.sonatype.org/org.eclipse.yasson/yasson.svg)](https://jakarta.oss.sonatype.org/content/repositories/staging/org/eclipse/yasson/yasson/)
+-->
 [![Gitter](https://badges.gitter.im/eclipse/yasson.svg)](https://gitter.im/eclipse/yasson)
-[![Javadocs](https://www.javadoc.io/badge/org.eclipse/yasson.svg)](https://www.javadoc.io/doc/org.eclipse/yasson)
-[![Build Status](https://github.com/eclipse-ee4j/yasson/actions/workflows/maven.yml/badge.svg?branch=master)](https://github.com/eclipse-ee4j/yasson/actions/workflows/maven.yml?branch=master)
+[![Javadocs](https://www.javadoc.io/badge/org.eclipse.yasson/yasson.svg)](https://www.javadoc.io/doc/org.eclipse.yasson/yasson)
+[![Build Status](https://github.com/eclipse-ee4j/yasson/actions/workflows/maven.yml/badge.svg?branch=main)](https://github.com/eclipse-ee4j/yasson/actions/workflows/maven.yml?branch=main)
 [![License](https://img.shields.io/badge/License-EPL%202.0-green.svg)](https://opensource.org/licenses/EPL-2.0)
 
 Yasson is a Java framework which provides a standard binding layer between Java classes and JSON documents. This is similar to what JAXB is doing in the XML world. Yasson is an official reference implementation of JSON Binding ([JSR-367](https://jcp.org/en/jsr/detail?id=367)).
@@ -45,6 +47,6 @@ Something not working right? Have an idea for an enhancement? Get in touch with 
 
 ## Links
 - Yasson home page: https://projects.eclipse.org/projects/ee4j.yasson
-- JSON-B official web site: https://eclipse-ee4j.github.io/jsonb-api/
-- JSON-B API & spec project: https://github.com/eclipse-ee4j/jsonb-api
+- JSON-B official web site: https://jakartaee.github.io/jsonb-api/
+- JSON-B API & spec project: https://github.com/jakartaee/jsonb-api
 - JSR-367 page on JCP site: https://jcp.org/en/jsr/detail?id=367

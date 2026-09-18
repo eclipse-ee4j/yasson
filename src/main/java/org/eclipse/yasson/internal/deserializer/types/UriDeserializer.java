@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2021, 2022 Oracle and/or its affiliates. All rights reserved.
+ * Copyright (c) 2021, 2026 Oracle and/or its affiliates. All rights reserved.
  *
  * This program and the accompanying materials are made available under the
  * terms of the Eclipse Public License v. 2.0 which is available at
@@ -14,8 +14,13 @@ package org.eclipse.yasson.internal.deserializer.types;
 
 import java.lang.reflect.Type;
 import java.net.URI;
+import java.net.URISyntaxException;
+
+import jakarta.json.bind.JsonbException;
 
 import org.eclipse.yasson.internal.DeserializationContextImpl;
+import org.eclipse.yasson.internal.properties.MessageKeys;
+import org.eclipse.yasson.internal.properties.Messages;
 
 /**
  * Deserializer of the {@link URI} type.
@@ -28,6 +33,10 @@ class UriDeserializer extends TypeDeserializer {
 
     @Override
     Object deserializeStringValue(String value, DeserializationContextImpl context, Type rType) {
-        return URI.create(value);
+        try {
+            return new URI(value);
+        } catch (URISyntaxException e) {
+            throw new JsonbException(Messages.getMessage(MessageKeys.URI_PARSE_ERROR, value), e);
+        }
     }
 }

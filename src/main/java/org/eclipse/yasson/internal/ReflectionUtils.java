@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2015, 2022 Oracle and/or its affiliates. All rights reserved.
+ * Copyright (c) 2015, 2023 Oracle and/or its affiliates. All rights reserved.
  *
  * This program and the accompanying materials are made available under the
  * terms of the Eclipse Public License v. 2.0 which is available at
@@ -190,6 +190,10 @@ public class ReflectionUtils {
             if (tmp != null) {
                 returnType = tmp;
             }
+            // If the type is a WildcardType we need to resolve the most specific type
+            if (returnType instanceof WildcardType) {
+                return resolveMostSpecificBound(chain, (WildcardType) returnType, warn);
+            }
             if (!(returnType instanceof TypeVariable)) {
                 break;
             }
@@ -240,6 +244,14 @@ public class ReflectionUtils {
                 }
                 resolvedArgs[i] = new VariableTypeInheritanceSearch()
                         .searchParametrizedType(typeToSearch, (TypeVariable<?>) variableType);
+                
+                if (resolvedArgs[i] == null) {
+                    Type[] bounds = ((TypeVariable<?>) variableType).getBounds();
+                    if (Objects.nonNull(bounds) && bounds.length > 0) {
+                        resolvedArgs[i] = bounds[0];
+                    }
+                }
+                
                 if (resolvedArgs[i] == null) {
                     if (typeToSearch instanceof Class) {
                         return Object.class;
@@ -249,6 +261,10 @@ public class ReflectionUtils {
                                                                         variableType,
                                                                         typeToSearch));
                 }
+            }
+            // The expected type and the resolved type are the same, simply return the type
+            if (resolvedArgs[i].equals(typeToResolve)) {
+                return typeToResolve;
             }
             if (resolvedArgs[i] instanceof ParameterizedType) {
                 resolvedArgs[i] = resolveTypeArguments((ParameterizedType) resolvedArgs[i], typeToSearch);

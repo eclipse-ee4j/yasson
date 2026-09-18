@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2016, 2023 Oracle and/or its affiliates. All rights reserved.
+ * Copyright (c) 2016, 2026 Oracle and/or its affiliates. All rights reserved.
  *
  * This program and the accompanying materials are made available under the
  * terms of the Eclipse Public License v. 2.0 which is available at
@@ -186,7 +186,9 @@ public class AnnotationIntrospector {
             }
         }
         if (jsonbCreator == null) {
-            jsonbCreator = ClassMultiReleaseExtension.findCreator(clazz, declaredConstructors, this, propertyNamingStrategy);
+            if (clazz.isRecord() && declaredConstructors.length == 1) {
+                jsonbCreator = createJsonbCreator(declaredConstructors[0], null, clazz, propertyNamingStrategy);
+            }
             if (jsonbCreator == null) {
                 jsonbCreator = constructorPropertiesIntrospector.getCreator(declaredConstructors);
             }

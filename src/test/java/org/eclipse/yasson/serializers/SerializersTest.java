@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2016, 2023 Oracle and/or its affiliates. All rights reserved.
+ * Copyright (c) 2016, 2025 Oracle and/or its affiliates. All rights reserved.
  *
  * This program and the accompanying materials are made available under the
  * terms of the Eclipse Public License v. 2.0 which is available at
@@ -16,6 +16,7 @@ import java.io.StringReader;
 import java.lang.reflect.ParameterizedType;
 import java.lang.reflect.Type;
 import java.math.BigDecimal;
+import java.sql.Timestamp;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Calendar;
@@ -35,6 +36,7 @@ import jakarta.json.bind.Jsonb;
 import jakarta.json.bind.JsonbBuilder;
 import jakarta.json.bind.JsonbConfig;
 import jakarta.json.bind.JsonbException;
+import jakarta.json.bind.annotation.JsonbTypeSerializer;
 import jakarta.json.bind.config.PropertyOrderStrategy;
 import jakarta.json.bind.serializer.DeserializationContext;
 import jakarta.json.bind.serializer.JsonbDeserializer;
@@ -69,6 +71,7 @@ import org.eclipse.yasson.serializers.model.RecursiveDeserializer;
 import org.eclipse.yasson.serializers.model.RecursiveSerializer;
 import org.eclipse.yasson.serializers.model.SimpleAnnotatedSerializedArrayContainer;
 import org.eclipse.yasson.serializers.model.SimpleContainer;
+import org.eclipse.yasson.serializers.model.SqlTimeBean;
 import org.eclipse.yasson.serializers.model.StringWrapper;
 import org.eclipse.yasson.serializers.model.SupertypeSerializerPojo;
 import org.junit.jupiter.api.Test;
@@ -78,6 +81,7 @@ import static java.util.Collections.singletonMap;
 import static org.eclipse.yasson.Jsonbs.defaultJsonb;
 import static org.eclipse.yasson.Jsonbs.nullableJsonb;
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertInstanceOf;
 import static org.junit.jupiter.api.Assertions.assertNull;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.junit.jupiter.api.Assertions.fail;
@@ -163,7 +167,7 @@ public class SerializersTest {
         JsonbConfig config = new JsonbConfig().withDeserializers(new CrateDeserializer());
         Jsonb jsonb = JsonbBuilder.create(config);
 
-        Box box = createPojoWithDates();
+        Box box = createPojoWithDates(getExpectedDate());
 
         String expected = "{\"boxStr\":\"Box string\",\"crate\":{\"crateInner\":{\"crateInnerBigDec\":10,\"crate_inner_str\":\"Single inner\",\"date\":\"14.05.2015 || 11:10:01\"},\"crateInnerList\":[{\"crateInnerBigDec\":10,\"crate_inner_str\":\"List inner 0\"},{\"crateInnerBigDec\":10,\"crate_inner_str\":\"List inner 1\"}],\"date\":\"2015-05-14T11:10:01\"},\"secondBoxStr\":\"Second box string\"}";
 
@@ -199,6 +203,19 @@ public class SerializersTest {
         assertNull(result.crate.crateStr);
         assertEquals(pojo.crate.crateInner.crateInnerStr, result.crate.crateInner.crateInnerStr);
         assertEquals(pojo.crate.crateInner.crateInnerBigDec, result.crate.crateInner.crateInnerBigDec);
+    }
+
+    @Test
+    public void testSerializerSerializationOfSqlTime() {
+        JsonbConfig config = new JsonbConfig().withSerializers(new CrateSerializer());
+        Jsonb jsonb = JsonbBuilder.create(config);
+        String expected = "{\"time\":\"1970-01-01T11:00:00Z[UTC]\"}";
+
+        SqlTimeBean value = new SqlTimeBean();
+        TimeZone.setDefault(TimeZone.getTimeZone("UTC"));
+        value.setTime(java.sql.Time.valueOf("11:00:00"));
+
+        assertEquals(expected, jsonb.toJson(value));
     }
 
     @Test
@@ -251,12 +268,18 @@ public class SerializersTest {
     }
 
     @Test
+    public void testSqlTimestampSerialization() {
+        Box box = createPojoWithTimestamp(new Timestamp(getExpectedDate().getTime()));
+        assertTrue(defaultJsonb.toJson(box).contains("\"timestamp\":\"05/14/2015 @ 11:10\""));
+    }
+
+    @Test
     public void testSerializationUsingConversion() {
         JsonbConfig config = new JsonbConfig().withSerializers(new CrateSerializerWithConversion());
         Jsonb jsonb = JsonbBuilder.create(config);
 
         String json = "{\"boxStr\":\"Box string\",\"crate\":{\"crateStr\":\"REPLACED crate str\",\"crateInner\":{\"crateInnerBigDec\":10,\"crate_inner_str\":\"Single inner\",\"date\":\"14.05.2015 || 11:10:01\"},\"crateInnerList\":[{\"crateInnerBigDec\":10,\"crate_inner_str\":\"List inner 0\"},{\"crateInnerBigDec\":10,\"crate_inner_str\":\"List inner 1\"}],\"crateBigDec\":54321,\"date-converted\":\"2015-05-14T11:10:01Z[UTC]\"},\"secondBoxStr\":\"Second box string\"}";
-        assertEquals(json, jsonb.toJson(createPojoWithDates()));
+        assertEquals(json, jsonb.toJson(createPojoWithDates(getExpectedDate())));
     }
 
     @Test
@@ -567,8 +590,13 @@ public class SerializersTest {
         }
     }
 
-    private static Box createPojoWithDates() {
-        Date date = getExpectedDate();
+    private static Box createPojoWithTimestamp(Timestamp timestamp) {
+        Box box = createPojo();
+        box.crate.timestamp = timestamp;
+        return box;
+    }
+
+    private static Box createPojoWithDates(Date date) {
         Box box = createPojo();
         box.crate.date = date;
         box.crate.crateInner.date = date;
@@ -580,7 +608,6 @@ public class SerializersTest {
         box.boxStr = "Box string";
         box.crate = new Crate();
         box.secondBoxStr = "Second box string";
-
 
         box.crate.crateInner = createCrateInner("Single inner");
 
@@ -810,6 +837,94 @@ public class SerializersTest {
 
         assertEquals(expected, jsonb.fromJson(expectedJson, Container.class));
 
+    }
+
+    /**
+     * Test that annotation-based serializers work when property is declared as Object
+     * but the runtime type has @JsonbTypeSerializer annotation.
+     * This is a regression test for issue #689.
+     */
+    @Test
+    public void testAnnotationBasedSerializerWithObjectTypedProperty() throws Exception {
+        try (Jsonb jsonb = JsonbBuilder.create()) {
+
+            final ObjectPropertyContainer container = new ObjectPropertyContainer();
+            final AnnotatedWithSerializerType objectInstance = new AnnotatedWithSerializerType();
+            objectInstance.value = "test";
+            container.annotatedAsObject = objectInstance;
+            container.annotatedConcrete = new AnnotatedWithSerializerType();
+            container.annotatedConcrete.value = "test2";
+
+            final String result = jsonb.toJson(container);
+
+            // Both properties should use the annotation-based serializer
+            final String expected = "{\"annotatedAsObject\":{\"valueField\":\"replaced value\"},\"annotatedConcrete\":{\"valueField\":\"replaced value\"}}";
+            assertEquals(expected, result);
+
+            // Deserialization: annotatedConcrete uses annotation-based deserializer
+            // annotatedAsObject is declared as Object so JSON-B creates a HashMap (expected behavior)
+            final ObjectPropertyContainer deserialized = jsonb.fromJson(expected, ObjectPropertyContainer.class);
+            //  In the JSON, the type looks like an object and therefore is a map
+            assertInstanceOf(Map.class, deserialized.annotatedAsObject, "Object property deserializes to Map");
+            final Map<?, ?> map =  (Map<?, ?>) deserialized.annotatedAsObject;
+            assertTrue(map.containsKey("valueField"));
+            assertEquals("replaced value", map.get("valueField"));
+            assertEquals("replaced value", deserialized.annotatedConcrete.value);
+        }
+    }
+
+    /**
+     * Test that field-level and method-level @JsonbTypeSerializer annotations work on Object-typed properties.
+     * This tests existing AnnotationIntrospector code (not runtime discovery).
+     */
+    @Test
+    public void testFieldAndMethodLevelSerializerOnObjectType() throws Exception {
+        try (Jsonb jsonb = JsonbBuilder.create()) {
+            final ObjectWithAnnotatedFields container = new ObjectWithAnnotatedFields();
+            container.fieldAnnotated = "test field";
+            container.setMethodAnnotated("test method");
+
+            final String result = jsonb.toJson(container);
+
+            // Both should use their respective serializers
+            final String expected = "{\"fieldAnnotated\":\"FIELD:test field\",\"methodAnnotated\":\"METHOD:test method\"}";
+            assertEquals(expected, result);
+        }
+    }
+
+    public static class ObjectWithAnnotatedFields {
+        @JsonbTypeSerializer(ObjectFieldSerializer.class)
+        public Object fieldAnnotated;
+
+        private Object methodAnnotated;
+
+        @JsonbTypeSerializer(ObjectMethodSerializer.class)
+        public Object getMethodAnnotated() {
+            return methodAnnotated;
+        }
+
+        public void setMethodAnnotated(Object methodAnnotated) {
+            this.methodAnnotated = methodAnnotated;
+        }
+    }
+
+    public static class ObjectFieldSerializer implements JsonbSerializer<Object> {
+        @Override
+        public void serialize(Object obj, JsonGenerator generator, SerializationContext ctx) {
+            generator.write("FIELD:" + obj.toString());
+        }
+    }
+
+    public static class ObjectMethodSerializer implements JsonbSerializer<Object> {
+        @Override
+        public void serialize(Object obj, JsonGenerator generator, SerializationContext ctx) {
+            generator.write("METHOD:" + obj.toString());
+        }
+    }
+
+    public static class ObjectPropertyContainer {
+        public Object annotatedAsObject;  // Declared as Object - this was the bug scenario
+        public AnnotatedWithSerializerType annotatedConcrete;  // Declared concretely - should always work
     }
 
 }

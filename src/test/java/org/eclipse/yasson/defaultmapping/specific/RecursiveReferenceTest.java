@@ -52,7 +52,7 @@ public class RecursiveReferenceTest {
                     "Unable to serialize property 'linksTo' from org.eclipse.yasson.adapters.model.Chain",
                     e.getMessage());
             assertEquals(
-                    "Recursive reference has been found in class class org.eclipse.yasson.adapters.model.Chain.",
+                    "Recursive reference has been found in class org.eclipse.yasson.adapters.model.Chain.",
                     e.getCause().getMessage());
         }
     }
@@ -79,7 +79,7 @@ public class RecursiveReferenceTest {
             userSerializerJsonb.toJson(recursive);
             fail("Exception should be caught");
         } catch (JsonbException e) {
-            assertEquals("Recursive reference has been found in class class org.eclipse.yasson.adapters.model.Chain.",
+            assertEquals("Recursive reference has been found in class org.eclipse.yasson.adapters.model.Chain.",
                          e.getMessage());
         }
     }

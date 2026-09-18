@@ -1,0 +1,21 @@
+version: 2
+updates:
+  - package-ecosystem: github-actions
+    directory: /
+    schedule:
+      interval: daily
+  
+  - package-ecosystem: maven
+    directory: /
+    schedule:
+      interval: daily
+  
+  - package-ecosystem: maven
+    directory: /yasson-jmh
+    schedule:
+      interval: weekly
+  
+  - package-ecosystem: maven
+    directory: /yasson-tck
+    schedule:
+      interval: weekly

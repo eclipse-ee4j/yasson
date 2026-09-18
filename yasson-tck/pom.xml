@@ -5,27 +5,40 @@
 
     <modelVersion>4.0.0</modelVersion>
 
-    <groupId>org.eclipse</groupId>
+    <parent>
+        <groupId>org.eclipse.ee4j</groupId>
+        <artifactId>project</artifactId>
+        <version>2.0.5</version>
+        <relativePath/>
+    </parent>
+
+    <groupId>org.eclipse.yasson</groupId>
     <artifactId>yasson-tck</artifactId>
-    <version>1.0.0-SNAPSHOT</version>
+    <version>3.1.0-SNAPSHOT</version>
 
     <properties>
-        <jsonb.tck.version>3.0.0</jsonb.tck.version>
-        <yasson.version>3.0.0-SNAPSHOT</yasson.version>
-        <jakarta.json.bind.version>3.0.0</jakarta.json.bind.version>
-        <jakarta.json.version>2.1.0</jakarta.json.version>
-        <maven.compiler.source>11</maven.compiler.source>
-        <maven.compiler.target>11</maven.compiler.target>
-    </properties>
+        <maven.compiler.release>17</maven.compiler.release>
 
-    <!-- TODO: Temporarily enable snapshot repository -->
-    <!-- This can be removed once an official release of jakarta.json.bind-tck is available -->
-    <repositories>
-        <repository>
-            <id>jakarta-snapshots</id>
-            <url>https://jakarta.oss.sonatype.org/content/repositories/staging/</url>
-        </repository>
-    </repositories>
+        <!-- API Versions -->
+        <!-- TODO update to EE 12 final versions -->
+        <jakarta.json.version>2.1.3</jakarta.json.version> <!-- EE10 -->
+        <jakarta.json.bind.version>3.1.0-M1</jakarta.json.bind.version>
+
+        <!-- IMPL Versions -->
+        <!-- TODO update to EE 12 final versions -->
+        <jsonb.tck.version>3.1.0-M1</jsonb.tck.version>
+        <yasson.version>${project.version}</yasson.version>
+
+        <!-- Test Versions -->
+        <junit-jupiter.version>6.1.1</junit-jupiter.version>
+        <weld-se-core.version>6.0.4.Final</weld-se-core.version>
+        <arquillian-junit5-container.version>1.10.2.Final</arquillian-junit5-container.version>
+
+        <!-- Plugin Versions -->
+        <maven-dependency-plugin.version>3.11.0</maven-dependency-plugin.version>
+        <maven-surefire-plugin.version>3.6.0</maven-surefire-plugin.version>
+        <maven-surefire-report-plugin.version>3.6.0</maven-surefire-report-plugin.version>
+    </properties>
 
     <dependencies>
         <dependency>
@@ -37,17 +50,17 @@
         <dependency>
             <groupId>jakarta.json.bind</groupId>
             <artifactId>jakarta.json.bind-api</artifactId>
-            <version>3.0.0</version>
+            <version>${jakarta.json.bind.version}</version>
             <scope>provided</scope>
         </dependency>
         <dependency>
             <groupId>jakarta.json</groupId>
             <artifactId>jakarta.json-api</artifactId>
-            <version>2.1.0</version>
+            <version>${jakarta.json.version}</version>
             <scope>provided</scope>
         </dependency>
         <dependency>
-            <groupId>org.eclipse</groupId>
+            <groupId>org.eclipse.yasson</groupId>
             <artifactId>yasson</artifactId>
             <version>${yasson.version}</version>
             <scope>test</scope>
@@ -55,13 +68,13 @@
         <dependency>
             <groupId>org.jboss.weld.se</groupId>
             <artifactId>weld-se-core</artifactId>
-            <version>5.0.1.Final</version>
+            <version>${weld-se-core.version}</version>
             <scope>test</scope>
         </dependency>
         <dependency>
             <groupId>org.jboss.arquillian.junit5</groupId>
             <artifactId>arquillian-junit5-container</artifactId>
-            <version>1.7.0.Alpha10</version>
+            <version>${arquillian-junit5-container.version}</version>
         </dependency>
     </dependencies>
 
@@ -70,7 +83,7 @@
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-dependency-plugin</artifactId>
-                <version>3.2.0</version>
+                <version>${maven-dependency-plugin.version}</version>
                 <executions>
                     <execution>
                         <id>copy</id>
@@ -105,22 +118,22 @@
             </plugin>
             <plugin>
                 <artifactId>maven-surefire-plugin</artifactId>
-                <version>3.0.0-M5</version>
+                <version>${maven-surefire-plugin.version}</version>
                 <configuration>
                     <trimStackTrace>false</trimStackTrace>
                     <failIfNoTests>true</failIfNoTests>
                     <dependenciesToScan>jakarta.json.bind:jakarta.json.bind-tck</dependenciesToScan>
                     <systemPropertyVariables>
-                        <jimage.dir>${project.build.directory}/jdk11-bundle</jimage.dir>
+                        <jimage.dir>${project.build.directory}/jdk-bundle</jimage.dir>
                         <signature.sigTestClasspath>
-                            ${project.build.directory}/signaturedirectory/jakarta.json.bind-api.jar:${project.build.directory}/jdk11-bundle/java.base:${project.build.directory}/jdk11-bundle/java.rmi:${project.build.directory}/jdk11-bundle/java.sql:${project.build.directory}/jdk11-bundle/java.naming
+                            ${project.build.directory}/signaturedirectory/jakarta.json.bind-api.jar:${project.build.directory}/jdk-bundle/java.base:${project.build.directory}/jdk-bundle/java.rmi:${project.build.directory}/jdk-bundle/java.sql:${project.build.directory}/jdk-bundle/java.naming
                         </signature.sigTestClasspath>
                     </systemPropertyVariables>
                 </configuration>
             </plugin>
             <plugin>
                 <artifactId>maven-surefire-report-plugin</artifactId>
-                <version>3.0.0-M4</version>
+                <version>${maven-surefire-report-plugin.version}</version>
                 <executions>
                     <execution>
                         <id>post-unit-test</id>

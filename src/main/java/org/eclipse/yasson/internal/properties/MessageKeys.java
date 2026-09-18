@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2015, 2022 Oracle and/or its affiliates. All rights reserved.
+ * Copyright (c) 2015, 2026 Oracle and/or its affiliates. All rights reserved.
  *
  * This program and the accompanying materials are made available under the
  * terms of the Eclipse Public License v. 2.0 which is available at
@@ -264,6 +264,14 @@ public enum MessageKeys {
      * There has been an error during zone deserialization.
      */
     ZONE_PARSE_ERROR("zoneParseError"),
+    /**
+     * There has been an error parsing a URI value.
+     */
+    URI_PARSE_ERROR("uriParseError"),
+    /**
+     * There has been an error parsing a URL value.
+     */
+    URL_PARSE_ERROR("urlParseError"),
     /**
      * {@link JsonbTransient} was not the only annotation on class property.
      */
