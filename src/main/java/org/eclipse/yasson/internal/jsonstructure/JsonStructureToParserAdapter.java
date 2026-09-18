@@ -89,11 +89,6 @@ public class JsonStructureToParserAdapter implements JsonParser {
         }
         return next;
     }
-
-    @Override
-    public Event currentEvent() {
-        return iterators.peek().getValueEvent(getValue());
-    }
     
     @Override
     public String getString() {
