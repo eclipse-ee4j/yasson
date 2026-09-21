@@ -225,6 +225,9 @@ public class DeserializationModelCreator {
         }
         for (String s : params) {
             CreatorModel creatorModel = creator.findByName(s);
+            if (creatorModel == null) {
+                continue; 
+            }
             String parameterName = renamer.apply(creatorModel.getName());
             // If the corresponding property model is write-transient (e.g. @JsonbTransient on a
             // record component), do not register a processor for this parameter so that any JSON
