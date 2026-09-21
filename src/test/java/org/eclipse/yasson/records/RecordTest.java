@@ -21,6 +21,8 @@ import org.eclipse.yasson.internal.properties.MessageKeys;
 import org.eclipse.yasson.internal.properties.Messages;
 import org.junit.jupiter.api.Test;
 
+import java.util.Set;
+
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.containsString;
 import static org.hamcrest.Matchers.is;
@@ -207,5 +209,32 @@ public class RecordTest {
 
         assertThat(json, containsString("\"getDisplayName\":\"skoda (green)\""));
         assertThat(json, not(containsString("\"displayName\"")));
+    }
+
+    // -----------------------------------------------------------------
+    // Issue #607 — @JsonbTypeAdapter on record components
+    // -----------------------------------------------------------------
+
+    /**
+     * Serialising a record whose component is annotated with {@code @JsonbTypeAdapter}
+     * must invoke the adapter and produce the adapted JSON value.
+     */
+    @Test
+    public void testRecordWithTypeAdapterSerialisation() {
+        RecordWithTypeAdapter record = new RecordWithTypeAdapter(Set.of("b", "a", "c"));
+        // SetToStringAdapter.adaptToJson sorts entries before joining
+        String json = Jsonbs.defaultJsonb.toJson(record);
+        assertThat(json, is("{\"entries\":\"a,b,c\"}"));
+    }
+
+    /**
+     * Deserialising into a record whose component is annotated with {@code @JsonbTypeAdapter}
+     * must invoke the adapter and reconstruct the original collection value.
+     */
+    @Test
+    public void testRecordWithTypeAdapterDeserialisation() {
+        String json = "{\"entries\":\"a,b,c\"}";
+        RecordWithTypeAdapter record = Jsonbs.defaultJsonb.fromJson(json, RecordWithTypeAdapter.class);
+        assertThat(record.entries(), is(Set.of("a", "b", "c")));
     }
 }
