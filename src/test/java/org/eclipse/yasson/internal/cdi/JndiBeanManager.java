@@ -170,16 +170,6 @@ public class JndiBeanManager implements BeanManager {
     }
 
     @Override
-    public ELResolver getELResolver() {
-        throw new UnsupportedOperationException("Not implemented");
-    }
-
-    @Override
-    public ExpressionFactory wrapExpressionFactory(ExpressionFactory expressionFactory) {
-        throw new UnsupportedOperationException("Not implemented");
-    }
-
-    @Override
     public <T> AnnotatedType<T> createAnnotatedType(Class<T> type) {
         return null;
     }
@@ -256,6 +246,11 @@ public class JndiBeanManager implements BeanManager {
 
     @Override
     public boolean isMatchingEvent(Type type, Set<Annotation> set, Type type1, Set<Annotation> set1) {
+        throw new UnsupportedOperationException("Not implemented");
+    }
+
+    @Override
+    public <T> T unwrapClientProxy(T reference) {
         throw new UnsupportedOperationException("Not implemented");
     }
 }
