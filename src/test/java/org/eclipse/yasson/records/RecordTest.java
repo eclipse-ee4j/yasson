@@ -21,10 +21,13 @@ import org.eclipse.yasson.internal.properties.MessageKeys;
 import org.eclipse.yasson.internal.properties.Messages;
 import org.junit.jupiter.api.Test;
 
+import java.util.List;
 import java.util.Set;
 
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.containsString;
+import static org.hamcrest.Matchers.hasSize;
+import static org.hamcrest.Matchers.instanceOf;
 import static org.hamcrest.Matchers.is;
 import static org.hamcrest.Matchers.not;
 import static org.junit.jupiter.api.Assertions.assertEquals;
@@ -236,5 +239,32 @@ public class RecordTest {
         String json = "{\"entries\":\"a,b,c\"}";
         RecordWithTypeAdapter record = Jsonbs.defaultJsonb.fromJson(json, RecordWithTypeAdapter.class);
         assertThat(record.entries(), is(Set.of("a", "b", "c")));
+    }
+	
+	/**
+     * Regression test for https://github.com/eclipse-ee4j/yasson/issues/656.
+     * <p>
+     * A record with a {@code List<RecordType>} component and a compact {@code @JsonbCreator}
+     * constructor must deserialize list elements as the declared record type, not as
+     * {@code Map} instances.  This was broken on certain JDK 21 builds due to
+     * JDK bug JDK-8320575 where generic type parameters on compact constructors were
+     * not resolved correctly by reflection.
+     */
+    @Test
+    public void testRecordWithListOfRecordsDeserializesElementsAsRecordType() {
+        String json = "{\"name\":\"parent\",\"items\":[{\"required\":\"a\",\"optional\":\"b\"},{\"required\":\"c\"}]}";
+
+        RecordWithList result = Jsonbs.defaultJsonb.fromJson(json, RecordWithList.class);
+
+        assertThat(result.name(), is("parent"));
+        assertThat(result.items(), hasSize(2));
+        assertThat("list elements must be RecordItem, not Map",
+                   result.items().get(0), instanceOf(RecordItem.class));
+
+        assertThat(result.items().get(0).required(), is("a"));
+        assertThat(result.items().get(0).optional(), is("b"));
+        
+        assertThat(result.items().get(1).required(), is("c"));
+        assertThat(result.items().get(1).optional(), is((String) null));
     }
 }
