@@ -622,6 +622,16 @@ public class DatesTest {
     @Test
     public void testMarshallZoneOffset() {
         assertEquals("{\"value\":\"+02:00\"}", bindingJsonb.toJson(new ScalarValueWrapper<>(ZoneOffset.of("+02:00"))));
+        assertEquals("{\"value\":\"Z\"}", bindingJsonb.toJson(new ScalarValueWrapper<>(ZoneOffset.UTC)));
+    }
+
+    @Test
+    public void testUnmarshallZoneOffset() {
+        ScalarValueWrapper<ZoneOffset> result1 = bindingJsonb.fromJson("{\"value\":\"+02:00\"}", new TestTypeToken<ScalarValueWrapper<ZoneOffset>>(){}.getType());
+        assertEquals(ZoneOffset.of("+02:00"), result1.getValue());
+
+        ScalarValueWrapper<ZoneOffset> result2 = bindingJsonb.fromJson("{\"value\":\"Z\"}", new TestTypeToken<ScalarValueWrapper<ZoneOffset>>(){}.getType());
+        assertEquals(ZoneOffset.UTC, result2.getValue());
     }
 
     @Test
