@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2021, 2022 Oracle and/or its affiliates. All rights reserved.
+ * Copyright (c) 2021, 2023 Oracle and/or its affiliates. All rights reserved.
  *
  * This program and the accompanying materials are made available under the
  * terms of the Eclipse Public License v. 2.0 which is available at
@@ -22,8 +22,6 @@ import jakarta.json.stream.JsonParser;
 import org.eclipse.yasson.internal.DeserializationContextImpl;
 import org.eclipse.yasson.internal.jsonstructure.JsonStructureToParserAdapter;
 import org.eclipse.yasson.internal.model.customization.TypeInheritanceConfiguration;
-
-import static jakarta.json.stream.JsonParser.Event;
 
 /**
  * Instance creator following the inheritance structure defined by {@link jakarta.json.bind.annotation.JsonbTypeInfo}.
@@ -58,8 +56,7 @@ class InheritanceInstanceCreator implements ModelDeserializer<JsonParser> {
                 .build();
         jsonParser = new JsonStructureToParserAdapter(newJsonObject);
         //To get to the first event
-        Event event = jsonParser.next();
-        context.setLastValueEvent(event);
+        jsonParser.next();
         Class<?> polymorphicTypeClass;
         if (alias == null) {
             return defaultProcessor.deserialize(jsonParser, context);

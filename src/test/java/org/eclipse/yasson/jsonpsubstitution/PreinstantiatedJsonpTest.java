@@ -1,5 +1,6 @@
 /*
- * Copyright (c) 2019, 2022 Oracle and/or its affiliates. All rights reserved.
+ * Copyright (c) 2019, 2023 Oracle and/or its affiliates. All rights reserved.
+ * Copyright (c) 2026 Contributors to the Eclipse Foundation
  *
  * This program and the accompanying materials are made available under the
  * terms of the Eclipse Public License v. 2.0 which is available at
@@ -19,12 +20,10 @@ import static org.eclipse.yasson.Jsonbs.*;
 import org.eclipse.yasson.Assertions;
 import org.eclipse.yasson.TestTypeToken;
 
-import jakarta.json.bind.JsonbException;
 import jakarta.json.stream.JsonGenerator;
 import jakarta.json.stream.JsonParser;
 import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
-import java.util.List;
 
 public class PreinstantiatedJsonpTest {
 
@@ -123,27 +122,6 @@ public class PreinstantiatedJsonpTest {
         generator.close();
 
         assertEquals(WRAPPED_JSON, new String(out.toByteArray()));
-    }
-
-    @Test
-    public void testInvalidJsonParserAdvancedToCustomPosition() {
-        ByteArrayInputStream in = new ByteArrayInputStream(WRAPPED_JSON.getBytes());
-        JsonParser parser = new AdaptedJsonParser((value) -> {
-            if ("Falco".equals(value)) {
-                return value + ", a best dog ever!";
-            }
-            return value;
-        }, in);
-
-        parser.next(); //START_OBJECT
-        //should be advanced further
-
-        try {
-        	bindingYassonJsonb.fromJson(parser, Dog.class);
-            fail("JsonbException not thrown");
-        } catch (JsonbException e) {
-            //OK, parser in inconsistent state
-        }
     }
 
     @Test

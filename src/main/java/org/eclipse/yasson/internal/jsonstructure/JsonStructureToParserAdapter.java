@@ -41,6 +41,7 @@ public class JsonStructureToParserAdapter implements JsonParser {
     private Deque<JsonStructureIterator> iterators = new ArrayDeque<>();
 
     private final JsonStructure rootStructure;
+    private JsonParser.Event currentEvent;
 
     /**
      * Creates new {@link JsonStructure} parser.
@@ -57,7 +58,17 @@ public class JsonStructureToParserAdapter implements JsonParser {
     }
 
     @Override
+    public Event currentEvent() {
+        return currentEvent;
+    }
+
+    @Override
     public Event next() {
+        currentEvent = nextInternal();
+        return currentEvent;
+    }
+
+    private Event nextInternal() {
         if (iterators.isEmpty()) {
             if (rootStructure instanceof JsonObject) {
                 iterators.push(new JsonObjectIterator((JsonObject) rootStructure));
@@ -78,15 +89,12 @@ public class JsonStructureToParserAdapter implements JsonParser {
         }
         return next;
     }
-
-    @Override
-    public Event currentEvent() {
-        return iterators.peek().getValueEvent(getValue());
-    }
     
     @Override
     public String getString() {
-        return iterators.peek().getString();
+        String string = iterators.peek().getString();
+        currentEvent = Event.VALUE_STRING;
+        return string;
     }
 
     @Override
@@ -120,6 +128,7 @@ public class JsonStructureToParserAdapter implements JsonParser {
         if (current instanceof JsonObjectIterator) {
             //Remove child iterator as getObject() method contract says
             iterators.pop();
+            currentEvent = Event.END_OBJECT;
             return current.getValue().asJsonObject();
         } else {
             throw new JsonbException(Messages.getMessage(MessageKeys.INTERNAL_ERROR, "Outside of object context"));
@@ -143,6 +152,7 @@ public class JsonStructureToParserAdapter implements JsonParser {
         if (value.getValueType() != JsonValue.ValueType.NUMBER) {
             throw new IllegalStateException(iterator.createIncompatibleValueError().getMessage());
         }
+        currentEvent = iterator.getValueEvent(value);
         return (JsonNumber) value;
     }
     
