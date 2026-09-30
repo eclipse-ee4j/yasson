@@ -29,7 +29,7 @@ class ZoneIdSerializer extends TypeSerializer<ZoneId> {
 
     @Override
     void serializeValue(ZoneId value, JsonGenerator generator, SerializationContextImpl context) {
-        generator.write(value.getId());
+        generator.write(value.normalized().getId());
     }
 
 }
