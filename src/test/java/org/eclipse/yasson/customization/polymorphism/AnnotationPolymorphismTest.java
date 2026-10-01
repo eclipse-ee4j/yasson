@@ -22,6 +22,8 @@ import jakarta.json.bind.annotation.JsonbSubtype;
 import jakarta.json.bind.annotation.JsonbTypeInfo;
 
 import org.eclipse.yasson.Jsonbs;
+import org.eclipse.yasson.internal.properties.MessageKeys;
+import org.eclipse.yasson.internal.properties.Messages;
 import org.junit.jupiter.api.Test;
 
 import static org.hamcrest.CoreMatchers.instanceOf;
@@ -143,6 +145,40 @@ public class AnnotationPolymorphismTest {
             this.localDate = localDate;
         }
 
+    }
+
+    /**
+     * When a class has a field annotated {@code @JsonbProperty("reason")} and its
+     * declaring interface carries {@code @JsonbTypeInfo(key = "reason", ...)}, the
+     * type-discriminator key and the property name are identical.  Serialisation must
+     * throw a {@link JsonbException} rather than silently emit a duplicate JSON key.
+     */
+    @Test
+    public void testTypeInfoKeyClashWithPropertyNameThrowsOnSerialisation() {
+        ReasonEvent event = new ReasonEvent("some-value");
+        String expectedMessage = Messages.getMessage(MessageKeys.TYPE_INFO_KEY_CLASH,
+                "reason", "reason", ReasonEvent.class.getName());
+        JsonbException ex = assertThrows(JsonbException.class, () -> Jsonbs.defaultJsonb.toJson(event));
+        assertThat(ex.getMessage(), is(expectedMessage));
+    }
+
+    @JsonbTypeInfo(
+            key = "reason",
+            value = {
+                    @JsonbSubtype(alias = "event", type = ReasonEvent.class)
+            }
+    )
+    public interface ReasonHolder {
+    }
+
+    public static final class ReasonEvent implements ReasonHolder {
+
+        @JsonbProperty("reason")
+        public String reason;
+
+        public ReasonEvent(String reason) {
+            this.reason = reason;
+        }
     }
 
 }
