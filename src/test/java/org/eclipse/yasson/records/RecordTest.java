@@ -14,6 +14,9 @@
 package org.eclipse.yasson.records;
 
 import jakarta.json.bind.JsonbException;
+import jakarta.json.bind.annotation.JsonbProperty;
+import jakarta.json.bind.annotation.JsonbSubtype;
+import jakarta.json.bind.annotation.JsonbTypeInfo;
 
 import org.eclipse.yasson.Jsonbs;
 import org.eclipse.yasson.TestTypeToken;
@@ -266,5 +269,36 @@ public class RecordTest {
         
         assertThat(result.items().get(1).required(), is("c"));
         assertThat(result.items().get(1).optional(), is((String) null));
+    }
+
+    /**
+     * Same clash as {@code testTypeInfoKeyClashWithPropertyNameThrowsOnSerialisation} in
+     * {@link org.eclipse.yasson.customization.polymorphism.AnnotationPolymorphismTest},
+     * but using a record component instead of a plain class field.
+     * <p>
+     * The {@code @JsonbTypeInfo(key = "reason")} discriminator and the record component
+     * {@code @JsonbProperty("reason")} map to the same JSON key.  Serialisation must
+     * throw a {@link JsonbException} with a descriptive message rather than silently
+     * emitting a duplicate key.
+     */
+    @Test
+    public void testRecordTypeInfoKeyClashWithComponentNameThrowsOnSerialisation() {
+        ReasonRecord record = new ReasonRecord("some-value");
+        String expectedMessage = Messages.getMessage(MessageKeys.TYPE_INFO_KEY_CLASH,
+                "reason", "reason", ReasonRecord.class.getName());
+        JsonbException ex = assertThrows(JsonbException.class, () -> Jsonbs.defaultJsonb.toJson(record));
+        assertThat(ex.getMessage(), is(expectedMessage));
+    }
+
+    @JsonbTypeInfo(
+            key = "reason",
+            value = {
+                    @JsonbSubtype(alias = "event", type = ReasonRecord.class)
+            }
+    )
+    public interface ReasonHolder {
+    }
+
+    public record ReasonRecord(@JsonbProperty("reason") String reason) implements ReasonHolder {
     }
 }
