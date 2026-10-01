@@ -271,6 +271,36 @@ public class RecordTest {
         assertThat(result.items().get(1).optional(), is((String) null));
     }
 
+    // -----------------------------------------------------------------
+    // Issue #615 — @JsonbTypeAdapter on record components with @JsonbTypeInfo
+    // -----------------------------------------------------------------
+
+    /**
+     * The original issue reported that {@code @JsonbTypeAdapter} on a record component was
+     * silently ignored during (de)serialisation when the declaring interface also carried
+     * {@code @JsonbTypeInfo}; that was resolved by
+     * https://github.com/eclipse-ee4j/yasson/pull/770
+     */
+    @Test
+    public void testNotificationMentionSerializesReasonViaAdapter() {
+        NotificationModel.MentionNotification mention =
+                new NotificationModel.MentionNotification("https://example.com/post/1",
+                                                          NotificationModel.NotificationReason.MENTION);
+        String json = Jsonbs.defaultJsonb.toJson(mention, NotificationModel.MentionNotification.class);
+        assertThat(json, is("{\"@reason\":\"mention\",\"reason\":\"mention\",\"uri\":\"https://example.com/post/1\"}"));
+    }
+
+    @Test
+    public void testNotificationMentionDeserializesReasonViaAdapter() {
+        String json = "{\"@reason\":\"mention\",\"reason\":\"mention\",\"uri\":\"https://example.com/post/1\"}";
+        NotificationModel.Notification notification =
+                Jsonbs.defaultJsonb.fromJson(json, NotificationModel.Notification.class);
+        assertThat(notification, instanceOf(NotificationModel.MentionNotification.class));
+        NotificationModel.MentionNotification mention = (NotificationModel.MentionNotification) notification;
+        assertThat(mention.uri(), is("https://example.com/post/1"));
+        assertThat(mention.reason(), is(NotificationModel.NotificationReason.MENTION));
+    }
+
     /**
      * Same clash as {@code testTypeInfoKeyClashWithPropertyNameThrowsOnSerialisation} in
      * {@link org.eclipse.yasson.customization.polymorphism.AnnotationPolymorphismTest},
