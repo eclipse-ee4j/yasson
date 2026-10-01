@@ -285,6 +285,10 @@ public enum MessageKeys {
      */
     PROPERTY_NAME_CLASH("propertyNameClash"),
     /**
+     * A {@code @JsonbTypeInfo} discriminator key collides with a property name on the implementing class.
+     */
+    TYPE_INFO_KEY_CLASH("typeInfoKeyClash"),
+    /**
      * {@link Date} is not supported I-Json is enabled.
      */
     SQL_DATE_IJSON_ERROR("sqlDateIJsonError"),
