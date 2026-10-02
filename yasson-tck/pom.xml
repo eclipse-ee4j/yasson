@@ -31,7 +31,7 @@
 
         <!-- Test Versions -->
         <junit-jupiter.version>6.1.1</junit-jupiter.version>
-        <weld-se-core.version>6.0.4.Final</weld-se-core.version>
+        <weld-se-core.version>7.0.0.Final</weld-se-core.version>
         <arquillian-junit5-container.version>1.10.2.Final</arquillian-junit5-container.version>
 
         <!-- Plugin Versions -->
