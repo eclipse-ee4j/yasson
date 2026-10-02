@@ -14,6 +14,9 @@
 package org.eclipse.yasson.records;
 
 import jakarta.json.bind.JsonbException;
+import jakarta.json.bind.annotation.JsonbProperty;
+import jakarta.json.bind.annotation.JsonbSubtype;
+import jakarta.json.bind.annotation.JsonbTypeInfo;
 
 import org.eclipse.yasson.Jsonbs;
 import org.eclipse.yasson.TestTypeToken;
@@ -266,5 +269,66 @@ public class RecordTest {
         
         assertThat(result.items().get(1).required(), is("c"));
         assertThat(result.items().get(1).optional(), is((String) null));
+    }
+
+    // -----------------------------------------------------------------
+    // Issue #615 — @JsonbTypeAdapter on record components with @JsonbTypeInfo
+    // -----------------------------------------------------------------
+
+    /**
+     * The original issue reported that {@code @JsonbTypeAdapter} on a record component was
+     * silently ignored during (de)serialisation when the declaring interface also carried
+     * {@code @JsonbTypeInfo}; that was resolved by
+     * https://github.com/eclipse-ee4j/yasson/pull/770
+     */
+    @Test
+    public void testNotificationMentionSerializesReasonViaAdapter() {
+        NotificationModel.MentionNotification mention =
+                new NotificationModel.MentionNotification("https://example.com/post/1",
+                                                          NotificationModel.NotificationReason.MENTION);
+        String json = Jsonbs.defaultJsonb.toJson(mention, NotificationModel.MentionNotification.class);
+        assertThat(json, is("{\"@reason\":\"mention\",\"reason\":\"mention\",\"uri\":\"https://example.com/post/1\"}"));
+    }
+
+    @Test
+    public void testNotificationMentionDeserializesReasonViaAdapter() {
+        String json = "{\"@reason\":\"mention\",\"reason\":\"mention\",\"uri\":\"https://example.com/post/1\"}";
+        NotificationModel.Notification notification =
+                Jsonbs.defaultJsonb.fromJson(json, NotificationModel.Notification.class);
+        assertThat(notification, instanceOf(NotificationModel.MentionNotification.class));
+        NotificationModel.MentionNotification mention = (NotificationModel.MentionNotification) notification;
+        assertThat(mention.uri(), is("https://example.com/post/1"));
+        assertThat(mention.reason(), is(NotificationModel.NotificationReason.MENTION));
+    }
+
+    /**
+     * Same clash as {@code testTypeInfoKeyClashWithPropertyNameThrowsOnSerialisation} in
+     * {@link org.eclipse.yasson.customization.polymorphism.AnnotationPolymorphismTest},
+     * but using a record component instead of a plain class field.
+     * <p>
+     * The {@code @JsonbTypeInfo(key = "reason")} discriminator and the record component
+     * {@code @JsonbProperty("reason")} map to the same JSON key.  Serialisation must
+     * throw a {@link JsonbException} with a descriptive message rather than silently
+     * emitting a duplicate key.
+     */
+    @Test
+    public void testRecordTypeInfoKeyClashWithComponentNameThrowsOnSerialisation() {
+        ReasonRecord record = new ReasonRecord("some-value");
+        String expectedMessage = Messages.getMessage(MessageKeys.TYPE_INFO_KEY_CLASH,
+                "reason", "reason", ReasonRecord.class.getName());
+        JsonbException ex = assertThrows(JsonbException.class, () -> Jsonbs.defaultJsonb.toJson(record));
+        assertThat(ex.getMessage(), is(expectedMessage));
+    }
+
+    @JsonbTypeInfo(
+            key = "reason",
+            value = {
+                    @JsonbSubtype(alias = "event", type = ReasonRecord.class)
+            }
+    )
+    public interface ReasonHolder {
+    }
+
+    public record ReasonRecord(@JsonbProperty("reason") String reason) implements ReasonHolder {
     }
 }

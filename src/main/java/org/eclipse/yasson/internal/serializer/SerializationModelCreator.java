@@ -237,7 +237,10 @@ public class SerializationModelCreator {
         }
         for (PropertyModel propertyModel : classModel.getSortedProperties()) {
             if (propertySerializers.containsKey(propertyModel.getWriteName())) {
-                throw new JsonbException("CHANGE naming conflict!");
+                throw new JsonbException(Messages.getMessage(MessageKeys.TYPE_INFO_KEY_CLASH,
+                        typeInheritanceConfiguration.getFieldName(),
+                        propertyModel.getWriteName(),
+                        classModel.getType().getName()));
             }
         }
     }
