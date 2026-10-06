@@ -1,5 +1,5 @@
 window.BENCHMARK_DATA = {
-  "lastUpdate": 1790658165367,
+  "lastUpdate": 1791263025942,
   "repoUrl": "https://github.com/eclipse-ee4j/yasson",
   "entries": {
     "Java JMH Benchmark": [
@@ -414,6 +414,58 @@ window.BENCHMARK_DATA = {
           {
             "name": "org.eclipse.yasson.jmh.TenPropertySerializationTest.testSerialize",
             "value": 861.6399464190066,
+            "unit": "ops/ms",
+            "extra": "iterations: 5\nforks: 5\nthreads: 1"
+          }
+        ]
+      },
+      {
+        "commit": {
+          "author": {
+            "name": "Kyle Aure",
+            "username": "KyleAure",
+            "email": "KyleJAure@gmail.com"
+          },
+          "committer": {
+            "name": "GitHub",
+            "username": "web-flow",
+            "email": "noreply@github.com"
+          },
+          "id": "82b0d8e10693a06a6350b6fb5ac072ba892f86ec",
+          "message": "Merge pull request #778 from eclipse-ee4j/dependabot/maven/yasson-tck/org.jboss.weld.se-weld-se-core-7.0.0.Final\n\nbuild(deps-dev): bump org.jboss.weld.se:weld-se-core from 6.0.4.Final to 7.0.0.Final in /yasson-tck",
+          "timestamp": "2026-10-02T14:05:50Z",
+          "url": "https://github.com/eclipse-ee4j/yasson/commit/82b0d8e10693a06a6350b6fb5ac072ba892f86ec"
+        },
+        "date": 1791263025295,
+        "tool": "jmh",
+        "benches": [
+          {
+            "name": "org.eclipse.yasson.jmh.CollectionsTest.testDeserialize",
+            "value": 25.564844201805432,
+            "unit": "ops/ms",
+            "extra": "iterations: 5\nforks: 5\nthreads: 1"
+          },
+          {
+            "name": "org.eclipse.yasson.jmh.CollectionsTest.testSerialize",
+            "value": 50.17590306799178,
+            "unit": "ops/ms",
+            "extra": "iterations: 5\nforks: 5\nthreads: 1"
+          },
+          {
+            "name": "org.eclipse.yasson.jmh.ScalarDataTest.testDeserialize",
+            "value": 2003.9212904308856,
+            "unit": "ops/ms",
+            "extra": "iterations: 5\nforks: 5\nthreads: 1"
+          },
+          {
+            "name": "org.eclipse.yasson.jmh.ScalarDataTest.testSerialize",
+            "value": 3096.3777164755616,
+            "unit": "ops/ms",
+            "extra": "iterations: 5\nforks: 5\nthreads: 1"
+          },
+          {
+            "name": "org.eclipse.yasson.jmh.TenPropertySerializationTest.testSerialize",
+            "value": 863.040169693648,
             "unit": "ops/ms",
             "extra": "iterations: 5\nforks: 5\nthreads: 1"
           }
