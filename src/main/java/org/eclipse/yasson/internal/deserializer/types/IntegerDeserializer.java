@@ -12,12 +12,6 @@
 
 package org.eclipse.yasson.internal.deserializer.types;
 
-import java.lang.reflect.Type;
-
-import jakarta.json.stream.JsonParser;
-
-import org.eclipse.yasson.internal.DeserializationContextImpl;
-
 /**
  * Deserializer of the {@link Integer} type.
  */
@@ -30,10 +24,5 @@ class IntegerDeserializer extends AbstractNumberDeserializer<Integer> {
     @Override
     Integer parseNumberValue(String value) {
         return Integer.parseInt(value);
-    }
-
-    @Override
-    Object deserializeNumberValue(JsonParser value, DeserializationContextImpl context, Type rType) {
-        return value.getInt();
     }
 }
