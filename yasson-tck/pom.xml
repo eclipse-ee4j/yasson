@@ -22,11 +22,9 @@
         <!-- API Versions -->
         <!-- TODO update to EE 12 final versions -->
         <jakarta.json.version>2.1.3</jakarta.json.version> <!-- EE10 -->
-        <jakarta.json.bind.version>3.1.0-M1</jakarta.json.bind.version>
+        <jakarta.json.bind.version>3.1.0-M2</jakarta.json.bind.version>
 
         <!-- IMPL Versions -->
-        <!-- TODO update to EE 12 final versions -->
-        <jsonb.tck.version>3.1.0-M1</jsonb.tck.version>
         <yasson.version>${project.version}</yasson.version>
 
         <!-- Test Versions -->
@@ -44,7 +42,7 @@
         <dependency>
             <groupId>jakarta.json.bind</groupId>
             <artifactId>jakarta.json.bind-tck</artifactId>
-            <version>${jsonb.tck.version}</version>
+            <version>${jakarta.json.bind.version}</version>
             <scope>test</scope>
         </dependency>
         <dependency>
