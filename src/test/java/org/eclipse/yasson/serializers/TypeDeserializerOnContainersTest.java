@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2025 IBM and/or its affiliates. All rights reserved.
+ * Copyright (c) 2025, 2026 IBM and/or its affiliates. All rights reserved.
  *
  * This program and the accompanying materials are made available under the
  * terms of the Eclipse Public License v. 2.0 which is available at
@@ -100,6 +100,50 @@ public class TypeDeserializerOnContainersTest {
 
     public static class ByteArrayContainer {
         public byte[] data;
+    }
+
+    // Test enum with type-level deserializer annotation
+    @JsonbTypeDeserializer(TestEnumDeserializer.class)
+    public enum TestEnum {
+        VALUE1(1),
+        VALUE2(2);
+
+        private final int value;
+
+        TestEnum(final int value) {
+            this.value = value;
+        }
+
+        public int getValue() {
+            return value;
+        }
+
+        public static TestEnum fromValue(final int value) {
+            for (TestEnum e : values()) {
+                if (e.value == value) {
+                    return e;
+                }
+            }
+            throw new IllegalArgumentException("Unknown value: " + value);
+        }
+    }
+
+    // Custom deserializer for TestEnum
+    public static class TestEnumDeserializer implements JsonbDeserializer<TestEnum> {
+        @Override
+        public TestEnum deserialize(final JsonParser parser, final DeserializationContext ctx, final Type rtType) {
+            final int value = parser.getInt();
+            return TestEnum.fromValue(value);
+        }
+    }
+
+    public static class EnumContainer {
+        public TestEnum value;
+        public Map<String, TestEnum> map;
+        public List<TestEnum> list;
+        public TestEnum[] array;
+        @SuppressWarnings("OptionalUsedAsFieldOrParameterType")
+        public Optional<TestEnum> optional;
     }
 
     private Jsonb jsonb;
@@ -207,5 +251,37 @@ public class TypeDeserializerOnContainersTest {
             Assertions.assertNotNull(result.data);
             Assertions.assertArrayEquals("Hello".getBytes(), result.data);
         }
+    }
+
+    @Test
+    public void testTypeDeserializerOnEnumContainers() {
+        final String json = "{\"value\":1,"
+                + "\"map\":{\"key1\":1,\"key2\":2},"
+                + "\"list\":[1,2],"
+                + "\"array\":[1,2],"
+                + "\"optional\":1}";
+
+        final EnumContainer result = jsonb.fromJson(json, EnumContainer.class);
+
+        Assertions.assertEquals(TestEnum.VALUE1, result.value);
+
+        Assertions.assertNotNull(result.map);
+        Assertions.assertEquals(2, result.map.size(), () -> String.format("Expected two entries got %s", result.map));
+        Assertions.assertEquals(TestEnum.VALUE1, result.map.get("key1"));
+        Assertions.assertEquals(TestEnum.VALUE2, result.map.get("key2"));
+
+        Assertions.assertNotNull(result.list);
+        Assertions.assertEquals(2, result.list.size(), () -> String.format("Expected two entries got %s", result.list));
+        Assertions.assertEquals(TestEnum.VALUE1, result.list.get(0));
+        Assertions.assertEquals(TestEnum.VALUE2, result.list.get(1));
+
+        Assertions.assertNotNull(result.array);
+        Assertions.assertEquals(2, result.array.length, () -> String.format("Expected two entries got %s", Arrays.toString(result.array)));
+        Assertions.assertEquals(TestEnum.VALUE1, result.array[0]);
+        Assertions.assertEquals(TestEnum.VALUE2, result.array[1]);
+
+        Assertions.assertNotNull(result.optional);
+        Assertions.assertTrue(result.optional.isPresent(), "Expected value to be present, but the optional was empty.");
+        Assertions.assertEquals(TestEnum.VALUE1, result.optional.get());
     }
 }

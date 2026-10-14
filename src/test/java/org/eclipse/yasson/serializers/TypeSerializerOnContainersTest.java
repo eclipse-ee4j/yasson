@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2025 IBM and/or its affiliates. All rights reserved.
+ * Copyright (c) 2025, 2026 IBM and/or its affiliates. All rights reserved.
  *
  * This program and the accompanying materials are made available under the
  * terms of the Eclipse Public License v. 2.0 which is available at
@@ -113,6 +113,46 @@ public class TypeSerializerOnContainersTest {
         }
     }
 
+    // Test enum with type-level serializer annotation
+    @JsonbTypeSerializer(TestEnumSerializer.class)
+    public enum TestEnum {
+        VALUE1(1),
+        VALUE2(2);
+
+        private final int value;
+
+        TestEnum(final int value) {
+            this.value = value;
+        }
+
+        public int getValue() {
+            return value;
+        }
+    }
+
+    // Custom serializer for TestEnum
+    public static class TestEnumSerializer implements JsonbSerializer<TestEnum> {
+        @Override
+        public void serialize(final TestEnum obj, final JsonGenerator generator, final SerializationContext ctx) {
+            generator.write(obj.getValue());
+        }
+    }
+
+    public static class EnumContainer {
+        public final Map<String, TestEnum> map;
+        public final List<TestEnum> list;
+        public final TestEnum[] array;
+        @SuppressWarnings("OptionalUsedAsFieldOrParameterType")
+        public final Optional<TestEnum> optional;
+
+        public EnumContainer(final Map<String, TestEnum> map, final List<TestEnum> list, final TestEnum[] array, final Optional<TestEnum> optional) {
+            this.map = map;
+            this.list = list;
+            this.array = array;
+            this.optional = optional;
+        }
+    }
+
     private Jsonb jsonb;
 
     @BeforeEach
@@ -199,6 +239,37 @@ public class TypeSerializerOnContainersTest {
 
         Assertions.assertEquals("SERIALIZED:value1", json.getString("optional"));
         Assertions.assertEquals("value2", json.getString("questionOptional"));
+    }
+
+    @Test
+    public void testTypeSerializerOnEnumContainers() {
+        final EnumContainer container = new EnumContainer(
+                Map.of("key1", TestEnum.VALUE1, "key2", TestEnum.VALUE2),
+                List.of(TestEnum.VALUE1, TestEnum.VALUE2),
+                new TestEnum[]{TestEnum.VALUE1, TestEnum.VALUE2},
+                Optional.of(TestEnum.VALUE1)
+        );
+
+        final JsonObject json = toJsonObject(container);
+
+        final JsonObject map = json.getJsonObject("map");
+        Supplier<String> errorMessage = () -> String.format("Expected value not found in %s", map);
+        Assertions.assertEquals(1, map.getInt("key1"), errorMessage);
+        Assertions.assertEquals(2, map.getInt("key2"), errorMessage);
+
+        final JsonArray list = json.getJsonArray("list");
+        errorMessage = () -> String.format("Expected value not found in %s", list);
+        Assertions.assertEquals(2, list.size(), () -> String.format("Expected a size of 2 in %s", list));
+        Assertions.assertEquals(1, list.getInt(0), errorMessage);
+        Assertions.assertEquals(2, list.getInt(1), errorMessage);
+
+        final JsonArray array = json.getJsonArray("array");
+        errorMessage = () -> String.format("Expected value not found in %s", array);
+        Assertions.assertEquals(2, array.size(), () -> String.format("Expected a size of 2 in %s", array));
+        Assertions.assertEquals(1, array.getInt(0), errorMessage);
+        Assertions.assertEquals(2, array.getInt(1), errorMessage);
+
+        Assertions.assertEquals(1, json.getInt("optional"));
     }
 
     private JsonObject toJsonObject(final Object object) throws JsonbException {
