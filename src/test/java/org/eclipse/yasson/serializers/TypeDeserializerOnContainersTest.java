@@ -284,4 +284,16 @@ public class TypeDeserializerOnContainersTest {
         Assertions.assertTrue(result.optional.isPresent(), "Expected value to be present, but the optional was empty.");
         Assertions.assertEquals(TestEnum.VALUE1, result.optional.get());
     }
+
+    @Test
+    public void testTypeDeserializerOnEnumAtRootLevel() {
+        final TestEnum result = jsonb.fromJson("2", TestEnum.class);
+        Assertions.assertEquals(TestEnum.VALUE2, result);
+    }
+
+    @Test
+    public void testTypeDeserializerOnInterfaceAtRootLevel() {
+        final TestInterface result = jsonb.fromJson("{\"value\":\"value1\"}", TestInterface.class);
+        Assertions.assertEquals("DESERIALIZED:value1", result.getValue());
+    }
 }

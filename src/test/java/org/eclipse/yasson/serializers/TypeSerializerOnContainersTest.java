@@ -272,6 +272,18 @@ public class TypeSerializerOnContainersTest {
         Assertions.assertEquals(1, json.getInt("optional"));
     }
 
+    @Test
+    public void testTypeSerializerOnEnumAtRootLevel() {
+        final String json = jsonb.toJson(TestEnum.VALUE1);
+        Assertions.assertEquals("1", json);
+    }
+
+    @Test
+    public void testTypeSerializerOnInterfaceAtRootLevel() {
+        final String json = jsonb.toJson(new TestImpl("value1"), TestInterface.class);
+        Assertions.assertEquals("\"SERIALIZED:value1\"", json);
+    }
+
     private JsonObject toJsonObject(final Object object) throws JsonbException {
         final String value = jsonb.toJson(object);
         try (
