@@ -128,16 +128,30 @@ public class UnmarshallingUnsupportedTypesTest {
 
     @Test
     public void testIntegerAsArray() {
-        //wrong, integerValue is a value.
+        // wrong: 'integerValue' field is an Integer, not an array
         String json  = "{\"nestedPojo\":{\"integerValue\":[10,11]},\"optionalLong\":11}";
         assertFail(json, SupportedTypes.class, "integerValue", Integer.class);
     }
 
     @Test
     public void testStringAsArray() {
-        //wrong, value is a value.
+        // wrong: 'value' field is a String, not an array
         String json  = "{\"value\":[\"data1\",\"data2\"]}";
         assertFail(json, new TestTypeToken<ScalarValueWrapper<String>>() { }.getType(), "value", String.class);
+    }
+
+    @Test
+    public void testStringAsObject() {
+        // wrong: 'value' field is a String, not an object.
+        String json  = "{\"value\":{\"nested\":\"data\"}}";
+        assertFail(json, new TestTypeToken<ScalarValueWrapper<String>>() { }.getType(), "value", String.class);
+    }
+
+    @Test
+    public void testIntegerAsObject() {
+        // wrong: 'integerValue' field is an Integer, not an object.
+        String json  = "{\"nestedPojo\":{\"integerValue\":{\"nested\":10}},\"optionalLong\":11}";
+        assertFail(json, SupportedTypes.class, "integerValue", Integer.class);
     }
 
     @Test()

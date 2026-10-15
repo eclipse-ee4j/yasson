@@ -76,7 +76,7 @@ public class PositionChecker implements ModelDeserializer<JsonParser> {
         Event original = value.currentEvent();
         Event startEvent = original;
         if (!expectedEvents.contains(startEvent)) {
-            if (original == null || !CLOSING_EVENTS.containsKey(original)) {
+            if (!CLOSING_EVENTS.containsKey(original)) {
                 startEvent = value.next();
             }
             if (!expectedEvents.contains(startEvent)) {
