@@ -1,5 +1,6 @@
 /*
  * Copyright (c) 2021, 2023 Oracle and/or its affiliates. All rights reserved.
+ * Copyright (c) 2026 Contributors to the Eclipse Foundation
  *
  * This program and the accompanying materials are made available under the
  * terms of the Eclipse Public License v. 2.0 which is available at
@@ -29,6 +30,7 @@ import static jakarta.json.stream.JsonParser.Event;
  * <br>
  * Checks whether json parser is in expected state. If not it will try to skip to the next event, since
  * if user defined components are involved, it is possible to expect incorrect states in terms of the last expected events.
+ * It does not skip into an array or an object which is not expected, since its content would be read as a different type.
  * If this checker is still not in expected state, an exception is thrown.
  */
 public class PositionChecker implements ModelDeserializer<JsonParser> {
@@ -74,7 +76,9 @@ public class PositionChecker implements ModelDeserializer<JsonParser> {
         Event original = value.currentEvent();
         Event startEvent = original;
         if (!expectedEvents.contains(startEvent)) {
-            startEvent = value.next();
+            if (!CLOSING_EVENTS.containsKey(original)) {
+                startEvent = value.next();
+            }
             if (!expectedEvents.contains(startEvent)) {
                 throw new JsonbException("Incorrect position for processing type: " + rType + ". "
                                                  + "Received event: " + original + " "
