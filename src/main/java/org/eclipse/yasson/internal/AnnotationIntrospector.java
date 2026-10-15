@@ -1,5 +1,6 @@
 /*
  * Copyright (c) 2016, 2026 Oracle and/or its affiliates. All rights reserved.
+ * Copyright (c) 2026 Contributors to the Eclipse Foundation
  *
  * This program and the accompanying materials are made available under the
  * terms of the Eclipse Public License v. 2.0 which is available at
@@ -594,9 +595,16 @@ public class AnnotationIntrospector {
      */
     public JsonbDateFormatter getConstructorDateFormatter(JsonbAnnotatedElement<Parameter> param) {
         return param.getAnnotation(JsonbDateFormat.class)
-                .map(annotation -> new JsonbDateFormatter(DateTimeFormatter.ofPattern(annotation.value(),
-                                                                                      Locale.forLanguageTag(annotation.locale())),
-                                                          annotation.value(), annotation.locale()))
+                .map(annotation -> {
+                    String format = annotation.value();
+                    String locale = annotation.locale();
+                    if (JsonbDateFormat.TIME_IN_MILLIS.equals(format) || JsonbDateFormat.DEFAULT_FORMAT.equals(format)) {
+                        //not patterns, handled by the date converters as for properties
+                        return new JsonbDateFormatter(format, locale);
+                    }
+                    return new JsonbDateFormatter(DateTimeFormatter.ofPattern(format, Locale.forLanguageTag(locale)),
+                                                  format, locale);
+                })
                 .orElse(null);
     }
 
