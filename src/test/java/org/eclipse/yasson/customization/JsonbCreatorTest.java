@@ -178,6 +178,17 @@ public class JsonbCreatorTest {
     }
 
     @Test
+    public void testLocalizedFactoryParameterNamedLikePropertyWithStrategy() throws Exception {
+        JsonbConfig config = new JsonbConfig().withPropertyNamingStrategy(PropertyNamingStrategy.LOWER_CASE_WITH_UNDERSCORES);
+        try (Jsonb jsonb = JsonbBuilder.create(config)) {
+            String json = "{\"totalAmount\":\"010.000\"}";
+            FactoryNumberParamNamedLikeProperty result = jsonb.fromJson(json, FactoryNumberParamNamedLikeProperty.class);
+            // Without the number format, "010.000" is read as 10.000, which has another scale than BigDecimal.TEN
+            assertEquals(BigDecimal.TEN, result.totalAmount);
+        }
+    }
+
+    @Test
     public void testCorrectCreatorParameterNames() {
         String json = "{\"string\":\"someText\", \"someParam\":null }";
         ParameterNameTester result = defaultJsonb.fromJson(json, ParameterNameTester.class);
@@ -329,6 +340,22 @@ public class JsonbCreatorTest {
         public static FactoryNumberParamMergedWithPropertyRenamedByStrategy createInstance(
                 @JsonbProperty("total_amount") BigDecimal totalAmount) {
             return new FactoryNumberParamMergedWithPropertyRenamedByStrategy(totalAmount);
+        }
+
+    }
+
+    public static final class FactoryNumberParamNamedLikeProperty {
+
+        @JsonbNumberFormat(value = "000.000", locale = "en-us")
+        public BigDecimal totalAmount;
+
+        private FactoryNumberParamNamedLikeProperty(BigDecimal totalAmount) {
+            this.totalAmount = totalAmount;
+        }
+
+        @JsonbCreator
+        public static FactoryNumberParamNamedLikeProperty createInstance(@JsonbProperty("totalAmount") BigDecimal totalAmount) {
+            return new FactoryNumberParamNamedLikeProperty(totalAmount);
         }
 
     }
