@@ -1,5 +1,6 @@
 /*
  * Copyright (c) 2015, 2026 Oracle and/or its affiliates. All rights reserved.
+ * Copyright (c) 2026 Contributors to the Eclipse Foundation
  *
  * This program and the accompanying materials are made available under the
  * terms of the Eclipse Public License v. 2.0 which is available at
@@ -109,11 +110,15 @@ public enum MessageKeys {
      */
     CREATING_HANDLES("creatingHandles"),
     /**
-     * Could not get field value with method.
+     * Could not get field value with method. 
+     * {0} is the class name of the object
+     * {1} is the method invoked
      */
     GETTING_VALUE_WITH("gettingValueWith"),
     /**
-     * Could not set field value with method.
+     * Could not set field value with method. 
+     * {0} is the class name of the object.
+     * {1} is the method invoked
      */
     SETTING_VALUE_WITH("settingValueWith"),
     /**
@@ -230,8 +235,17 @@ public enum MessageKeys {
     INTERNAL_ERROR("internalError"),
     /**
      * There has been an error during property serialization.
+     * {0} is the property name
+     * {1} is the canonical class name of the object being serialized
+     * {2} is the chained error message
      */
     SERIALIZE_PROPERTY_ERROR("serializePropertyError"),
+    /**
+     * There has been an error during property deserialization.
+     * {0} is the property name
+     * {1} is the chained error message
+     */
+    DESERIALIZE_PROPERTY_ERROR("deserializePropertyError"),
     /**
      * There has been an error during value deserialization.
      */

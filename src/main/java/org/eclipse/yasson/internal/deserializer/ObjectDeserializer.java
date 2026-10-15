@@ -1,5 +1,6 @@
 /*
  * Copyright (c) 2021, 2023 Oracle and/or its affiliates. All rights reserved.
+ * Copyright (c) 2026 Contributors to the Eclipse Foundation
  *
  * This program and the accompanying materials are made available under the
  * terms of the Eclipse Public License v. 2.0 which is available at
@@ -75,7 +76,8 @@ class ObjectDeserializer implements ModelDeserializer<JsonParser> {
                     try {
                         propertyDeserializerChains.get(key).deserialize(parser, context);
                     } catch (JsonbException e) {
-                        throw new JsonbException("Unable to deserialize property '" + key + "' because of: " + e.getMessage(), e);
+                        throw new JsonbException(
+                                Messages.getMessage(MessageKeys.DESERIALIZE_PROPERTY_ERROR, key, e.getMessage()), e);
                     }
                 } else if (failOnUnknownProperty && !ignoredProperties.contains(key)) {
                     throw new JsonbException(Messages.getMessage(MessageKeys.UNKNOWN_JSON_PROPERTY, key, rawClass));
@@ -89,7 +91,8 @@ class ObjectDeserializer implements ModelDeserializer<JsonParser> {
             case END_OBJECT:
                 return context.getInstance();
             default:
-                throw new JsonbException("Unexpected state: " + parser.currentEvent());
+                throw new JsonbException(Messages.getMessage(MessageKeys.INTERNAL_ERROR,
+                        "Unexpected parser state: " + parser.currentEvent()));
             }
         }
         return context.getInstance();
