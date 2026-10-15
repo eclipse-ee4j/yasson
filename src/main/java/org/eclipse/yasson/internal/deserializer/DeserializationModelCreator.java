@@ -233,8 +233,10 @@ public class DeserializationModelCreator {
             // record component), do not register a processor for this parameter so that any JSON
             // value under that key is silently ignored.  The default-value entry is still required
             // so the constructor receives null / the type default for that slot.
-            PropertyModel propertyModel = classModel.getPropertyModel(s);
-            boolean writeTransient = propertyModel != null && propertyModel.getCustomization().isWriteTransient();
+            // A creator parameter is named by JSON name, which can differ from the Java name of its property with a
+            // naming strategy, so the property is looked up by both names.
+            boolean writeTransient = isWriteTransient(classModel.getPropertyModel(s))
+                    || isWriteTransient(classModel.findPropertyModelByJsonReadName(s));
             if (!writeTransient) {
                 ModelDeserializer<JsonParser> modelDeserializer = typeProcessor(chain,
                                                                                 creatorModel.getType(),
@@ -423,6 +425,10 @@ public class DeserializationModelCreator {
 
     private List<String> creatorParamsList(JsonbCreator creator) {
         return Arrays.stream(creator.getParams()).map(CreatorModel::getName).collect(Collectors.toList());
+    }
+
+    private static boolean isWriteTransient(PropertyModel propertyModel) {
+        return propertyModel != null && propertyModel.getCustomization().isWriteTransient();
     }
 
     private ModelDeserializer<JsonParser> memberTypeProcessor(LinkedList<Type> chain,
