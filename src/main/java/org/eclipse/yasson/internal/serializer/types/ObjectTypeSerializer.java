@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2021, 2022 Oracle and/or its affiliates. All rights reserved.
+ * Copyright (c) 2021, 2025 Oracle and/or its affiliates. All rights reserved.
  *
  * This program and the accompanying materials are made available under the
  * terms of the Eclipse Public License v. 2.0 which is available at
@@ -21,6 +21,8 @@ import java.util.concurrent.ConcurrentHashMap;
 import jakarta.json.stream.JsonGenerator;
 
 import org.eclipse.yasson.internal.SerializationContextImpl;
+import org.eclipse.yasson.internal.model.ClassModel;
+import org.eclipse.yasson.internal.model.customization.ComponentBoundCustomization;
 import org.eclipse.yasson.internal.model.customization.Customization;
 import org.eclipse.yasson.internal.serializer.ModelSerializer;
 import org.eclipse.yasson.internal.serializer.SerializationModelCreator;
@@ -64,8 +66,24 @@ public class ObjectTypeSerializer extends TypeSerializer<Object> {
         Class<?> clazz = key.getClass();
         cache.computeIfAbsent(clazz, aClass -> {
             SerializationModelCreator serializationModelCreator = context.getJsonbContext().getSerializationModelCreator();
-            return serializationModelCreator.serializerChainRuntime(new LinkedList<>(chain), clazz, customization, false, isKey);
+            // For regular objects, check if the class has its own customization with potential adapter bindings
+            // This ensures that class-level annotations like @JsonbTypeAdapter are respected
+            ClassModel classModel = context.getJsonbContext().getMappingContext().getOrCreateClassModel(aClass);
+            Customization effectiveCustomization = getEffectiveCustomization(classModel);
+            return serializationModelCreator.serializerChainRuntime(new LinkedList<>(chain), aClass, effectiveCustomization, false, isKey);
         }).serialize(key, generator, context);
+    }
+
+    private Customization getEffectiveCustomization(ClassModel classModel) {
+        Customization classCustomization = classModel.getClassCustomization();
+        
+        // Use class customization if it has adapter bindings, otherwise use the context customization
+        boolean hasAdapterBinding = false;
+        if (classCustomization instanceof ComponentBoundCustomization) {
+            ComponentBoundCustomization componentBound = (ComponentBoundCustomization) classCustomization;
+            hasAdapterBinding = componentBound.getSerializeAdapterBinding() != null;
+        }
+        return hasAdapterBinding ? classCustomization : customization;
     }
 
     /**
