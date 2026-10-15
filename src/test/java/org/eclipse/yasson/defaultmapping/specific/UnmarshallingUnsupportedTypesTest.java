@@ -1,5 +1,6 @@
 /*
  * Copyright (c) 2015, 2026 Oracle and/or its affiliates. All rights reserved.
+ * Copyright (c) 2026 Contributors to the Eclipse Foundation
  *
  * This program and the accompanying materials are made available under the
  * terms of the Eclipse Public License v. 2.0 which is available at
@@ -116,6 +117,27 @@ public class UnmarshallingUnsupportedTypesTest {
         //wrong, nestedPojo is a collection.
         String json  = "{\"nestedPojo\":[\"10\"],\"optionalLong\":11}";
         assertFail(json, SupportedTypes.class, "nestedPojo", NestedPojo.class);
+    }
+
+    @Test
+    public void testPojoAsArrayOfPojos() {
+        //wrong, nestedPojo is an object, not an array of objects.
+        String json  = "{\"nestedPojo\":[{\"integerValue\":10}],\"optionalLong\":11}";
+        assertFail(json, SupportedTypes.class, "nestedPojo", NestedPojo.class);
+    }
+
+    @Test
+    public void testIntegerAsArray() {
+        //wrong, integerValue is a value.
+        String json  = "{\"nestedPojo\":{\"integerValue\":[10,11]},\"optionalLong\":11}";
+        assertFail(json, SupportedTypes.class, "integerValue", Integer.class);
+    }
+
+    @Test
+    public void testStringAsArray() {
+        //wrong, value is a value.
+        String json  = "{\"value\":[\"data1\",\"data2\"]}";
+        assertFail(json, new TestTypeToken<ScalarValueWrapper<String>>() { }.getType(), "value", String.class);
     }
 
     @Test()
