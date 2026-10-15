@@ -1,5 +1,6 @@
 /*
  * Copyright (c) 2016, 2025 Oracle and/or its affiliates. All rights reserved.
+ * Copyright (c) 2026 Contributors to the Eclipse Foundation
  *
  * This program and the accompanying materials are made available under the
  * terms of the Eclipse Public License v. 2.0 which is available at
@@ -837,6 +838,27 @@ public class SerializersTest {
 
         assertEquals(expected, jsonb.fromJson(expectedJson, Container.class));
 
+    }
+
+    @JsonbTypeSerializer(SerializedTypeSerializer.class)
+    public static class SerializedType {
+        public String field = "value";
+    }
+
+    public static class SerializedTypeSerializer implements JsonbSerializer<SerializedType> {
+        @Override
+        public void serialize(SerializedType obj, JsonGenerator generator, SerializationContext ctx) {
+            generator.write("serialized");
+        }
+    }
+
+    @Test
+    public void testClassSerializerOfCollectionElement() throws Exception {
+        // Must use a new Jsonb instance to make sure serializer cache is empty
+        try (Jsonb jsonb = JsonbBuilder.create()) {
+            assertEquals("[\"serialized\"]", jsonb.toJson(List.of(new SerializedType())));
+            assertEquals("\"serialized\"", jsonb.toJson(new SerializedType()));
+        }
     }
 
     /**

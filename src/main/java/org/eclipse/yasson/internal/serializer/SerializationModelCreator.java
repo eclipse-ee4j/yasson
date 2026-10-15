@@ -124,27 +124,25 @@ public class SerializationModelCreator {
     /**
      * Return the customization to create the serializer of a type only known at runtime with.
      * The given customization is the one of the declared type, for example {@link Object} for the elements of a raw
-     * collection, so a serializer or an adapter bound to the class of the runtime type, for example with
-     * {@code @JsonbTypeAdapter} on the class, is taken from the customization of that class when the given
-     * customization does not bind one.
+     * collection, so an adapter bound to the class of the runtime type with {@code @JsonbTypeAdapter} is taken from
+     * the customization of that class when the given customization binds neither a serializer nor an adapter.
+     * A serializer bound to the class with {@code @JsonbTypeSerializer} is already found by
+     * {@link ComponentMatcher#getSerializerBinding}.
      *
      * @param runtimeType   runtime type of the value
      * @param customization customization of the declared type
      * @return customization to use
      */
     private Customization runtimeTypeCustomization(Class<?> runtimeType, Customization customization) {
-        if (bindsSerializationComponent((ComponentBoundCustomization) customization)) {
+        ComponentBoundCustomization declared = (ComponentBoundCustomization) customization;
+        if (declared != null
+                && (declared.getSerializerBinding() != null || declared.getSerializeAdapterBinding() != null)) {
             return customization;
         }
         ClassCustomization classCustomization = jsonbContext.getMappingContext()
                 .getOrCreateClassModel(runtimeType)
                 .getClassCustomization();
-        return bindsSerializationComponent(classCustomization) ? classCustomization : customization;
-    }
-
-    private static boolean bindsSerializationComponent(ComponentBoundCustomization customization) {
-        return customization != null
-                && (customization.getSerializerBinding() != null || customization.getSerializeAdapterBinding() != null);
+        return classCustomization.getSerializeAdapterBinding() != null ? classCustomization : customization;
     }
 
     private ModelSerializer serializerChain(LinkedList<Type> chain,

@@ -152,6 +152,7 @@ public class JsonbTypeAdapterTest {
 
     @Test
     public void testClassAdapterOfCollectionElement() throws Exception {
+        // Must use a new Jsonb instance to make sure adapter cache is empty
         try (Jsonb jsonb = JsonbBuilder.create()) {
             assertEquals("[\"adapted\"]", jsonb.toJson(List.of(new AnnotatedType())));
             assertEquals("\"adapted\"", jsonb.toJson(new AnnotatedType()));
