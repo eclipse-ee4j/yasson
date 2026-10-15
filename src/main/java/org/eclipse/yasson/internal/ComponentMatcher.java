@@ -1,5 +1,6 @@
 /*
  * Copyright (c) 2016, 2022 Oracle and/or its affiliates. All rights reserved.
+ * Copyright (c) 2026 Contributors to the Eclipse Foundation
  *
  * This program and the accompanying materials are made available under the
  * terms of the Eclipse Public License v. 2.0 which is available at
@@ -418,7 +419,7 @@ public class ComponentMatcher {
                 .findParameterizedType(deserializerClass, JsonbDeserializer.class);
         Type deserializerBindingType = resolveTypeArg(deserializerRuntimeType.getActualTypeArguments()[0], deserializerClass);
         final ComponentBindings componentBindings = getBindingInfo(deserializerBindingType);
-        if (componentBindings.getDeserializer() != null && componentBindings.getDeserializer().getClass()
+        if (componentBindings.getDeserializer() != null && componentBindings.getDeserializer().getJsonbDeserializer().getClass()
                 .equals(deserializerClass)) {
             return componentBindings.getDeserializer();
         } else {
@@ -442,7 +443,8 @@ public class ComponentMatcher {
                 .findParameterizedType(serializerClass, JsonbSerializer.class);
         Type serBindingType = resolveTypeArg(serializerRuntimeType.getActualTypeArguments()[0], serializerClass);
         final ComponentBindings componentBindings = getBindingInfo(serBindingType);
-        if (componentBindings.getSerializer() != null && componentBindings.getSerializer().getClass().equals(serializerClass)) {
+        if (componentBindings.getSerializer() != null
+                && componentBindings.getSerializer().getJsonbSerializer().getClass().equals(serializerClass)) {
             return componentBindings.getSerializer();
         } else {
             JsonbSerializer serializer = instance != null ? instance : jsonbContext.getComponentInstanceCreator()
