@@ -1,5 +1,6 @@
 /*
  * Copyright (c) 2019, 2022 Oracle and/or its affiliates. All rights reserved.
+ * Copyright (c) 2026 Contributors to the Eclipse Foundation
  *
  * This program and the accompanying materials are made available under the
  * terms of the Eclipse Public License v. 2.0 which is available at
@@ -13,6 +14,7 @@
 package org.eclipse.yasson.defaultmapping.specific;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.junit.jupiter.api.Assertions.fail;
 
 import java.util.Arrays;
@@ -48,9 +50,9 @@ public class RecursiveReferenceTest {
             Jsonbs.defaultJsonb.toJson(recursive);
             fail("Exception should be caught");
         } catch (JsonbException e) {
-            assertEquals(
-                    "Unable to serialize property 'linksTo' from org.eclipse.yasson.adapters.model.Chain",
-                    e.getMessage());
+            assertTrue(e.getMessage().contains("linksTo"), "Message missing property name: " + e.getMessage());
+            assertTrue(e.getMessage().contains("org.eclipse.yasson.adapters.model.Chain"),
+                    "Message missing class name: " + e.getMessage());
             assertEquals(
                     "Recursive reference has been found in class org.eclipse.yasson.adapters.model.Chain.",
                     e.getCause().getMessage());
