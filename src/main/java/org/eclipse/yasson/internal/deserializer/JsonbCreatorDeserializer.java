@@ -1,5 +1,6 @@
 /*
  * Copyright (c) 2021, 2023 Oracle and/or its affiliates. All rights reserved.
+ * Copyright (c) 2026 Contributors to the Eclipse Foundation
  *
  * This program and the accompanying materials are made available under the
  * terms of the Eclipse Public License v. 2.0 which is available at
@@ -55,7 +56,8 @@ class JsonbCreatorDeserializer implements ModelDeserializer<JsonParser> {
                              Set<String> ignoredProperties) {
         this.propertyDeserializerChains = propertyDeserializerChains;
         this.defaultCreatorValues = defaultCreatorValues;
-        this.creatorParams = Arrays.stream(creator.getParams()).map(CreatorModel::getName).collect(Collectors.toList());
+        // Renamed like the keys of propertyDeserializerChains and defaultCreatorValues, and the JSON keys
+        this.creatorParams = Arrays.stream(creator.getParams()).map(CreatorModel::getName).map(renamer).collect(Collectors.toList());
         this.ignoredProperties = Set.copyOf(ignoredProperties);
         this.creator = creator;
         this.clazz = clazz;

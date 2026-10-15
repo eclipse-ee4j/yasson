@@ -1,5 +1,6 @@
 /*
  * Copyright (c) 2016, 2020 Oracle and/or its affiliates. All rights reserved.
+ * Copyright (c) 2026 Contributors to the Eclipse Foundation
  *
  * This program and the accompanying materials are made available under the
  * terms of the Eclipse Public License v. 2.0 which is available at
@@ -18,9 +19,12 @@ import static org.junit.jupiter.api.Assertions.*;
 import jakarta.json.bind.Jsonb;
 import jakarta.json.bind.JsonbBuilder;
 import jakarta.json.bind.JsonbConfig;
+import jakarta.json.bind.annotation.JsonbCreator;
+import jakarta.json.bind.annotation.JsonbProperty;
 import jakarta.json.bind.config.PropertyNamingStrategy;
 
 import org.eclipse.yasson.internal.model.customization.StrategiesProvider;
+import org.eclipse.yasson.records.Car;
 
 /**
  * Tests naming strategies.
@@ -98,6 +102,44 @@ public class PropertyNamingStrategyTest {
         assertResult(result);
     }
     
+    public static class Person {
+        private final String firstName;
+        private final int birthYear;
+
+        @JsonbCreator
+        public Person(@JsonbProperty("firstName") String firstName, @JsonbProperty("birthYear") int birthYear) {
+            this.firstName = firstName;
+            this.birthYear = birthYear;
+        }
+
+        public String getFirstName() {
+            return firstName;
+        }
+
+        public int getBirthYear() {
+            return birthYear;
+        }
+    }
+
+    @Test
+    public void testCaseInsensitiveWithCreator() throws Exception {
+        try (Jsonb jsonb = JsonbBuilder.create(new JsonbConfig().withPropertyNamingStrategy(PropertyNamingStrategy.CASE_INSENSITIVE))) {
+            assertEquals("Ann", jsonb.fromJson("{\"firstName\":\"Ann\"}", Person.class).getFirstName());
+            assertEquals("Ann", jsonb.fromJson("{\"FIRSTNAME\":\"Ann\"}", Person.class).getFirstName());
+            assertEquals(1990, jsonb.fromJson("{\"BirthYear\":1990}", Person.class).getBirthYear());
+            Person missing = jsonb.fromJson("{}", Person.class);
+            assertNull(missing.getFirstName());
+            assertEquals(0, missing.getBirthYear());
+        }
+    }
+
+    @Test
+    public void testCaseInsensitiveWithRecord() throws Exception {
+        try (Jsonb jsonb = JsonbBuilder.create(new JsonbConfig().withPropertyNamingStrategy(PropertyNamingStrategy.CASE_INSENSITIVE))) {
+            assertEquals(new Car("skoda", "red"), jsonb.fromJson("{\"TYPECHANGED\":\"skoda\",\"colorChanged\":\"red\"}", Car.class));
+        }
+    }
+
     @Test
     public void testIdentityCaseSensitive() {
         Jsonb jsonb = JsonbBuilder.create(new JsonbConfig().withPropertyNamingStrategy(PropertyNamingStrategy.IDENTITY));
