@@ -28,6 +28,7 @@ import java.time.Instant;
 import java.time.LocalDate;
 import java.util.List;
 import java.util.Set;
+import java.util.UUID;
 
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.containsString;
@@ -229,6 +230,23 @@ public class RecordTest {
 
         assertThat(json, containsString("\"getDisplayName\":\"skoda (green)\""));
         assertThat(json, not(containsString("\"displayName\"")));
+    }
+
+    // -----------------------------------------------------------------
+    // Issue #606 — @JsonbTypeDeserializer on record components
+    // -----------------------------------------------------------------
+
+    /**
+     * Regression test for https://github.com/eclipse-ee4j/yasson/issues/606.
+     * <p>
+     * Deserialising into a record whose component is annotated with {@code @JsonbTypeDeserializer}
+     * must invoke the custom deserializer rather than the default deserializer.
+     */
+    @Test
+    public void testRecordWithTypeDeserializer() {
+        String json = "{\"sys_id\":\"2b8f1a676f04c7c027e0cc60cb1f4ec3\"}";
+        RecordWithTypeDeserializer record = Jsonbs.defaultJsonb.fromJson(json, RecordWithTypeDeserializer.class);
+        assertThat(record.sysId(), is(UUID.fromString("2b8f1a67-6f04-c7c0-27e0-cc60cb1f4ec3")));
     }
 
     // -----------------------------------------------------------------
