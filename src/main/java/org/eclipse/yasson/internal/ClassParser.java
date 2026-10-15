@@ -1,5 +1,6 @@
 /*
  * Copyright (c) 2015, 2026 Oracle and/or its affiliates. All rights reserved.
+ * Copyright (c) 2026 Contributors to the Eclipse Foundation
  *
  * This program and the accompanying materials are made available under the
  * terms of the Eclipse Public License v. 2.0 which is available at
@@ -83,12 +84,13 @@ class ClassParser {
         sortedPropertyModels.addAll(jsonbContext.getConfigProperties().getPropertyOrdering()
                                             .orderProperties(classPropertyModels, classModel));
 
-        //reference property to creator parameter by name to merge configuration in runtime
+        //reference property to creator parameter by JSON name, which is the name of a creator parameter,
+        //so that the parameter can use the configuration of the property it is deserialized for
         JsonbCreator creator = classModel.getClassCustomization().getCreator();
         if (creator != null) {
             sortedPropertyModels.forEach(propertyModel -> {
                 for (CreatorModel creatorModel : creator.getParams()) {
-                    if (creatorModel.getName().equals(propertyModel.getPropertyName())) {
+                    if (creatorModel.getName().equals(propertyModel.getReadName())) {
                         creatorModel.getCustomization().setPropertyModel(propertyModel);
                     }
                 }

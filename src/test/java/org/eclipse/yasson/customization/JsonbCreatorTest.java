@@ -1,5 +1,6 @@
 /*
  * Copyright (c) 2016, 2026 Oracle and/or its affiliates. All rights reserved.
+ * Copyright (c) 2026 Contributors to the Eclipse Foundation
  *
  * This program and the accompanying materials are made available under the
  * terms of the Eclipse Public License v. 2.0 which is available at
@@ -16,11 +17,15 @@ import java.math.BigDecimal;
 import java.time.LocalDate;
 import java.util.Set;
 
+import jakarta.json.bind.Jsonb;
+import jakarta.json.bind.JsonbBuilder;
+import jakarta.json.bind.JsonbConfig;
 import jakarta.json.bind.JsonbException;
 import jakarta.json.bind.annotation.JsonbCreator;
 import jakarta.json.bind.annotation.JsonbDateFormat;
 import jakarta.json.bind.annotation.JsonbNumberFormat;
 import jakarta.json.bind.annotation.JsonbProperty;
+import jakarta.json.bind.config.PropertyNamingStrategy;
 
 import org.eclipse.yasson.customization.model.CreatorConstructorPojo;
 import org.eclipse.yasson.customization.model.CreatorFactoryMethodPojo;
@@ -153,6 +158,26 @@ public class JsonbCreatorTest {
     }
 
     @Test
+    public void testLocalizedConstructorMergedWithRenamedProperty() {
+        String json = "{\"date\":\"05-09-2017\"}";
+        DateConstructorMergedWithRenamedProperty result = defaultJsonb.fromJson(json, DateConstructorMergedWithRenamedProperty.class);
+        assertEquals(LocalDate.of(2017, 9, 5), result.localDate);
+    }
+
+    @Test
+    public void testLocalizedFactoryParameterMergedWithPropertyRenamedByStrategy() throws Exception {
+        JsonbConfig config = new JsonbConfig().withPropertyNamingStrategy(PropertyNamingStrategy.LOWER_CASE_WITH_UNDERSCORES);
+        try (Jsonb jsonb = JsonbBuilder.create(config)) {
+            String json = "{\"total_amount\":\"010.000\"}";
+            FactoryNumberParamMergedWithPropertyRenamedByStrategy result =
+                    jsonb.fromJson(json, FactoryNumberParamMergedWithPropertyRenamedByStrategy.class);
+            // Without the number format, "010.000" is read as 10.000, which has another scale than BigDecimal.TEN
+            assertEquals(BigDecimal.TEN, result.totalAmount);
+            assertEquals(json, jsonb.toJson(result));
+        }
+    }
+
+    @Test
     public void testCorrectCreatorParameterNames() {
         String json = "{\"string\":\"someText\", \"someParam\":null }";
         ParameterNameTester result = defaultJsonb.fromJson(json, ParameterNameTester.class);
@@ -275,6 +300,35 @@ public class JsonbCreatorTest {
                 @JsonbProperty("number") @JsonbNumberFormat(value = "000.000", locale = "en-us")
                         BigDecimal number) {
             return new FactoryNumberParam(number);
+        }
+
+    }
+
+    public static final class DateConstructorMergedWithRenamedProperty {
+        @JsonbProperty("date")
+        @JsonbDateFormat(value = "dd-MM-yyyy", locale = "cs-CZ")
+        public LocalDate localDate;
+
+        @JsonbCreator
+        public DateConstructorMergedWithRenamedProperty(@JsonbProperty("date") LocalDate localDate) {
+            this.localDate = localDate;
+        }
+
+    }
+
+    public static final class FactoryNumberParamMergedWithPropertyRenamedByStrategy {
+
+        @JsonbNumberFormat(value = "000.000", locale = "en-us")
+        public BigDecimal totalAmount;
+
+        private FactoryNumberParamMergedWithPropertyRenamedByStrategy(BigDecimal totalAmount) {
+            this.totalAmount = totalAmount;
+        }
+
+        @JsonbCreator
+        public static FactoryNumberParamMergedWithPropertyRenamedByStrategy createInstance(
+                @JsonbProperty("total_amount") BigDecimal totalAmount) {
+            return new FactoryNumberParamMergedWithPropertyRenamedByStrategy(totalAmount);
         }
 
     }
