@@ -24,6 +24,8 @@ import org.eclipse.yasson.internal.properties.MessageKeys;
 import org.eclipse.yasson.internal.properties.Messages;
 import org.junit.jupiter.api.Test;
 
+import java.time.Instant;
+import java.time.LocalDate;
 import java.util.List;
 import java.util.Set;
 
@@ -47,6 +49,18 @@ public class RecordTest {
         assertEquals(expected, json);
         Car deserialized = Jsonbs.defaultJsonb.fromJson(expected, Car.class);
         assertEquals(car, deserialized);
+    }
+
+    @Test
+    public void testRecordWithDateFormats() {
+        String json = "{\"iso\":\"2024-10-11T13:28:22Z\",\"localeOnly\":\"2024-10-11\",\"millis\":1728574424000}";
+
+        RecordWithDateFormats deserialized = Jsonbs.defaultJsonb.fromJson(json, RecordWithDateFormats.class);
+
+        assertEquals(Instant.ofEpochMilli(1728574424000L), deserialized.millis());
+        assertEquals(LocalDate.of(2024, 10, 11), deserialized.localeOnly());
+        assertEquals(Instant.parse("2024-10-11T13:28:22Z"), deserialized.iso());
+        assertEquals(json, Jsonbs.defaultJsonb.toJson(deserialized));
     }
 
     @Test
