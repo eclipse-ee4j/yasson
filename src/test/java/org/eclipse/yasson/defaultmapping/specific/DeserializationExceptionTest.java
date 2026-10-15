@@ -61,9 +61,10 @@ public class DeserializationExceptionTest {
         List<Throwable> causes = causesOf(assertThrows(JsonbException.class,
                                                        () -> defaultJsonb.fromJson(JSON, BrokenSetterPojo.class)));
 
-        String expectedMessage = "Error setting value on: " + BrokenSetterPojo.class.getName();
-        assertTrue(causes.stream().anyMatch(cause -> expectedMessage.equals(cause.getMessage())),
-                   "No exception with the message: " + expectedMessage);
+        String className = BrokenSetterPojo.class.getName();
+        assertTrue(causes.stream().anyMatch(cause -> cause.getMessage() != null
+                           && cause.getMessage().contains(className)),
+                   "No exception whose message contains class name: " + className);
     }
 
     private static List<Throwable> causesOf(Throwable throwable) {

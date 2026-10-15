@@ -41,8 +41,9 @@ class ObjectSerializer implements ModelSerializer {
                 context.setKey(key);
                 serializer.serialize(value, generator, context);
             } catch (Exception e) {
-                throw new JsonbException(Messages.getMessage(MessageKeys.SERIALIZE_PROPERTY_ERROR, key,
-                                                             value.getClass().getCanonicalName()), e);
+                throw new JsonbException(
+                        Messages.getMessage(MessageKeys.SERIALIZE_PROPERTY_ERROR, key,
+                                            value.getClass().getCanonicalName(), e.getMessage()), e);
             } finally {
                 context.setKey(null);
             }
