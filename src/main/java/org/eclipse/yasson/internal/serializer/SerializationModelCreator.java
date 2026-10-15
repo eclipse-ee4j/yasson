@@ -1,5 +1,6 @@
 /*
  * Copyright (c) 2021, 2023 Oracle and/or its affiliates. All rights reserved.
+ * Copyright (c) 2026 Contributors to the Eclipse Foundation
  *
  * This program and the accompanying materials are made available under the
  * terms of the Eclipse Public License v. 2.0 which is available at
@@ -112,11 +113,38 @@ public class SerializationModelCreator {
         //If the class instance and class of the field are the same and there has been generics specified for this field,
         //we need to use those instead of raw type.
         Class<?> rawType = ReflectionUtils.getRawType(type);
+        Customization customization = runtimeTypeCustomization(rawType, propertyCustomization);
         Class<?> rawLast = ReflectionUtils.getRawType(chain.getLast());
         if (rawLast.equals(rawType)) {
-            return serializerChainInternal(chain, chain.getLast(), propertyCustomization, rootValue, isKey, true);
+            return serializerChainInternal(chain, chain.getLast(), customization, rootValue, isKey, true);
         }
-        return serializerChainInternal(chain, type, propertyCustomization, rootValue, isKey, true);
+        return serializerChainInternal(chain, type, customization, rootValue, isKey, true);
+    }
+
+    /**
+     * Return the customization to create the serializer of a type only known at runtime with.
+     * The given customization is the one of the declared type, for example {@link Object} for the elements of a raw
+     * collection, so a serializer or an adapter bound to the class of the runtime type, for example with
+     * {@code @JsonbTypeAdapter} on the class, is taken from the customization of that class when the given
+     * customization does not bind one.
+     *
+     * @param runtimeType   runtime type of the value
+     * @param customization customization of the declared type
+     * @return customization to use
+     */
+    private Customization runtimeTypeCustomization(Class<?> runtimeType, Customization customization) {
+        if (bindsSerializationComponent((ComponentBoundCustomization) customization)) {
+            return customization;
+        }
+        ClassCustomization classCustomization = jsonbContext.getMappingContext()
+                .getOrCreateClassModel(runtimeType)
+                .getClassCustomization();
+        return bindsSerializationComponent(classCustomization) ? classCustomization : customization;
+    }
+
+    private static boolean bindsSerializationComponent(ComponentBoundCustomization customization) {
+        return customization != null
+                && (customization.getSerializerBinding() != null || customization.getSerializeAdapterBinding() != null);
     }
 
     private ModelSerializer serializerChain(LinkedList<Type> chain,

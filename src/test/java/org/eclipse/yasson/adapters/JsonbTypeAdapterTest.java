@@ -1,5 +1,6 @@
 /*
  * Copyright (c) 2016, 2026 Oracle and/or its affiliates. All rights reserved.
+ * Copyright (c) 2026 Contributors to the Eclipse Foundation
  *
  * This program and the accompanying materials are made available under the
  * terms of the Eclipse Public License v. 2.0 which is available at
@@ -19,6 +20,10 @@ import static org.eclipse.yasson.Jsonbs.*;
 import org.eclipse.yasson.TestTypeToken;
 import org.eclipse.yasson.adapters.model.*;
 
+import java.util.List;
+
+import jakarta.json.bind.Jsonb;
+import jakarta.json.bind.JsonbBuilder;
 import jakarta.json.bind.JsonbException;
 import jakarta.json.bind.adapter.JsonbAdapter;
 import jakarta.json.bind.annotation.JsonbTypeAdapter;
@@ -125,6 +130,32 @@ public class JsonbTypeAdapterTest {
     public static class BoxWithPrimitiveBooleanDeserializer {
         @JsonbTypeDeserializer(CustomBooleanDeserializer.class)
         public boolean bool;
+    }
+
+    @JsonbTypeAdapter(AnnotatedTypeAdapter.class)
+    public static class AnnotatedType {
+        public String field = "value";
+    }
+
+    public static class AnnotatedTypeAdapter implements JsonbAdapter<AnnotatedType, String> {
+
+        @Override
+        public String adaptToJson(AnnotatedType obj) {
+            return "adapted";
+        }
+
+        @Override
+        public AnnotatedType adaptFromJson(String obj) {
+            return new AnnotatedType();
+        }
+    }
+
+    @Test
+    public void testClassAdapterOfCollectionElement() throws Exception {
+        try (Jsonb jsonb = JsonbBuilder.create()) {
+            assertEquals("[\"adapted\"]", jsonb.toJson(List.of(new AnnotatedType())));
+            assertEquals("\"adapted\"", jsonb.toJson(new AnnotatedType()));
+        }
     }
 
     @Test
