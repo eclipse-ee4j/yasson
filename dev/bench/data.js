@@ -1,5 +1,5 @@
 window.BENCHMARK_DATA = {
-  "lastUpdate": 1791868114291,
+  "lastUpdate": 1792472416553,
   "repoUrl": "https://github.com/eclipse-ee4j/yasson",
   "entries": {
     "Java JMH Benchmark": [
@@ -518,6 +518,58 @@ window.BENCHMARK_DATA = {
           {
             "name": "org.eclipse.yasson.jmh.TenPropertySerializationTest.testSerialize",
             "value": 1539.4584770864246,
+            "unit": "ops/ms",
+            "extra": "iterations: 5\nforks: 5\nthreads: 1"
+          }
+        ]
+      },
+      {
+        "commit": {
+          "author": {
+            "name": "Kyle Aure",
+            "username": "KyleAure",
+            "email": "KyleJAure@gmail.com"
+          },
+          "committer": {
+            "name": "GitHub",
+            "username": "web-flow",
+            "email": "noreply@github.com"
+          },
+          "id": "6db20c8a26c3c8c5348cf5d807e0013b7e245da7",
+          "message": "Merge pull request #792 from sharanggupta/fix-456-setter-error-message\n\nFix #456: Do not call toString() of an object whose setter fails",
+          "timestamp": "2026-10-15T18:33:13Z",
+          "url": "https://github.com/eclipse-ee4j/yasson/commit/6db20c8a26c3c8c5348cf5d807e0013b7e245da7"
+        },
+        "date": 1792472416201,
+        "tool": "jmh",
+        "benches": [
+          {
+            "name": "org.eclipse.yasson.jmh.CollectionsTest.testDeserialize",
+            "value": 25.510144458655635,
+            "unit": "ops/ms",
+            "extra": "iterations: 5\nforks: 5\nthreads: 1"
+          },
+          {
+            "name": "org.eclipse.yasson.jmh.CollectionsTest.testSerialize",
+            "value": 49.51543471339157,
+            "unit": "ops/ms",
+            "extra": "iterations: 5\nforks: 5\nthreads: 1"
+          },
+          {
+            "name": "org.eclipse.yasson.jmh.ScalarDataTest.testDeserialize",
+            "value": 2027.8061220680531,
+            "unit": "ops/ms",
+            "extra": "iterations: 5\nforks: 5\nthreads: 1"
+          },
+          {
+            "name": "org.eclipse.yasson.jmh.ScalarDataTest.testSerialize",
+            "value": 3051.7547208416217,
+            "unit": "ops/ms",
+            "extra": "iterations: 5\nforks: 5\nthreads: 1"
+          },
+          {
+            "name": "org.eclipse.yasson.jmh.TenPropertySerializationTest.testSerialize",
+            "value": 868.4306875880419,
             "unit": "ops/ms",
             "extra": "iterations: 5\nforks: 5\nthreads: 1"
           }
