@@ -1,5 +1,6 @@
 /*
  * Copyright (c) 2019, 2022 Oracle and/or its affiliates. All rights reserved.
+ * Copyright (c) 2026 Contributors to the Eclipse Foundation
  *
  * This program and the accompanying materials are made available under the
  * terms of the Eclipse Public License v. 2.0 which is available at
@@ -12,8 +13,12 @@
 
 package org.eclipse.yasson.internal.model.customization;
 
+import java.lang.reflect.Type;
+
 import org.eclipse.yasson.internal.JsonbDateFormatter;
 import org.eclipse.yasson.internal.JsonbNumberFormatter;
+import org.eclipse.yasson.internal.components.AdapterBinding;
+import org.eclipse.yasson.internal.components.DeserializerBinding;
 import org.eclipse.yasson.internal.model.PropertyModel;
 
 /**
@@ -24,6 +29,7 @@ public class CreatorCustomization extends CustomizationBase {
     private final JsonbNumberFormatter numberFormatter;
     private final JsonbDateFormatter dateFormatter;
     private final boolean required;
+    private final Type parameterType;
     private PropertyModel propertyModel;
 
     /**
@@ -36,6 +42,7 @@ public class CreatorCustomization extends CustomizationBase {
         this.numberFormatter = builder.numberFormatter;
         this.dateFormatter = builder.dateFormatter;
         this.required = builder.required;
+        this.parameterType = builder.parameterType;
     }
 
     public static Builder builder() {
@@ -73,6 +80,33 @@ public class CreatorCustomization extends CustomizationBase {
     }
 
     @Override
+    public AdapterBinding getDeserializeAdapterBinding() {
+        if (inheritsPropertyBindings()) {
+            return propertyModel.getCustomization().getDeserializeAdapterBinding();
+        }
+        return super.getDeserializeAdapterBinding();
+    }
+
+    @Override
+    public DeserializerBinding<?> getDeserializerBinding() {
+        if (inheritsPropertyBindings()) {
+            return propertyModel.getCustomization().getDeserializerBinding();
+        }
+        return super.getDeserializerBinding();
+    }
+
+    /**
+     * Whether the parameter takes the adapter and deserializer of the referenced property. It does when it declares
+     * neither itself and the property is deserialized as the parameter's type, which the property's ones produce.
+     */
+    private boolean inheritsPropertyBindings() {
+        return super.getDeserializeAdapterBinding() == null
+                && super.getDeserializerBinding() == null
+                && propertyModel != null
+                && propertyModel.getPropertyDeserializationType().equals(parameterType);
+    }
+
+    @Override
     public boolean isNillable() {
         throw new UnsupportedOperationException("Not supported for creator parameters.");
     }
@@ -95,6 +129,7 @@ public class CreatorCustomization extends CustomizationBase {
         private JsonbNumberFormatter numberFormatter;
         private JsonbDateFormatter dateFormatter;
         private boolean required = false;
+        private Type parameterType;
 
         private Builder() {
         }
@@ -104,6 +139,7 @@ public class CreatorCustomization extends CustomizationBase {
             super.of(customization);
             numberFormatter = customization.numberFormatter;
             dateFormatter = customization.dateFormatter;
+            parameterType = customization.parameterType;
             return this;
         }
 
@@ -119,6 +155,11 @@ public class CreatorCustomization extends CustomizationBase {
 
         public Builder required(boolean required) {
             this.required = required;
+            return this;
+        }
+
+        public Builder parameterType(Type parameterType) {
+            this.parameterType = parameterType;
             return this;
         }
 
