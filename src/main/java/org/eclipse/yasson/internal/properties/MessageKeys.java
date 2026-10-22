@@ -327,7 +327,11 @@ public enum MessageKeys {
     /**
      * Unknown visibility strategy.
      */
-    UNKNOWN_VISIBILITY_STRATEGY("unknownVisibilityStrategy");
+    UNKNOWN_VISIBILITY_STRATEGY("unknownVisibilityStrategy"),
+    /**
+     * Two properties or creator parameters collapse to the same key under CASE_INSENSITIVE naming strategy.
+     */
+    CASE_INSENSITIVE_COLLISION("caseInsensitiveCollision");
 
     /**
      * Message bundle key.

@@ -39,6 +39,7 @@ import jakarta.json.bind.JsonbException;
 import jakarta.json.bind.config.BinaryDataStrategy;
 import jakarta.json.bind.config.PropertyNamingStrategy;
 import jakarta.json.stream.JsonParser;
+import jakarta.json.stream.JsonParser.Event;
 
 import org.eclipse.yasson.internal.DeserializationContextImpl;
 import org.eclipse.yasson.internal.JsonbConfigProperties;
@@ -214,19 +215,28 @@ public class DeserializationModelCreator {
         boolean hasCreator = creator != null;
         List<String> params = hasCreator ? creatorParamsList(creator) : Collections.emptyList();
         Function<String, String> renamer = propertyRenamer();
+        // Tracks the original property/parameter name for each renamed key under CASE_INSENSITIVE.
+        // A non-null return from put() means two names collapsed to the same key — fail fast.
+        Map<String, String> renamedKeyOrigins = new LinkedHashMap<>();
         Map<String, ModelDeserializer<JsonParser>> processors = new LinkedHashMap<>();
         Map<String, ModelDeserializer<Object>> defaultCreatorValues = new HashMap<>();
         for (PropertyModel propertyModel : classModel.getSortedProperties()) {
             if (!propertyModel.isWritable() || params.contains(propertyModel.getReadName())) {
                 continue;
             }
-            ModelDeserializer<JsonParser> modelDeserializer = memberTypeProcessor(chain, propertyModel, hasCreator);
-            processors.put(renamer.apply(propertyModel.getReadName()), modelDeserializer);
+            String originalName = propertyModel.getReadName();
+            String renamed = renamer.apply(originalName);
+            String prior = renamedKeyOrigins.put(renamed, originalName);
+            if (prior != null && isCaseInsensitive()) {
+                throw new JsonbException(Messages.getMessage(MessageKeys.CASE_INSENSITIVE_COLLISION,
+                    prior, originalName, rawType.getName(), renamed));
+            }
+            processors.put(renamed, memberTypeProcessor(chain, propertyModel, hasCreator));
         }
         for (String s : params) {
             CreatorModel creatorModel = creator.findByName(s);
             if (creatorModel == null) {
-                continue; 
+                continue;
             }
             String parameterName = renamer.apply(creatorModel.getName());
             // If the corresponding property model is write-transient (e.g. @JsonbTransient on a
@@ -236,11 +246,15 @@ public class DeserializationModelCreator {
             PropertyModel propertyModel = classModel.getPropertyModel(s);
             boolean writeTransient = propertyModel != null && propertyModel.getCustomization().isWriteTransient();
             if (!writeTransient) {
-                ModelDeserializer<JsonParser> modelDeserializer = typeProcessor(chain,
-                                                                                creatorModel.getType(),
-                                                                                creatorModel.getCustomization(),
-                                                                                JustReturn.instance());
-                processors.put(parameterName, modelDeserializer);
+                String prior = renamedKeyOrigins.put(parameterName, creatorModel.getName());
+                if (prior != null && isCaseInsensitive()) {
+                    throw new JsonbException(Messages.getMessage(MessageKeys.CASE_INSENSITIVE_COLLISION,
+                            prior, creatorModel.getName(), rawType.getName(), parameterName));
+                }
+                processors.put(parameterName, typeProcessor(chain,
+                                                            creatorModel.getType(),
+                                                            creatorModel.getCustomization(),
+                                                            JustReturn.instance()));
             }
             if (creatorModel.getCustomization().isRequired()) {
                 defaultCreatorValues.put(parameterName, new RequiredCreatorParameter(parameterName));
@@ -402,13 +416,15 @@ public class DeserializationModelCreator {
         return ignoredProperties;
     }
 
-    private Function<String, String> propertyRenamer() {
-        boolean isCaseInsensitive = jsonbContext.getConfig()
+    private boolean isCaseInsensitive() {
+        return jsonbContext.getConfig()
                 .getProperty(PROPERTY_NAMING_STRATEGY)
                 .filter(prop -> prop.equals(PropertyNamingStrategy.CASE_INSENSITIVE))
                 .isPresent();
+    }
 
-        return isCaseInsensitive
+    private Function<String, String> propertyRenamer() {
+        return isCaseInsensitive()
                 ? String::toLowerCase
                 : value -> value;
     }
