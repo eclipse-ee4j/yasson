@@ -19,6 +19,7 @@ import static org.junit.jupiter.api.Assertions.*;
 import jakarta.json.bind.Jsonb;
 import jakarta.json.bind.JsonbBuilder;
 import jakarta.json.bind.JsonbConfig;
+import jakarta.json.bind.JsonbException;
 import jakarta.json.bind.annotation.JsonbCreator;
 import jakarta.json.bind.annotation.JsonbProperty;
 import jakarta.json.bind.config.PropertyNamingStrategy;
@@ -163,5 +164,65 @@ public class PropertyNamingStrategyTest {
         assertEquals("abc", result.upperCasedProperty);
         assertEquals("def", result._startingWithUnderscoreProperty);
         assertEquals("ghi", result.CAPS_UNDERSCORE_PROPERTY);
+    }
+
+    // ----- CASE_INSENSITIVE collision tests -----
+
+    public static class CollidingPojo {
+        public String foo;
+        public String FOO;
+    }
+
+    @Test
+    public void testCaseInsensitivePojoCollisionThrows() throws Exception {
+        try (Jsonb jsonb = JsonbBuilder.create(new JsonbConfig().withPropertyNamingStrategy(PropertyNamingStrategy.CASE_INSENSITIVE))) {
+            JsonbException ex = assertThrows(JsonbException.class, () -> jsonb.fromJson("{\"foo\":\"a\"}", CollidingPojo.class));
+            assertAll(
+                    () -> assertTrue(ex.getMessage().contains("foo"),     "message should contain first property name 'foo'"),
+                    () -> assertTrue(ex.getMessage().contains("FOO"),     "message should contain second property name 'FOO'"),
+                    () -> assertTrue(ex.getMessage().contains(CollidingPojo.class.getName()), "message should contain the class name")
+            );
+        }
+    }
+
+    public static class CollidingCreator {
+        private final String firstName;
+        private final String FIRSTNAME;
+
+        @JsonbCreator
+        public CollidingCreator(@JsonbProperty("firstName") String firstName,
+                                @JsonbProperty("FIRSTNAME") String FIRSTNAME) {
+            this.firstName = firstName;
+            this.FIRSTNAME = FIRSTNAME;
+        }
+
+        public String getFirstName() { return firstName; }
+        public String getFIRSTNAME() { return FIRSTNAME; }
+    }
+
+    @Test
+    public void testCaseInsensitiveCreatorCollisionThrows() throws Exception {
+        try (Jsonb jsonb = JsonbBuilder.create(new JsonbConfig().withPropertyNamingStrategy(PropertyNamingStrategy.CASE_INSENSITIVE))) {
+            JsonbException ex = assertThrows(JsonbException.class, () -> jsonb.fromJson("{\"firstName\":\"Ann\"}", CollidingCreator.class));
+            assertAll(
+                    () -> assertTrue(ex.getMessage().contains("firstName"), "message should contain first parameter name 'firstName'"),
+                    () -> assertTrue(ex.getMessage().contains("FIRSTNAME"), "message should contain second parameter name 'FIRSTNAME'"),
+                    () -> assertTrue(ex.getMessage().contains(CollidingCreator.class.getName()), "message should contain the class name")
+            );
+        }
+    }
+
+    public record CollidingRecord(String value, String VALUE) {}
+
+    @Test
+    public void testCaseInsensitiveRecordCollisionThrows() throws Exception {
+        try (Jsonb jsonb = JsonbBuilder.create(new JsonbConfig().withPropertyNamingStrategy(PropertyNamingStrategy.CASE_INSENSITIVE))) {
+            JsonbException ex = assertThrows(JsonbException.class, () -> jsonb.fromJson("{\"value\":\"x\"}", CollidingRecord.class));
+            assertAll(
+                    () -> assertTrue(ex.getMessage().contains("value"), "message should contain first component name 'value'"),
+                    () -> assertTrue(ex.getMessage().contains("VALUE"), "message should contain second component name 'VALUE'"),
+                    () -> assertTrue(ex.getMessage().contains(CollidingRecord.class.getName()), "message should contain the class name")
+            );
+        }
     }
 }
