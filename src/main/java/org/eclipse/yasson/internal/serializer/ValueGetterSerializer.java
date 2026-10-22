@@ -1,5 +1,6 @@
 /*
  * Copyright (c) 2021, 2022 Oracle and/or its affiliates. All rights reserved.
+ * Copyright (c) 2026 Contributors to the Eclipse Foundation
  *
  * This program and the accompanying materials are made available under the
  * terms of the Eclipse Public License v. 2.0 which is available at
@@ -18,6 +19,8 @@ import jakarta.json.bind.JsonbException;
 import jakarta.json.stream.JsonGenerator;
 
 import org.eclipse.yasson.internal.SerializationContextImpl;
+import org.eclipse.yasson.internal.properties.MessageKeys;
+import org.eclipse.yasson.internal.properties.Messages;
 
 /**
  * Extractor of the serialized value from the instance.
@@ -38,7 +41,8 @@ class ValueGetterSerializer implements ModelSerializer {
         try {
             object = valueGetter.invoke(value);
         } catch (Throwable e) {
-            throw new JsonbException("Error getting value on: " + value.getClass().getName(), e);
+            throw new JsonbException(
+                    Messages.getMessage(MessageKeys.GETTING_VALUE_WITH, value.getClass().getName(), valueGetter), e);
         }
         delegate.serialize(object, generator, context);
     }

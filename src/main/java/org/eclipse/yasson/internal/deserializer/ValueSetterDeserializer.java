@@ -19,6 +19,8 @@ import java.util.Objects;
 import jakarta.json.bind.JsonbException;
 
 import org.eclipse.yasson.internal.DeserializationContextImpl;
+import org.eclipse.yasson.internal.properties.MessageKeys;
+import org.eclipse.yasson.internal.properties.Messages;
 
 /**
  * Value setter. Invokes created {@link MethodHandle} to set deserialized value to the instance.
@@ -40,7 +42,8 @@ class ValueSetterDeserializer implements ModelDeserializer<Object> {
         } catch (Throwable e) {
             // Do not call toString() of the instance, which is only partially deserialized
             String typeName = instance == null ? "null" : instance.getClass().getName();
-            throw new JsonbException("Error setting value on: " + typeName, e);
+            throw new JsonbException(
+                    Messages.getMessage(MessageKeys.SETTING_VALUE_WITH, typeName, valueSetter), e);
         }
     }
 

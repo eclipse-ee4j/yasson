@@ -88,7 +88,8 @@ class JsonbCreatorDeserializer implements ModelDeserializer<JsonParser> {
                             paramValues.put(key, o);
                         }
                     } catch (JsonbException e) {
-                        throw new JsonbException("Unable to deserialize property '" + key + "' because of: " + e.getMessage(), e);
+                        throw new JsonbException(
+                                Messages.getMessage(MessageKeys.DESERIALIZE_PROPERTY_ERROR, key, e.getMessage()), e);
                     }
                 } else if (failOnUnknownProperties && !ignoredProperties.contains(key)) {
                     throw new JsonbException(Messages.getMessage(MessageKeys.UNKNOWN_JSON_PROPERTY, key, clazz));
@@ -112,7 +113,8 @@ class JsonbCreatorDeserializer implements ModelDeserializer<JsonParser> {
                 context.getDeferredDeserializers().clear();
                 return context.getInstance();
             default:
-                throw new JsonbException("Unexpected state: " + parser.currentEvent());
+                throw new JsonbException(Messages.getMessage(MessageKeys.INTERNAL_ERROR,
+                        "Unexpected parser state: " + parser.currentEvent()));
             }
         }
         return context.getInstance();
