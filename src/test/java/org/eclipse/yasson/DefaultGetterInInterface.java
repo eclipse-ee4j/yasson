@@ -117,7 +117,7 @@ public class DefaultGetterInInterface {
         // default implementation
         Method pojoDefaultOnlyGetter = jsonbContext.getMappingContext().getOrCreateClassModel(PojoWithDefaultOnly.class).getPropertyModel("getterI").getGetter();
 
-        // default implementation overriden by super class
+        // default implementation overridden by super class
         Method pojoDefaultSuperGetter = jsonbContext.getMappingContext().getOrCreateClassModel(PojoWithDefaultSuperImplementation.class).getPropertyModel("getterI").getGetter();
 
         // default implementation
