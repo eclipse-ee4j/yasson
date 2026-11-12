@@ -12,6 +12,9 @@
 
 package org.eclipse.yasson.internal;
 
+import java.io.FilterInputStream;
+import java.io.FilterOutputStream;
+import java.io.FilterReader;
 import java.io.FilterWriter;
 import java.io.InputStream;
 import java.io.OutputStream;
@@ -74,7 +77,7 @@ public class JsonBinding implements YassonJsonb {
 
     @Override
     public <T> T fromJson(Reader reader, Class<T> type) throws JsonbException {
-        try (JsonParser parser = jsonbContext.getJsonProvider().createParser(reader)) {
+        try (JsonParser parser = jsonbContext.getJsonProvider().createParser(new CloseSuppressingReader(reader))) {
             DeserializationContextImpl unmarshaller = new DeserializationContextImpl(jsonbContext);
             return deserialize(type, parser, unmarshaller);
         }
@@ -82,7 +85,7 @@ public class JsonBinding implements YassonJsonb {
 
     @Override
     public <T> T fromJson(Reader reader, Type type) throws JsonbException {
-        try (JsonParser parser = jsonbContext.getJsonProvider().createParser(reader)) {
+        try (JsonParser parser = jsonbContext.getJsonProvider().createParser(new CloseSuppressingReader(reader))) {
             DeserializationContextImpl unmarshaller = new DeserializationContextImpl(jsonbContext);
             return deserialize(type, parser, unmarshaller);
         }
@@ -91,7 +94,7 @@ public class JsonBinding implements YassonJsonb {
     @Override
     public <T> T fromJson(InputStream stream, Class<T> clazz) throws JsonbException {
         DeserializationContextImpl unmarshaller = new DeserializationContextImpl(jsonbContext);
-        try (JsonParser parser = inputStreamParser(stream)) {
+        try (JsonParser parser = inputStreamParser(new CloseSuppressingInputStream(stream))) {
             return deserialize(clazz, parser, unmarshaller);
         }
     }
@@ -99,7 +102,7 @@ public class JsonBinding implements YassonJsonb {
     @Override
     public <T> T fromJson(InputStream stream, Type type) throws JsonbException {
         DeserializationContextImpl unmarshaller = new DeserializationContextImpl(jsonbContext);
-        try (JsonParser parser = inputStreamParser(stream)) {
+        try (JsonParser parser = inputStreamParser(new CloseSuppressingInputStream(stream))) {
             return deserialize(type, parser, unmarshaller);
         }
     }
@@ -170,7 +173,7 @@ public class JsonBinding implements YassonJsonb {
     @Override
     public void toJson(Object object, OutputStream stream) throws JsonbException {
         final SerializationContextImpl marshaller = new SerializationContextImpl(jsonbContext);
-        try (JsonGenerator generator = streamGenerator(stream)) {
+        try (JsonGenerator generator = streamGenerator(new CloseSuppressingOutputStream(stream))) {
             marshaller.marshall(object, generator);
         }
     }
@@ -178,7 +181,7 @@ public class JsonBinding implements YassonJsonb {
     @Override
     public void toJson(Object object, Type type, OutputStream stream) throws JsonbException {
         final SerializationContextImpl marshaller = new SerializationContextImpl(jsonbContext, type);
-        try (JsonGenerator generator = streamGenerator(stream)) {
+        try (JsonGenerator generator = streamGenerator(new CloseSuppressingOutputStream(stream))) {
             marshaller.marshall(object, generator);
         }
     }
@@ -238,6 +241,45 @@ public class JsonBinding implements YassonJsonb {
     private static class CloseSuppressingWriter extends FilterWriter {
 
         protected CloseSuppressingWriter(final Writer in) {
+            super(in);
+        }
+
+        @Override
+        public void close() {
+            // do not close
+        }
+
+    }
+
+    private static class CloseSuppressingOutputStream extends FilterOutputStream {
+
+        protected CloseSuppressingOutputStream(OutputStream out) {
+            super(out);
+        }
+
+        @Override
+        public void close() {
+            // do not close
+        }
+
+    }
+
+    private static class CloseSuppressingInputStream extends FilterInputStream {
+
+        protected CloseSuppressingInputStream(InputStream in) {
+            super(in);
+        }
+
+        @Override
+        public void close() {
+            // do not close
+        }
+
+    }
+
+    private static class CloseSuppressingReader extends FilterReader {
+
+        protected CloseSuppressingReader(Reader in) {
             super(in);
         }
 
