@@ -1,5 +1,6 @@
 /*
  * Copyright (c) 2015, 2026 Oracle and/or its affiliates. All rights reserved.
+ * Copyright (c) 2026 Contributors to the Eclipse Foundation
  *
  * This program and the accompanying materials are made available under the
  * terms of the Eclipse Public License v. 2.0 which is available at
@@ -86,17 +87,38 @@ class ClassParser {
         //reference property to creator parameter by name to merge configuration in runtime
         JsonbCreator creator = classModel.getClassCustomization().getCreator();
         if (creator != null) {
-            sortedPropertyModels.forEach(propertyModel -> {
-                for (CreatorModel creatorModel : creator.getParams()) {
-                    if (creatorModel.getName().equals(propertyModel.getPropertyName())) {
-                        creatorModel.getCustomization().setPropertyModel(propertyModel);
-                    }
+            for (CreatorModel creatorModel : creator.getParams()) {
+                PropertyModel propertyModel = findCreatorProperty(sortedPropertyModels, creatorModel.getName());
+                if (propertyModel != null) {
+                    creatorModel.getCustomization().setPropertyModel(propertyModel);
                 }
-            });
+            }
         }
 
         classModel.setProperties(sortedPropertyModels);
 
+    }
+
+    /**
+     * Finds the property of a creator parameter. The name of a creator parameter is a JSON name, so the property read
+     * from that name is preferred. Otherwise, the property with that Java name is used, which a parameter annotated
+     * with the Java name of its property refers to when a naming strategy changes the JSON names.
+     *
+     * @param properties properties of the class
+     * @param name name of the creator parameter
+     * @return the property or {@code null}
+     */
+    private static PropertyModel findCreatorProperty(List<PropertyModel> properties, String name) {
+        PropertyModel byJavaName = null;
+        for (PropertyModel propertyModel : properties) {
+            if (name.equals(propertyModel.getReadName())) {
+                return propertyModel;
+            }
+            if (byJavaName == null && name.equals(propertyModel.getPropertyName())) {
+                byJavaName = propertyModel;
+            }
+        }
+        return byJavaName;
     }
 
     private static void mergePropertyModels(List<PropertyModel> unsortedMerged) {
