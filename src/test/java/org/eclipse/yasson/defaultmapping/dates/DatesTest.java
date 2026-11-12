@@ -416,7 +416,7 @@ public class DatesTest {
     }
 
     @Test
-    public void testMarshalGregorianCalendar() {
+    public void testMarshallGregorianCalendar() {
         final Calendar cal = GregorianCalendar.getInstance();
         cal.clear();
         cal.set(2015, Calendar.APRIL, 3);
@@ -433,13 +433,13 @@ public class DatesTest {
     }
 
     @Test
-    public void testMarshalTimeZone() {
+    public void testMarshallTimeZone() {
         assertEquals("{\"value\":\"Europe/Prague\"}", bindingJsonb.toJson(new ScalarValueWrapper<>(TimeZone.getTimeZone("Europe/Prague"))));
         assertEquals("{\"value\":\"Europe/Prague\"}", bindingJsonb.toJson(new ScalarValueWrapper<>(SimpleTimeZone.getTimeZone("Europe/Prague"))));
     }
 
     @Test
-    public void testMarshalInstant() {
+    public void testMarshallInstant() {
         final Instant instant = Instant.parse("2015-03-03T23:00:00Z");
         InstantPojo instantPojo = new InstantPojo(instant);
 
@@ -472,12 +472,12 @@ public class DatesTest {
     }
 
     @Test
-    public void testMarshalDuration() {
+    public void testMarshallDuration() {
         assertEquals("{\"value\":\"PT5H4M\"}", bindingJsonb.toJson(new ScalarValueWrapper<>(Duration.ofHours(5).plusMinutes(4))));
     }
 
     @Test
-    public void testMarshalPeriod() {
+    public void testMarshallPeriod() {
         final Period period = Period.between(LocalDate.of(1960, Month.JANUARY, 1), LocalDate.of(1970, Month.JANUARY, 1));
         final ScalarValueWrapper<Period> value = new ScalarValueWrapper<>(period);
         assertEquals("{\"value\":\"P10Y\"}", bindingJsonb.toJson(value));
@@ -605,17 +605,37 @@ public class DatesTest {
     }
 
     @Test
-    public void testMarshalZoneId() {
+    public void testMarshallZoneId() {
         assertEquals("{\"value\":\"Europe/Prague\"}", bindingJsonb.toJson(new ScalarValueWrapper<>(ZoneId.of("Europe/Prague"))));
+        assertEquals("{\"value\":\"Z\"}", bindingJsonb.toJson(new ScalarValueWrapper<>(ZoneId.of("UTC"))));
     }
 
     @Test
-    public void testMarshalZoneOffset() {
+    public void testUnmarshallZoneId() {
+        ScalarValueWrapper<ZoneId> result1 = bindingJsonb.fromJson("{\"value\":\"Europe/Prague\"}", new TestTypeToken<ScalarValueWrapper<ZoneId>>(){}.getType());
+        assertEquals(ZoneId.of("Europe/Prague"), result1.getValue());
+
+        ScalarValueWrapper<ZoneId> result2 = bindingJsonb.fromJson("{\"value\":\"Z\"}", new TestTypeToken<ScalarValueWrapper<ZoneId>>(){}.getType());
+        assertEquals(ZoneId.of("UTC").normalized(), result2.getValue());
+    }
+
+    @Test
+    public void testMarshallZoneOffset() {
         assertEquals("{\"value\":\"+02:00\"}", bindingJsonb.toJson(new ScalarValueWrapper<>(ZoneOffset.of("+02:00"))));
+        assertEquals("{\"value\":\"Z\"}", bindingJsonb.toJson(new ScalarValueWrapper<>(ZoneOffset.UTC)));
     }
 
     @Test
-    public void testMarshalOffsetDateTime() {
+    public void testUnmarshallZoneOffset() {
+        ScalarValueWrapper<ZoneOffset> result1 = bindingJsonb.fromJson("{\"value\":\"+02:00\"}", new TestTypeToken<ScalarValueWrapper<ZoneOffset>>(){}.getType());
+        assertEquals(ZoneOffset.of("+02:00"), result1.getValue());
+
+        ScalarValueWrapper<ZoneOffset> result2 = bindingJsonb.fromJson("{\"value\":\"Z\"}", new TestTypeToken<ScalarValueWrapper<ZoneOffset>>(){}.getType());
+        assertEquals(ZoneOffset.UTC, result2.getValue());
+    }
+
+    @Test
+    public void testMarshallOffsetDateTime() {
         final OffsetDateTime dateTime = OffsetDateTime.of(2015, 2, 16, 13, 21, 0, 0, ZoneOffset.of("+05:00"));
         final OffsetDateTimePojo pojo = new OffsetDateTimePojo(dateTime);
 
@@ -630,7 +650,7 @@ public class DatesTest {
     }
 
     @Test
-    public void testMarshalOffsetTime() {
+    public void testMarshallOffsetTime() {
         final Jsonb jsonb = getJsonbWithMillisIgnored();
         final OffsetTime dateTime = OffsetTime.of(13, 21, 15, 0, ZoneOffset.of("+05:00"));
         final OffsetTimePojo pojo = new OffsetTimePojo(dateTime);
