@@ -18,8 +18,12 @@ import static org.junit.jupiter.api.Assertions.*;
 import static org.eclipse.yasson.Jsonbs.*;
 
 import org.eclipse.yasson.customization.transients.models.*;
+import jakarta.json.bind.Jsonb;
+import jakarta.json.bind.JsonbBuilder;
+import jakarta.json.bind.JsonbConfig;
 import jakarta.json.bind.JsonbException;
 import jakarta.json.bind.annotation.JsonbTransient;
+import jakarta.json.bind.config.PropertyNamingStrategy;
 
 /**
  * @author Roman Grigoriadi
@@ -216,6 +220,29 @@ public class JsonbTransientTest {
     }
 
     /**
+     * Deserialization with a {@link PropertyNamingStrategy}: a {@link JsonbTransient} record component is not bound
+     * from its translated JSON name either.
+     */
+    @Test
+    public void testJsonbTransientRecordDeserializeWithNamingStrategy() throws Exception {
+        JsonbConfig config = new JsonbConfig().withPropertyNamingStrategy(PropertyNamingStrategy.LOWER_CASE_WITH_UNDERSCORES);
+        try (Jsonb jsonb = JsonbBuilder.create(config)) {
+            JsonbTransientRecord result = jsonb.fromJson(
+                    "{\"plain_property\":\"plainProperty value\"," +
+                    "\"component_transient\":\"component transient value\"," +
+                    "\"accessor_transient\":\"accessor transient value\"," +
+                    "\"component_and_accessor_transient\":\"component and accessor transient value\"" +
+                    "}",
+                    JsonbTransientRecord.class);
+
+            assertEquals("plainProperty value", result.plainProperty());
+            assertNull(result.componentTransient());
+            assertEquals("accessor transient value", result.accessorTransient());
+            assertNull(result.componentAndAccessorTransient());
+        }
+    }
+
+    /**
      * Verifies that all meaningful combinations of {@link JsonbTransient} placement on fields,
      * getters, and setters are correctly honoured when deserialization goes through an explicit
      * {@link jakarta.json.bind.annotation.JsonbCreator} constructor.
@@ -260,6 +287,32 @@ public class JsonbTransientTest {
         // Getter-only transient: read-transient only, write is still allowed
         assertEquals("getter transient value", result.getterTransient,
                 "@JsonbTransient on getter only: deserialization should still be allowed via @JsonbCreator");
+    }
+
+    /**
+     * Deserialization with a {@link PropertyNamingStrategy} of a class whose {@link jakarta.json.bind.annotation.JsonbCreator}
+     * parameters are named like the Java properties: the write-transient properties are still not bound.
+     */
+    @Test
+    public void testJsonbTransientWithCreatorDeserializeWithNamingStrategy() throws Exception {
+        JsonbConfig config = new JsonbConfig().withPropertyNamingStrategy(PropertyNamingStrategy.LOWER_CASE_WITH_UNDERSCORES);
+        try (Jsonb jsonb = JsonbBuilder.create(config)) {
+            JsonbTransientWithCreator result = jsonb.fromJson(
+                    "{" +
+                    "\"plainProperty\":\"plain value\"," +
+                    "\"fieldTransient\":\"field transient value\"," +
+                    "\"getterTransient\":\"getter transient value\"," +
+                    "\"setterTransient\":\"setter transient value\"," +
+                    "\"allTransient\":\"all transient value\"" +
+                    "}",
+                    JsonbTransientWithCreator.class);
+
+            assertEquals("plain value", result.plainProperty);
+            assertNull(result.fieldTransient);
+            assertNull(result.setterTransient);
+            assertNull(result.allTransient);
+            assertEquals("getter transient value", result.getterTransient);
+        }
     }
 
     /**
