@@ -1,5 +1,6 @@
 /*
  * Copyright (c) 2016, 2026 Oracle and/or its affiliates. All rights reserved.
+ * Copyright (c) 2026 Contributors to the Eclipse Foundation
  *
  * This program and the accompanying materials are made available under the
  * terms of the Eclipse Public License v. 2.0 which is available at
@@ -12,15 +13,28 @@
 
 package org.eclipse.yasson.customization;
 
+import java.lang.reflect.Type;
 import java.math.BigDecimal;
 import java.time.LocalDate;
+import java.util.Arrays;
+import java.util.List;
 import java.util.Set;
 
+import jakarta.json.bind.Jsonb;
+import jakarta.json.bind.JsonbBuilder;
+import jakarta.json.bind.JsonbConfig;
+
 import jakarta.json.bind.JsonbException;
+import jakarta.json.bind.adapter.JsonbAdapter;
 import jakarta.json.bind.annotation.JsonbCreator;
 import jakarta.json.bind.annotation.JsonbDateFormat;
 import jakarta.json.bind.annotation.JsonbNumberFormat;
 import jakarta.json.bind.annotation.JsonbProperty;
+import jakarta.json.bind.annotation.JsonbTypeAdapter;
+import jakarta.json.bind.annotation.JsonbTypeDeserializer;
+import jakarta.json.bind.serializer.DeserializationContext;
+import jakarta.json.bind.serializer.JsonbDeserializer;
+import jakarta.json.stream.JsonParser;
 
 import org.eclipse.yasson.customization.model.CreatorConstructorPojo;
 import org.eclipse.yasson.customization.model.CreatorFactoryMethodPojo;
@@ -295,5 +309,222 @@ public class JsonbCreatorTest {
 
     }
 
+    public static class UpperCaseAdapter implements JsonbAdapter<String, String> {
+        @Override
+        public String adaptToJson(String obj) {
+            return obj.toLowerCase();
+        }
 
+        @Override
+        public String adaptFromJson(String obj) {
+            return obj.toUpperCase();
+        }
+    }
+
+    public static class PrefixAdapter implements JsonbAdapter<String, String> {
+        @Override
+        public String adaptToJson(String obj) {
+            return obj;
+        }
+
+        @Override
+        public String adaptFromJson(String obj) {
+            return "prefix-" + obj;
+        }
+    }
+
+    public static class UpperCaseDeserializer implements JsonbDeserializer<String> {
+        @Override
+        public String deserialize(JsonParser parser, DeserializationContext ctx, Type rtType) {
+            return parser.getString().toUpperCase();
+        }
+    }
+
+    public static class PrefixDeserializer implements JsonbDeserializer<String> {
+        @Override
+        public String deserialize(JsonParser parser, DeserializationContext ctx, Type rtType) {
+            return "prefix-" + parser.getString();
+        }
+    }
+
+    public static class CommaSeparatedAdapter implements JsonbAdapter<List<String>, String> {
+        @Override
+        public String adaptToJson(List<String> obj) {
+            return String.join(",", obj);
+        }
+
+        @Override
+        public List<String> adaptFromJson(String obj) {
+            return Arrays.asList(obj.split(","));
+        }
+    }
+
+    public static class CreatorWithAdaptedField {
+        @JsonbTypeAdapter(UpperCaseAdapter.class)
+        private final String code;
+
+        @JsonbCreator
+        public CreatorWithAdaptedField(@JsonbProperty("code") String code) {
+            this.code = code;
+        }
+
+        public String getCode() {
+            return code;
+        }
+    }
+
+    public static class CreatorWithDeserializedField {
+        @JsonbTypeDeserializer(UpperCaseDeserializer.class)
+        private final String code;
+
+        @JsonbCreator
+        public CreatorWithDeserializedField(@JsonbProperty("code") String code) {
+            this.code = code;
+        }
+
+        public String getCode() {
+            return code;
+        }
+    }
+
+    public static class CreatorWithAdaptedListField {
+        @JsonbTypeAdapter(CommaSeparatedAdapter.class)
+        private final List<String> tags;
+
+        @JsonbCreator
+        public CreatorWithAdaptedListField(@JsonbProperty("tags") List<String> tags) {
+            this.tags = tags;
+        }
+
+        public List<String> getTags() {
+            return tags;
+        }
+    }
+
+    public static class CreatorWithAdaptedFieldAndDeserializedParameter {
+        @JsonbTypeAdapter(UpperCaseAdapter.class)
+        private final String code;
+
+        @JsonbCreator
+        public CreatorWithAdaptedFieldAndDeserializedParameter(
+                @JsonbProperty("code") @JsonbTypeDeserializer(PrefixDeserializer.class) String code) {
+            this.code = code;
+        }
+
+        public String getCode() {
+            return code;
+        }
+    }
+
+    public static class CreatorWithAdaptedFieldAndParameter {
+        @JsonbTypeAdapter(UpperCaseAdapter.class)
+        private final String code;
+
+        @JsonbCreator
+        public CreatorWithAdaptedFieldAndParameter(@JsonbProperty("code") @JsonbTypeAdapter(PrefixAdapter.class) String code) {
+            this.code = code;
+        }
+
+        public String getCode() {
+            return code;
+        }
+    }
+
+    public static class Code {
+        private final String value;
+
+        public Code(String value) {
+            this.value = value;
+        }
+
+        public String getValue() {
+            return value;
+        }
+    }
+
+    public static class CreatorWithFieldOfOtherType {
+        private final Code code;
+
+        @JsonbCreator
+        public CreatorWithFieldOfOtherType(@JsonbProperty("code") String code) {
+            this.code = new Code(code);
+        }
+
+        public Code getCode() {
+            return code;
+        }
+    }
+
+    public static class CodeAdapter implements JsonbAdapter<Code, String> {
+        @Override
+        public String adaptToJson(Code obj) {
+            return obj.getValue();
+        }
+
+        @Override
+        public Code adaptFromJson(String obj) {
+            return new Code(obj);
+        }
+    }
+
+    public static class CreatorWithAdaptedFieldOfOtherType {
+        @JsonbTypeAdapter(CodeAdapter.class)
+        private final Code code;
+
+        @JsonbCreator
+        public CreatorWithAdaptedFieldOfOtherType(@JsonbProperty("code") String code) {
+            this.code = new Code(code);
+        }
+
+        public Code getCode() {
+            return code;
+        }
+    }
+
+    @Test
+    public void testCreatorParameterUsesAdapterOfField() {
+        CreatorWithAdaptedField result = defaultJsonb.fromJson("{\"code\":\"abc\"}", CreatorWithAdaptedField.class);
+        assertEquals("ABC", result.getCode());
+    }
+
+    @Test
+    public void testCreatorParameterUsesDeserializerOfField() {
+        CreatorWithDeserializedField result = defaultJsonb.fromJson("{\"code\":\"abc\"}", CreatorWithDeserializedField.class);
+        assertEquals("ABC", result.getCode());
+    }
+
+    @Test
+    public void testCreatorParameterUsesAdapterOfGenericField() {
+        CreatorWithAdaptedListField result = defaultJsonb.fromJson("{\"tags\":\"a,b\"}", CreatorWithAdaptedListField.class);
+        assertEquals(Arrays.asList("a", "b"), result.getTags());
+    }
+
+    @Test
+    public void testDeserializerOfCreatorParameterTakesPrecedenceOverAdapterOfField() {
+        CreatorWithAdaptedFieldAndDeserializedParameter result = defaultJsonb.fromJson("{\"code\":\"abc\"}",
+                                                                                       CreatorWithAdaptedFieldAndDeserializedParameter.class);
+        assertEquals("prefix-abc", result.getCode());
+    }
+
+    @Test
+    public void testAdapterOfCreatorParameterTakesPrecedenceOverField() {
+        CreatorWithAdaptedFieldAndParameter result = defaultJsonb.fromJson("{\"code\":\"abc\"}",
+                                                                           CreatorWithAdaptedFieldAndParameter.class);
+        assertEquals("prefix-abc", result.getCode());
+    }
+
+    @Test
+    public void testCreatorParameterIgnoresAdapterOfFieldWithOtherType() {
+        CreatorWithAdaptedFieldOfOtherType result = defaultJsonb.fromJson("{\"code\":\"abc\"}",
+                                                                          CreatorWithAdaptedFieldOfOtherType.class);
+        assertEquals("abc", result.getCode().getValue());
+    }
+
+    @Test
+    public void testCreatorParameterIgnoresConfiguredAdapterOfFieldType() throws Exception {
+        try (Jsonb jsonb = JsonbBuilder.create(new JsonbConfig().withAdapters(new CodeAdapter()))) {
+            CreatorWithFieldOfOtherType result = jsonb.fromJson("{\"code\":\"abc\"}", CreatorWithFieldOfOtherType.class);
+            assertEquals("abc", result.getCode().getValue());
+        }
+    }
 }
