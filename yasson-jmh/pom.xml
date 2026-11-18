@@ -13,7 +13,7 @@
 
     <groupId>org.eclipse.yasson</groupId>
     <artifactId>yasson-jmh</artifactId>
-    <version>3.0.6</version>
+    <version>3.0.7-SNAPSHOT</version>
     <description>This is a performance testing project for Yasson. It leverages a JMH technology.
         See https://openjdk.java.net/projects/code-tools/jmh/.
     </description>
