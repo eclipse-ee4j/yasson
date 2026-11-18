@@ -1,5 +1,6 @@
 /*
  * Copyright (c) 2021, 2022 Oracle and/or its affiliates. All rights reserved.
+ * Copyright (c) 2026 Contributors to the Eclipse Foundation
  *
  * This program and the accompanying materials are made available under the
  * terms of the Eclipse Public License v. 2.0 which is available at
@@ -44,7 +45,11 @@ abstract class AbstractNumberSerializer<T> extends TypeSerializer<T> {
         final NumberFormat format = NumberFormat
                 .getInstance(jsonbContext.getConfigProperties().getLocale(formatter.getLocale()));
         ((DecimalFormat) format).applyPattern(formatter.getFormat());
-        return (value, generator, context) -> generator.write(format.format(value));
+        return (value, generator, context) -> {
+            synchronized (format) {
+                generator.write(format.format(value));
+            }            
+        };
     }
 
     @Override

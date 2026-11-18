@@ -1,5 +1,6 @@
 /*
  * Copyright (c) 2021, 2022 Oracle and/or its affiliates. All rights reserved.
+ * Copyright (c) 2026 Contributors to the Eclipse Foundation
  *
  * This program and the accompanying materials are made available under the
  * terms of the Eclipse Public License v. 2.0 which is available at
@@ -56,7 +57,6 @@ abstract class AbstractNumberDeserializer<T extends Number> extends TypeDeserial
         }
 
         final JsonbNumberFormatter numberFormat = customization.getDeserializeNumberFormatter();
-        //consider synchronizing on format instance or per thread cache.
         Locale locale = builder.getConfigProperties().getLocale(numberFormat.getLocale());
         final NumberFormat format = NumberFormat.getInstance(locale);
         ((DecimalFormat) format).applyPattern(numberFormat.getFormat());
@@ -65,7 +65,9 @@ abstract class AbstractNumberDeserializer<T extends Number> extends TypeDeserial
         return (value, context) -> {
             try {
                 String updated = valueChanger.apply(value);
-                return parseNumberValue(String.valueOf(format.parse(updated)));
+                synchronized (format) {
+                    return parseNumberValue(String.valueOf(format.parse(updated)));
+                }
             } catch (ParseException e) {
                 throw new JsonbException(Messages.getMessage(MessageKeys.PARSING_NUMBER, value, numberFormat.getFormat()), e);
             }
