@@ -21,6 +21,7 @@ import org.eclipse.yasson.defaultmapping.generics.model.ScalarValueWrapper;
 import jakarta.json.bind.Jsonb;
 import jakarta.json.bind.JsonbBuilder;
 import jakarta.json.bind.JsonbConfig;
+import jakarta.json.bind.JsonbException;
 import java.time.*;
 import java.util.Calendar;
 import java.util.Date;
@@ -97,6 +98,18 @@ public class IJsonTest {
 
 
         assertEquals(localDateTime, result.getValue());
+    }
+
+    @Test
+    public void testStrictLongRejectsFractionalJsonNumber() {
+        assertThrows(JsonbException.class,
+                () -> jsonb.fromJson("{\"value\":1254.5}", new TestTypeToken<ScalarValueWrapper<Long>>() {}.getType()));
+    }
+
+    @Test
+    public void testStrictIntegerRejectsFractionalJsonNumber() {
+        assertThrows(JsonbException.class,
+                () -> jsonb.fromJson("{\"value\":1254.5}", new TestTypeToken<ScalarValueWrapper<Integer>>() {}.getType()));
     }
 
     @Test
