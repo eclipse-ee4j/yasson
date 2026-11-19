@@ -5,13 +5,12 @@
 
   <modelVersion>4.0.0</modelVersion>
 
-  <groupId>org.eclipse</groupId>
+  <groupId>org.eclipse.yasson</groupId>
   <artifactId>yasson-tck</artifactId>
-  <version>1.0.0-SNAPSHOT</version>
+  <version>2.0.5-SNAPSHOT</version>
 
   <properties>
     <jsonb.tck.version>2.0.0-SNAPSHOT</jsonb.tck.version>
-    <yasson.version>2.0.3-SNAPSHOT</yasson.version>
     <maven.compiler.source>1.8</maven.compiler.source>
     <maven.compiler.target>1.8</maven.compiler.target>
   </properties>
@@ -35,9 +34,9 @@
       <!--      <scope>test</scope>-->
     </dependency>
     <dependency>
-      <groupId>org.eclipse</groupId>
+      <groupId>org.eclipse.yasson</groupId>
       <artifactId>yasson</artifactId>
-      <version>${yasson.version}</version>
+      <version>${project.version}</version>
       <!--      Limitation to the test scope has been temporarily removed due to NumberFormatCustomizationTest, once it is removed,
         test scope will be enabled again-->
 <!--      <scope>test</scope>-->
