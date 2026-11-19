@@ -2,6 +2,7 @@
 <!--
 
     Copyright (c) 2016, 2020 Oracle and/or its affiliates. All rights reserved.
+    Copyright (c) 2026 Contributors to the Eclipse Foundation
 
     This program and the accompanying materials are made available under the
     terms of the Eclipse Public License v. 2.0 which is available at
@@ -15,18 +16,21 @@
 
 <project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
          xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+    
+    <modelVersion>4.0.0</modelVersion>
 
     <parent>
         <groupId>org.eclipse.ee4j</groupId>
         <artifactId>project</artifactId>
-        <version>1.0.6</version>
+        <version>2.0.6</version>
     </parent>
 
-    <modelVersion>4.0.0</modelVersion>
-    <groupId>org.eclipse</groupId>
+    
+    <groupId>org.eclipse.yasson</groupId>
     <artifactId>yasson</artifactId>
     <version>1.0.11-SNAPSHOT</version>
     <packaging>jar</packaging>
+
     <name>org.eclipse.yasson</name>
 
     <description>Eclipse Yasson. Reference implementation of JSR-367 (JSON-B).</description>
@@ -37,6 +41,7 @@
         <jakarta.json.version>1.1.6</jakarta.json.version>
         <jakarta.json.bind.version>1.0.2</jakarta.json.bind.version>
         <netbeans.hint.jdkPlatform>JDK_9</netbeans.hint.jdkPlatform>
+        <nexus.staging.repository>yasson-maven2-staging</nexus.staging.repository>
     </properties>
 
     <dependencies>
@@ -416,6 +421,7 @@
                                     (Yasson does read CDI which is on CP, CDI access yasson's classes with reflection)
                                     -->
                                     --add-reads org.eclipse.yasson=ALL-UNNAMED --add-opens org.eclipse.yasson/org.eclipse.yasson.internal.cdi=ALL-UNNAMED
+                                    --add-opens java.base/java.lang=ALL-UNNAMED
 
                                     --add-exports org.eclipse.yasson/org.eclipse.yasson.internal.cdi=java.naming
                                 </argLine>
